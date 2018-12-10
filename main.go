@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowser/armclient"
 	"log"
 	"time"
 )
@@ -24,7 +25,7 @@ func main() {
 
 	status := NewStatusbarWidget("status", 1, maxY-2, maxX)
 	header := NewHeaderWidget(1, 1, 70, 8)
-	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"thing", "another", "somemore", "stuff"}, 0)
+	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"Loading..."}, 0)
 	contentStart := maxX / 4
 	content := NewItemWidget(contentStart+4, 1, ((maxX/4)*3)-3, maxY-4, "This is a thing")
 
@@ -51,7 +52,14 @@ func main() {
 
 	go func() {
 		time.Sleep(time.Second * 1)
+		data, err := armclient.DoRequest("/subscriptions?api-version=2018-01-01")
+
 		g.Update(func(gui *gocui.Gui) error {
+			if err != nil {
+				content.Content = err.Error()
+				return nil
+			}
+			content.Content = data
 			statusSet(status, 0.9)
 			return nil
 		})

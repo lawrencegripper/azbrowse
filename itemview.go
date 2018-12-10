@@ -8,11 +8,11 @@ import (
 type ItemWidget struct {
 	x, y    int
 	w, h    int
-	content string
+	Content string
 }
 
 func NewItemWidget(x, y, w, h int, content string) *ItemWidget {
-	return &ItemWidget{x: x, y: y, w: w, h: h, content: content}
+	return &ItemWidget{x: x, y: y, w: w, h: h, Content: content}
 }
 
 func (w *ItemWidget) Layout(g *gocui.Gui) error {
@@ -22,7 +22,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	}
 	v.Clear()
 
-	fmt.Fprint(v, w.content)
+	fmt.Fprint(v, w.Content)
 
 	return nil
 }

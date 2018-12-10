@@ -1,6 +1,6 @@
 # Gopkg.toml example
 #
-# Refer to https://golang.github.io/dep/docs/Gopkg.toml.html
+# Refer to https://github.com/golang/dep/blob/master/docs/Gopkg.toml.md
 # for detailed Gopkg.toml documentation.
 #
 # required = ["github.com/user/thing/cmd/thing"]
@@ -25,14 +25,22 @@
 #   unused-packages = true
 
 
+[[constraint]]
+  name = "github.com/Azure/go-autorest"
+  version = "10.1.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/atotto/clipboard"
+
+[[constraint]]
+  name = "github.com/dgrijalva/jwt-go"
+  version = "3.1.0"
+
+[[constraint]]
+  name = "github.com/urfave/cli"
+  version = "1.20.0"
+
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  name = "github.com/jroimartin/gocui"
-  version = "0.4.0"
-
-[[constraint]]
-  name = "github.com/yangl900/armclient-go"
-  version = "0.2.3"
