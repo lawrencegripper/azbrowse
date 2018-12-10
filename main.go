@@ -23,11 +23,12 @@ func main() {
 	maxY = maxY - 2
 
 	status := NewStatusbarWidget("status", 1, maxY-2, maxX)
-	list := NewListWidget(1, 1, maxX/4, maxY-4, []string{"thing", "another", "somemore", "stuff"}, 0)
+	header := NewHeaderWidget(1, 1, 70, 8)
+	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"thing", "another", "somemore", "stuff"}, 0)
 	contentStart := maxX / 4
 	content := NewItemWidget(contentStart+4, 1, ((maxX/4)*3)-3, maxY-4, "This is a thing")
 
-	g.SetManager(status, list, content)
+	g.SetManager(status, list, header, content)
 	statusSet(status, 0.1)
 
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
