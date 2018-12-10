@@ -26,9 +26,9 @@ func main() {
 
 	status := NewStatusbarWidget("status", 1, maxY-2, maxX)
 	header := NewHeaderWidget(1, 1, 70, 8)
-	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"Loading..."}, 0)
 	contentStart := maxX / 4
 	content := NewItemWidget(contentStart+4, 1, ((maxX/4)*3)-3, maxY-4, "This is a thing")
+	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"Loading..."}, 0, content)
 
 	g.SetManager(status, list, header, content)
 	statusSet(status, 0.1)
@@ -42,6 +42,13 @@ func main() {
 
 	if err := g.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() - 1)
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		list.ExpandCurrentSelection()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
