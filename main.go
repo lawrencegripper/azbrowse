@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowser/armclient"
 	"log"
@@ -52,9 +53,23 @@ func main() {
 
 	go func() {
 		time.Sleep(time.Second * 1)
+
+		// Get Subscriptions
 		data, err := armclient.DoRequest("/subscriptions?api-version=2018-01-01")
+		if err != nil {
+			panic(err)
+		}
+
+		var subRequest armclient.SubResponse
+		err = json.Unmarshal([]byte(data), &subRequest)
+		if err != nil {
+			panic(err)
+		}
 
 		g.Update(func(gui *gocui.Gui) error {
+
+			list.SetSubscriptions(subRequest)
+
 			if err != nil {
 				content.Content = err.Error()
 				return nil

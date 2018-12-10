@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowser/armclient"
 )
 
 type ListWidget struct {
@@ -32,6 +33,15 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		fmt.Fprintf(v, s+"\n")
 	}
 	return nil
+}
+
+func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
+	newList := []string{}
+	for _, sub := range subs.Subs {
+		newList = append(newList, sub.DisplayName)
+	}
+
+	w.items = newList
 }
 
 func (w *ListWidget) ChangeSelection(i int) {
