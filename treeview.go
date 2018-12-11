@@ -28,6 +28,8 @@ type ListWidget struct {
 	contentView *ItemWidget
 
 	selected int
+
+	resourceApiVersionLookup map[string]string
 }
 
 func NewListWidget(x, y, w, h int, items []string, selected int, contentView *ItemWidget) *ListWidget {
@@ -74,8 +76,28 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	currentItem := w.items[w.selected]
 
 	data, err := armclient.DoRequest(currentItem.expandURL)
-
 	w.contentView.Content = data
+
+	if currentItem.itemType == SubscriptionType {
+
+		// Get Subscriptions
+		providerData, err := armclient.DoRequest("/providers?api-version=2017-05-10")
+		if err != nil {
+			panic(err)
+		}
+		var providerResponse armclient.ProvidersResponse
+		err = json.Unmarshal([]byte(providerData), &providerResponse)
+		if err != nil {
+			panic(err)
+		}
+
+		resourceToApiVersion := make(map[string]string)
+		for _, provider := range providerResponse.Providers {
+			for _, resourceType := range provider.ResourceTypes {
+				resourceToApiVersion[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
+			}
+		}
+	}
 
 	if currentItem.expandReturnType == ResourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse
@@ -110,10 +132,12 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, treeNode{
 				name:             "[" + rg.Type + "] - " + rg.Name,
 				id:               rg.ID,
-				expandURL:        rg.ID + "?api-version=latest", //TOD: This won't work we need to query the provider api to get the resource api version https://zimmergren.net/developing-with-azure-resource-manager-part-5-tip-get-the-available-api-version-for-the-arm-endpoints/
+				expandURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
 				expandReturnType: "none",
 				itemType:         ResourceType,
 			})
+			w.contentView.Content = w.resourceApiVersionLookup[rg.Type]
+
 		}
 		w.items = newItems
 		w.selected = 0

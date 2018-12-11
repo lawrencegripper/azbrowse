@@ -41,3 +41,24 @@ type ResourceReseponse struct {
 		} `json:"tags"`
 	} `json:"value"`
 }
+
+type ProvidersResponse struct {
+	Providers []struct {
+		ID            string `json:"id"`
+		Namespace     string `json:"namespace"`
+		Authorization struct {
+			ApplicationID    string `json:"applicationId"`
+			RoleDefinitionID string `json:"roleDefinitionId"`
+		} `json:"authorization,omitempty"`
+		ResourceTypes []struct {
+			ResourceType string        `json:"resourceType"`
+			Locations    []interface{} `json:"locations"`
+			APIVersions  []string      `json:"apiVersions"`
+		} `json:"resourceTypes"`
+		RegistrationState string `json:"registrationState"`
+		Authorizations    []struct {
+			ApplicationID    string `json:"applicationId"`
+			RoleDefinitionID string `json:"roleDefinitionId"`
+		} `json:"authorizations,omitempty"`
+	} `json:"value"`
+}
