@@ -24,10 +24,10 @@ func (w *HeaderWidget) Layout(g *gocui.Gui) error {
 	fmt.Fprint(v, `
 	
     _       ___                         ↑/↓:     Select resource
-   /_\   __| _ )_ _ _____ __ _____ ___  →/ENTER: Expand/View resource
-  / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_) F1:      Open Portal
+   /_\   __| _ )_ _ _____ __ _____ ___  ENTER:   Expand/View resource
+  / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_) Backspace: Go back
  /_/ \_\/__|___/_| \___/\_/\_//__/\___| F5:      Refresh 
-                                       
+                                        
  Interactive CLI for browsing Azure resources`)
 
 	return nil

@@ -26,6 +26,8 @@ type ListWidget struct {
 	w, h        int
 	items       []treeNode
 	contentView *ItemWidget
+	navStack    Stack
+	title       string
 
 	selected int
 
@@ -42,6 +44,8 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
+
+	fmt.Fprintln(v, w.title)
 
 	for i, s := range w.items {
 		if i == w.selected {
@@ -69,10 +73,25 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 		})
 	}
 
+	w.title = "Subscriptions"
 	w.items = newList
 }
 
+func (w *ListWidget) GoBack() {
+	previousPage := w.navStack.Pop()
+	w.contentView.Content = previousPage.Data
+	w.selected = 0
+	w.items = previousPage.Value
+}
+
 func (w *ListWidget) ExpandCurrentSelection() {
+	// Capture current view to navstack
+	w.navStack.Push(&Page{
+		Data:  w.contentView.Content,
+		Value: w.items,
+		Title: w.title,
+	})
+
 	currentItem := w.items[w.selected]
 
 	data, err := armclient.DoRequest(currentItem.expandURL)
@@ -118,6 +137,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 		w.items = newItems
 		w.selected = 0
+		w.title = "Resource Group>" + currentItem.name
 	}
 
 	if currentItem.expandReturnType == ResourceType {
@@ -141,6 +161,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 		w.items = newItems
 		w.selected = 0
+		w.title = "Resource"
 
 	}
 }
