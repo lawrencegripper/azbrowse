@@ -79,6 +79,9 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 
 func (w *ListWidget) GoBack() {
 	previousPage := w.navStack.Pop()
+	if previousPage == nil {
+		return
+	}
 	w.contentView.Content = previousPage.Data
 	w.selected = 0
 	w.items = previousPage.Value
@@ -97,30 +100,55 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	data, err := armclient.DoRequest(currentItem.expandURL)
 	w.contentView.Content = data
 
-	if currentItem.itemType == SubscriptionType {
+	if w.resourceApiVersionLookup == nil {
 
-		// Get Subscriptions
-		providerData, err := armclient.DoRequest("/providers?api-version=2017-05-10")
-		if err != nil {
-			panic(err)
-		}
-		var providerResponse armclient.ProvidersResponse
-		err = json.Unmarshal([]byte(providerData), &providerResponse)
-		if err != nil {
-			panic(err)
-		}
+		if currentItem.itemType == SubscriptionType {
 
-		resourceToApiVersion := make(map[string]string)
-		for _, provider := range providerResponse.Providers {
-			for _, resourceType := range provider.ResourceTypes {
-				resourceToApiVersion[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
+			// Get data from cache
+			providerData, err := get("providerCache")
+
+			if err != nil {
+				// Get Subscriptions
+				data, err = armclient.DoRequest("/providers?api-version=2017-05-10")
+				if err != nil {
+					panic(err)
+				}
+				var providerResponse armclient.ProvidersResponse
+				err = json.Unmarshal([]byte(data), &providerResponse)
+				if err != nil {
+					panic(err)
+				}
+
+				w.resourceApiVersionLookup = make(map[string]string)
+				for _, provider := range providerResponse.Providers {
+					for _, resourceType := range provider.ResourceTypes {
+						w.resourceApiVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
+					}
+				}
+
+				bytes, err := json.Marshal(w.resourceApiVersionLookup)
+				if err != nil {
+					panic(err)
+				}
+				providerData = string(bytes)
+
+				put("provderCache", providerData)
+
+			} else {
+				var providerCache map[string]string
+				err = json.Unmarshal([]byte(providerData), &providerCache)
+				if err != nil {
+					panic(err)
+				}
+				w.resourceApiVersionLookup = providerCache
 			}
 		}
+
 	}
 
 	if currentItem.expandReturnType == ResourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse
-		err = json.Unmarshal([]byte(data), &rgResponse)
+		err := json.Unmarshal([]byte(data), &rgResponse)
 		if err != nil {
 			panic(err)
 		}
@@ -137,7 +165,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 		w.items = newItems
 		w.selected = 0
-		w.title = "Resource Group>" + currentItem.name
+		w.title = currentItem.name + ">Resource Groups"
 	}
 
 	if currentItem.expandReturnType == ResourceType {
@@ -150,18 +178,16 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		newItems := []treeNode{}
 		for _, rg := range resourceResponse.Resources {
 			newItems = append(newItems, treeNode{
-				name:             "[" + rg.Type + "] - " + rg.Name,
+				name:             "[" + rg.Type + "] \n " + rg.Name,
 				id:               rg.ID,
 				expandURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
 				expandReturnType: "none",
 				itemType:         ResourceType,
 			})
-			w.contentView.Content = w.resourceApiVersionLookup[rg.Type]
-
 		}
 		w.items = newItems
 		w.selected = 0
-		w.title = "Resource"
+		w.title = w.title + ">" + currentItem.name
 
 	}
 }

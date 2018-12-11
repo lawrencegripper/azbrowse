@@ -2,32 +2,12 @@
 
 
 [[projects]]
-  digest = "1:be00686d14abcdd59f411a3c2a02c5719c50eabdd62796b303c5d55712d32a7f"
-  name = "github.com/Azure/go-autorest"
-  packages = [
-    "autorest/adal",
-    "autorest/date",
-    "version",
-  ]
-  pruneopts = "UT"
-  revision = "9bc4033dd347c7f416fca46b2f42a043dc1fbdf6"
-  version = "v10.15.5"
-
-[[projects]]
-  branch = "master"
-  digest = "1:1ca95505ec8a6d69762d2b5d9ab7e66ae619365b2e26031e220b675ff6fb010b"
-  name = "github.com/atotto/clipboard"
+  digest = "1:0f98f59e9a2f4070d66f0c9c39561f68fcd1dc837b22a852d28d0003aebd1b1e"
+  name = "github.com/boltdb/bolt"
   packages = ["."]
   pruneopts = "UT"
-  revision = "aa9549103943c05f3e8951009cdb6a0bec2c8949"
-
-[[projects]]
-  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
-  name = "github.com/dgrijalva/jwt-go"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
-  version = "v3.2.0"
+  revision = "2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8"
+  version = "v1.3.1"
 
 [[projects]]
   digest = "1:114ecad51af93a73ae6781fd0d0bc28e52b433c852b84ab4b4c109c15e6c6b6d"
@@ -54,27 +34,19 @@
   revision = "60ab7e3d12ed91bc1b2486559c4b3a6b62297577"
 
 [[projects]]
-  digest = "1:b24d38b282bacf9791408a080f606370efa3d364e4b5fd9ba0f7b87786d3b679"
-  name = "github.com/urfave/cli"
-  packages = ["."]
+  branch = "master"
+  digest = "1:418531991b3ea024fd1947c8fdd18019b3ce285025955fddc6b8e4cc4f9213fc"
+  name = "golang.org/x/sys"
+  packages = ["unix"]
   pruneopts = "UT"
-  revision = "cfb38830724cc34fedffe9a2a29fb54fa9169cd1"
-  version = "v1.20.0"
-
-[[projects]]
-  digest = "1:247ca4de254a88a171d8c325bd14a8d03e6106ea7c1b464b75fac75fae6ee549"
-  name = "github.com/yangl900/armclient-go"
-  packages = ["."]
-  pruneopts = "UT"
-  revision = "374f2cab6bd04c5f638df3baed65e3377668dd3d"
-  version = "v0.2.3"
+  revision = "7da8ea5c81829e397bdf930c5d8ba4b703616f33"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/boltdb/bolt",
     "github.com/jroimartin/gocui",
-    "github.com/yangl900/armclient-go",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1
