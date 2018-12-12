@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"github.com/lawrencegripper/azbrowse/style"
 	"log"
+	"os"
 	"time"
 
 	"github.com/jroimartin/gocui"
@@ -70,7 +72,42 @@ func main() {
 
 	if err := g.SetKeybinding("", gocui.KeyF2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		item := list.CurrentItem()
-		open.Run("https://portal.azure.com/#@" + armclient.GetTenantId() + "/resource/" + item.parentid + "/overview")
+		protalURL := os.Getenv("AZURE_PORTAL_URL")
+		if protalURL == "" {
+			protalURL = "https://portal.azure.com"
+		}
+		open.Run(protalURL + "/#@" + armclient.GetTenantId() + "/resource/" + item.parentid + "/overview")
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	// HACK: To prevent accidental deletes this method requires del to be pressed twice on a resource
+	// before it will proceed
+	var deleteConfirmItemId string
+	var deleteConfirmCount int
+	if err := g.SetKeybinding("", gocui.KeyDelete, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		item := list.CurrentItem()
+		if deleteConfirmItemId != item.id {
+			deleteConfirmItemId = item.id
+			deleteConfirmCount = 0
+		}
+		status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.deleteURL, true)
+		deleteConfirmCount++
+
+		if deleteConfirmCount > 1 {
+			status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.deleteURL, true)
+
+			res, err := armclient.DoRequest("DELETE", item.deleteURL)
+			if err != nil {
+				panic(err)
+			}
+			content.Content = style.Title("Delete response for item:"+item.deleteURL+"\n ------------------------------- \n") + res
+			status.Status("Delete request sent successfully: "+item.deleteURL, false)
+
+			deleteConfirmItemId = ""
+
+		}
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -86,7 +123,7 @@ func main() {
 		status.Status("Fetching Subscriptions", true)
 
 		// Get Subscriptions
-		data, err := armclient.DoRequest("/subscriptions?api-version=2018-01-01")
+		data, err := armclient.DoRequest("GET", "/subscriptions?api-version=2018-01-01")
 		if err != nil {
 			panic(err)
 		}

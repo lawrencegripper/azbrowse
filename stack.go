@@ -1,9 +1,10 @@
 package main
 
 type Page struct {
-	Value []treeNode
-	Data  string
-	Title string
+	Value     []treeNode
+	Data      string
+	Title     string
+	Selection int
 }
 
 // NewStack returns a new stack.

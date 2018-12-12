@@ -23,6 +23,7 @@ type treeNode struct {
 	expandURL        string
 	itemType         string
 	expandReturnType string
+	deleteURL        string
 }
 
 type ListWidget struct {
@@ -88,6 +89,7 @@ func (w *ListWidget) GoBack() {
 	w.selected = 0
 	w.items = previousPage.Value
 	w.title = previousPage.Title
+	w.selected = previousPage.Selection
 }
 
 func (w *ListWidget) ExpandCurrentSelection() {
@@ -95,15 +97,16 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.expandReturnType != "none" {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
-			Data:  w.contentView.Content,
-			Value: w.items,
-			Title: w.title,
+			Data:      w.contentView.Content,
+			Value:     w.items,
+			Title:     w.title,
+			Selection: w.selected,
 		})
 	}
 
 	w.statusView.Status("Fetching item:"+currentItem.expandURL, true)
 
-	data, err := armclient.DoRequest(currentItem.expandURL)
+	data, err := armclient.DoRequest("GET", currentItem.expandURL)
 
 	if currentItem.expandReturnType == ResourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse
@@ -121,6 +124,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
 				expandReturnType: ResourceType,
 				itemType:         ResourceGroupType,
+				deleteURL:        rg.ID + "?api-version=2017-05-10",
 			})
 		}
 		w.items = newItems
@@ -144,6 +148,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				expandURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
 				expandReturnType: "none",
 				itemType:         ResourceType,
+				deleteURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
 			})
 		}
 		w.items = newItems
@@ -188,7 +193,7 @@ func (w *ListWidget) PopulateResourceAPILookup() {
 			w.statusView.Status("Getting provider data from API", true)
 
 			// Get Subscriptions
-			data, err := armclient.DoRequest("/providers?api-version=2017-05-10")
+			data, err := armclient.DoRequest("GET", "/providers?api-version=2017-05-10")
 			if err != nil {
 				panic(err)
 			}

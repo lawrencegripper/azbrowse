@@ -28,7 +28,7 @@ func GetTenantId() string {
 	return tenantId
 }
 
-func DoRequest(path string) (string, error) {
+func DoRequest(method, path string) (string, error) {
 	url, err := getRequestURL(path)
 	if err != nil {
 		return "", err
@@ -36,7 +36,7 @@ func DoRequest(path string) (string, error) {
 
 	var reqBody string
 	client := &http.Client{}
-	req, _ := http.NewRequest("GET", url, bytes.NewReader([]byte(reqBody)))
+	req, _ := http.NewRequest(method, url, bytes.NewReader([]byte(reqBody)))
 
 	cliToken, err := aquireTokenFromAzCLI()
 	if err != nil {
