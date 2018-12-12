@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowser/style"
+	"github.com/lawrencegripper/azbrowse/style"
 )
 
 type HeaderWidget struct {

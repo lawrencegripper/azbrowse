@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowser/armclient"
-	"github.com/lawrencegripper/azbrowser/style"
+	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/style"
 )
 
 const (
@@ -57,9 +57,6 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 			fmt.Fprintf(v, "   ")
 		}
 		fmt.Fprintf(v, s.name+"\n")
-		// if s.isExpanded {
-		// 	for _, sub
-		// }
 	}
 	return nil
 }

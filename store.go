@@ -4,12 +4,14 @@ import (
 	"fmt"
 	"github.com/boltdb/bolt"
 	"log"
+	"os/user"
 )
 
 var db *bolt.DB
 
 func init() {
-	dbCreate, err := bolt.Open("azbrowse.db", 0600, nil)
+	user, _ := user.Current()
+	dbCreate, err := bolt.Open(user.HomeDir+"/.azbrowse.db", 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}

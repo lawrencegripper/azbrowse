@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowser/armclient"
+	"github.com/lawrencegripper/azbrowse/armclient"
 	open "github.com/skratchdot/open-golang/open"
 )
 
