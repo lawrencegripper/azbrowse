@@ -1,15 +1,11 @@
 package main
 
+// Page represents a previous view in the nav stack
 type Page struct {
-	Value     []treeNode
+	Value     []TreeNode
 	Data      string
 	Title     string
 	Selection int
-}
-
-// NewStack returns a new stack.
-func NewStack() *Stack {
-	return &Stack{}
 }
 
 // Stack is a basic LIFO stack that resizes as needed.

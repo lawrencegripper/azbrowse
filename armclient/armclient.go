@@ -5,29 +5,25 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 const (
-	appVersion   = "0.2.3"
-	userAgentStr = "github.com/yangl900/armclient-go"
-	flagVerbose  = "verbose"
-	flagRaw      = "raw, r"
-	flagTenantID = "tenant, t"
-	flagHeader   = "header, H"
+	userAgentStr = "github.com/lawrencegripper/azbrowse"
 )
 
-func isWriteVerb(verb string) bool {
-	v := strings.ToUpper(verb)
-	return v == "PUT" || v == "POST" || v == "PATCH"
+// func isWriteVerb(verb string) bool {
+// 	v := strings.ToUpper(verb)
+// 	return v == "PUT" || v == "POST" || v == "PATCH"
+// }
+
+var tenantID string
+
+// GetTenantID gets the current tenandid from AzCli
+func GetTenantID() string {
+	return tenantID
 }
 
-var tenantId string
-
-func GetTenantId() string {
-	return tenantId
-}
-
+// DoRequest makes an ARM rest request
 func DoRequest(method, path string) (string, error) {
 	url, err := getRequestURL(path)
 	if err != nil {
@@ -42,7 +38,7 @@ func DoRequest(method, path string) (string, error) {
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
-	tenantId = cliToken.Tenant
+	tenantID = cliToken.Tenant
 
 	req.Header.Set("Authorization", cliToken.TokenType+" "+cliToken.AccessToken)
 	req.Header.Set("User-Agent", userAgentStr)

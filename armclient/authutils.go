@@ -5,14 +5,6 @@ import (
 	"os/exec"
 )
 
-const (
-	msiEndpoint             = "http://localhost:50342/oauth2/token"
-	activeDirectoryEndpoint = "https://login.microsoftonline.com/"
-	armResource             = "https://management.core.windows.net/"
-	clientAppID             = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
-	commonTenant            = "common"
-)
-
 type azCLIToken struct {
 	AccessToken  string `json:"accessToken"`
 	TokenType    string `json:"tokenType"`

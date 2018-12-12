@@ -10,13 +10,14 @@ import (
 )
 
 const (
-	SubscriptionType  = "subscription"
-	ResourceGroupType = "resourcegroup"
-	ResourceType      = "resource"
-	ProviderCacheKey  = "providerCache"
+	subscriptionType  = "subscription"
+	resourceGroupType = "resourcegroup"
+	resourceType      = "resource"
+	providerCacheKey  = "providerCache"
 )
 
-type treeNode struct {
+// TreeNode is an item in the ListWidget
+type TreeNode struct {
 	parentid         string
 	id               string
 	name             string
@@ -26,10 +27,11 @@ type treeNode struct {
 	deleteURL        string
 }
 
+// ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
 	x, y        int
 	w, h        int
-	items       []treeNode
+	items       []TreeNode
 	contentView *ItemWidget
 	statusView  *StatusbarWidget
 	navStack    Stack
@@ -37,13 +39,15 @@ type ListWidget struct {
 
 	selected int
 
-	resourceApiVersionLookup map[string]string
+	resourceAPIVersionLookup map[string]string
 }
 
+// NewListWidget creates a new instance
 func NewListWidget(x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget) *ListWidget {
 	return &ListWidget{x: x, y: y, w: w, h: h, contentView: contentView, statusView: status}
 }
 
+// Layout draws the widget in the gocui view
 func (w *ListWidget) Layout(g *gocui.Gui) error {
 	v, err := g.SetView("listWidget", w.x, w.y, w.x+w.w, w.y+w.h)
 	if err != nil && err != gocui.ErrUnknownView {
@@ -62,15 +66,16 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
+// SetSubscriptions starts vaidation with the subs found
 func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
-	newList := []treeNode{}
+	newList := []TreeNode{}
 	for _, sub := range subs.Subs {
-		newList = append(newList, treeNode{
+		newList = append(newList, TreeNode{
 			name:             sub.DisplayName,
 			id:               sub.ID,
 			expandURL:        sub.ID + "/resourceGroups?api-version=2014-04-01",
-			itemType:         SubscriptionType,
-			expandReturnType: ResourceGroupType,
+			itemType:         subscriptionType,
+			expandReturnType: resourceGroupType,
 		})
 	}
 
@@ -80,6 +85,7 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	w.items = newList
 }
 
+// GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
 	previousPage := w.navStack.Pop()
 	if previousPage == nil {
@@ -92,6 +98,7 @@ func (w *ListWidget) GoBack() {
 	w.selected = previousPage.Selection
 }
 
+// ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
 	currentItem := w.items[w.selected]
 	if currentItem.expandReturnType != "none" {
@@ -108,22 +115,22 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	data, err := armclient.DoRequest("GET", currentItem.expandURL)
 
-	if currentItem.expandReturnType == ResourceGroupType {
+	if currentItem.expandReturnType == resourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse
 		err := json.Unmarshal([]byte(data), &rgResponse)
 		if err != nil {
 			panic(err)
 		}
 
-		newItems := []treeNode{}
+		newItems := []TreeNode{}
 		for _, rg := range rgResponse.Groups {
-			newItems = append(newItems, treeNode{
+			newItems = append(newItems, TreeNode{
 				name:             rg.Name,
 				id:               rg.ID,
 				parentid:         currentItem.id,
 				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
-				expandReturnType: ResourceType,
-				itemType:         ResourceGroupType,
+				expandReturnType: resourceType,
+				itemType:         resourceGroupType,
 				deleteURL:        rg.ID + "?api-version=2017-05-10",
 			})
 		}
@@ -132,23 +139,23 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.title = currentItem.name + ">Resource Groups"
 	}
 
-	if currentItem.expandReturnType == ResourceType {
+	if currentItem.expandReturnType == resourceType {
 		var resourceResponse armclient.ResourceReseponse
 		err = json.Unmarshal([]byte(data), &resourceResponse)
 		if err != nil {
 			panic(err)
 		}
 
-		newItems := []treeNode{}
+		newItems := []TreeNode{}
 		for _, rg := range resourceResponse.Resources {
-			newItems = append(newItems, treeNode{
+			newItems = append(newItems, TreeNode{
 				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
 				parentid:         currentItem.id,
 				id:               rg.ID,
-				expandURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
+				expandURL:        rg.ID + "?api-version=" + w.resourceAPIVersionLookup[rg.Type],
 				expandReturnType: "none",
-				itemType:         ResourceType,
-				deleteURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
+				itemType:         resourceType,
+				deleteURL:        rg.ID + "?api-version=" + w.resourceAPIVersionLookup[rg.Type],
 			})
 		}
 		w.items = newItems
@@ -166,6 +173,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 }
 
+// ChangeSelection updates the selected item
 func (w *ListWidget) ChangeSelection(i int) {
 	if i >= len(w.items) || i < 0 {
 		return
@@ -173,19 +181,23 @@ func (w *ListWidget) ChangeSelection(i int) {
 	w.selected = i
 }
 
+// CurrentSelection returns the current selection int
 func (w *ListWidget) CurrentSelection() int {
 	return w.selected
 }
 
-func (w *ListWidget) CurrentItem() *treeNode {
+// CurrentItem returns the selected item as a treenode
+func (w *ListWidget) CurrentItem() *TreeNode {
 	return &w.items[w.selected]
 }
 
+// PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
+// this is needed when requesting details from a resource as APIVersion isn't known and is required
 func (w *ListWidget) PopulateResourceAPILookup() {
-	if w.resourceApiVersionLookup == nil {
+	if w.resourceAPIVersionLookup == nil {
 		w.statusView.Status("Getting provider data from cache", true)
 		// Get data from cache
-		providerData, err := get(ProviderCacheKey)
+		providerData, err := get(providerCacheKey)
 
 		w.statusView.Status("Getting provider data from cache: Completed", false)
 
@@ -203,20 +215,20 @@ func (w *ListWidget) PopulateResourceAPILookup() {
 				panic(err)
 			}
 
-			w.resourceApiVersionLookup = make(map[string]string)
+			w.resourceAPIVersionLookup = make(map[string]string)
 			for _, provider := range providerResponse.Providers {
 				for _, resourceType := range provider.ResourceTypes {
-					w.resourceApiVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
+					w.resourceAPIVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
 				}
 			}
 
-			bytes, err := json.Marshal(w.resourceApiVersionLookup)
+			bytes, err := json.Marshal(w.resourceAPIVersionLookup)
 			if err != nil {
 				panic(err)
 			}
 			providerData = string(bytes)
 
-			put(ProviderCacheKey, providerData)
+			put(providerCacheKey, providerData)
 			w.statusView.Status("Getting provider data from API: Completed", false)
 
 		} else {
@@ -225,7 +237,7 @@ func (w *ListWidget) PopulateResourceAPILookup() {
 			if err != nil {
 				panic(err)
 			}
-			w.resourceApiVersionLookup = providerCache
+			w.resourceAPIVersionLookup = providerCache
 			w.statusView.Status("Getting provider data from cache: Completed", false)
 
 		}

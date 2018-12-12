@@ -7,15 +7,18 @@ import (
 	"github.com/lawrencegripper/azbrowse/style"
 )
 
+// HeaderWidget controls the header for the cli interface
 type HeaderWidget struct {
 	x, y int
 	w, h int
 }
 
+// NewHeaderWidget creates a new header instance
 func NewHeaderWidget(x, y, w, h int) *HeaderWidget {
 	return &HeaderWidget{x: x, y: y, w: w, h: h}
 }
 
+// Layout draws the widget in the gocui view
 func (w *HeaderWidget) Layout(g *gocui.Gui) error {
 	v, err := g.SetView("headerWidget", w.x, w.y, w.x+w.w, w.y+w.h)
 	if err != nil && err != gocui.ErrUnknownView {

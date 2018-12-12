@@ -7,7 +7,7 @@ bash -f ./install.sh
 cd ../
 
 dep ensure 
-gometalinter --vendor --disable-all --enable=errcheck --enable=vet --enable=gofmt --enable=golint --enable=deadcode --enable=varcheck --enable=structcheck --enable=misspell --deadline=15m ./...
+gometalinter --vendor --disable-all --enable=vet --enable=gofmt --enable=golint --enable=deadcode --enable=varcheck --enable=structcheck --enable=misspell --deadline=15m ./...
 
 platforms=("windows/amd64" "windows/386" "darwin/amd64" "linux/amd64" "linux/386" "linux/arm")
 
@@ -21,6 +21,7 @@ do
     if [ $GOOS = "windows" ]; then
         output_name+='.exe'
     fi  
+    echo "Building for $GOOS $GOARCH..."
 
     env GOOS=$GOOS GOARCH=$GOARCH go build -installsuffix cgo -o $output_name .
     if [ $? -ne 0 ]; then
@@ -28,3 +29,5 @@ do
         exit 1
     fi
 done
+
+echo "Completed builds, for output see ./bin"

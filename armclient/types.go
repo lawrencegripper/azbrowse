@@ -1,5 +1,6 @@
 package armclient
 
+// SubResponse Subscriptions REST type
 type SubResponse struct {
 	Subs []struct {
 		ID                   string `json:"id"`
@@ -14,6 +15,7 @@ type SubResponse struct {
 	} `json:"value"`
 }
 
+// ResourceGroupResponse ResourceGroup rest type
 type ResourceGroupResponse struct {
 	Groups []struct {
 		ID         string `json:"id"`
@@ -25,6 +27,7 @@ type ResourceGroupResponse struct {
 	} `json:"value"`
 }
 
+// ResourceReseponse Resources list rest type
 type ResourceReseponse struct {
 	Resources []struct {
 		ID   string `json:"id"`
@@ -42,6 +45,7 @@ type ResourceReseponse struct {
 	} `json:"value"`
 }
 
+// ProvidersResponse providers list rest type
 type ProvidersResponse struct {
 	Providers []struct {
 		ID            string `json:"id"`

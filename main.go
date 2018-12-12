@@ -76,7 +76,7 @@ func main() {
 		if protalURL == "" {
 			protalURL = "https://portal.azure.com"
 		}
-		open.Run(protalURL + "/#@" + armclient.GetTenantId() + "/resource/" + item.parentid + "/overview")
+		open.Run(protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.parentid + "/overview")
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -84,12 +84,12 @@ func main() {
 
 	// HACK: To prevent accidental deletes this method requires del to be pressed twice on a resource
 	// before it will proceed
-	var deleteConfirmItemId string
+	var deleteConfirmItemID string
 	var deleteConfirmCount int
 	if err := g.SetKeybinding("", gocui.KeyDelete, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		item := list.CurrentItem()
-		if deleteConfirmItemId != item.id {
-			deleteConfirmItemId = item.id
+		if deleteConfirmItemID != item.id {
+			deleteConfirmItemID = item.id
 			deleteConfirmCount = 0
 		}
 		status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.deleteURL, true)
@@ -105,7 +105,7 @@ func main() {
 			content.Content = style.Title("Delete response for item:"+item.deleteURL+"\n ------------------------------- \n") + res
 			status.Status("Delete request sent successfully: "+item.deleteURL, false)
 
-			deleteConfirmItemId = ""
+			deleteConfirmItemID = ""
 
 		}
 		return nil
