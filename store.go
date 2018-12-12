@@ -45,7 +45,7 @@ func get(key string) (string, error) {
 		s = v
 		return nil
 	})
-	if err != nil || s == nil {
+	if err != nil {
 		return "", fmt.Errorf("Failed to find item: %v", err)
 	}
 	return string(s), nil

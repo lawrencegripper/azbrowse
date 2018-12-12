@@ -1,33 +1,38 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/jroimartin/gocui"
-	"strings"
+	"time"
 )
 
 type StatusbarWidget struct {
-	name string
-	x, y int
-	w    int
-	val  float64
+	name            string
+	x, y            int
+	w               int
+	message         string
+	messageAddition string
+	loading         bool
 }
 
-func NewStatusbarWidget(name string, x, y, w int) *StatusbarWidget {
-	return &StatusbarWidget{name: name, x: x, y: y, w: w}
-}
+func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
+	widget := &StatusbarWidget{name: "statusBarWidget", x: x, y: y, w: w}
+	// Start loop for showing loading in statusbar
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			g.Update(func(gui *gocui.Gui) error {
+				if widget.loading {
+					widget.messageAddition = widget.messageAddition + "."
+				} else {
+					widget.messageAddition = ""
+				}
+				return nil
+			})
 
-func (w *StatusbarWidget) SetVal(val float64) error {
-	if val < 0 || val > 1 {
-		return errors.New("invalid value")
-	}
-	w.val = val
-	return nil
-}
-
-func (w *StatusbarWidget) Val() float64 {
-	return w.val
+		}
+	}()
+	return widget
 }
 
 func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
@@ -36,17 +41,15 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
+	v.Wrap = true
 
-	rep := int(w.val * float64(w.w-1))
-	fmt.Fprint(v, strings.Repeat("▒", rep))
-	fmt.Fprint(v, "\n"+w.name)
+	fmt.Fprint(v, w.message)
+	fmt.Fprint(v, w.messageAddition)
+
 	return nil
 }
 
-func statusSet(sw *StatusbarWidget, inc float64) error {
-	val := sw.Val() + inc
-	if val < 0 || val > 1 {
-		return nil
-	}
-	return sw.SetVal(val)
+func (w *StatusbarWidget) Status(message string, loading bool) {
+	w.message = message
+	w.loading = loading
 }

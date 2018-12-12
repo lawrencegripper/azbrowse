@@ -24,14 +24,13 @@ func main() {
 	maxX = maxX - 2
 	maxY = maxY - 2
 
-	status := NewStatusbarWidget("status", 1, maxY-2, maxX)
+	status := NewStatusbarWidget(1, maxY-2, maxX, g)
 	header := NewHeaderWidget(1, 1, 70, 8)
 	contentStart := maxX / 4
-	content := NewItemWidget(contentStart+4, 1, ((maxX/4)*3)-3, maxY-4, "This is a thing")
-	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"Loading..."}, 0, content)
+	content := NewItemWidget(contentStart+4, 1, ((maxX/4)*3)-3, maxY-4, "")
+	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"Loading..."}, 0, content, status)
 
 	g.SetManager(status, list, header, content)
-	statusSet(status, 0.1)
 
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() + 1)
@@ -75,6 +74,8 @@ func main() {
 	go func() {
 		time.Sleep(time.Second * 1)
 
+		status.Status("Fetching Subscriptions", true)
+
 		// Get Subscriptions
 		data, err := armclient.DoRequest("/subscriptions?api-version=2018-01-01")
 		if err != nil {
@@ -96,9 +97,11 @@ func main() {
 				return nil
 			}
 			content.Content = data
-			statusSet(status, 0.9)
 			return nil
 		})
+
+		status.Status("Fetching Subscriptions: Completed", false)
+
 	}()
 
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
