@@ -1,0 +1,25 @@
+sudo: required
+language: go
+addons:
+  apt:
+    packages:
+    - docker-ce
+services:
+- docker
+script:
+- bash ./scripts/ci.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: nIz87qXhaeXKucy9ivK/5D80Zb8P0QhcfhFwvxIFUz841Z7INofuyY/LdGDqmes8gElMKTxi8QdHVIrwQEkdRr3MfidCYR5lIInHlvTaNGMn3YhuebL2VJ2xAtNPTCapikZl5AB/clDXbpKkAzheHFZrKPxQKUhlSkUj32jRMH9fBzUax2qHxIekAaVZ0ruvdfel/s41197UWWYk69zNPMbWUrKkBjuTedwgmzS2qqHt2pqLyWc2w6WJ16olVfi3hQ+kHKjhqZgR3J+YvOdsSp0UDfONnQUt4OmHcJj3bvZum4o9dv/VlhTTDcGYI5Ce4EV2q6bnG4CRJfqUlkZNpcWMqWBina/JzzXGAI0/AetvLLqCossbwsXxiERZA7ug10KxqFbSM+xOvvt1JfcbKDL0B6xtOETId9gCoRMGlkKFisBMh8UYKaiP7oRIelJgu5dd7UdfEMBgk9owltyKHYueBx/5UlKyWFE435x7/1PhZVHgSQdJR+FpgfFUW+SJHt3zM0zrasbomd/Lw2bbguipNYEBV2Zq2ZxmKwm8JR6SH6hwKaid0+CN121qY/43fcr0dOmFd1hAcJUu71t0Hq1fUFldGL3yCv5mJpatSai9eCbmAUVDsNdjGaeGpQHrjbVGc9fbCT/p/VJH0AzQyatIaGs9kfN35yf3BW37Bls=
+  file: 
+    - "./bin/azbrowse-darwin-amd64"
+    - "./bin/azbrowse-linux-amd64"
+    - "./bin/azbrowse-linux-386"
+    - "./bin/azbrowse-linux-arm"
+    - "./bin/azbrowse-windows-amd64.exe"
+    - "./bin/azbrowse-windows-386.exe"
+  on:
+    repo: lawrencegripper/azbrowse
+    branch: master
