@@ -22,6 +22,12 @@ func isWriteVerb(verb string) bool {
 	return v == "PUT" || v == "POST" || v == "PATCH"
 }
 
+var tenantId string
+
+func GetTenantId() string {
+	return tenantId
+}
+
 func DoRequest(path string) (string, error) {
 	url, err := getRequestURL(path)
 	if err != nil {
@@ -36,6 +42,7 @@ func DoRequest(path string) (string, error) {
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
+	tenantId = cliToken.Tenant
 
 	req.Header.Set("Authorization", cliToken.TokenType+" "+cliToken.AccessToken)
 	req.Header.Set("User-Agent", userAgentStr)

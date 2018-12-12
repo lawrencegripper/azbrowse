@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/jroimartin/gocui"
 	"time"
+
+	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowser/style"
 )
 
 type StatusbarWidget struct {
@@ -43,7 +45,11 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Clear()
 	v.Wrap = true
 
-	fmt.Fprint(v, w.message)
+	if w.loading {
+		fmt.Fprint(v, style.Loading(w.message))
+	} else {
+		fmt.Fprint(v, style.Completed(w.message))
+	}
 	fmt.Fprint(v, w.messageAddition)
 
 	return nil

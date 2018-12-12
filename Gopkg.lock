@@ -59,6 +59,14 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:39853e1ae46a02816e2419e1f590e00682b1a6b60bb988597cf2efb84314da45"
+  name = "github.com/skratchdot/open-golang"
+  packages = ["open"]
+  pruneopts = "UT"
+  revision = "75fb7ed4208cf72d323d7d02fd1a5964a7a9073c"
+
+[[projects]]
+  branch = "master"
   digest = "1:418531991b3ea024fd1947c8fdd18019b3ce285025955fddc6b8e4cc4f9213fc"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -72,6 +80,7 @@
     "github.com/boltdb/bolt",
     "github.com/fatih/color",
     "github.com/jroimartin/gocui",
+    "github.com/skratchdot/open-golang/open",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

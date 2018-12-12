@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowser/armclient"
 	"log"
 	"time"
+
+	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowser/armclient"
+	open "github.com/skratchdot/open-golang/open"
 )
 
 func main() {
@@ -26,11 +28,10 @@ func main() {
 
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
 	header := NewHeaderWidget(1, 1, 70, 8)
-	contentStart := maxX / 4
-	content := NewItemWidget(contentStart+4, 1, ((maxX/4)*3)-3, maxY-4, "")
-	list := NewListWidget(1, 10, maxX/4, maxY-13, []string{"Loading..."}, 0, content, status)
+	content := NewItemWidget(70+2, 1, ((maxX/4)*3)-3, maxY-4, "")
+	list := NewListWidget(1, 10, 70, maxY-13, []string{"Loading..."}, 0, content, status)
 
-	g.SetManager(status, list, header, content)
+	g.SetManager(status, content, list, header)
 
 	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() + 1)
@@ -62,6 +63,14 @@ func main() {
 
 	if err := g.SetKeybinding("", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("", gocui.KeyF2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		item := list.CurrentItem()
+		open.Run("https://portal.azure.com/#@" + armclient.GetTenantId() + "/resource/" + item.parentid + "/overview")
 		return nil
 	}); err != nil {
 		log.Panicln(err)

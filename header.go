@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowser/style"
 )
 
 type HeaderWidget struct {
@@ -21,14 +23,15 @@ func (w *HeaderWidget) Layout(g *gocui.Gui) error {
 	}
 	v.Clear()
 
-	fmt.Fprint(v, `
-	
-    _       ___                         ↑/↓:     Select resource
+	fmt.Fprint(v, style.Header(`
+	                                                                      
+    _       ___                         ↑/↓:     Select resource              
    /_\   __| _ )_ _ _____ __ _____ ___  ENTER:   Expand/View resource
-  / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_) Backspace: Go back
- /_/ \_\/__|___/_| \___/\_/\_//__/\___| F5:      Refresh 
-                                        
- Interactive CLI for browsing Azure resources`)
+  / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_) Backspace: Go back           
+ /_/ \_\/__|___/_| \___/\_/\_//__/\___| F2:      Open Portal             
+                                                                     
+ Interactive CLI for browsing Azure resources                         
+                                                                       `))
 
 	return nil
 }

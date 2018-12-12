@@ -6,6 +6,7 @@ import (
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowser/armclient"
+	"github.com/lawrencegripper/azbrowser/style"
 )
 
 const (
@@ -16,6 +17,7 @@ const (
 )
 
 type treeNode struct {
+	parentid         string
 	id               string
 	name             string
 	expandURL        string
@@ -47,8 +49,6 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
-
-	fmt.Fprintln(v, w.title)
 
 	for i, s := range w.items {
 		if i == w.selected {
@@ -94,18 +94,19 @@ func (w *ListWidget) GoBack() {
 }
 
 func (w *ListWidget) ExpandCurrentSelection() {
-	// Capture current view to navstack
-	w.navStack.Push(&Page{
-		Data:  w.contentView.Content,
-		Value: w.items,
-		Title: w.title,
-	})
-
 	currentItem := w.items[w.selected]
+	if currentItem.expandReturnType != "none" {
+		// Capture current view to navstack
+		w.navStack.Push(&Page{
+			Data:  w.contentView.Content,
+			Value: w.items,
+			Title: w.title,
+		})
+	}
+
 	w.statusView.Status("Fetching item:"+currentItem.expandURL, true)
 
 	data, err := armclient.DoRequest(currentItem.expandURL)
-	w.contentView.Content = data
 
 	if currentItem.expandReturnType == ResourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse
@@ -119,6 +120,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, treeNode{
 				name:             rg.Name,
 				id:               rg.ID,
+				parentid:         currentItem.id,
 				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
 				expandReturnType: ResourceType,
 				itemType:         ResourceGroupType,
@@ -139,7 +141,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		newItems := []treeNode{}
 		for _, rg := range resourceResponse.Resources {
 			newItems = append(newItems, treeNode{
-				name:             Blue("["+rg.Type+"] \n   ") + rg.Name,
+				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
+				parentid:         currentItem.id,
 				id:               rg.ID,
 				expandURL:        rg.ID + "?api-version=" + w.resourceApiVersionLookup[rg.Type],
 				expandReturnType: "none",
@@ -151,7 +154,13 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.title = w.title + ">" + currentItem.name
 
 	}
+
+	if currentItem.expandReturnType == "none" {
+		w.title = w.title + ">" + currentItem.name
+	}
+
 	w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
+	w.contentView.Content = style.Title(w.title) + "\n-------------------------------------------------------\n" + data
 
 }
 
@@ -164,6 +173,10 @@ func (w *ListWidget) ChangeSelection(i int) {
 
 func (w *ListWidget) CurrentSelection() int {
 	return w.selected
+}
+
+func (w *ListWidget) CurrentItem() *treeNode {
+	return &w.items[w.selected]
 }
 
 func (w *ListWidget) PopulateResourceAPILookup() {
