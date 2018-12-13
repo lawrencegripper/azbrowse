@@ -70,7 +70,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyF2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("", gocui.KeyCtrlO, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		item := list.CurrentItem()
 		protalURL := os.Getenv("AZURE_PORTAL_URL")
 		if protalURL == "" {

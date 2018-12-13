@@ -18,8 +18,8 @@ ENTER:   Expand/View resource
 
 ## Operations
 
-F2:      Open Portal at this resource           
-DEL:     Delete resource the currently selected resource (Requires double press to confirm)
+CTRL+o (o for open):    Open Portal at this resource           
+DEL:                    Delete resource the currently selected resource (Requires double press to confirm)
 
 ![Demo](./docs/quickdemo-azbrowse.gif) 
 
