@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/blang/semver"
+	"github.com/lawrencegripper/azbrowse/version"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	"log"
 	"os"
@@ -16,7 +17,11 @@ func confirmAndSelfUpdate() {
 		return
 	}
 
-	v := semver.MustParse(BuildDataVersion)
+	v, err := semver.Parse(version.BuildDataVersion)
+	if err != nil {
+		log.Println(err.Error())
+		return
+	}
 	if !found || latest.Version.LTE(v) {
 		log.Println("Current version is the latest")
 		return

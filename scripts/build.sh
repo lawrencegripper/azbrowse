@@ -9,12 +9,14 @@ cd ../
 dep ensure 
 gometalinter --vendor --disable-all --enable=vet --enable=gofmt --enable=golint --enable=deadcode --enable=varcheck --enable=structcheck --enable=misspell --deadline=15m ./...
 
-VERSION="v1.0.$TRAVIS_BUILD_NUMBER"
+VERSION="1.0.$TRAVIS_BUILD_NUMBER"
 GIT_COMMIT=$(git rev-parse HEAD)
 BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 GO_VERSION=$(go version | awk '{print $3}')
 
-platforms=("windows/amd64" "windows/386" "darwin/amd64" "linux/amd64" "linux/386" "linux/arm")
+echo "Building version: $VERSION"
+
+platforms=("linux/amd64" "windows/amd64" "windows/386" "darwin/amd64" "linux/386" "linux/arm")
 
 for platform in "${platforms[@]}"
 do
@@ -28,11 +30,12 @@ do
     fi  
     echo "Building for $GOOS $GOARCH..."
 
-    env GOOS=$GOOS GOARCH=$GOARCH go build -installsuffix cgo -o $output_name . --ldflags "-w -s \
-        -X /go/src/github.com/lawrencegripper/azbrowse/version.BuildDataVersion=${VERSION} \
-        -X /go/src/github.com/lawrencegripper/azbrowse/version.BuildDataGitCommit=${GIT_COMMIT} \
-        -X /go/src/github.com/lawrencegripper/azbrowse/version.BuildDataBuildDate=${BUILD_DATE} \
-        -X /go/src/github.com/lawrencegripper/azbrowse/version.BuildDataGoVersion=${GO_VERSION}"
+    GOOS=$GOOS GOARCH=$GOARCH go build --ldflags "-w -s \
+        -X github.com/lawrencegripper/azbrowse/version.BuildDataVersion=${VERSION} \
+        -X github.com/lawrencegripper/azbrowse/version.BuildDataGitCommit=${GIT_COMMIT} \
+        -X github.com/lawrencegripper/azbrowse/version.BuildDataBuildDate=${BUILD_DATE} \
+        -X github.com/lawrencegripper/azbrowse/version.BuildDataGoVersion=${GO_VERSION}" \
+        -a -installsuffix cgo -o $output_name
 
     if [ $? -ne 0 ]; then
         echo 'An error has occurred! Aborting the script execution...'

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"github.com/blang/semver"
 	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/version"
 	"log"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -21,11 +23,11 @@ func main() {
 	if len(os.Args) == 2 {
 		arg := os.Args[1]
 		if strings.Contains(arg, "version") {
-			fmt.Println(BuildDataVersion)
-			fmt.Println(BuildDataGitCommit)
-			fmt.Println(BuildDataGoVersion)
-			fmt.Println(BuildDataPlatform)
-			fmt.Println(BuildDataBuildDate)
+			fmt.Println(version.BuildDataVersion)
+			fmt.Println(version.BuildDataGitCommit)
+			fmt.Println(version.BuildDataGoVersion)
+			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
+			fmt.Println(version.BuildDataBuildDate)
 			os.Exit(0)
 		}
 	}
@@ -38,10 +40,14 @@ func main() {
 		return
 	}
 
-	v := semver.MustParse(BuildDataVersion)
-	if !found || latest.Version.LTE(v) {
-		log.Println("Current version is the latest")
-		return
+	v, err := semver.Parse(version.BuildDataVersion)
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		if !found || latest.Version.LTE(v) {
+			log.Println("Current version is the latest")
+			return
+		}
 	}
 
 	g, err := gocui.NewGui(gocui.OutputNormal)

@@ -1,4 +1,4 @@
-package main
+package version
 
 // Overridden via ldflags
 var (
