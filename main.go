@@ -6,6 +6,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/style"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/atotto/clipboard"
@@ -73,6 +74,27 @@ func main() {
 		log.Panicln(err)
 	}
 
+	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlA, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		data, err := armclient.DoRequest("GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
+		if err != nil {
+			panic(err)
+		}
+		var opsRequest armclient.OperationsRequest
+		err = json.Unmarshal([]byte(data), &opsRequest)
+		if err != nil {
+			panic(err)
+		}
+
+		for _, resOps := range opsRequest.ResourceTypes {
+			if resOps.Name == strings.Split(list.CurrentItem().armType, "/")[1] {
+				fmt.Println("Found op:" + resOps.Operations[0].DisplayName)
+			}
+		}
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
 	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlO, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		item := list.CurrentItem()
 		protalURL := os.Getenv("AZURE_PORTAL_URL")
@@ -124,6 +146,7 @@ func main() {
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		clipboard.WriteAll(content.Content)
+		status.Status("Current resource's JSON copied to clipboard", false)
 		return nil
 	}); err != nil {
 		log.Panicln(err)

@@ -27,6 +27,8 @@ type TreeNode struct {
 	itemType         string
 	expandReturnType string
 	deleteURL        string
+	namespace        string
+	armType          string
 }
 
 // ListWidget hosts the left panel showing resources and controls the navigation
@@ -176,6 +178,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		if currentItem.itemType == resourceGroupType {
 			newItems = append(newItems, TreeNode{
 				parentid:         currentItem.id,
+				namespace:        "None",
 				name:             style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
 				id:               currentItem.id,
 				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
@@ -188,6 +191,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, TreeNode{
 				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
 				parentid:         currentItem.id,
+				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
+				armType:          rg.Type,
 				id:               rg.ID,
 				expandURL:        rg.ID + "?api-version=" + w.resourceAPIVersionLookup[rg.Type],
 				expandReturnType: "none",
