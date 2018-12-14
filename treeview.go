@@ -93,6 +93,19 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
+// SetNodes allows others to set the list nodes
+func (w *ListWidget) SetNodes(nodes []TreeNode) {
+	// Capture current view to navstack
+	w.navStack.Push(&Page{
+		Data:      w.contentView.Content,
+		Value:     w.items,
+		Title:     w.title,
+		Selection: w.selected,
+	})
+
+	w.items = nodes
+}
+
 // SetSubscriptions starts vaidation with the subs found
 func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	newList := []TreeNode{}

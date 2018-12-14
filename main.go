@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/blang/semver"
 	"github.com/lawrencegripper/azbrowse/style"
 	"log"
 	"os"
@@ -12,10 +13,37 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	open "github.com/skratchdot/open-golang/open"
 )
 
 func main() {
+	if len(os.Args) == 2 {
+		arg := os.Args[1]
+		if strings.Contains(arg, "version") {
+			fmt.Println(BuildDataVersion)
+			fmt.Println(BuildDataGitCommit)
+			fmt.Println(BuildDataGoVersion)
+			fmt.Println(BuildDataPlatform)
+			fmt.Println(BuildDataBuildDate)
+			os.Exit(0)
+		}
+	}
+
+	confirmAndSelfUpdate()
+
+	latest, found, err := selfupdate.DetectLatest("lawrencegripper/azbrowse")
+	if err != nil {
+		log.Println("Error occurred while detecting version:", err)
+		return
+	}
+
+	v := semver.MustParse(BuildDataVersion)
+	if !found || latest.Version.LTE(v) {
+		log.Println("Current version is the latest")
+		return
+	}
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -30,6 +58,10 @@ func main() {
 	// Padding
 	maxX = maxX - 2
 	maxY = maxY - 2
+
+	if maxX < 72 {
+		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
+	}
 
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
 	header := NewHeaderWidget(1, 1, 70, 9)
@@ -75,22 +107,7 @@ func main() {
 	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlA, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		data, err := armclient.DoRequest("GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
-		if err != nil {
-			panic(err)
-		}
-		var opsRequest armclient.OperationsRequest
-		err = json.Unmarshal([]byte(data), &opsRequest)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, resOps := range opsRequest.ResourceTypes {
-			if resOps.Name == strings.Split(list.CurrentItem().armType, "/")[1] {
-				fmt.Println("Found op:" + resOps.Operations[0].DisplayName)
-			}
-		}
-		return nil
+		return LoadActionsView(list)
 	}); err != nil {
 		log.Panicln(err)
 	}
@@ -188,6 +205,29 @@ func main() {
 	}
 
 	go func() {
+		time.Sleep(time.Second * 3)
+
+		view := ConfirmWidget{
+			Content: "New version available:" + latest.Version.String() +
+				" - Do you want to update? \n Yes -> ENTER \n No -> ESC",
+			Action: func() error {
+				exe, err := os.Executable()
+				if err != nil {
+					log.Println("Could not locate executable path")
+					panic(err)
+				}
+				if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
+					log.Println("Error occurred while updating binary:", err)
+					panic(err)
+				}
+				return nil
+			},
+		}
+
+		view.Layout(g)
+	}()
+
+	go func() {
 		time.Sleep(time.Second * 1)
 
 		status.Status("Fetching Subscriptions", true)
@@ -207,7 +247,6 @@ func main() {
 		g.Update(func(gui *gocui.Gui) error {
 
 			list.SetSubscriptions(subRequest)
-			g.SetCurrentView("listWidget")
 
 			if err != nil {
 				content.Content = err.Error()
