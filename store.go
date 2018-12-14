@@ -10,7 +10,7 @@ import (
 var db *bolt.DB
 
 func init() {
-	fmt.Println("Waiting for access to '~/.azbrowse.db, do you have another instance of azbrowse open?")
+	fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db, do you have another instance of azbrowse open?")
 	user, _ := user.Current()
 	dbCreate, err := bolt.Open(user.HomeDir+"/.azbrowse.db", 0600, nil)
 	if err != nil {
@@ -30,6 +30,8 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("Loading db complete")
+
 }
 
 func put(key, value string) error {

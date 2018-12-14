@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/lawrencegripper/azbrowse/style"
 	"log"
 	"os"
@@ -12,6 +13,8 @@ import (
 	open "github.com/skratchdot/open-golang/open"
 )
 
+var setupKeyBindings func()
+
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -20,7 +23,7 @@ func main() {
 	defer g.Close()
 
 	g.Highlight = true
-	g.SelFgColor = gocui.ColorRed
+	g.SelFgColor = gocui.ColorBlue
 
 	// help := NewHelpWidget("help", 1, 1, helpText)
 	maxX, maxY := g.Size()
@@ -29,54 +32,92 @@ func main() {
 	maxY = maxY - 2
 
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
-	header := NewHeaderWidget(1, 1, 70, 8)
-	content := NewItemWidget(70+2, 1, ((maxX/4)*3)-3, maxY-4, "")
-	list := NewListWidget(1, 10, 70, maxY-13, []string{"Loading..."}, 0, content, status)
+	header := NewHeaderWidget(1, 1, 70, 9)
+	content := NewItemWidget(70+2, 1, maxX-70-1, maxY-4, "")
+	list := NewListWidget(1, 11, 70, maxY-14, []string{"Loading..."}, 0, content, status)
 
 	g.SetManager(status, content, list, header)
+	g.SetCurrentView("listWidget")
 
-	if err := g.SetKeybinding("", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() + 1)
 		return nil
 	}); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyArrowUp, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyArrowUp, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() - 1)
 		return nil
 	}); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ExpandCurrentSelection()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyCtrlO, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlO, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		item := list.CurrentItem()
 		protalURL := os.Getenv("AZURE_PORTAL_URL")
 		if protalURL == "" {
 			protalURL = "https://portal.azure.com"
 		}
 		open.Run(protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.parentid + "/overview")
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	editModelEnabled := false
+	if err := g.SetKeybinding("", gocui.KeyCtrlE, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		editModelEnabled = !editModelEnabled
+		if editModelEnabled {
+			g.Cursor = true
+			g.SetCurrentView("itemWidget")
+		} else {
+			g.Cursor = false
+			g.SetCurrentView("listWidget")
+		}
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	isFullScreen := false
+	if err := g.SetKeybinding("", gocui.KeyCtrlF, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		isFullScreen = !isFullScreen
+		if isFullScreen {
+			g.Cursor = true
+			maxX, maxY := g.Size()
+			v, _ := g.SetView("fullscreenContent", 0, 0, maxX, maxY)
+			v.Editable = true
+			v.Frame = false
+			v.Wrap = true
+			fmt.Fprintf(v, content.Content)
+			g.SetCurrentView("fullscreenContent")
+		} else {
+			g.Cursor = false
+			g.DeleteView("fullscreenContent")
+			g.SetCurrentView("listWidget")
+		}
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -137,6 +178,7 @@ func main() {
 		g.Update(func(gui *gocui.Gui) error {
 
 			list.SetSubscriptions(subRequest)
+			g.SetCurrentView("listWidget")
 
 			if err != nil {
 				content.Content = err.Error()
