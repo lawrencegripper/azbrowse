@@ -197,6 +197,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/atotto/clipboard",
+    "github.com/blang/semver",
     "github.com/boltdb/bolt",
     "github.com/fatih/color",
     "github.com/jroimartin/gocui",

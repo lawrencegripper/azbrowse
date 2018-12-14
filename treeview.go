@@ -15,6 +15,7 @@ const (
 	resourceGroupType = "resourcegroup"
 	resourceType      = "resource"
 	deploymentType    = "deployment"
+	actionType        = "action"
 	providerCacheKey  = "providerCache"
 )
 
@@ -95,6 +96,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 
 // SetNodes allows others to set the list nodes
 func (w *ListWidget) SetNodes(nodes []TreeNode) {
+	w.selected = 0
 	// Capture current view to navstack
 	w.navStack.Push(&Page{
 		Data:      w.contentView.Content,
@@ -141,7 +143,7 @@ func (w *ListWidget) GoBack() {
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
 	currentItem := w.items[w.selected]
-	if currentItem.expandReturnType != "none" {
+	if currentItem.expandReturnType != "none" && currentItem.expandReturnType != actionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
 			Data:      w.contentView.Content,
@@ -151,9 +153,18 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		})
 	}
 
-	w.statusView.Status("Fetching item:"+currentItem.expandURL, true)
+	method := "GET"
+	if currentItem.expandReturnType == actionType {
+		method = "POST"
+	}
+	w.statusView.Status("Requesting:"+currentItem.expandURL, true)
 
-	data, err := armclient.DoRequest("GET", currentItem.expandURL)
+	data, err := armclient.DoRequest(method, currentItem.expandURL)
+	if err != nil {
+		w.statusView.Status("Failed"+err.Error()+currentItem.expandURL, false)
+	} else {
+		w.title = "Action Succeeded: " + currentItem.expandURL
+	}
 
 	if currentItem.expandReturnType == resourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse

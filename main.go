@@ -203,30 +203,6 @@ func main() {
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
 	}
-
-	go func() {
-		time.Sleep(time.Second * 3)
-
-		view := ConfirmWidget{
-			Content: "New version available:" + latest.Version.String() +
-				" - Do you want to update? \n Yes -> ENTER \n No -> ESC",
-			Action: func() error {
-				exe, err := os.Executable()
-				if err != nil {
-					log.Println("Could not locate executable path")
-					panic(err)
-				}
-				if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
-					log.Println("Error occurred while updating binary:", err)
-					panic(err)
-				}
-				return nil
-			},
-		}
-
-		view.Layout(g)
-	}()
-
 	go func() {
 		time.Sleep(time.Second * 1)
 
@@ -245,6 +221,7 @@ func main() {
 		}
 
 		g.Update(func(gui *gocui.Gui) error {
+			g.SetCurrentView("listWidget")
 
 			list.SetSubscriptions(subRequest)
 

@@ -67,6 +67,7 @@ type ProvidersResponse struct {
 	} `json:"value"`
 }
 
+// OperationsRequest list the actions that can be performed
 type OperationsRequest struct {
 	DisplayName string `json:"displayName"`
 	Operations  []struct {
