@@ -27,12 +27,12 @@ func (w *HeaderWidget) Layout(g *gocui.Gui) error {
 	v.Clear()
 
 	fmt.Fprint(v, style.Header(`
-                                        CTLT+E:  Toggle browse JSON    
-                                        CTLT+F:  Toggle Fullscreen                                        
-    _       ___                         ↑/↓:     Select resource              
+    CTLT+E:  Toggle browse JSON         CTLT+F:  Toggle Fullscreen        
+    CTRL+O:  Open Portal                CTLT+S:  Save JSON to clipboard                                        
+    _       ___                                                        
    /_\   __| _ )_ _ _____ __ _____ ___  ENTER:   Expand/View resource
   / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_) Backspace: Go back           
- /_/ \_\/__|___/_| \___/\_/\_//__/\___| CTRL+O:  Open Portal             
+ /_/ \_\/__|___/_| \___/\_/\_//__/\___| ↑/↓:     Select resource              
                                         DEL:     Delete resource                             
  Interactive CLI for browsing Azure resources                         
                                                                        `))

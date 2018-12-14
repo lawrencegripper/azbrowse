@@ -8,12 +8,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
 	open "github.com/skratchdot/open-golang/open"
 )
-
-var setupKeyBindings func()
 
 func main() {
 	g, err := gocui.NewGui(gocui.OutputNormal)
@@ -118,6 +117,13 @@ func main() {
 			g.DeleteView("fullscreenContent")
 			g.SetCurrentView("listWidget")
 		}
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		clipboard.WriteAll(content.Content)
 		return nil
 	}); err != nil {
 		log.Panicln(err)

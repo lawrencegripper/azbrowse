@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  digest = "1:1ca95505ec8a6d69762d2b5d9ab7e66ae619365b2e26031e220b675ff6fb010b"
+  name = "github.com/atotto/clipboard"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "aa9549103943c05f3e8951009cdb6a0bec2c8949"
+  version = "v0.1.1"
+
+[[projects]]
   digest = "1:0f98f59e9a2f4070d66f0c9c39561f68fcd1dc837b22a852d28d0003aebd1b1e"
   name = "github.com/boltdb/bolt"
   packages = ["."]
@@ -77,6 +85,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/atotto/clipboard",
     "github.com/boltdb/bolt",
     "github.com/fatih/color",
     "github.com/jroimartin/gocui",

@@ -14,6 +14,7 @@ const (
 	subscriptionType  = "subscription"
 	resourceGroupType = "resourcegroup"
 	resourceType      = "resource"
+	deploymentType    = "deployment"
 	providerCacheKey  = "providerCache"
 )
 
@@ -171,6 +172,18 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 
 		newItems := []TreeNode{}
+		// Add Deployments
+		if currentItem.itemType == resourceGroupType {
+			newItems = append(newItems, TreeNode{
+				parentid:         currentItem.id,
+				name:             style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
+				id:               currentItem.id,
+				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
+				expandReturnType: deploymentType,
+				itemType:         resourceType,
+				deleteURL:        "NotSupported",
+			})
+		}
 		for _, rg := range resourceResponse.Resources {
 			newItems = append(newItems, TreeNode{
 				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
@@ -185,7 +198,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.items = newItems
 		w.selected = 0
 		w.title = w.title + ">" + currentItem.name
-
 	}
 
 	if currentItem.expandReturnType == "none" {
