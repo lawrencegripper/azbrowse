@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
@@ -55,14 +56,37 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	}
 	v.Clear()
 
-	for i, s := range w.items {
-		if i == w.selected {
-			fmt.Fprintf(v, "▶  ")
-		} else {
-			fmt.Fprintf(v, "   ")
-		}
-		fmt.Fprintf(v, s.name+"\n")
+	if len(w.items) < 1 {
+		return nil
 	}
+
+	linesUsedCount := 0
+	allItems := make([]string, 0, len(w.items))
+
+	for i, s := range w.items {
+		var itemToShow string
+		if i == w.selected {
+			itemToShow = "▶  "
+		} else {
+			itemToShow = "   "
+		}
+		itemToShow = itemToShow + s.name + "\n"
+
+		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
+		allItems = append(allItems, itemToShow)
+	}
+
+	linesPerItem := linesUsedCount / len(w.items)
+	maxItemsCanShow := w.h / linesPerItem
+
+	for i, item := range allItems {
+		// Skip items above the selection to allow scrolling
+		if w.selected > maxItemsCanShow && i < w.selected {
+			continue
+		}
+		fmt.Fprintf(v, item)
+	}
+
 	return nil
 }
 

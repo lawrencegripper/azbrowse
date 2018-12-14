@@ -10,6 +10,7 @@ import (
 var db *bolt.DB
 
 func init() {
+	fmt.Println("Waiting for access to '~/.azbrowse.db, do you have another instance of azbrowse open?")
 	user, _ := user.Current()
 	dbCreate, err := bolt.Open(user.HomeDir+"/.azbrowse.db", 0600, nil)
 	if err != nil {
