@@ -15,6 +15,7 @@ const (
 	resourceGroupType = "resourcegroup"
 	resourceType      = "resource"
 	deploymentType    = "deployment"
+	actionType        = "action"
 	providerCacheKey  = "providerCache"
 )
 
@@ -27,6 +28,8 @@ type TreeNode struct {
 	itemType         string
 	expandReturnType string
 	deleteURL        string
+	namespace        string
+	armType          string
 }
 
 // ListWidget hosts the left panel showing resources and controls the navigation
@@ -91,6 +94,20 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
+// SetNodes allows others to set the list nodes
+func (w *ListWidget) SetNodes(nodes []TreeNode) {
+	w.selected = 0
+	// Capture current view to navstack
+	w.navStack.Push(&Page{
+		Data:      w.contentView.Content,
+		Value:     w.items,
+		Title:     w.title,
+		Selection: w.selected,
+	})
+
+	w.items = nodes
+}
+
 // SetSubscriptions starts vaidation with the subs found
 func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	newList := []TreeNode{}
@@ -126,7 +143,7 @@ func (w *ListWidget) GoBack() {
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
 	currentItem := w.items[w.selected]
-	if currentItem.expandReturnType != "none" {
+	if currentItem.expandReturnType != "none" && currentItem.expandReturnType != actionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
 			Data:      w.contentView.Content,
@@ -136,9 +153,18 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		})
 	}
 
-	w.statusView.Status("Fetching item:"+currentItem.expandURL, true)
+	method := "GET"
+	if currentItem.expandReturnType == actionType {
+		method = "POST"
+	}
+	w.statusView.Status("Requesting:"+currentItem.expandURL, true)
 
-	data, err := armclient.DoRequest("GET", currentItem.expandURL)
+	data, err := armclient.DoRequest(method, currentItem.expandURL)
+	if err != nil {
+		w.statusView.Status("Failed"+err.Error()+currentItem.expandURL, false)
+	} else {
+		w.title = "Action Succeeded: " + currentItem.expandURL
+	}
 
 	if currentItem.expandReturnType == resourceGroupType {
 		var rgResponse armclient.ResourceGroupResponse
@@ -176,6 +202,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		if currentItem.itemType == resourceGroupType {
 			newItems = append(newItems, TreeNode{
 				parentid:         currentItem.id,
+				namespace:        "None",
 				name:             style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
 				id:               currentItem.id,
 				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
@@ -188,6 +215,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, TreeNode{
 				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
 				parentid:         currentItem.id,
+				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
+				armType:          rg.Type,
 				id:               rg.ID,
 				expandURL:        rg.ID + "?api-version=" + w.resourceAPIVersionLookup[rg.Type],
 				expandReturnType: "none",

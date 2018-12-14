@@ -3,18 +3,53 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/blang/semver"
 	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/version"
 	"log"
 	"os"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	open "github.com/skratchdot/open-golang/open"
 )
 
 func main() {
+	if len(os.Args) == 2 {
+		arg := os.Args[1]
+		if strings.Contains(arg, "version") {
+			fmt.Println(version.BuildDataVersion)
+			fmt.Println(version.BuildDataGitCommit)
+			fmt.Println(version.BuildDataGoVersion)
+			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
+			fmt.Println(version.BuildDataBuildDate)
+			os.Exit(0)
+		}
+	}
+
+	confirmAndSelfUpdate()
+
+	latest, found, err := selfupdate.DetectLatest("lawrencegripper/azbrowse")
+	if err != nil {
+		log.Println("Error occurred while detecting version:", err)
+		return
+	}
+
+	v, err := semver.Parse(version.BuildDataVersion)
+	if err != nil {
+		log.Println(err.Error())
+	} else {
+		if !found || latest.Version.LTE(v) {
+			log.Println("Current version is the latest")
+			return
+		}
+	}
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -29,6 +64,10 @@ func main() {
 	// Padding
 	maxX = maxX - 2
 	maxY = maxY - 2
+
+	if maxX < 72 {
+		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
+	}
 
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
 	header := NewHeaderWidget(1, 1, 70, 9)
@@ -69,6 +108,12 @@ func main() {
 	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlA, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		return LoadActionsView(list)
 	}); err != nil {
 		log.Panicln(err)
 	}
@@ -124,6 +169,7 @@ func main() {
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		clipboard.WriteAll(content.Content)
+		status.Status("Current resource's JSON copied to clipboard", false)
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -163,7 +209,6 @@ func main() {
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
 	}
-
 	go func() {
 		time.Sleep(time.Second * 1)
 
@@ -182,9 +227,9 @@ func main() {
 		}
 
 		g.Update(func(gui *gocui.Gui) error {
+			g.SetCurrentView("listWidget")
 
 			list.SetSubscriptions(subRequest)
-			g.SetCurrentView("listWidget")
 
 			if err != nil {
 				content.Content = err.Error()

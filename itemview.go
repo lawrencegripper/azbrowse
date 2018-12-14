@@ -21,8 +21,11 @@ func NewItemWidget(x, y, w, h int, content string) *ItemWidget {
 // Layout draws the widget in the gocui view
 func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	v, err := g.SetView("itemWidget", w.x, w.y, w.x+w.w, w.y+w.h)
+	// if err != nil {
+	// 	panic(err)
+	// }
 	v.Editable = true
-	// v.Wrap = true
+	v.Wrap = true
 
 	w.view = v
 	if err != nil && err != gocui.ErrUnknownView {
