@@ -162,7 +162,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	data, err := armclient.DoRequest(method, currentItem.expandURL)
 	if err != nil {
 		w.statusView.Status("Failed"+err.Error()+currentItem.expandURL, false)
-	} else {
+	} else if currentItem.expandReturnType == actionType {
 		w.title = "Action Succeeded: " + currentItem.expandURL
 	}
 

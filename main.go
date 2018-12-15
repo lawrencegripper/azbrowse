@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/blang/semver"
 	"github.com/lawrencegripper/azbrowse/style"
 	"github.com/lawrencegripper/azbrowse/version"
 	"log"
@@ -15,7 +14,6 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/rhysd/go-github-selfupdate/selfupdate"
 	open "github.com/skratchdot/open-golang/open"
 )
 
@@ -33,22 +31,6 @@ func main() {
 	}
 
 	confirmAndSelfUpdate()
-
-	latest, found, err := selfupdate.DetectLatest("lawrencegripper/azbrowse")
-	if err != nil {
-		log.Println("Error occurred while detecting version:", err)
-		return
-	}
-
-	v, err := semver.Parse(version.BuildDataVersion)
-	if err != nil {
-		log.Println(err.Error())
-	} else {
-		if !found || latest.Version.LTE(v) {
-			log.Println("Current version is the latest")
-			return
-		}
-	}
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
