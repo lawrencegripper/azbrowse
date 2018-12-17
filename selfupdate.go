@@ -20,8 +20,7 @@ func confirmAndSelfUpdate() {
 
 	v, err := semver.Parse(version.BuildDataVersion)
 	if err != nil {
-		log.Println(err.Error())
-		return
+		log.Panicln(err.Error())
 	}
 	if !found || latest.Version.LTE(v) {
 		log.Println("Current version is the latest")
@@ -31,7 +30,7 @@ func confirmAndSelfUpdate() {
 	fmt.Print("\n\n UPDATE AVAILABLE \n \n Release notes: "+latest.ReleaseNotes+" \n Do you want to update to: ", latest.Version, "? (y/n): ")
 	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil || (input != "y\n" && input != "n\n" && input != "y\r\n" && input != "n\r\n") {
-		log.Printf("Invalid input: '%s'\n", input)
+		log.Panicf("Invalid input: '%s'\n", input)
 		return
 	}
 	if input == "n\n" || input == "n\r\n" {
@@ -40,12 +39,10 @@ func confirmAndSelfUpdate() {
 
 	exe, err := os.Executable()
 	if err != nil {
-		log.Println("Could not locate executable path")
-		return
+		log.Panicln("Could not locate executable path")
 	}
 	if err := selfupdate.UpdateTo(latest.AssetURL, exe); err != nil {
-		log.Println("Error occurred while updating binary:", err)
-		return
+		log.Panicln("Error occurred while updating binary:", err)
 	}
 	log.Println("Successfully updated to version", latest.Version)
 }
