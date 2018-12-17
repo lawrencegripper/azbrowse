@@ -13,7 +13,7 @@ type azCLIToken struct {
 }
 
 func aquireTokenFromAzCLI() (azCLIToken, error) {
-	out, err := exec.Command("az", "account", "get-access-token").Output()
+	out, err := exec.Command("az", "account", "get-access-token", "--output", "json").Output()
 	if err != nil {
 		return azCLIToken{}, err
 	}
