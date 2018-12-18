@@ -232,8 +232,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.expandReturnType == "none" {
 		w.title = w.title + ">" + currentItem.name
 	}
-
-	w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
+	if err != nil {
+		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
+	}
 	w.contentView.Content = style.Title(w.title) + "\n-------------------------------------------------------\n" + data
 
 }
