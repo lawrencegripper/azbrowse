@@ -137,7 +137,7 @@ func main() {
 			v.Editable = true
 			v.Frame = false
 			v.Wrap = true
-			fmt.Fprintf(v, content.Content)
+			fmt.Fprintf(v, content.GetContent())
 			g.SetCurrentView("fullscreenContent")
 		} else {
 			g.Cursor = false
@@ -150,7 +150,7 @@ func main() {
 	}
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		clipboard.WriteAll(content.Content)
+		clipboard.WriteAll(content.GetContent())
 		status.Status("Current resource's JSON copied to clipboard", false)
 		return nil
 	}); err != nil {
@@ -177,7 +177,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			content.Content = style.Title("Delete response for item:"+item.deleteURL+"\n ------------------------------- \n") + res
+			content.SetContent(style.Title("Delete response for item:"+item.deleteURL+"\n ------------------------------- \n") + res)
 			status.Status("Delete request sent successfully: "+item.deleteURL, false)
 
 			deleteConfirmItemID = ""
@@ -214,10 +214,10 @@ func main() {
 			list.SetSubscriptions(subRequest)
 
 			if err != nil {
-				content.Content = err.Error()
+				content.SetContent(err.Error())
 				return nil
 			}
-			content.Content = data
+			content.SetContent(data)
 			return nil
 		})
 
