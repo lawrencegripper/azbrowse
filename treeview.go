@@ -99,7 +99,7 @@ func (w *ListWidget) SetNodes(nodes []TreeNode) {
 	w.selected = 0
 	// Capture current view to navstack
 	w.navStack.Push(&Page{
-		Data:      w.contentView.Content,
+		Data:      w.contentView.GetContent(),
 		Value:     w.items,
 		Title:     w.title,
 		Selection: w.selected,
@@ -133,7 +133,7 @@ func (w *ListWidget) GoBack() {
 	if previousPage == nil {
 		return
 	}
-	w.contentView.Content = previousPage.Data
+	w.contentView.SetContent(previousPage.Data)
 	w.selected = 0
 	w.items = previousPage.Value
 	w.title = previousPage.Title
@@ -146,7 +146,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.expandReturnType != "none" && currentItem.expandReturnType != actionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
-			Data:      w.contentView.Content,
+			Data:      w.contentView.GetContent(),
 			Value:     w.items,
 			Title:     w.title,
 			Selection: w.selected,
@@ -232,9 +232,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.expandReturnType == "none" {
 		w.title = w.title + ">" + currentItem.name
 	}
-
-	w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
-	w.contentView.Content = style.Title(w.title) + "\n-------------------------------------------------------\n" + data
+	if err == nil {
+		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
+	}
+	w.contentView.SetContent(style.Title(w.title) + "\n-------------------------------------------------------\n" + data)
 
 }
 

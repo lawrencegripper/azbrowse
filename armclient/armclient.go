@@ -3,6 +3,7 @@ package armclient
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -51,12 +52,19 @@ func DoRequest(method, path string) (string, error) {
 		return "", errors.New("Request failed: " + err.Error())
 	}
 
+	// Check response error but also return body as it may contain useful information
+	// about the error
+	var responseErr error
+	if response.StatusCode < 200 && response.StatusCode > 299 {
+		responseErr = fmt.Errorf("Request returned a non-success status code of %v with a status message of %s", response.StatusCode, response.Status)
+	}
+
 	defer response.Body.Close()
 	buf, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		return "", errors.New("Request failed: " + err.Error())
+		return "", errors.New("Request failed: " + err.Error() + " ResponseErr:" + responseErr.Error())
 	}
 
-	return prettyJSON(buf), nil
+	return prettyJSON(buf), responseErr
 }

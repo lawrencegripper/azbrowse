@@ -9,10 +9,11 @@ import (
 
 // LoadActionsView Shows available actions for the current resource
 func LoadActionsView(list *ListWidget) error {
+	list.statusView.Status("Getting available Actions", true)
 	currentItem := list.CurrentItem()
 	data, err := armclient.DoRequest("GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
 	if err != nil {
-		panic(err)
+		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}
 	var opsRequest armclient.OperationsRequest
 	err = json.Unmarshal([]byte(data), &opsRequest)
@@ -37,5 +38,7 @@ func LoadActionsView(list *ListWidget) error {
 	if len(items) > 1 {
 		list.SetNodes(items)
 	}
+	list.statusView.Status("Fetched available Actions", false)
+
 	return nil
 }
