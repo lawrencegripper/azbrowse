@@ -43,8 +43,6 @@ type ListWidget struct {
 	title       string
 
 	selected int
-
-	resourceAPIVersionLookup map[string]string
 }
 
 // NewListWidget creates a new instance
@@ -120,8 +118,6 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 			expandReturnType: resourceGroupType,
 		})
 	}
-
-	go w.PopulateResourceAPILookup()
 
 	w.title = "Subscriptions"
 	w.items = newList
@@ -212,16 +208,20 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			})
 		}
 		for _, rg := range resourceResponse.Resources {
+			resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
+			if err != nil {
+				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
+			}
 			newItems = append(newItems, TreeNode{
 				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
 				parentid:         currentItem.id,
 				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
 				armType:          rg.Type,
 				id:               rg.ID,
-				expandURL:        rg.ID + "?api-version=" + w.resourceAPIVersionLookup[rg.Type],
+				expandURL:        rg.ID + "?api-version=" + resourceAPIVersion,
 				expandReturnType: "none",
 				itemType:         resourceType,
-				deleteURL:        rg.ID + "?api-version=" + w.resourceAPIVersionLookup[rg.Type],
+				deleteURL:        rg.ID + "?api-version=" + resourceAPIVersion,
 			})
 		}
 		w.items = newItems
@@ -255,58 +255,4 @@ func (w *ListWidget) CurrentSelection() int {
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *TreeNode {
 	return &w.items[w.selected]
-}
-
-// PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
-// this is needed when requesting details from a resource as APIVersion isn't known and is required
-func (w *ListWidget) PopulateResourceAPILookup() {
-	if w.resourceAPIVersionLookup == nil {
-		w.statusView.Status("Getting provider data from cache", true)
-		// Get data from cache
-		providerData, err := get(providerCacheKey)
-
-		w.statusView.Status("Getting provider data from cache: Completed", false)
-
-		if err != nil || providerData == "" {
-			w.statusView.Status("Getting provider data from API", true)
-
-			// Get Subscriptions
-			data, err := armclient.DoRequest("GET", "/providers?api-version=2017-05-10")
-			if err != nil {
-				panic(err)
-			}
-			var providerResponse armclient.ProvidersResponse
-			err = json.Unmarshal([]byte(data), &providerResponse)
-			if err != nil {
-				panic(err)
-			}
-
-			w.resourceAPIVersionLookup = make(map[string]string)
-			for _, provider := range providerResponse.Providers {
-				for _, resourceType := range provider.ResourceTypes {
-					w.resourceAPIVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
-				}
-			}
-
-			bytes, err := json.Marshal(w.resourceAPIVersionLookup)
-			if err != nil {
-				panic(err)
-			}
-			providerData = string(bytes)
-
-			put(providerCacheKey, providerData)
-			w.statusView.Status("Getting provider data from API: Completed", false)
-
-		} else {
-			var providerCache map[string]string
-			err = json.Unmarshal([]byte(providerData), &providerCache)
-			if err != nil {
-				panic(err)
-			}
-			w.resourceAPIVersionLookup = providerCache
-			w.statusView.Status("Getting provider data from cache: Completed", false)
-
-		}
-
-	}
 }

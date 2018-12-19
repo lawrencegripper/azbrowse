@@ -211,6 +211,11 @@ func main() {
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
 
+			status.Status("Getting provider data", true)
+
+			armclient.PopulateResourceAPILookup()
+			status.Status("Done getting provider data", false)
+
 			list.SetSubscriptions(subRequest)
 
 			if err != nil {

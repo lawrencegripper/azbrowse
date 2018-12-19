@@ -25,8 +25,12 @@ func LoadActionsView(list *ListWidget) error {
 	for _, resOps := range opsRequest.ResourceTypes {
 		if resOps.Name == strings.Split(list.CurrentItem().armType, "/")[1] {
 			for _, op := range resOps.Operations {
+				resourceAPIVersion, err := armclient.GetAPIVersion(currentItem.armType)
+				if err != nil {
+					list.statusView.Status("Failed to find an api version: "+err.Error(), false)
+				}
 				stripArmType := strings.Replace(op.Name, currentItem.armType, "", -1)
-				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + list.resourceAPIVersionLookup[currentItem.armType]
+				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + resourceAPIVersion
 				items = append(items, TreeNode{
 					name:             op.DisplayName,
 					expandURL:        currentItem.id + "/" + actionURL,

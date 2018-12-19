@@ -1,4 +1,4 @@
-package main
+package storage
 
 import (
 	"fmt"
@@ -24,6 +24,10 @@ func init() {
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
+		_, err = tx.CreateBucketIfNotExists([]byte("search"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
 		return nil
 	})
 
@@ -34,7 +38,8 @@ func init() {
 
 }
 
-func put(key, value string) error {
+// PutCache puts an item in the cache bucket
+func PutCache(key, value string) error {
 	return db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("cache"))
 		err := b.Put([]byte(key), []byte(value))
@@ -42,7 +47,8 @@ func put(key, value string) error {
 	})
 }
 
-func get(key string) (string, error) {
+// GetCache gets an item from the cache bucket
+func GetCache(key string) (string, error) {
 	var s []byte
 	err := db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("cache"))
