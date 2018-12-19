@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/boltdb/bolt"
 	"log"
@@ -36,6 +37,18 @@ func init() {
 	}
 	fmt.Println("Loading db complete")
 
+}
+
+func PutResource(key string, value Resource) error {
+	bytes, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+	return db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("search"))
+		err := b.Put([]byte(key), bytes)
+		return err
+	})
 }
 
 // PutCache puts an item in the cache bucket

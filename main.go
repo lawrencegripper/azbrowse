@@ -14,6 +14,7 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/search"
 	open "github.com/skratchdot/open-golang/open"
 )
 
@@ -26,6 +27,12 @@ func main() {
 			fmt.Println(version.BuildDataGoVersion)
 			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
 			fmt.Println(version.BuildDataBuildDate)
+			os.Exit(0)
+		}
+
+		if strings.Contains(arg, "crawl") {
+			subRequest, _ := getSubscriptions()
+			search.StartCrawler(subRequest)
 			os.Exit(0)
 		}
 	}
@@ -195,18 +202,7 @@ func main() {
 		time.Sleep(time.Second * 1)
 
 		status.Status("Fetching Subscriptions", true)
-
-		// Get Subscriptions
-		data, err := armclient.DoRequest("GET", "/subscriptions?api-version=2018-01-01")
-		if err != nil {
-			panic(err)
-		}
-
-		var subRequest armclient.SubResponse
-		err = json.Unmarshal([]byte(data), &subRequest)
-		if err != nil {
-			panic(err)
-		}
+		subRequest, data := getSubscriptions()
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
@@ -234,6 +230,21 @@ func main() {
 		log.Panicln(err)
 	}
 
+}
+
+func getSubscriptions() (armclient.SubResponse, string) {
+	// Get Subscriptions
+	data, err := armclient.DoRequest("GET", "/subscriptions?api-version=2018-01-01")
+	if err != nil {
+		panic(err)
+	}
+
+	var subRequest armclient.SubResponse
+	err = json.Unmarshal([]byte(data), &subRequest)
+	if err != nil {
+		panic(err)
+	}
+	return subRequest, data
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {
