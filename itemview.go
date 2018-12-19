@@ -44,7 +44,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 func (w *ItemWidget) SetContent(s string) {
 	w.g.Update(func(g *gocui.Gui) error {
 		w.content = s
-		// Reset the cursor and orgin (scroll poisition)
+		// Reset the cursor and origin (scroll poisition)
 		// so we don't start at the bottom of a new doc
 		w.view.SetCursor(0, 0)
 		w.view.SetOrigin(0, 0)
