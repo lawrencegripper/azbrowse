@@ -94,3 +94,27 @@ type OperationsRequest struct {
 	Type string `json:"type"`
 	Name string `json:"name"`
 }
+
+type SubResourcesResponse struct {
+	Resources []struct {
+		ID       string `json:"id"`
+		Name     string `json:"name"`
+		Type     string `json:"type"`
+		Location string `json:"location"`
+		Tags     struct {
+			Test string `json:"test"`
+		} `json:"tags,omitempty"`
+		Sku struct {
+			Name string `json:"name"`
+			Tier string `json:"tier"`
+		} `json:"sku,omitempty"`
+		Kind string `json:"kind,omitempty"`
+		Plan struct {
+			Name          string `json:"name"`
+			PromotionCode string `json:"promotionCode"`
+			Product       string `json:"product"`
+			Publisher     string `json:"publisher"`
+		} `json:"plan,omitempty"`
+	} `json:"value"`
+	NextLink string `json:"nextLink"`
+}

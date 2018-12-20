@@ -39,16 +39,40 @@ func init() {
 
 }
 
-func PutResource(key string, value Resource) error {
-	bytes, err := json.Marshal(value)
-	if err != nil {
-		return err
-	}
-	return db.Update(func(tx *bolt.Tx) error {
+// PutResourceBatch puts a batch of resources into the boltdb
+func PutResourceBatch(key string, value []Resource) error {
+	return db.Batch(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("search"))
-		err := b.Put([]byte(key), bytes)
-		return err
+		bytes, err := json.Marshal(value)
+		if err != nil {
+			return err
+		}
+		err = b.Put([]byte(key), bytes)
+		if err != nil {
+			return err
+		}
+		return nil
 	})
+}
+
+// GetAllResources returns all the resources seen in the last crawl
+func GetAllResources() (*[]Resource, error) {
+	resources := []Resource{}
+	err := db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte("search"))
+		b.ForEach(func(key, value []byte) error {
+			var storedResources []Resource
+			err := json.Unmarshal([]byte(value), &storedResources)
+			if err != nil {
+				return err
+			}
+
+			resources = append(resources, storedResources...)
+			return nil
+		})
+		return nil
+	})
+	return &resources, err
 }
 
 // PutCache puts an item in the cache bucket
