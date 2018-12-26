@@ -3,23 +3,30 @@ package search
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/storage"
+	"github.com/schollz/closestmatch"
 )
 
-// StartCrawler grabs all the resources in all subs and stores their name/id in the boltdb for searching over
-func StartCrawler(subs armclient.SubResponse) error {
+// CrawlResources grabs all the resources in all subs and stores their name/id in the boltdb for searching over
+func CrawlResources(subs armclient.SubResponse) error {
 	wait := &sync.WaitGroup{}
 
 	for _, sub := range subs.Subs {
 		wait.Add(1)
 		subID := sub.ID
 		go func() {
-			fmt.Println("Starting with sub " + subID)
-			rgListURL := subID + "/resources?api-version=2014-04-01"
-			err := fetchAndStoreURL(subID, rgListURL)
+			rgList := subID + "/resourceGroups?api-version=2014-04-01"
+			err := fetchAndStoreGroups(rgList)
+			if err != nil {
+				panic(err)
+			}
+
+			resourcesListURL := subID + "/resources?api-version=2014-04-01"
+			err = fetchAndStoreResourceURL(resourcesListURL)
 			if err != nil {
 				panic(err)
 			}
@@ -28,18 +35,39 @@ func StartCrawler(subs armclient.SubResponse) error {
 	}
 
 	wait.Wait()
+	return nil
+}
 
-	res, err := storage.GetAllResources()
+func fetchAndStoreGroups(url string) error {
+	fmt.Printf("Fetching url: %s \n", url)
+
+	data, err := armclient.DoRequest("GET", url)
+	if err != nil {
+		return fmt.Errorf("Failed requesting %s: %v", url, err)
+	}
+
+	var rgResponse armclient.ResourceGroupResponse
+	err = json.Unmarshal([]byte(data), &rgResponse)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Got %v resources", len(*res))
+	rgToStore := make([]storage.Resource, 0, len(rgResponse.Groups))
+	for _, r := range rgResponse.Groups {
+		rgToStore = append(rgToStore, storage.Resource{
+			ID:   r.ID,
+			Name: r.Name,
+		})
+	}
+	storage.PutResourceBatch(url, rgToStore)
+
 	return nil
 }
 
-func fetchAndStoreURL(subID, url string) error {
-	fmt.Println("-- Fetching for sub " + subID)
+// fetchAndStoreURL takes a link to a page of '/resources'
+// and stores the resulting batch into a bucket in boltdb
+func fetchAndStoreResourceURL(url string) error {
+	fmt.Printf("Fetching url: %s \n", url)
 	data, err := armclient.DoRequest("GET", url)
 	if err != nil {
 		panic(err)
@@ -56,10 +84,46 @@ func fetchAndStoreURL(subID, url string) error {
 			Name: r.Name,
 		})
 	}
-	storage.PutResourceBatch(subID, resourcesToStore)
+	if len(resourcesToStore) == 0 {
+		return nil
+	}
+	storage.PutResourceBatch(url, resourcesToStore)
 
 	if resourceResponse.NextLink != "" {
-		return fetchAndStoreURL(subID, resourceResponse.NextLink)
+		// Next links are fully formed, including 'https://management.azure.com/'
+		// we don't want this so we strip that out
+		return fetchAndStoreResourceURL(strings.Replace(resourceResponse.NextLink, "https://management.azure.com", "", 1))
 	}
 	return nil
+}
+
+// Suggester provides search functionality over all resources in all subs
+type Suggester struct {
+	matcher *closestmatch.ClosestMatch
+}
+
+// NewSuggester builds a suggester based on your resources
+func NewSuggester() (*Suggester, error) {
+	resources, err := storage.GetAllResources()
+	if err != nil {
+		return nil, err
+	}
+
+	names := make([]string, 0, len(resources))
+	for _, r := range resources {
+		names = append(names, r.Name)
+	}
+	fmt.Printf("Names: %v \n", names)
+
+	// Choose a set of bag sizes, more is more accurate but slower
+	bagSizes := []int{3}
+
+	// Create a closestmatch object
+	cm := closestmatch.New(names, bagSizes)
+	return &Suggester{matcher: cm}, nil
+}
+
+// Autocomplete finds items based on the query string
+func (s *Suggester) Autocomplete(query string) []string {
+	return s.matcher.ClosestN(query, 8)
 }

@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	if len(os.Args) == 2 {
+	if len(os.Args) >= 2 {
 		arg := os.Args[1]
 		if strings.Contains(arg, "version") {
 			fmt.Println(version.BuildDataVersion)
@@ -30,9 +30,17 @@ func main() {
 			os.Exit(0)
 		}
 
-		if strings.Contains(arg, "crawl") {
+		if strings.Contains(arg, "search") {
+			fmt.Print("Getting resources \n")
 			subRequest, _ := getSubscriptions()
-			search.StartCrawler(subRequest)
+			search.CrawlResources(subRequest)
+			fmt.Print("Build suggester \n")
+
+			suggester, _ := search.NewSuggester()
+			fmt.Print("Get suggestions \n")
+
+			suggestions := suggester.Autocomplete(os.Args[2])
+			fmt.Printf("%v \n", suggestions)
 			os.Exit(0)
 		}
 	}

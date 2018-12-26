@@ -95,6 +95,7 @@ type OperationsRequest struct {
 	Name string `json:"name"`
 }
 
+// SubResourcesResponse is the response from the /resources call on a sub
 type SubResourcesResponse struct {
 	Resources []struct {
 		ID       string `json:"id"`

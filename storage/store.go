@@ -47,6 +47,7 @@ func PutResourceBatch(key string, value []Resource) error {
 		if err != nil {
 			return err
 		}
+		fmt.Printf("Putting key: %v length: %v \n", key, len(value))
 		err = b.Put([]byte(key), bytes)
 		if err != nil {
 			return err
@@ -56,11 +57,12 @@ func PutResourceBatch(key string, value []Resource) error {
 }
 
 // GetAllResources returns all the resources seen in the last crawl
-func GetAllResources() (*[]Resource, error) {
+func GetAllResources() ([]Resource, error) {
 	resources := []Resource{}
 	err := db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("search"))
-		b.ForEach(func(key, value []byte) error {
+		return b.ForEach(func(key, value []byte) error {
+			fmt.Println(string(key))
 			var storedResources []Resource
 			err := json.Unmarshal([]byte(value), &storedResources)
 			if err != nil {
@@ -68,11 +70,12 @@ func GetAllResources() (*[]Resource, error) {
 			}
 
 			resources = append(resources, storedResources...)
+			fmt.Println(len(resources))
 			return nil
 		})
-		return nil
 	})
-	return &resources, err
+	fmt.Println(len(resources))
+	return resources, err
 }
 
 // PutCache puts an item in the cache bucket

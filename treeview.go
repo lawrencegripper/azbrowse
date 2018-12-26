@@ -16,7 +16,6 @@ const (
 	resourceType      = "resource"
 	deploymentType    = "deployment"
 	actionType        = "action"
-	providerCacheKey  = "providerCache"
 )
 
 // TreeNode is an item in the ListWidget
