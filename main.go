@@ -1,9 +1,11 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/tracing"
 	"github.com/lawrencegripper/azbrowse/version"
 	"log"
 	"os"
@@ -19,6 +21,7 @@ import (
 )
 
 func main() {
+
 	if len(os.Args) >= 2 {
 		arg := os.Args[1]
 		if strings.Contains(arg, "version") {
@@ -32,8 +35,8 @@ func main() {
 
 		if strings.Contains(arg, "search") {
 			fmt.Print("Getting resources \n")
-			subRequest, _ := getSubscriptions()
-			search.CrawlResources(subRequest)
+			subRequest, _ := getSubscriptions(context.Background())
+			search.CrawlResources(context.Background(), subRequest)
 			fmt.Print("Build suggester \n")
 
 			suggester, _ := search.NewSuggester()
@@ -46,6 +49,12 @@ func main() {
 	}
 
 	confirmAndSelfUpdate()
+
+	tracing.StartTracingUI()
+
+	rootCtx := context.Background()
+	span, ctx := tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
+	span.LogEvent("Starting azbrowse")
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -69,7 +78,7 @@ func main() {
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
 	header := NewHeaderWidget(1, 1, 70, 9)
 	content := NewItemWidget(70+2, 1, maxX-70-1, maxY-4, "")
-	list := NewListWidget(1, 11, 70, maxY-14, []string{"Loading..."}, 0, content, status)
+	list := NewListWidget(ctx, 1, 11, 70, maxY-14, []string{"Loading..."}, 0, content, status)
 
 	g.SetManager(status, content, list, header)
 	g.SetCurrentView("listWidget")
@@ -188,7 +197,7 @@ func main() {
 		if deleteConfirmCount > 1 {
 			status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.deleteURL, true)
 
-			res, err := armclient.DoRequest("DELETE", item.deleteURL)
+			res, err := armclient.DoRequest(ctx, "DELETE", item.deleteURL)
 			if err != nil {
 				panic(err)
 			}
@@ -210,14 +219,14 @@ func main() {
 		time.Sleep(time.Second * 1)
 
 		status.Status("Fetching Subscriptions", true)
-		subRequest, data := getSubscriptions()
+		subRequest, data := getSubscriptions(ctx)
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
 
 			status.Status("Getting provider data", true)
 
-			armclient.PopulateResourceAPILookup()
+			armclient.PopulateResourceAPILookup(ctx)
 			status.Status("Done getting provider data", false)
 
 			list.SetSubscriptions(subRequest)
@@ -234,15 +243,19 @@ func main() {
 
 	}()
 
+	span.Finish()
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
 
 }
 
-func getSubscriptions() (armclient.SubResponse, string) {
+func getSubscriptions(ctx context.Context) (armclient.SubResponse, string) {
+	span, ctx := tracing.StartSpanFromContext(ctx, "GetSubscriptions")
+	defer span.Finish()
+
 	// Get Subscriptions
-	data, err := armclient.DoRequest("GET", "/subscriptions?api-version=2018-01-01")
+	data, err := armclient.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
 	if err != nil {
 		panic(err)
 	}

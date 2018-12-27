@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/lawrencegripper/azbrowse/tracing"
 	"strings"
 
 	"github.com/jroimartin/gocui"
@@ -40,13 +42,13 @@ type ListWidget struct {
 	statusView  *StatusbarWidget
 	navStack    Stack
 	title       string
-
-	selected int
+	ctx         context.Context
+	selected    int
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget) *ListWidget {
-	return &ListWidget{x: x, y: y, w: w, h: h, contentView: contentView, statusView: status}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget) *ListWidget {
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status}
 }
 
 // Layout draws the widget in the gocui view
@@ -137,6 +139,7 @@ func (w *ListWidget) GoBack() {
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
+
 	currentItem := w.items[w.selected]
 	if currentItem.expandReturnType != "none" && currentItem.expandReturnType != actionType {
 		// Capture current view to navstack
@@ -147,6 +150,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			Selection: w.selected,
 		})
 	}
+	span, ctx := tracing.StartSpanFromContext(w.ctx, "expandItem-"+currentItem.itemType, tracing.SetTag("item", currentItem))
+	defer span.Finish()
+	w.ctx = ctx
 
 	method := "GET"
 	if currentItem.expandReturnType == actionType {
@@ -154,7 +160,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 	w.statusView.Status("Requesting:"+currentItem.expandURL, true)
 
-	data, err := armclient.DoRequest(method, currentItem.expandURL)
+	data, err := armclient.DoRequest(ctx, method, currentItem.expandURL)
 	if err != nil {
 		w.statusView.Status("Failed"+err.Error()+currentItem.expandURL, false)
 	} else if currentItem.expandReturnType == actionType {

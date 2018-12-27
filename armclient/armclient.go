@@ -2,6 +2,7 @@ package armclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/lawrencegripper/azbrowse/storage"
+	"github.com/lawrencegripper/azbrowse/tracing"
 )
 
 const (
@@ -29,7 +31,10 @@ func GetTenantID() string {
 }
 
 // DoRequest makes an ARM rest request
-func DoRequest(method, path string) (string, error) {
+func DoRequest(ctx context.Context, method, path string) (string, error) {
+	span, ctx := tracing.StartSpanFromContext(ctx, "ARMRequest-"+method, tracing.SetTag("url", path))
+	defer span.Finish()
+
 	url, err := getRequestURL(path)
 	if err != nil {
 		return "", err
@@ -60,6 +65,10 @@ func DoRequest(method, path string) (string, error) {
 	// about the error
 	var responseErr error
 	if response.StatusCode < 200 && response.StatusCode > 299 {
+		span.SetTag("isError", true)
+		span.SetTag("errorCode", response.StatusCode)
+		span.SetTag("error", response.Status)
+
 		responseErr = fmt.Errorf("Request returned a non-success status code of %v with a status message of %s", response.StatusCode, response.Status)
 	}
 
@@ -67,7 +76,9 @@ func DoRequest(method, path string) (string, error) {
 	buf, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		return "", errors.New("Request failed: " + err.Error() + " ResponseErr:" + responseErr.Error())
+		wrappedError := errors.New("Request failed: " + err.Error() + " ResponseErr:" + responseErr.Error())
+		span.SetTag("err", wrappedError)
+		return "", wrappedError
 	}
 
 	return prettyJSON(buf), responseErr
@@ -86,7 +97,7 @@ func GetAPIVersion(armType string) (string, error) {
 
 // PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
 // this is needed when requesting details from a resource as APIVersion isn't known and is required
-func PopulateResourceAPILookup() {
+func PopulateResourceAPILookup(ctx context.Context) {
 	// w.statusView.Status("Getting provider data from cache", true)
 	if resourceAPIVersionLookup == nil {
 		// Get data from cache
@@ -98,7 +109,7 @@ func PopulateResourceAPILookup() {
 			// w.statusView.Status("Getting provider data from API", true)
 
 			// Get Subscriptions
-			data, err := DoRequest("GET", "/providers?api-version=2017-05-10")
+			data, err := DoRequest(ctx, "GET", "/providers?api-version=2017-05-10")
 			if err != nil {
 				panic(err)
 			}

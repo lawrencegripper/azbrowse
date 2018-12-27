@@ -44,3 +44,7 @@
 [[constraint]]
   branch = "master"
   name = "github.com/skratchdot/open-golang"
+
+[[constraint]]
+  name = "go.opencensus.io"
+  version = "0.18.0"

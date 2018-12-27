@@ -11,7 +11,7 @@ import (
 func LoadActionsView(list *ListWidget) error {
 	list.statusView.Status("Getting available Actions", true)
 	currentItem := list.CurrentItem()
-	data, err := armclient.DoRequest("GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
+	data, err := armclient.DoRequest(list.ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
 	if err != nil {
 		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}
