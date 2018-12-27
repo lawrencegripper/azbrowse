@@ -14,11 +14,12 @@ import (
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/search"
 	open "github.com/skratchdot/open-golang/open"
 )
 
 func main() {
-	if len(os.Args) == 2 {
+	if len(os.Args) >= 2 {
 		arg := os.Args[1]
 		if strings.Contains(arg, "version") {
 			fmt.Println(version.BuildDataVersion)
@@ -26,6 +27,20 @@ func main() {
 			fmt.Println(version.BuildDataGoVersion)
 			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
 			fmt.Println(version.BuildDataBuildDate)
+			os.Exit(0)
+		}
+
+		if strings.Contains(arg, "search") {
+			fmt.Print("Getting resources \n")
+			subRequest, _ := getSubscriptions()
+			search.CrawlResources(subRequest)
+			fmt.Print("Build suggester \n")
+
+			suggester, _ := search.NewSuggester()
+			fmt.Print("Get suggestions \n")
+
+			suggestions := suggester.Autocomplete(os.Args[2])
+			fmt.Printf("%v \n", suggestions)
 			os.Exit(0)
 		}
 	}
@@ -195,21 +210,15 @@ func main() {
 		time.Sleep(time.Second * 1)
 
 		status.Status("Fetching Subscriptions", true)
-
-		// Get Subscriptions
-		data, err := armclient.DoRequest("GET", "/subscriptions?api-version=2018-01-01")
-		if err != nil {
-			panic(err)
-		}
-
-		var subRequest armclient.SubResponse
-		err = json.Unmarshal([]byte(data), &subRequest)
-		if err != nil {
-			panic(err)
-		}
+		subRequest, data := getSubscriptions()
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
+
+			status.Status("Getting provider data", true)
+
+			armclient.PopulateResourceAPILookup()
+			status.Status("Done getting provider data", false)
 
 			list.SetSubscriptions(subRequest)
 
@@ -229,6 +238,21 @@ func main() {
 		log.Panicln(err)
 	}
 
+}
+
+func getSubscriptions() (armclient.SubResponse, string) {
+	// Get Subscriptions
+	data, err := armclient.DoRequest("GET", "/subscriptions?api-version=2018-01-01")
+	if err != nil {
+		panic(err)
+	}
+
+	var subRequest armclient.SubResponse
+	err = json.Unmarshal([]byte(data), &subRequest)
+	if err != nil {
+		panic(err)
+	}
+	return subRequest, data
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {
