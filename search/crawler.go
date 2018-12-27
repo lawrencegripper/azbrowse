@@ -15,6 +15,11 @@ import (
 func CrawlResources(subs armclient.SubResponse) error {
 	wait := &sync.WaitGroup{}
 
+	err := storage.ClearResources()
+	if err != nil {
+		return err
+	}
+
 	for _, sub := range subs.Subs {
 		wait.Add(1)
 		subID := sub.ID
@@ -39,8 +44,6 @@ func CrawlResources(subs armclient.SubResponse) error {
 }
 
 func fetchAndStoreGroups(url string) error {
-	fmt.Printf("Fetching url: %s \n", url)
-
 	data, err := armclient.DoRequest("GET", url)
 	if err != nil {
 		return fmt.Errorf("Failed requesting %s: %v", url, err)
@@ -67,7 +70,6 @@ func fetchAndStoreGroups(url string) error {
 // fetchAndStoreURL takes a link to a page of '/resources'
 // and stores the resulting batch into a bucket in boltdb
 func fetchAndStoreResourceURL(url string) error {
-	fmt.Printf("Fetching url: %s \n", url)
 	data, err := armclient.DoRequest("GET", url)
 	if err != nil {
 		panic(err)
@@ -113,7 +115,6 @@ func NewSuggester() (*Suggester, error) {
 	for _, r := range resources {
 		names = append(names, r.Name)
 	}
-	fmt.Printf("Names: %v \n", names)
 
 	// Choose a set of bag sizes, more is more accurate but slower
 	bagSizes := []int{3}

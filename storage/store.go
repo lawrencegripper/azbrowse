@@ -11,7 +11,7 @@ import (
 var db *bolt.DB
 
 func init() {
-	fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db, do you have another instance of azbrowse open?")
+	fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
 	user, _ := user.Current()
 	dbCreate, err := bolt.Open(user.HomeDir+"/.azbrowse.db", 0600, nil)
 	if err != nil {
@@ -39,15 +39,32 @@ func init() {
 
 }
 
+// ClearResources removes all resources from the
+func ClearResources() error {
+	return db.Update(func(tx *bolt.Tx) error {
+		return tx.DeleteBucket([]byte("search"))
+	})
+}
+
 // PutResourceBatch puts a batch of resources into the boltdb
 func PutResourceBatch(key string, value []Resource) error {
+	err := db.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte("search"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+
 	return db.Batch(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("search"))
 		bytes, err := json.Marshal(value)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("Putting key: %v length: %v \n", key, len(value))
 		err = b.Put([]byte(key), bytes)
 		if err != nil {
 			return err
@@ -62,7 +79,6 @@ func GetAllResources() ([]Resource, error) {
 	err := db.View(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte("search"))
 		return b.ForEach(func(key, value []byte) error {
-			fmt.Println(string(key))
 			var storedResources []Resource
 			err := json.Unmarshal([]byte(value), &storedResources)
 			if err != nil {
@@ -70,11 +86,9 @@ func GetAllResources() ([]Resource, error) {
 			}
 
 			resources = append(resources, storedResources...)
-			fmt.Println(len(resources))
 			return nil
 		})
 	})
-	fmt.Println(len(resources))
 	return resources, err
 }
 
