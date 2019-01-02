@@ -15,7 +15,7 @@ import (
 
 // StartTracingUI starts an OpenTracing UI on localhost:8700
 // inspired by: https://medium.com/opentracing/distributed-tracing-in-10-minutes-51b378ee40f1
-func StartTracingUI() {
+func StartTracingUI() func(opentracing.Span) string {
 
 	store := appdash.NewMemoryStore()
 
@@ -54,4 +54,14 @@ func StartTracingUI() {
 
 	tracer := appdashot.NewTracer(appdash.NewRemoteCollector(collectorAdd))
 	opentracing.InitGlobalTracer(tracer)
+
+	getURLFunc := func(s opentracing.Span) string {
+		traces, err := tapp.Queryer.Traces(appdash.TracesOpts{})
+		if err != nil {
+			log.Panic(err)
+		}
+		return appdashURLStr + "/traces/" + traces[0].ID.Trace.String()
+	}
+
+	return getURLFunc
 }

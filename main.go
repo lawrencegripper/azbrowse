@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -50,11 +51,19 @@ func main() {
 
 	confirmAndSelfUpdate()
 
-	tracing.StartTracingUI()
+	traceURLFunc := tracing.StartTracingUI()
 
 	rootCtx := context.Background()
 	span, ctx := tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
 	span.LogEvent("Starting azbrowse")
+
+	defer func() {
+		// recover from panic if one occured and show user the trace URL for debugging.
+		if recover() != nil {
+			fmt.Printf("A crash occurred, to see the trace details for the session visit: %s. \n Press any key to exit when you are done. \n", traceURLFunc(span))
+			bufio.NewReader(os.Stdin).ReadString('\n')
+		}
+	}()
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -244,6 +253,7 @@ func main() {
 	}()
 
 	span.Finish()
+
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
