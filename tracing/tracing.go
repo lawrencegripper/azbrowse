@@ -5,6 +5,18 @@ import (
 	opentracing "github.com/opentracing/opentracing-go"
 )
 
+var isDebug bool
+
+// IsDebug checks if tracing is configured for debuggging
+func IsDebug() bool {
+	return isDebug
+}
+
+// EnableDebug enables debugging traces for the session
+func EnableDebug() {
+	isDebug = true
+}
+
 // SetTag is a shortcut to create tags easily
 func SetTag(key string, value interface{}) opentracing.Tag {
 	return opentracing.Tag{Key: key, Value: value}

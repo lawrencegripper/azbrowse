@@ -13,9 +13,9 @@ import (
 	"sourcegraph.com/sourcegraph/appdash/traceapp"
 )
 
-// StartTracingUI starts an OpenTracing UI on localhost:8700
+// StartTracing starts an OpenTracing UI on localhost:8700
 // inspired by: https://medium.com/opentracing/distributed-tracing-in-10-minutes-51b378ee40f1
-func StartTracingUI() func(opentracing.Span) string {
+func StartTracing() func(opentracing.Span) string {
 
 	store := appdash.NewMemoryStore()
 
@@ -32,33 +32,34 @@ func StartTracingUI() func(opentracing.Span) string {
 	cs := appdash.NewServer(l, appdash.NewLocalCollector(store))
 	go cs.Start()
 
-	// Print the URL at which the web UI will be running.
-	appdashPort := 8700
-	appdashURLStr := fmt.Sprintf("http://localhost:%d", appdashPort)
-	appdashURL, err := url.Parse(appdashURLStr)
-	if err != nil {
-		log.Fatalf("Error parsing %s: %s", appdashURLStr, err)
-	}
-	fmt.Printf("To see your traces, go to %s/traces\n", appdashURL)
-
-	// Start the web UI in a separate goroutine.
-	tapp, err := traceapp.New(nil, appdashURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	tapp.Store = store
-	tapp.Queryer = store
-	go func() {
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", appdashPort), tapp))
-	}()
-
 	tracer := appdashot.NewTracer(appdash.NewRemoteCollector(collectorAdd))
 	opentracing.InitGlobalTracer(tracer)
 
 	getURLFunc := func(s opentracing.Span) string {
+		// Start the webui for viewing traces
+		appdashPort := 8700
+		appdashURLStr := fmt.Sprintf("http://localhost:%d", appdashPort)
+		appdashURL, err := url.Parse(appdashURLStr)
+		if err != nil {
+			log.Fatalf("Error parsing %s: %s", appdashURLStr, err)
+		}
+
+		// Start the web UI in a separate goroutine.
+		tapp, err := traceapp.New(nil, appdashURL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tapp.Store = store
+		tapp.Queryer = store
+		go func() {
+			log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", appdashPort), tapp))
+		}()
 		traces, err := tapp.Queryer.Traces(appdash.TracesOpts{})
 		if err != nil {
 			log.Panic(err)
+		}
+		if len(traces) < 1 {
+			return appdashURLStr
 		}
 		return appdashURLStr + "/traces/" + traces[0].ID.Trace.String()
 	}

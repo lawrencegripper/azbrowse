@@ -11,6 +11,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -20,6 +21,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/search"
 	open "github.com/skratchdot/open-golang/open"
 )
+
+var enableTracing bool
 
 func main() {
 
@@ -47,20 +50,30 @@ func main() {
 			fmt.Printf("%v \n", suggestions)
 			os.Exit(0)
 		}
+
+		if strings.Contains(arg, "debug") {
+			enableTracing = true
+			tracing.EnableDebug()
+		}
 	}
 
 	confirmAndSelfUpdate()
 
-	traceURLFunc := tracing.StartTracingUI()
+	startTraceDashboardForSpan := tracing.StartTracing()
 
 	rootCtx := context.Background()
 	span, ctx := tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
 	span.LogEvent("Starting azbrowse")
+	if enableTracing {
+		startTraceDashboardForSpan(span)
+	}
 
 	defer func() {
 		// recover from panic if one occured and show user the trace URL for debugging.
-		if recover() != nil {
-			fmt.Printf("A crash occurred, to see the trace details for the session visit: %s. \n Press any key to exit when you are done. \n", traceURLFunc(span))
+		if r := recover(); r != nil {
+			fmt.Printf("A crash occurred: %s", r)
+			debug.PrintStack()
+			fmt.Printf("To see the trace details for the session visit: %s. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
 			bufio.NewReader(os.Stdin).ReadString('\n')
 		}
 	}()
@@ -128,7 +141,7 @@ func main() {
 	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlA, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		return LoadActionsView(list)
+		return LoadActionsView(ctx, list)
 	}); err != nil {
 		log.Panicln(err)
 	}
@@ -261,7 +274,7 @@ func main() {
 }
 
 func getSubscriptions(ctx context.Context) (armclient.SubResponse, string) {
-	span, ctx := tracing.StartSpanFromContext(ctx, "GetSubscriptions")
+	span, ctx := tracing.StartSpanFromContext(ctx, "expand:subs")
 	defer span.Finish()
 
 	// Get Subscriptions

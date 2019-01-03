@@ -32,7 +32,7 @@ func GetTenantID() string {
 
 // DoRequest makes an ARM rest request
 func DoRequest(ctx context.Context, method, path string) (string, error) {
-	span, ctx := tracing.StartSpanFromContext(ctx, "ARMRequest-"+method, tracing.SetTag("url", path))
+	span, ctx := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
 	defer span.Finish()
 
 	url, err := getRequestURL(path)
@@ -81,7 +81,14 @@ func DoRequest(ctx context.Context, method, path string) (string, error) {
 		return "", wrappedError
 	}
 
-	return prettyJSON(buf), responseErr
+	prettyOutput := prettyJSON(buf)
+	if tracing.IsDebug() {
+		span.SetTag("responseBody", truncateString(prettyOutput, 800))
+		span.SetTag("requestBody", reqBody)
+		span.SetTag("url", url)
+	}
+
+	return prettyOutput, responseErr
 }
 
 var resourceAPIVersionLookup map[string]string
@@ -100,6 +107,7 @@ func GetAPIVersion(armType string) (string, error) {
 func PopulateResourceAPILookup(ctx context.Context) {
 	// w.statusView.Status("Getting provider data from cache", true)
 	if resourceAPIVersionLookup == nil {
+		span, ctx := tracing.StartSpanFromContext(ctx, "populateResCache")
 		// Get data from cache
 		providerData, err := storage.GetCache(providerCacheKey)
 
@@ -107,6 +115,9 @@ func PopulateResourceAPILookup(ctx context.Context) {
 
 		if err != nil || providerData == "" {
 			// w.statusView.Status("Getting provider data from API", true)
+			span.LogEvent("Cache lookup failed, getting form api")
+			span.SetTag("error", err)
+			span.SetTag("cacheData", providerData)
 
 			// Get Subscriptions
 			data, err := DoRequest(ctx, "GET", "/providers?api-version=2017-05-10")
@@ -136,15 +147,28 @@ func PopulateResourceAPILookup(ctx context.Context) {
 			// w.statusView.Status("Getting provider data from API: Completed", false)
 
 		} else {
+			span.LogEvent("Data read from cache")
 			var providerCache map[string]string
 			err = json.Unmarshal([]byte(providerData), &providerCache)
 			if err != nil {
+				span.LogEvent("Failed to read data from cache")
+				span.SetTag("error", err)
+				span.Finish()
 				panic(err)
 			}
 			resourceAPIVersionLookup = providerCache
 			// w.statusView.Status("Getting provider data from cache: Completed", false)
 
 		}
+		span.Finish()
 
 	}
+}
+
+func truncateString(s string, i int) string {
+	runes := []rune(s)
+	if len(runes) > i {
+		return string(runes[:i]) + "..."
+	}
+	return s
 }

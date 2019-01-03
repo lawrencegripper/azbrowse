@@ -22,15 +22,16 @@ const (
 
 // TreeNode is an item in the ListWidget
 type TreeNode struct {
-	parentid         string
-	id               string
-	name             string
-	expandURL        string
-	itemType         string
-	expandReturnType string
-	deleteURL        string
-	namespace        string
-	armType          string
+	parentid         string // The ID of the parent resource
+	id               string // The ID of the resource in ARM
+	name             string // The name of the object returned by the API
+	display          string // The Text used to draw the object in the list
+	expandURL        string // The URL to call to expand the item
+	itemType         string // The type of item either subscription, resourcegroup, resource, deployment or action
+	expandReturnType string // The type of the items returned by the expandURL
+	deleteURL        string // The URL to call to delete the current resource
+	namespace        string // The ARM Namespace of the item eg StorageAccount
+	armType          string // The ARM type of the item eg Microsoft.Storage/StorageAccount
 }
 
 // ListWidget hosts the left panel showing resources and controls the navigation
@@ -73,7 +74,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		} else {
 			itemToShow = "   "
 		}
-		itemToShow = itemToShow + s.name + "\n"
+		itemToShow = itemToShow + s.display + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)
@@ -112,6 +113,7 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	newList := []TreeNode{}
 	for _, sub := range subs.Subs {
 		newList = append(newList, TreeNode{
+			display:          sub.DisplayName,
 			name:             sub.DisplayName,
 			id:               sub.ID,
 			expandURL:        sub.ID + "/resourceGroups?api-version=2014-04-01",
@@ -150,9 +152,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			Selection: w.selected,
 		})
 	}
-	span, ctx := tracing.StartSpanFromContext(w.ctx, "expandItem-"+currentItem.itemType, tracing.SetTag("item", currentItem))
+	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.itemType+":"+currentItem.name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
-	w.ctx = ctx
 
 	method := "GET"
 	if currentItem.expandReturnType == actionType {
@@ -178,6 +179,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		for _, rg := range rgResponse.Groups {
 			newItems = append(newItems, TreeNode{
 				name:             rg.Name,
+				display:          rg.Name,
 				id:               rg.ID,
 				parentid:         currentItem.id,
 				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
@@ -204,7 +206,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, TreeNode{
 				parentid:         currentItem.id,
 				namespace:        "None",
-				name:             style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
+				display:          style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
+				name:             "Deployments",
 				id:               currentItem.id,
 				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
 				expandReturnType: deploymentType,
@@ -218,7 +221,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
 			}
 			newItems = append(newItems, TreeNode{
-				name:             style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
+				display:          style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
+				name:             rg.Name,
 				parentid:         currentItem.id,
 				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
 				armType:          rg.Type,
