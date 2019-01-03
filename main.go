@@ -5,9 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/style"
-	"github.com/lawrencegripper/azbrowse/tracing"
-	"github.com/lawrencegripper/azbrowse/version"
 	"log"
 	"os"
 	"runtime"
@@ -15,10 +12,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/atotto/clipboard"
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/search"
+	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/tracing"
+	"github.com/lawrencegripper/azbrowse/version"
+
+	"github.com/atotto/clipboard"
+	"github.com/jroimartin/gocui"
+	opentracing "github.com/opentracing/opentracing-go"
 	open "github.com/skratchdot/open-golang/open"
 )
 
@@ -58,25 +60,31 @@ func main() {
 	}
 
 	confirmAndSelfUpdate()
+	var ctx context.Context
+	var span opentracing.Span
 
-	startTraceDashboardForSpan := tracing.StartTracing()
-
-	rootCtx := context.Background()
-	span, ctx := tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
-	span.LogEvent("Starting azbrowse")
 	if enableTracing {
-		startTraceDashboardForSpan(span)
-	}
+		startTraceDashboardForSpan := tracing.StartTracing()
 
-	defer func() {
-		// recover from panic if one occured and show user the trace URL for debugging.
-		if r := recover(); r != nil {
-			fmt.Printf("A crash occurred: %s", r)
-			debug.PrintStack()
-			fmt.Printf("To see the trace details for the session visit: %s. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
-			bufio.NewReader(os.Stdin).ReadString('\n')
-		}
-	}()
+		rootCtx := context.Background()
+		span, ctx = tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
+
+		startTraceDashboardForSpan(span)
+
+		defer func() {
+			// recover from panic if one occurred and show user the trace URL for debugging.
+			if r := recover(); r != nil {
+				fmt.Printf("A crash occurred: %s", r)
+				debug.PrintStack()
+				fmt.Printf("To see the trace details for the session visit: %s. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
+				bufio.NewReader(os.Stdin).ReadString('\n')
+			}
+		}()
+	} else {
+
+		rootCtx := context.Background()
+		span, ctx = tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
+	}
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {

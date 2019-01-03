@@ -24,6 +24,12 @@ func SetTag(key string, value interface{}) opentracing.Tag {
 
 // StartSpanFromContext create a span for the context
 func StartSpanFromContext(ctx context.Context, operationName string, opts ...opentracing.StartSpanOption) (opentracing.Span, context.Context) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, operationName, opts...)
+	// without a tracing specified this call will fail
+	if isDebug {
+		span, ctx := opentracing.StartSpanFromContext(ctx, operationName, opts...)
+		return span, ctx
+	}
+	// so we fallback to this one
+	span := opentracing.StartSpan(operationName, opts...)
 	return span, ctx
 }
