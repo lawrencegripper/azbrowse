@@ -1,10 +1,12 @@
 package search
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/storage"
@@ -12,7 +14,7 @@ import (
 )
 
 // CrawlResources grabs all the resources in all subs and stores their name/id in the boltdb for searching over
-func CrawlResources(subs armclient.SubResponse) error {
+func CrawlResources(ctx context.Context, subs armclient.SubResponse) error {
 	wait := &sync.WaitGroup{}
 
 	err := storage.ClearResources()
@@ -24,14 +26,16 @@ func CrawlResources(subs armclient.SubResponse) error {
 		wait.Add(1)
 		subID := sub.ID
 		go func() {
+			ctx, cancel := context.WithTimeout(ctx, time.Duration(30*time.Minute))
+			defer cancel()
 			rgList := subID + "/resourceGroups?api-version=2014-04-01"
-			err := fetchAndStoreGroups(rgList)
+			err := fetchAndStoreGroups(ctx, rgList)
 			if err != nil {
 				panic(err)
 			}
 
 			resourcesListURL := subID + "/resources?api-version=2014-04-01"
-			err = fetchAndStoreResourceURL(resourcesListURL)
+			err = fetchAndStoreResourceURL(ctx, resourcesListURL)
 			if err != nil {
 				panic(err)
 			}
@@ -43,8 +47,8 @@ func CrawlResources(subs armclient.SubResponse) error {
 	return nil
 }
 
-func fetchAndStoreGroups(url string) error {
-	data, err := armclient.DoRequest("GET", url)
+func fetchAndStoreGroups(ctx context.Context, url string) error {
+	data, err := armclient.DoRequest(ctx, "GET", url)
 	if err != nil {
 		return fmt.Errorf("Failed requesting %s: %v", url, err)
 	}
@@ -69,8 +73,8 @@ func fetchAndStoreGroups(url string) error {
 
 // fetchAndStoreURL takes a link to a page of '/resources'
 // and stores the resulting batch into a bucket in boltdb
-func fetchAndStoreResourceURL(url string) error {
-	data, err := armclient.DoRequest("GET", url)
+func fetchAndStoreResourceURL(ctx context.Context, url string) error {
+	data, err := armclient.DoRequest(ctx, "GET", url)
 	if err != nil {
 		panic(err)
 	}
@@ -94,7 +98,7 @@ func fetchAndStoreResourceURL(url string) error {
 	if resourceResponse.NextLink != "" {
 		// Next links are fully formed, including 'https://management.azure.com/'
 		// we don't want this so we strip that out
-		return fetchAndStoreResourceURL(strings.Replace(resourceResponse.NextLink, "https://management.azure.com", "", 1))
+		return fetchAndStoreResourceURL(ctx, strings.Replace(resourceResponse.NextLink, "https://management.azure.com", "", 1))
 	}
 	return nil
 }

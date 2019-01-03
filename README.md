@@ -35,7 +35,14 @@ Currently I'm using it every day **but it is experimental so use with caution on
 | CTLT+S:             | Save JSON to clipboard    | Saves the last JSON response to the clipboard for export                           |
 | CTLT+A:             | View Actions for resource | This allows things like ListKeys on storage or Restart on VMs                      |
 
-![Demo](./docs/quickdemo-azbrowse.gif) 
+![Demo](./docs/quickdemo-azbrowse.gif)
+
+
+## Debugging
+
+Running `azbrowse --debug` will start an in-memory collector for the `opentracing` and a GUI to browse this at http://localhost:8700. You can use this to look at tracing information output by `azbrowse` as it runs.
+
+![tracing ui](docs/trace.png)
 
 ## Plans
 

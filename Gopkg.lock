@@ -34,6 +34,17 @@
   version = "v1.7.0"
 
 [[projects]]
+  digest = "1:db75c3971e4fcaa251e4726f132fab3b17ad90beb7829d90ade140533b577861"
+  name = "github.com/gogo/protobuf"
+  packages = [
+    "io",
+    "proto",
+  ]
+  pruneopts = "UT"
+  revision = "4cbf7e384e768b4e01799441fdf2a706a5635ae7"
+  version = "v1.2.0"
+
+[[projects]]
   digest = "1:97df918963298c287643883209a2c3f642e6593379f97ab400c2a2e219ab647d"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
@@ -56,6 +67,22 @@
   pruneopts = "UT"
   revision = "44c6ddd0a2342c386950e880b658017258da92fc"
   version = "v1.0.0"
+
+[[projects]]
+  digest = "1:c79fb010be38a59d657c48c6ba1d003a8aa651fa56b579d959d74573b7dff8e1"
+  name = "github.com/gorilla/context"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "08b5f424b9271eedf6f9f0ce86cb9396ed337a42"
+  version = "v1.1.1"
+
+[[projects]]
+  digest = "1:e73f5b0152105f18bc131fba127d9949305c8693f8a762588a82a48f61756f5f"
+  name = "github.com/gorilla/mux"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "e3702bed27f0d39777b0b37b664b6280e8ef8fbf"
+  version = "v1.6.2"
 
 [[projects]]
   branch = "master"
@@ -110,6 +137,29 @@
   revision = "60ab7e3d12ed91bc1b2486559c4b3a6b62297577"
 
 [[projects]]
+  digest = "1:d07bd28263c09c5d7f6502e8ddac63e027eca0eafcd07632790d958b50360317"
+  name = "github.com/opentracing/basictracer-go"
+  packages = [
+    ".",
+    "wire",
+  ]
+  pruneopts = "UT"
+  revision = "1b32af207119a14b1b231d451df3ed04a72efebf"
+  version = "v1.0.0"
+
+[[projects]]
+  digest = "1:450b7623b185031f3a456801155c8320209f75d0d4c4e633c6b1e59d44d6e392"
+  name = "github.com/opentracing/opentracing-go"
+  packages = [
+    ".",
+    "ext",
+    "log",
+  ]
+  pruneopts = "UT"
+  revision = "1949ddbfd147afd4d964a9f00b24eb291e0e7c38"
+  version = "v1.0.2"
+
+[[projects]]
   digest = "1:01bb0a58b86f4f816be2bcf0ae68dffd042b2d1c356b97b14dc1cd12a53fc731"
   name = "github.com/rhysd/go-github-selfupdate"
   packages = ["selfupdate"]
@@ -124,6 +174,22 @@
   pruneopts = "UT"
   revision = "56fb6b15a5e88fbcbc21b196488e749fc176514c"
   version = "v2.1.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:68cecd4c1137f77dfa2db1f13a0ceef2b5606d6b69d66fa69f7df1b2f2fe9afc"
+  name = "github.com/shurcooL/httpfs"
+  packages = ["vfsutil"]
+  pruneopts = "UT"
+  revision = "74dc9339e414ad069a8d04bba7e7aafd08043a25"
+
+[[projects]]
+  branch = "master"
+  digest = "1:98450c86949b8cdc4637b80c1c686ca955e503d3fbae9296d1f49c532895d281"
+  name = "github.com/shurcooL/vfsgen"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "6a9ea43bcacdf716a5c1b38efff722c07adf0069"
 
 [[projects]]
   branch = "master"
@@ -153,6 +219,21 @@
   pruneopts = "UT"
   revision = "590df8077fbcb06ad62d7714da06c00e5dd2316d"
   version = "v0.5.5"
+
+[[projects]]
+  digest = "1:bc4aaa0db4ea6107fd151d7c56ab48cae34d65a0f409ede7484dfd3c6f793e7e"
+  name = "go.opencensus.io"
+  packages = [
+    ".",
+    "exemplar",
+    "internal",
+    "trace",
+    "trace/internal",
+    "trace/tracestate",
+  ]
+  pruneopts = "UT"
+  revision = "b7bf3cdb64150a8c8c53b769fdeb2ba581bd4d4b"
+  version = "v0.18.0"
 
 [[projects]]
   branch = "master"
@@ -200,6 +281,30 @@
   revision = "4a4468ece617fc8205e99368fa2200e9d1fad421"
   version = "v1.3.0"
 
+[[projects]]
+  branch = "master"
+  digest = "1:3657d2aab4a1ba9582b6d1bb3d0e8527588b6a451c9df21b4446ece1432a2695"
+  name = "sourcegraph.com/sourcegraph/appdash"
+  packages = [
+    ".",
+    "httptrace",
+    "internal/wire",
+    "opentracing",
+    "sqltrace",
+    "traceapp",
+    "traceapp/tmpl",
+  ]
+  pruneopts = "UT"
+  revision = "4c381bd170b46de54530ae6170358c98fdaa515f"
+
+[[projects]]
+  branch = "master"
+  digest = "1:8e0a2957fe342f22d70a543c3fcdf390f7627419c3d82d87ab4fd715a9ef5716"
+  name = "sourcegraph.com/sourcegraph/appdash-data"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "73f23eafcf67cad684fba328dd545a116ac273ff"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
@@ -209,9 +314,14 @@
     "github.com/boltdb/bolt",
     "github.com/fatih/color",
     "github.com/jroimartin/gocui",
+    "github.com/opentracing/opentracing-go",
     "github.com/rhysd/go-github-selfupdate/selfupdate",
     "github.com/schollz/closestmatch",
     "github.com/skratchdot/open-golang/open",
+    "go.opencensus.io/trace",
+    "sourcegraph.com/sourcegraph/appdash",
+    "sourcegraph.com/sourcegraph/appdash/opentracing",
+    "sourcegraph.com/sourcegraph/appdash/traceapp",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

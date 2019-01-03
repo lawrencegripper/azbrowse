@@ -2,6 +2,7 @@ package armclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 
 	"github.com/lawrencegripper/azbrowse/storage"
+	"github.com/lawrencegripper/azbrowse/tracing"
 )
 
 const (
@@ -29,7 +31,10 @@ func GetTenantID() string {
 }
 
 // DoRequest makes an ARM rest request
-func DoRequest(method, path string) (string, error) {
+func DoRequest(ctx context.Context, method, path string) (string, error) {
+	span, ctx := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
+	defer span.Finish()
+
 	url, err := getRequestURL(path)
 	if err != nil {
 		return "", err
@@ -60,6 +65,10 @@ func DoRequest(method, path string) (string, error) {
 	// about the error
 	var responseErr error
 	if response.StatusCode < 200 && response.StatusCode > 299 {
+		span.SetTag("isError", true)
+		span.SetTag("errorCode", response.StatusCode)
+		span.SetTag("error", response.Status)
+
 		responseErr = fmt.Errorf("Request returned a non-success status code of %v with a status message of %s", response.StatusCode, response.Status)
 	}
 
@@ -67,10 +76,19 @@ func DoRequest(method, path string) (string, error) {
 	buf, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
-		return "", errors.New("Request failed: " + err.Error() + " ResponseErr:" + responseErr.Error())
+		wrappedError := errors.New("Request failed: " + err.Error() + " ResponseErr:" + responseErr.Error())
+		span.SetTag("err", wrappedError)
+		return "", wrappedError
 	}
 
-	return prettyJSON(buf), responseErr
+	prettyOutput := prettyJSON(buf)
+	if tracing.IsDebug() {
+		span.SetTag("responseBody", truncateString(prettyOutput, 800))
+		span.SetTag("requestBody", reqBody)
+		span.SetTag("url", url)
+	}
+
+	return prettyOutput, responseErr
 }
 
 var resourceAPIVersionLookup map[string]string
@@ -86,9 +104,10 @@ func GetAPIVersion(armType string) (string, error) {
 
 // PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
 // this is needed when requesting details from a resource as APIVersion isn't known and is required
-func PopulateResourceAPILookup() {
+func PopulateResourceAPILookup(ctx context.Context) {
 	// w.statusView.Status("Getting provider data from cache", true)
 	if resourceAPIVersionLookup == nil {
+		span, ctx := tracing.StartSpanFromContext(ctx, "populateResCache")
 		// Get data from cache
 		providerData, err := storage.GetCache(providerCacheKey)
 
@@ -96,9 +115,11 @@ func PopulateResourceAPILookup() {
 
 		if err != nil || providerData == "" {
 			// w.statusView.Status("Getting provider data from API", true)
+			span.SetTag("error: failed getting cached data", err)
+			span.SetTag("cacheData", providerData)
 
 			// Get Subscriptions
-			data, err := DoRequest("GET", "/providers?api-version=2017-05-10")
+			data, err := DoRequest(ctx, "GET", "/providers?api-version=2017-05-10")
 			if err != nil {
 				panic(err)
 			}
@@ -125,15 +146,27 @@ func PopulateResourceAPILookup() {
 			// w.statusView.Status("Getting provider data from API: Completed", false)
 
 		} else {
+			span.LogEvent("Data read from cache")
 			var providerCache map[string]string
 			err = json.Unmarshal([]byte(providerData), &providerCache)
 			if err != nil {
+				span.SetTag("error: failed to read data from cache", err)
+				span.Finish()
 				panic(err)
 			}
 			resourceAPIVersionLookup = providerCache
 			// w.statusView.Status("Getting provider data from cache: Completed", false)
 
 		}
+		span.Finish()
 
 	}
+}
+
+func truncateString(s string, i int) string {
+	runes := []rune(s)
+	if len(runes) > i {
+		return string(runes[:i]) + "..."
+	}
+	return s
 }

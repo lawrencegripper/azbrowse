@@ -1,17 +1,23 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/lawrencegripper/azbrowse/tracing"
 	// "fmt"
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"strings"
 )
 
 // LoadActionsView Shows available actions for the current resource
-func LoadActionsView(list *ListWidget) error {
+func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	list.statusView.Status("Getting available Actions", true)
+
 	currentItem := list.CurrentItem()
-	data, err := armclient.DoRequest("GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
+	span, ctx := tracing.StartSpanFromContext(ctx, "actions:"+currentItem.name, tracing.SetTag("item", currentItem))
+	defer span.Finish()
+
+	data, err := armclient.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
 	if err != nil {
 		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}
@@ -33,8 +39,10 @@ func LoadActionsView(list *ListWidget) error {
 				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + resourceAPIVersion
 				items = append(items, TreeNode{
 					name:             op.DisplayName,
+					display:          op.DisplayName,
 					expandURL:        currentItem.id + "/" + actionURL,
 					expandReturnType: actionType,
+					itemType:         "action",
 				})
 			}
 		}
