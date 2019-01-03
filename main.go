@@ -76,7 +76,7 @@ func main() {
 			if r := recover(); r != nil {
 				fmt.Printf("A crash occurred: %s", r)
 				debug.PrintStack()
-				fmt.Printf("To see the trace details for the session visit: %s. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
+				fmt.Printf("To see the trace details for the session visit: %s. \n Visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
 				bufio.NewReader(os.Stdin).ReadString('\n')
 			}
 		}()
@@ -84,6 +84,15 @@ func main() {
 
 		rootCtx := context.Background()
 		span, ctx = tracing.StartSpanFromContext(rootCtx, "azbrowseStart")
+
+		defer func() {
+			// recover from panic if one occurred and explain to the user how to proceed
+			if r := recover(); r != nil {
+				fmt.Printf("A crash occurred: %s", r)
+				debug.PrintStack()
+				fmt.Printf("To capture a more detailed train run 'azbrowse --debug' and reproduce the issue. Visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug.")
+			}
+		}()
 	}
 
 	g, err := gocui.NewGui(gocui.OutputNormal)
