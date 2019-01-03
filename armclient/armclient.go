@@ -115,8 +115,7 @@ func PopulateResourceAPILookup(ctx context.Context) {
 
 		if err != nil || providerData == "" {
 			// w.statusView.Status("Getting provider data from API", true)
-			span.LogEvent("Cache lookup failed, getting form api")
-			span.SetTag("error", err)
+			span.SetTag("error: failed getting cached data", err)
 			span.SetTag("cacheData", providerData)
 
 			// Get Subscriptions
@@ -151,8 +150,7 @@ func PopulateResourceAPILookup(ctx context.Context) {
 			var providerCache map[string]string
 			err = json.Unmarshal([]byte(providerData), &providerCache)
 			if err != nil {
-				span.LogEvent("Failed to read data from cache")
-				span.SetTag("error", err)
+				span.SetTag("error: failed to read data from cache", err)
 				span.Finish()
 				panic(err)
 			}

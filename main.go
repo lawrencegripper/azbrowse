@@ -160,7 +160,10 @@ func main() {
 		if protalURL == "" {
 			protalURL = "https://portal.azure.com"
 		}
-		open.Run(protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.parentid + "/overview")
+		url := protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.parentid + "/overview"
+		span, _ := tracing.StartSpanFromContext(ctx, "openportal:url")
+		open.Run(url)
+		span.Finish()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
