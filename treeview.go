@@ -69,6 +69,8 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	linesUsedCount := 0
 	allItems := make([]string, 0, len(w.items))
 
+	allItems = append(allItems, style.Seperator("  ---\n"))
+
 	for i, s := range w.items {
 		var itemToShow string
 		if i == w.selected {
@@ -76,14 +78,14 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		} else {
 			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.display + "\n  ---\n"
+		itemToShow = itemToShow + s.display + "\n" + style.Seperator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)
 	}
 
 	linesPerItem := linesUsedCount / len(w.items)
-	maxItemsCanShow := w.h / linesPerItem
+	maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
 
 	for i, item := range allItems {
 		// Skip items above the selection to allow scrolling
