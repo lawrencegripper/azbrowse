@@ -114,13 +114,22 @@ func main() {
 		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
 	}
 
+	leftColumnWidth := 45
+
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
-	header := NewHeaderWidget(1, 1, 70, 9)
-	content := NewItemWidget(70+2, 1, maxX-70-1, maxY-4, "")
-	list := NewListWidget(ctx, 1, 11, 70, maxY-14, []string{"Loading..."}, 0, content, status)
+	header := NewHeaderWidget(1, 1, leftColumnWidth, 9)
+	content := NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, "")
+	list := NewListWidget(ctx, 1, 11, leftColumnWidth, maxY-14, []string{"Loading..."}, 0, content, status)
 
 	g.SetManager(status, content, list, header)
 	g.SetCurrentView("listWidget")
+
+	if err := g.SetKeybinding("", gocui.KeyCtrlH, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		list.ChangeSelection(list.CurrentSelection() + 1)
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() + 1)
