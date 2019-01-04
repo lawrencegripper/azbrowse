@@ -160,6 +160,14 @@ func main() {
 		log.Panicln(err)
 	}
 
+	if err := g.SetKeybinding("listWidget", gocui.KeyF5, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		list.GoBack()
+		list.ExpandCurrentSelection()
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
 	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
