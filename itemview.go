@@ -28,6 +28,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	// }
 	v.Editable = true
 	v.Wrap = true
+	v.Title = "JSON Response"
 
 	w.view = v
 	if err != nil && err != gocui.ErrUnknownView {
@@ -41,9 +42,9 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 }
 
 // SetContent displays the string in the itemview
-func (w *ItemWidget) SetContent(s string) {
+func (w *ItemWidget) SetContent(content string) {
 	w.g.Update(func(g *gocui.Gui) error {
-		w.content = s
+		w.content = content
 		// Reset the cursor and origin (scroll poisition)
 		// so we don't start at the bottom of a new doc
 		w.view.SetCursor(0, 0)

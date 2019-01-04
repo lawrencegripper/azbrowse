@@ -45,6 +45,7 @@ type ListWidget struct {
 	title       string
 	ctx         context.Context
 	selected    int
+	view        *gocui.View
 }
 
 // NewListWidget creates a new instance
@@ -59,6 +60,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
+	w.view = v
 
 	if len(w.items) < 1 {
 		return nil
@@ -124,6 +126,7 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 
 	w.title = "Subscriptions"
 	w.items = newList
+	w.view.Title = w.title
 }
 
 // GoBack takes the user back to preview view
@@ -137,6 +140,7 @@ func (w *ListWidget) GoBack() {
 	w.items = previousPage.Value
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
+	w.view.Title = w.title
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
@@ -244,8 +248,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if err == nil {
 		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
 	}
-	w.contentView.SetContent(style.Title(w.title) + "\n-------------------------------------------------------\n" + data)
 
+	w.contentView.SetContent(data)
+	w.view.Title = w.title
 }
 
 // ChangeSelection updates the selected item

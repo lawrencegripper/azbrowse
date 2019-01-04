@@ -14,6 +14,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/search"
+	"github.com/lawrencegripper/azbrowse/storage"
 	"github.com/lawrencegripper/azbrowse/style"
 	"github.com/lawrencegripper/azbrowse/tracing"
 	"github.com/lawrencegripper/azbrowse/version"
@@ -102,13 +103,22 @@ func main() {
 	defer g.Close()
 
 	g.Highlight = true
-	g.SelFgColor = gocui.ColorBlue
+	g.SelFgColor = gocui.ColorCyan
 
-	// help := NewHelpWidget("help", 1, 1, helpText)
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
 	maxY = maxY - 2
+
+	// Show help if this is the first time the app has run
+	firstRun, err := storage.GetCache("firstrun")
+	if firstRun == "" || err != nil {
+		go func() {
+			time.Sleep(time.Second * 1)
+			ToggleHelpView(g)
+			storage.PutCache("firstrun", version.BuildDataVersion)
+		}()
+	}
 
 	if maxX < 72 {
 		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
@@ -117,11 +127,10 @@ func main() {
 	leftColumnWidth := 45
 
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
-	header := NewHeaderWidget(1, 1, leftColumnWidth, 9)
 	content := NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, "")
-	list := NewListWidget(ctx, 1, 11, leftColumnWidth, maxY-14, []string{"Loading..."}, 0, content, status)
+	list := NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status)
 
-	g.SetManager(status, content, list, header)
+	g.SetManager(status, content, list)
 	g.SetCurrentView("listWidget")
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlH, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
@@ -212,6 +221,7 @@ func main() {
 			v.Editable = true
 			v.Frame = false
 			v.Wrap = true
+			v.Title = "JSON Response - Fullscreen (CTRL+F to exit)"
 			fmt.Fprintf(v, content.GetContent())
 			g.SetCurrentView("fullscreenContent")
 		} else {
@@ -227,6 +237,13 @@ func main() {
 	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		clipboard.WriteAll(content.GetContent())
 		status.Status("Current resource's JSON copied to clipboard", false)
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("", gocui.KeyCtrlH, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		ToggleHelpView(g)
 		return nil
 	}); err != nil {
 		log.Panicln(err)
