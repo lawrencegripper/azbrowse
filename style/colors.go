@@ -7,8 +7,8 @@ func Subtle(s string) string {
 	return color.New(color.FgMagenta, color.Faint).Sprint(s)
 }
 
-// Seperator use magenta and faint to format the text
-func Seperator(s string) string {
+// Separator use magenta and faint to format the text
+func Separator(s string) string {
 	return color.New(color.FgBlack, color.Faint, color.Concealed).Sprint(s)
 }
 

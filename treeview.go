@@ -69,7 +69,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	linesUsedCount := 0
 	allItems := make([]string, 0, len(w.items))
 
-	allItems = append(allItems, style.Seperator("  ---\n"))
+	allItems = append(allItems, style.Separator("  ---\n"))
 
 	for i, s := range w.items {
 		var itemToShow string
@@ -78,7 +78,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		} else {
 			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.display + "\n" + style.Seperator("  ---") + "\n"
+		itemToShow = itemToShow + s.display + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)
