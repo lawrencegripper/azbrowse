@@ -72,11 +72,11 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	for i, s := range w.items {
 		var itemToShow string
 		if i == w.selected {
-			itemToShow = "▶  "
+			itemToShow = "▶ "
 		} else {
-			itemToShow = "   "
+			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.display + "\n"
+		itemToShow = itemToShow + s.display + "\n  ---\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)
@@ -210,7 +210,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, TreeNode{
 				parentid:         currentItem.id,
 				namespace:        "None",
-				display:          style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
+				display:          style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
 				name:             "Deployments",
 				id:               currentItem.id,
 				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
@@ -225,7 +225,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
 			}
 			newItems = append(newItems, TreeNode{
-				display:          style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
+				display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
 				name:             rg.Name,
 				parentid:         currentItem.id,
 				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
