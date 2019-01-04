@@ -135,7 +135,7 @@ func (w *ListWidget) GoBack() {
 	if previousPage == nil {
 		return
 	}
-	w.contentView.SetContent(previousPage.Data)
+	w.contentView.SetContent(previousPage.Data, "Response")
 	w.selected = 0
 	w.items = previousPage.Value
 	w.title = previousPage.Title
@@ -249,7 +249,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
 	}
 
-	w.contentView.SetContent(data)
+	w.contentView.SetContent(data, currentItem.name)
 	w.view.Title = w.title
 }
 

@@ -15,7 +15,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/search"
 	"github.com/lawrencegripper/azbrowse/storage"
-	"github.com/lawrencegripper/azbrowse/style"
 	"github.com/lawrencegripper/azbrowse/tracing"
 	"github.com/lawrencegripper/azbrowse/version"
 
@@ -269,7 +268,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			content.SetContent(style.Title("Delete response for item:"+item.deleteURL+"\n ------------------------------- \n") + res)
+			content.SetContent(res, "Delete response>"+item.name)
 			status.Status("Delete request sent successfully: "+item.deleteURL, false)
 
 			deleteConfirmItemID = ""
@@ -300,10 +299,10 @@ func main() {
 			list.SetSubscriptions(subRequest)
 
 			if err != nil {
-				content.SetContent(err.Error())
+				content.SetContent(err.Error(), "Error")
 				return nil
 			}
-			content.SetContent(data)
+			content.SetContent(data, "Subscriptions response")
 			return nil
 		})
 
