@@ -2,6 +2,15 @@
 set -e
 cd `dirname $0`
 
+# This script builds executables for multiple platforms and architectures 
+# it is used by the CI system to output releases. When testing locally it shouldn't be required
+# unless you wish to share a build with someone on a different platform
+
+if [ -z "$BUILD_NUMBER" ]; then
+    echo "Envvar 'BUILD_NUMBER' must be set for this script to work correctly. When building locally for debugging/testing this script is not needed use 'go build' instead."
+    exit 1
+fi 
+
 VERSION="1.0.$BUILD_NUMBER"
 GIT_COMMIT=$(git rev-parse HEAD)
 BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')

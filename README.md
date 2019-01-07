@@ -44,6 +44,10 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ![tracing ui](docs/trace.png)
 
+## Developing 
+
+Clone the repository then use `go build` or `go install` to build the tool and run it locally. Before submitting a PR you can test the CI process locally by running `./scripts/ci.sh` this requires `docker` be installed and configured on your box. 
+
 ## Plans
 
 [Issues on the repository track plans](https://github.com/lawrencegripper/azbrowse/issues), I'd love help so feel free to comment on an issue you'd like to work on and we'll go from there.
