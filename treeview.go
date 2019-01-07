@@ -45,6 +45,7 @@ type ListWidget struct {
 	title       string
 	ctx         context.Context
 	selected    int
+	view        *gocui.View
 }
 
 // NewListWidget creates a new instance
@@ -59,6 +60,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
+	w.view = v
 
 	if len(w.items) < 1 {
 		return nil
@@ -67,21 +69,23 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	linesUsedCount := 0
 	allItems := make([]string, 0, len(w.items))
 
+	allItems = append(allItems, style.Separator("  ---\n"))
+
 	for i, s := range w.items {
 		var itemToShow string
 		if i == w.selected {
-			itemToShow = "▶  "
+			itemToShow = "▶ "
 		} else {
-			itemToShow = "   "
+			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.display + "\n"
+		itemToShow = itemToShow + s.display + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)
 	}
 
 	linesPerItem := linesUsedCount / len(w.items)
-	maxItemsCanShow := w.h / linesPerItem
+	maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
 
 	for i, item := range allItems {
 		// Skip items above the selection to allow scrolling
@@ -124,6 +128,7 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 
 	w.title = "Subscriptions"
 	w.items = newList
+	w.view.Title = w.title
 }
 
 // GoBack takes the user back to preview view
@@ -132,11 +137,12 @@ func (w *ListWidget) GoBack() {
 	if previousPage == nil {
 		return
 	}
-	w.contentView.SetContent(previousPage.Data)
+	w.contentView.SetContent(previousPage.Data, "Response")
 	w.selected = 0
 	w.items = previousPage.Value
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
+	w.view.Title = w.title
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
@@ -206,7 +212,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, TreeNode{
 				parentid:         currentItem.id,
 				namespace:        "None",
-				display:          style.Subtle("[Microsoft.Resources]") + "\n   Deployments",
+				display:          style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
 				name:             "Deployments",
 				id:               currentItem.id,
 				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
@@ -221,7 +227,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
 			}
 			newItems = append(newItems, TreeNode{
-				display:          style.Subtle("["+rg.Type+"] \n   ") + rg.Name,
+				display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
 				name:             rg.Name,
 				parentid:         currentItem.id,
 				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
@@ -244,8 +250,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if err == nil {
 		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
 	}
-	w.contentView.SetContent(style.Title(w.title) + "\n-------------------------------------------------------\n" + data)
 
+	w.contentView.SetContent(data, currentItem.name)
+	w.view.Title = w.title
 }
 
 // ChangeSelection updates the selected item
