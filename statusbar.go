@@ -50,9 +50,9 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Wrap = true
 
 	if w.loading {
-		fmt.Fprint(v, style.Loading(w.message))
+		fmt.Fprint(v, style.Loading("⏳  "+w.message))
 	} else {
-		fmt.Fprint(v, style.Completed(w.message))
+		fmt.Fprint(v, style.Completed("✓ "+w.message))
 	}
 	fmt.Fprint(v, w.messageAddition)
 
