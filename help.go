@@ -7,30 +7,9 @@ import (
 	"github.com/lawrencegripper/azbrowse/style"
 )
 
-var showHelp bool
-
 // ToggleHelpView shows and hides the help view
 func ToggleHelpView(g *gocui.Gui) {
-	showHelp = !showHelp
 
-	// If we're up and running clear and redraw the view
-	// if w.g != nil {
-	if showHelp {
-		g.Update(func(g *gocui.Gui) error {
-			maxX, maxY := g.Size()
-			// Padding
-			maxX = maxX - 2
-			maxY = maxY - 2
-			v, err := g.SetView("helpWidget", 1, 1, 140, 32)
-			if err != nil && err != gocui.ErrUnknownView {
-				panic(err)
-			}
-			DrawHelp(v)
-			return nil
-		})
-	} else {
-		g.DeleteView("helpWidget")
-	}
 	// }
 }
 
@@ -46,13 +25,13 @@ func DrawHelp(v *gocui.View) {
                         Interactive CLI for browsing Azure resources                                                                                                                                                                     
 # Navigation                                                                                                                                                                                                                                                
                                                                                                                                                                                                                                                 
-| Key       | Does                 |                                                                                                                                                                                                                                                 
-| --------- | -------------------- |                                                                                                                                                                                                            
-| ↑/↓       | Select resource      |                                                                                                                                                                                                           
-| Backspace | Go back              |                                                                                                                                                                                                           
-| ENTER     | Expand/View resource |                                                                                                                                                                                                           
-| F5        | Refresh              |                                                                                                                                                                                                           
-| CTRL+H    | Show this page       |                                                                                                                                                                                                           
+| Key         | Does                 |                                                                                                                                                                                                                                                 
+| ----------- | -------------------- |                                                                                                                                                                                                            
+| ↑/↓         | Select resource      |                                                                                                                                                                                                           
+| Backspace/← | Go back              |                                                                                                                                                                                                           
+| ENTER/→     | Expand/View resource |                                                                                                                                                                                                           
+| F5          | Refresh              |                                                                                                                                                                                                           
+| CTRL+H      | Show this page       |                                                                                                                                                                                                           
                                                                                                                                                                                                            
 # Operations	                                                                                                                                                                                                           
                                                                                                                                                                                                            

@@ -132,13 +132,6 @@ func main() {
 	g.SetManager(status, content, list)
 	g.SetCurrentView("listWidget")
 
-	if err := g.SetKeybinding("", gocui.KeyCtrlH, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ChangeSelection(list.CurrentSelection() + 1)
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
 	if err := g.SetKeybinding("listWidget", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ChangeSelection(list.CurrentSelection() + 1)
 		return nil
@@ -160,6 +153,13 @@ func main() {
 		log.Panicln(err)
 	}
 
+	if err := g.SetKeybinding("listWidget", gocui.KeyArrowRight, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		list.ExpandCurrentSelection()
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
 	if err := g.SetKeybinding("listWidget", gocui.KeyF5, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		list.ExpandCurrentSelection()
@@ -175,7 +175,7 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("listWidget", gocui.KeyArrowLeft, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
 	}); err != nil {
@@ -249,8 +249,21 @@ func main() {
 		log.Panicln(err)
 	}
 
+	var showHelp bool
 	if err := g.SetKeybinding("", gocui.KeyCtrlH, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		ToggleHelpView(g)
+		showHelp = !showHelp
+
+		// If we're up and running clear and redraw the view
+		// if w.g != nil {
+		if showHelp {
+			v, err := g.SetView("helppopup", 1, 1, 140, 32)
+			if err != nil && err != gocui.ErrUnknownView {
+				panic(err)
+			}
+			DrawHelp(v)
+		} else {
+			g.DeleteView("helppopup")
+		}
 		return nil
 	}); err != nil {
 		log.Panicln(err)
