@@ -218,6 +218,24 @@ func main() {
 		log.Panicln(err)
 	}
 
+	if err := g.SetKeybinding("listWidget", gocui.KeyArrowRight, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		editModelEnabled = true
+		g.Cursor = true
+		g.SetCurrentView("itemWidget")
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("itemWidget", gocui.KeyArrowLeft, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		editModelEnabled = false
+		g.Cursor = false
+		g.SetCurrentView("listWidget")
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
 	isFullScreen := false
 	if err := g.SetKeybinding("", gocui.KeyCtrlF, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		isFullScreen = !isFullScreen
