@@ -175,6 +175,17 @@ func main() {
 		log.Panicln(err)
 	}
 
+	// When back is pressed in the itemWidget go back and also move
+	// focus to the list of resources
+	if err := g.SetKeybinding("itemWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		g.SetCurrentView("listWidget")
+		g.Cursor = false
+		list.GoBack()
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
 	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
