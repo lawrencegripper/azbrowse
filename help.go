@@ -25,10 +25,10 @@ func DrawHelp(v *gocui.View) {
                         Interactive CLI for browsing Azure resources                                                                                                                                                                     
 # Navigation                                                                                                                                                                                                                                                
                                                                                                                                                                                                                                                 
-| Key         | Does                 |
-| ----------- | -------------------- |
-| ⇧ / ⇩       | Select resource      |
-| ⇦ / ⇨       | Select Menu/JSON     |               
+| Key         | Does                 |                                                                                                                                                                                                                                              
+| ----------- | -------------------- |                                                                                                                                                                                                                                              
+| ⇧ / ⇩       | Select resource      |                                                                                                                                                                                                                                              
+| ⇦ / ⇨       | Select Menu/JSON     |                                                                                                                                                                                                                                                             
 | Backspace   | Go back              |                                                                                                                                                                                                           
 | ENTER       | Expand/View resource |                                                                                                                                                                                                           
 | F5          | Refresh              |                                                                                                                                                                                                           

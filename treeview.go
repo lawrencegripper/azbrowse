@@ -246,13 +246,16 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	if currentItem.expandReturnType == "none" {
 		w.title = w.title + ">" + currentItem.name
+		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.name)
+		w.view.Title = w.title
+	} else {
+		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen] "+currentItem.name)
 	}
+
 	if err == nil {
 		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
 	}
 
-	w.contentView.SetContent(data, currentItem.name)
-	w.view.Title = w.title
 }
 
 // ChangeSelection updates the selected item
