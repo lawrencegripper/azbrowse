@@ -46,7 +46,7 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
-	v.Title = `Status (CTRL+H for Help)`
+	v.Title = `Status (CTRL+I for Help)`
 	v.Wrap = true
 
 	if w.loading {

@@ -153,13 +153,6 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowRight, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ExpandCurrentSelection()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
 	if err := g.SetKeybinding("listWidget", gocui.KeyF5, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		list.ExpandCurrentSelection()
@@ -168,6 +161,7 @@ func main() {
 		log.Panicln(err)
 	}
 
+	// Handle backspace for modern terminals
 	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
@@ -175,7 +169,10 @@ func main() {
 		log.Panicln(err)
 	}
 
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowLeft, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	// Handle backspace for out-dated terminals
+	// A side-effect is that this key combination clashes with CTRL+H so we can't use that combination for help... oh well.
+	// https://superuser.com/questions/375864/ctrlh-causing-backspace-instead-of-help-in-emacs-on-cygwin
+	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.GoBack()
 		return nil
 	}); err != nil {
@@ -250,7 +247,7 @@ func main() {
 	}
 
 	var showHelp bool
-	if err := g.SetKeybinding("", gocui.KeyCtrlH, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+	if err := g.SetKeybinding("", gocui.KeyCtrlI, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		showHelp = !showHelp
 
 		// If we're up and running clear and redraw the view

@@ -17,7 +17,7 @@ func ToggleHelpView(g *gocui.Gui) {
 func DrawHelp(v *gocui.View) {
 
 	fmt.Fprint(v, style.Header(`
-	--> PRESS CTRL+H TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH CRTL+H AT ANY TIME. <--                                                                                                                                  
+	--> PRESS CTRL+I TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH CRTL+I AT ANY TIME. <--                                                                                                                                  
                              _       ___                                                                                                                                                                                                 
                             /_\   __| _ )_ _ _____ __ _____ ___                                                                                                                                                                          
                            / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_)                                                                                                                                                                         
@@ -46,7 +46,7 @@ func DrawHelp(v *gocui.View) {
                                                                                                                                                                                                            
 For bugs, issue or to contribute visit: https://github.com/lawrencegripper/azbrowse                                                                        
                                                                                                                                                                                                                                                                                                                                                             
---> PRESS CTRL+H TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH CRTL+H AT ANY TIME. <--                                                                                                                                                                                                            
+--> PRESS CTRL+I TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH CRTL+I AT ANY TIME. <--                                                                                                                                                                                                            
 `))
 
 }
