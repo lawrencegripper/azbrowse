@@ -169,6 +169,17 @@ func main() {
 		log.Panicln(err)
 	}
 
+	// When back is pressed in the itemWidget go back and also move
+	// focus to the list of resources
+	if err := g.SetKeybinding("itemWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		g.SetCurrentView("listWidget")
+		g.Cursor = false
+		list.GoBack()
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
 	// Handle backspace for out-dated terminals
 	// A side-effect is that this key combination clashes with CTRL+H so we can't use that combination for help... oh well.
 	// https://superuser.com/questions/375864/ctrlh-causing-backspace-instead-of-help-in-emacs-on-cygwin
@@ -210,6 +221,24 @@ func main() {
 			g.Cursor = false
 			g.SetCurrentView("listWidget")
 		}
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("listWidget", gocui.KeyArrowRight, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		editModelEnabled = true
+		g.Cursor = true
+		g.SetCurrentView("itemWidget")
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("itemWidget", gocui.KeyArrowLeft, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+		editModelEnabled = false
+		g.Cursor = false
+		g.SetCurrentView("listWidget")
 		return nil
 	}); err != nil {
 		log.Panicln(err)
