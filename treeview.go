@@ -120,7 +120,7 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 			display:          sub.DisplayName,
 			name:             sub.DisplayName,
 			id:               sub.ID,
-			expandURL:        sub.ID + "/resourceGroups?api-version=2014-04-01",
+			expandURL:        sub.ID + "/resourceGroups?api-version=2018-05-01",
 			itemType:         subscriptionType,
 			expandReturnType: resourceGroupType,
 		})
@@ -185,7 +185,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		for _, rg := range rgResponse.Groups {
 			newItems = append(newItems, TreeNode{
 				name:             rg.Name,
-				display:          rg.Name,
+				display:          rg.Name + " " + drawStatus(rg.Properties.ProvisioningState),
 				id:               rg.ID,
 				parentid:         currentItem.id,
 				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
@@ -274,4 +274,30 @@ func (w *ListWidget) CurrentSelection() int {
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *TreeNode {
 	return &w.items[w.selected]
+}
+
+func drawStatus(s string) string {
+	switch s {
+	case "Deleting":
+		return "☠"
+	case "Updating":
+		return "⚙️"
+	case "Resuming":
+		return "⚙️"
+	case "Starting":
+		return "⚙️"
+	case "Provisioning":
+		return "⌛"
+	case "Creating":
+		return "🧱"
+	case "Preparing":
+		return "🧱"
+	case "Scaling":
+		return "𝄩"
+	case "Suspended":
+		return "⛔"
+	case "Suspending":
+		return "⛔"
+	}
+	return ""
 }
