@@ -134,8 +134,12 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 // Refresh refreshes the current view
 func (w *ListWidget) Refresh() {
 	w.statusView.Status("Refreshing", true)
+	currentSelection := w.CurrentSelection()
+
 	w.GoBack()
 	w.ExpandCurrentSelection()
+
+	w.ChangeSelection(currentSelection)
 	w.statusView.Status("Done refreshing", false)
 }
 
