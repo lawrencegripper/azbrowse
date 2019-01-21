@@ -3,20 +3,22 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
+	"regexp"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests
 type ItemWidget struct {
-	x, y    int
-	w, h    int
-	content string
-	view    *gocui.View
-	g       *gocui.Gui
+	x, y      int
+	w, h      int
+	hideGuids bool
+	content   string
+	view      *gocui.View
+	g         *gocui.Gui
 }
 
 // NewItemWidget creates a new instance of ItemWidget
-func NewItemWidget(x, y, w, h int, content string) *ItemWidget {
-	return &ItemWidget{x: x, y: y, w: w, h: h, content: content}
+func NewItemWidget(x, y, w, h int, hideGuids bool, content string) *ItemWidget {
+	return &ItemWidget{x: x, y: y, w: w, h: h, hideGuids: hideGuids, content: content}
 }
 
 // Layout draws the widget in the gocui view
@@ -31,6 +33,11 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 
 	w.view = v
 	v.Clear()
+
+	if w.hideGuids {
+		guidRegex := regexp.MustCompile(`[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?`)
+		w.content = guidRegex.ReplaceAllString(w.content, "00000000-0000-0000-0000-HIDDEN000000")
+	}
 
 	fmt.Fprint(v, w.content)
 
