@@ -154,8 +154,7 @@ func main() {
 	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyF5, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.GoBack()
-		list.ExpandCurrentSelection()
+		list.Refresh()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -319,6 +318,8 @@ func main() {
 			status.Status("Delete request sent successfully: "+item.deleteURL, false)
 
 			deleteConfirmItemID = ""
+
+			list.Refresh()
 
 		}
 		return nil
