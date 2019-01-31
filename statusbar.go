@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/jroimartin/gocui"
@@ -49,6 +50,11 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Clear()
 	v.Title = `Status [CTRL+I -> Help]`
 	v.Wrap = true
+
+	if hideGuids {
+		guidRegex := regexp.MustCompile(`[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?`)
+		w.message = guidRegex.ReplaceAllString(w.message, "00000000-0000-0000-0000-HIDDEN000000")
+	}
 
 	if w.loading {
 		fmt.Fprint(v, style.Loading("⏳  "+w.at.Format("15:04:05")+" "+w.message))
