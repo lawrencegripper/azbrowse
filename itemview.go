@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
-	"regexp"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests
@@ -35,20 +34,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	v.Clear()
 
 	if w.hideGuids {
-		guidRegex := regexp.MustCompile(`[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?`)
-		w.content = guidRegex.ReplaceAllString(w.content, "00000000-0000-0000-0000-HIDDEN000000")
-
-		idRegex := regexp.MustCompile(`"id":.*`)
-		w.content = idRegex.ReplaceAllString(w.content, `"id": "HIDDEN",`)
-
-		locationRegex := regexp.MustCompile(`"location":.*`)
-		w.content = locationRegex.ReplaceAllString(w.content, `"location": "HIDDEN",`)
-
-		fqdnRegex := regexp.MustCompile(`"fqdn":.*`)
-		w.content = fqdnRegex.ReplaceAllString(w.content, `"fqdn": "HIDDEN",`)
-
-		nameRegex := regexp.MustCompile(`"name":.*`)
-		w.content = nameRegex.ReplaceAllString(w.content, `"name": "HIDDEN",`)
+		w.content = stripSecretVals(w.content)
 	}
 
 	fmt.Fprint(v, w.content)

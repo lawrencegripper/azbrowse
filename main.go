@@ -327,12 +327,11 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
+			list.Refresh()
 			content.SetContent(res, "Delete response>"+item.name)
 			status.Status("Delete request sent successfully: "+item.deleteURL, false)
 
 			deleteConfirmItemID = ""
-
-			list.Refresh()
 
 		}
 		return nil

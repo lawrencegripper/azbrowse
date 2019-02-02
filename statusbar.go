@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/jroimartin/gocui"
@@ -52,8 +51,7 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Wrap = true
 
 	if hideGuids {
-		guidRegex := regexp.MustCompile(`[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?`)
-		w.message = guidRegex.ReplaceAllString(w.message, "00000000-0000-0000-0000-HIDDEN000000")
+		w.message = stripSecretVals(w.message)
 	}
 
 	if w.loading {
@@ -70,5 +68,8 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 func (w *StatusbarWidget) Status(message string, loading bool) {
 	w.at = time.Now()
 	w.message = message
+	if hideGuids {
+		w.message = "[DEMO MODE - SOME DATA HIDDEN] " + w.message
+	}
 	w.loading = loading
 }
