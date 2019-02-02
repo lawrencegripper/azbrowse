@@ -202,7 +202,7 @@ func main() {
 		if protalURL == "" {
 			protalURL = "https://portal.azure.com"
 		}
-		url := protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.parentid + "/overview"
+		url := protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.Parentid + "/overview"
 		span, _ := tracing.StartSpanFromContext(ctx, "openportal:url")
 		open.Run(url)
 		span.Finish()
@@ -301,22 +301,22 @@ func main() {
 	var deleteConfirmCount int
 	if err := g.SetKeybinding("", gocui.KeyDelete, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		item := list.CurrentItem()
-		if deleteConfirmItemID != item.id {
-			deleteConfirmItemID = item.id
+		if deleteConfirmItemID != item.ID {
+			deleteConfirmItemID = item.ID
 			deleteConfirmCount = 0
 		}
-		status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.deleteURL, true)
+		status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.DeleteURL, true)
 		deleteConfirmCount++
 
 		if deleteConfirmCount > 1 {
-			status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.deleteURL, true)
+			status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.DeleteURL, true)
 
-			res, err := armclient.DoRequest(ctx, "DELETE", item.deleteURL)
+			res, err := armclient.DoRequest(ctx, "DELETE", item.DeleteURL)
 			if err != nil {
 				panic(err)
 			}
-			content.SetContent(res, "Delete response>"+item.name)
-			status.Status("Delete request sent successfully: "+item.deleteURL, false)
+			content.SetContent(res, "Delete response>"+item.Name)
+			status.Status("Delete request sent successfully: "+item.DeleteURL, false)
 
 			deleteConfirmItemID = ""
 

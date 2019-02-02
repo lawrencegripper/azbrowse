@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/lawrencegripper/azbrowse/tracing"
-	// "fmt"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/handlers"
+	"github.com/lawrencegripper/azbrowse/tracing"
 	"strings"
 )
 
@@ -14,10 +14,10 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	list.statusView.Status("Getting available Actions", true)
 
 	currentItem := list.CurrentItem()
-	span, ctx := tracing.StartSpanFromContext(ctx, "actions:"+currentItem.name, tracing.SetTag("item", currentItem))
+	span, ctx := tracing.StartSpanFromContext(ctx, "actions:"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	data, err := armclient.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
+	data, err := armclient.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().Namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
 	if err != nil {
 		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}
@@ -27,22 +27,22 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 		panic(err)
 	}
 
-	items := []TreeNode{}
+	items := []handlers.TreeNode{}
 	for _, resOps := range opsRequest.ResourceTypes {
-		if resOps.Name == strings.Split(list.CurrentItem().armType, "/")[1] {
+		if resOps.Name == strings.Split(list.CurrentItem().ArmType, "/")[1] {
 			for _, op := range resOps.Operations {
-				resourceAPIVersion, err := armclient.GetAPIVersion(currentItem.armType)
+				resourceAPIVersion, err := armclient.GetAPIVersion(currentItem.ArmType)
 				if err != nil {
 					list.statusView.Status("Failed to find an api version: "+err.Error(), false)
 				}
-				stripArmType := strings.Replace(op.Name, currentItem.armType, "", -1)
+				stripArmType := strings.Replace(op.Name, currentItem.ArmType, "", -1)
 				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + resourceAPIVersion
-				items = append(items, TreeNode{
-					name:             op.DisplayName,
-					display:          op.DisplayName,
-					expandURL:        currentItem.id + "/" + actionURL,
-					expandReturnType: actionType,
-					itemType:         "action",
+				items = append(items, handlers.TreeNode{
+					Name:             op.DisplayName,
+					Display:          op.DisplayName,
+					ExpandURL:        currentItem.ID + "/" + actionURL,
+					ExpandReturnType: actionType,
+					ItemType:         "action",
 				})
 			}
 		}

@@ -1,8 +1,10 @@
 package main
 
+import "github.com/lawrencegripper/azbrowse/handlers"
+
 // Page represents a previous view in the nav stack
 type Page struct {
-	Value     []TreeNode
+	Value     []handlers.TreeNode
 	Data      string
 	Title     string
 	Selection int
