@@ -16,6 +16,7 @@ type StatusbarWidget struct {
 	message         string
 	messageAddition string
 	loading         bool
+	at              time.Time
 }
 
 // NewStatusbarWidget create new instance and start go routine for spinner
@@ -49,10 +50,14 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Title = `Status [CTRL+I -> Help]`
 	v.Wrap = true
 
+	if hideGuids {
+		w.message = stripSecretVals(w.message)
+	}
+
 	if w.loading {
-		fmt.Fprint(v, style.Loading("⏳  "+w.message))
+		fmt.Fprint(v, style.Loading("⏳  "+w.at.Format("15:04:05")+" "+w.message))
 	} else {
-		fmt.Fprint(v, style.Completed("✓ "+w.message))
+		fmt.Fprint(v, style.Completed("✓ "+w.at.Format("15:04:05")+" "+w.message))
 	}
 	fmt.Fprint(v, w.messageAddition)
 
@@ -61,6 +66,10 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 
 // Status updates the message in the status bar and whether to show loading indicator
 func (w *StatusbarWidget) Status(message string, loading bool) {
+	w.at = time.Now()
 	w.message = message
+	if hideGuids {
+		w.message = "[DEMO MODE - SOME DATA HIDDEN] " + w.message
+	}
 	w.loading = loading
 }

@@ -131,6 +131,18 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	w.view.Title = w.title
 }
 
+// Refresh refreshes the current view
+func (w *ListWidget) Refresh() {
+	w.statusView.Status("Refreshing", true)
+	currentSelection := w.CurrentSelection()
+
+	w.GoBack()
+	w.ExpandCurrentSelection()
+
+	w.ChangeSelection(currentSelection)
+	w.statusView.Status("Done refreshing", false)
+}
+
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
 	previousPage := w.navStack.Pop()
@@ -185,7 +197,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		for _, rg := range rgResponse.Groups {
 			newItems = append(newItems, TreeNode{
 				name:             rg.Name,
-				display:          rg.Name + " " + drawStatus(rg.Properties.ProvisioningState),
+				display:          rg.Name + drawStatus(rg.Properties.ProvisioningState),
 				id:               rg.ID,
 				parentid:         currentItem.id,
 				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
@@ -227,7 +239,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
 			}
 			newItems = append(newItems, TreeNode{
-				display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
+				display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name + drawStatus(rg.Properties.ProvisioningState),
 				name:             rg.Name,
 				parentid:         currentItem.id,
 				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
@@ -279,25 +291,25 @@ func (w *ListWidget) CurrentItem() *TreeNode {
 func drawStatus(s string) string {
 	switch s {
 	case "Deleting":
-		return "☠"
+		return " ☠ "
 	case "Updating":
-		return "⚙️"
+		return " ⚙️ "
 	case "Resuming":
-		return "⚙️"
+		return " ⚙ ️"
 	case "Starting":
-		return "⚙️"
+		return " ⚙ ️"
 	case "Provisioning":
-		return "⌛"
+		return " ⌛ "
 	case "Creating":
-		return "🧱"
+		return " 🧱 "
 	case "Preparing":
-		return "🧱"
+		return " 🧱 "
 	case "Scaling":
-		return "𝄩"
+		return " 𝄩 "
 	case "Suspended":
-		return "⛔"
+		return " ⛔ "
 	case "Suspending":
-		return "⛔"
+		return " ⛔ "
 	}
 	return ""
 }

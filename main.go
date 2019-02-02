@@ -25,6 +25,7 @@ import (
 )
 
 var enableTracing bool
+var hideGuids bool
 
 func main() {
 
@@ -56,6 +57,10 @@ func main() {
 		if strings.Contains(arg, "debug") {
 			enableTracing = true
 			tracing.EnableDebug()
+		}
+
+		if strings.Contains(arg, "demo") {
+			hideGuids = true
 		}
 	}
 
@@ -126,7 +131,7 @@ func main() {
 	leftColumnWidth := 45
 
 	status := NewStatusbarWidget(1, maxY-2, maxX, g)
-	content := NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, "")
+	content := NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
 	list := NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status)
 
 	g.SetManager(status, content, list)
@@ -154,8 +159,15 @@ func main() {
 	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyF5, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.GoBack()
-		list.ExpandCurrentSelection()
+		list.Refresh()
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
+
+	if err := g.SetKeybinding("listWidget", gocui.KeyF6, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+
+		list.Refresh()
 		return nil
 	}); err != nil {
 		log.Panicln(err)
@@ -315,6 +327,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
+			list.Refresh()
 			content.SetContent(res, "Delete response>"+item.name)
 			status.Status("Delete request sent successfully: "+item.deleteURL, false)
 
