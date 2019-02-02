@@ -1,9 +1,24 @@
 package handlers
 
+import (
+	"context"
+)
+
 // HandlerFunc is used to expand a node in the `TreeView`
 // It takes current node and returns a list of new nodes
 // to be displayed
-type HandlerFunc func(currentNode TreeNode) (matched bool, newNodes []TreeNode, responseContent string, err error)
+type HandlerFunc func(ctx context.Context, currentNode TreeNode) (
+	matched bool, // Does the handler work on this type of node?
+	newNodes *[]TreeNode, // What new items does it want to add to the list?
+	responseContent string, // What response did it get from the API
+	err error)
+
+// Register tracks all the current handlers
+// add new handlers to the array to augment the
+// processing of items in the
+var Register = []HandlerFunc{
+	ResourceGroupHandler,
+}
 
 // TreeNode is an item in the ListWidget
 type TreeNode struct {

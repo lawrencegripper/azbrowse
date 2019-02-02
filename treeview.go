@@ -145,6 +145,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			Selection: w.selected,
 		})
 	}
+
+	w.items = []handlers.TreeNode{}
+
 	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
@@ -186,50 +189,24 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.title = currentItem.Name + ">Resource Groups"
 	}
 
-	if currentItem.ExpandReturnType == resourceType {
-		var resourceResponse armclient.ResourceReseponse
-		err = json.Unmarshal([]byte(data), &resourceResponse)
+	// New handler approach
+	for _, h := range handlers.Register {
+		worksOnItem, newItems, apiResponse, err := h(w.ctx, currentItem)
 		if err != nil {
 			panic(err)
 		}
+		if !worksOnItem {
+			continue
+		}
 
-		newItems := []handlers.TreeNode{}
-		// Add Deployments
-		if currentItem.ItemType == resourceGroupType {
-			newItems = append(newItems, handlers.TreeNode{
-				Parentid:         currentItem.ID,
-				Namespace:        "None",
-				Display:          style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
-				Name:             "Deployments",
-				ID:               currentItem.ID,
-				ExpandURL:        currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
-				ExpandReturnType: deploymentType,
-				ItemType:         resourceType,
-				DeleteURL:        "NotSupported",
-			})
-		}
-		for _, rg := range resourceResponse.Resources {
-			resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
-			if err != nil {
-				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
-			}
-			newItems = append(newItems, handlers.TreeNode{
-				Display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
-				Name:             rg.Name,
-				Parentid:         currentItem.ID,
-				Namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
-				ArmType:          rg.Type,
-				ID:               rg.ID,
-				ExpandURL:        rg.ID + "?api-version=" + resourceAPIVersion,
-				ExpandReturnType: "none",
-				ItemType:         resourceType,
-				DeleteURL:        rg.ID + "?api-version=" + resourceAPIVersion,
-			})
-		}
-		w.items = newItems
-		w.selected = 0
-		w.title = w.title + ">" + currentItem.Name
+		// Todo: How is this handled with multiple handlers per resource?
+		w.contentView.content = apiResponse
+
+		w.items = append(w.items, *newItems...)
 	}
+
+	w.selected = 0
+	w.title = w.title + ">" + currentItem.Name
 
 	if currentItem.ExpandReturnType == "none" {
 		w.title = w.title + ">" + currentItem.Name
