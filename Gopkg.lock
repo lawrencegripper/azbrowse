@@ -26,6 +26,14 @@
   version = "v1.3.1"
 
 [[projects]]
+  digest = "1:259651ca4058543532c88dbdd650fe99d8b02f785dceeae01ba0435a6c9f7c72"
+  name = "github.com/cskr/pubsub"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "a1dc30a0b38055a251f1f04ceb4cc1c7207b0540"
+  version = "v1.0.1"
+
+[[projects]]
   digest = "1:865079840386857c809b72ce300be7580cb50d3d3129ce11bf9aa6ca2bc1934a"
   name = "github.com/fatih/color"
   packages = ["."]
@@ -168,6 +176,14 @@
   version = "v1.1.0"
 
 [[projects]]
+  digest = "1:274f67cb6fed9588ea2521ecdac05a6d62a8c51c074c1fccc6a49a40ba80e925"
+  name = "github.com/satori/go.uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f58768cc1a7a7e77a3bd49e98cdd21419399b6a3"
+  version = "v1.2.0"
+
+[[projects]]
   digest = "1:2b97fd8c3ebafa161b3cf34948a0dd7d1ec27ab3fed686eb3639ead64344e9e6"
   name = "github.com/schollz/closestmatch"
   packages = ["."]
@@ -219,21 +235,6 @@
   pruneopts = "UT"
   revision = "590df8077fbcb06ad62d7714da06c00e5dd2316d"
   version = "v0.5.5"
-
-[[projects]]
-  digest = "1:bc4aaa0db4ea6107fd151d7c56ab48cae34d65a0f409ede7484dfd3c6f793e7e"
-  name = "go.opencensus.io"
-  packages = [
-    ".",
-    "exemplar",
-    "internal",
-    "trace",
-    "trace/internal",
-    "trace/tracestate",
-  ]
-  pruneopts = "UT"
-  revision = "b7bf3cdb64150a8c8c53b769fdeb2ba581bd4d4b"
-  version = "v0.18.0"
 
 [[projects]]
   branch = "master"
@@ -312,13 +313,14 @@
     "github.com/atotto/clipboard",
     "github.com/blang/semver",
     "github.com/boltdb/bolt",
+    "github.com/cskr/pubsub",
     "github.com/fatih/color",
     "github.com/jroimartin/gocui",
     "github.com/opentracing/opentracing-go",
     "github.com/rhysd/go-github-selfupdate/selfupdate",
+    "github.com/satori/go.uuid",
     "github.com/schollz/closestmatch",
     "github.com/skratchdot/open-golang/open",
-    "go.opencensus.io/trace",
     "sourcegraph.com/sourcegraph/appdash",
     "sourcegraph.com/sourcegraph/appdash/opentracing",
     "sourcegraph.com/sourcegraph/appdash/traceapp",

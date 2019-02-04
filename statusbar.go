@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/eventing"
 	"github.com/lawrencegripper/azbrowse/style"
 )
 
@@ -21,18 +22,26 @@ type StatusbarWidget struct {
 // NewStatusbarWidget create new instance and start go routine for spinner
 func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
 	widget := &StatusbarWidget{name: "statusBarWidget", x: x, y: y, w: w}
+
+	newEvents := eventing.SubscribeToStatusEvents()
 	// Start loop for showing loading in statusbar
 	go func() {
 		for {
-			time.Sleep(time.Second)
-			g.Update(func(gui *gocui.Gui) error {
-				if widget.loading {
-					widget.messageAddition = widget.messageAddition + "."
-				} else {
-					widget.messageAddition = ""
-				}
-				return nil
-			})
+			select {
+			case eventObj := <-newEvents:
+				event := eventObj.(eventing.StatusEvent)
+				widget.message = event.Message
+			default:
+				time.Sleep(time.Second)
+				g.Update(func(gui *gocui.Gui) error {
+					if widget.loading {
+						widget.messageAddition = widget.messageAddition + "."
+					} else {
+						widget.messageAddition = ""
+					}
+					return nil
+				})
+			}
 
 		}
 	}()
@@ -61,6 +70,9 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 
 // Status updates the message in the status bar and whether to show loading indicator
 func (w *StatusbarWidget) Status(message string, loading bool) {
-	w.message = message
-	w.loading = loading
+	eventing.SendStatusEvent(eventing.StatusEvent{
+		Message:    message,
+		InProgress: loading,
+		Timeout:    time.Duration(time.Second * 3),
+	})
 }
