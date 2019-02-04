@@ -19,11 +19,20 @@ const (
 	actionType        = "action"
 )
 
-// ResourceGroupHandler expands resource group items
-func ResourceGroupHandler(ctx context.Context, currentItem TreeNode) (bool, *[]TreeNode, string, error) {
-	if currentItem.ItemType != resourceGroupType {
-		return false, nil, "", nil
+// ResourceGroupResourceExpander expands resource under an RG
+type ResourceGroupResourceExpander struct{}
+
+// DoesExpand checks if this is an RG
+func (e *ResourceGroupResourceExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
+	if currentItem.ItemType == resourceGroupType {
+		return true, nil
 	}
+
+	return false, nil
+}
+
+// Expand returns Resources in the RG
+func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem TreeNode) ExpanderResult {
 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
@@ -31,7 +40,11 @@ func ResourceGroupHandler(ctx context.Context, currentItem TreeNode) (bool, *[]T
 	method := "GET"
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
-		return true, nil, string(data), fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
+		return ExpanderResult{
+			Nodes:    nil,
+			Response: string(data),
+			Err:      fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+		}
 	}
 
 	var resourceResponse armclient.ResourceReseponse
@@ -74,5 +87,8 @@ func ResourceGroupHandler(ctx context.Context, currentItem TreeNode) (bool, *[]T
 		})
 	}
 
-	return true, &newItems, string(data), nil
+	return ExpanderResult{
+		Nodes:    &newItems,
+		Response: string(data),
+	}
 }

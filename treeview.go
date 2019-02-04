@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/lawrencegripper/azbrowse/tracing"
 	"strings"
+	"time"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
@@ -190,19 +191,44 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	// New handler approach
+	handlerExpanding := 0
+	completedExpands := make(chan handlers.ExpanderResult)
+
+	// Check which expanders are interested and kick them off
 	for _, h := range handlers.Register {
-		worksOnItem, newItems, apiResponse, err := h(w.ctx, currentItem)
+		doesExpand, err := h.DoesExpand(w.ctx, currentItem)
 		if err != nil {
 			panic(err)
 		}
-		if !worksOnItem {
+		if !doesExpand {
 			continue
 		}
 
-		// Todo: How is this handled with multiple handlers per resource?
-		w.contentView.content = apiResponse
+		// Fire each handler in parellel
+		go func() {
+			completedExpands <- h.Expand(ctx, currentItem)
+		}()
 
-		w.items = append(w.items, *newItems...)
+		handlerExpanding = handlerExpanding + 1
+	}
+
+	// Lets give all the expanders 45secs to completed
+	timeout := time.After(time.Second * 45)
+	for index := 0; index < handlerExpanding; index++ {
+		select {
+		case done := <-completedExpands:
+			// Did it fail?
+			if done.Err != nil {
+				panic(err) // Todo: Replace panic with status update
+			}
+			if done.Nodes == nil {
+				continue
+			}
+			// Add the items it found
+			w.items = append(w.items, *done.Nodes...)
+		case <-timeout:
+			panic("Expander timed out after 45seconds") // Todo: Replace panic with status update
+		}
 	}
 
 	w.selected = 0
