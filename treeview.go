@@ -156,7 +156,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.ExpandReturnType == actionType {
 		method = "POST"
 	}
-	w.statusView.Status("Requesting:"+currentItem.ExpandURL, true)
+
+	done := w.statusView.Status("Requesting:"+currentItem.ExpandURL, true)
+	defer done()
 
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
@@ -240,10 +242,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.view.Title = w.title
 	} else {
 		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen] "+currentItem.Name)
-	}
-
-	if err == nil {
-		w.statusView.Status("Fetching item completed:"+currentItem.ExpandURL, false)
 	}
 
 }
