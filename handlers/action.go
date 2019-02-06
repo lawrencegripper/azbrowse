@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/eventing"
@@ -28,17 +29,14 @@ func (e *ActionExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (
 func (e *ActionExpander) Expand(ctx context.Context, currentItem TreeNode) ExpanderResult {
 	method := "POST"
 
-	status, done := eventing.SendStatusEvent(eventing.StatusEvent{
+	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		InProgress: true,
-		Message:    "Requestion Resource Groups for subscription",
+		Message:    "Action:" + currentItem.Name + " @ " + currentItem.ID,
+		Timeout:    time.Duration(time.Second * 45),
 	})
 	defer done()
 
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
-	if err != nil {
-		status.Message = "Failed" + err.Error() + currentItem.ExpandURL
-		status.Update()
-	}
 
 	return ExpanderResult{
 		Err:               err,

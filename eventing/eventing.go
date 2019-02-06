@@ -19,6 +19,7 @@ type StatusEvent struct {
 	Timeout    time.Duration
 	createdAt  time.Time
 	InProgress bool
+	Failure    bool
 	id         uuid.UUID
 }
 
@@ -34,7 +35,7 @@ func (s *StatusEvent) CreatedAt() time.Time {
 
 // HasExpired returns true if the message has expired
 func (s *StatusEvent) HasExpired() bool {
-	return s.createdAt.Add(s.Timeout).Before(time.Now())
+	return s.createdAt.Add(s.Timeout).After(time.Now())
 }
 
 // Update sends and update to the status event
@@ -49,7 +50,7 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 
 	// set default timeout
 	if s.Timeout == time.Duration(0) {
-		s.Timeout = time.Duration(time.Second * 35)
+		s.Timeout = time.Duration(time.Second * 5)
 	}
 
 	doneFunc := func() {
