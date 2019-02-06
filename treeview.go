@@ -178,8 +178,13 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 	spanQuery.Finish()
 
-	// Lets give all the expanders 45secs to completed
-	timeout := time.After(time.Second * 45)
+	// Lets give all the expanders 45secs to completed (unless debugging)
+	var timeout <-chan time.Time
+	if enableTracing {
+		timeout = time.After(time.Second * 600)
+	} else {
+		timeout = time.After(time.Second * 45)
+	}
 	for index := 0; index < handlerExpanding; index++ {
 		select {
 		case done := <-completedExpands:
