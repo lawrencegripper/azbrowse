@@ -15,7 +15,7 @@ type StatusbarWidget struct {
 	x, y            int
 	w               int
 	messages        map[string]eventing.StatusEvent
-	currentMessage  eventing.StatusEvent
+	currentMessage  *eventing.StatusEvent
 	messageAddition string
 }
 
@@ -29,6 +29,8 @@ func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
 		messages: map[string]eventing.StatusEvent{},
 	}
 
+	widget.currentMessage = &eventing.StatusEvent{}
+
 	newEvents := eventing.SubscribeToStatusEvents()
 	// Start loop for showing loading in statusbar
 	go func() {
@@ -40,41 +42,38 @@ func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
 				// See if we have any new events
 				event := eventObj.(eventing.StatusEvent)
 				widget.messages[event.ID()] = event
-				if widget.currentMessage.ID() == event.ID() {
-					widget.currentMessage = event
-				}
+				// Favour the most recent message
+				widget.currentMessage = &event
 			case <-timeout:
 				// Update the UI
 				continue
 			}
 
-			// Set the current message
-			if widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
-				// Remove the current message
-				delete(widget.messages, widget.currentMessage.ID())
+			for _, message := range widget.messages {
+				// Remove any that have now expired
+				if message.HasExpired() {
+					delete(widget.messages, message.ID())
+					continue
+				}
+			}
 
-				widget.currentMessage = eventing.StatusEvent{}
-
+			// Set the current message to a non-expired message favour in-progress messages
+			if !widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
+				foundInProgress := false
 				for _, message := range widget.messages {
-					// Remove any that have now expired
-					if message.HasExpired() {
-						delete(widget.messages, message.ID())
-						continue
-					}
-
 					if message.InProgress {
-						widget.currentMessage = message
+						foundInProgress = true
+						widget.currentMessage = &message
+						break
 					}
 				}
 
-				// // If there are no in-progress messages set the first
-				// // non-expired message
-				// if !messageSet {
-				// 	for _, message := range widget.messages {
-				// 		widget.currentMessage = message
-				// 		messageSet = true
-				// 	}
-				// }
+				if !foundInProgress {
+					for _, message := range widget.messages {
+						widget.currentMessage = &message
+						break
+					}
+				}
 			}
 
 			g.Update(func(gui *gocui.Gui) error {
@@ -105,6 +104,8 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 
 	if w.currentMessage.InProgress {
 		fmt.Fprint(v, style.Loading("⏳  "+w.currentMessage.Message))
+	} else if w.currentMessage.Failure {
+		fmt.Fprint(v, style.Loading("☠ "+w.currentMessage.Message))
 	} else {
 		fmt.Fprint(v, style.Completed("✓ "+w.currentMessage.Message))
 	}

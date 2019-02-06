@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/lawrencegripper/azbrowse/eventing"
 	"strings"
 	"time"
 
@@ -75,6 +76,15 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		fmt.Fprintf(v, item)
 	}
 
+	// If the title is getting too long trim things
+	// down from the front
+	if len(w.title) > w.w {
+		trimLength := len(w.title) - w.w + 5 // Add five for spacing and elipsis
+		w.title = ".." + w.title[trimLength:]
+	}
+
+	w.view.Title = w.title
+
 	return nil
 }
 
@@ -108,7 +118,6 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 
 	w.title = "Subscriptions"
 	w.items = newList
-	w.view.Title = w.title
 }
 
 // GoBack takes the user back to preview view
@@ -122,13 +131,21 @@ func (w *ListWidget) GoBack() {
 	w.items = previousPage.Value
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
-	w.view.Title = w.title
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
+	if w.title == "Subscriptions" {
+		w.title = ""
+	}
 
 	currentItem := w.items[w.selected]
+
+	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+		InProgress: true,
+		Message:    "Opening: " + currentItem.ID,
+	})
+
 	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != handlers.ActionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
@@ -184,7 +201,11 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+done.SourceDescription, tracing.SetTag("result", done))
 			// Did it fail?
 			if done.Err != nil {
-				panic(done.Err) // Todo: Replace panic with status update
+				eventing.SendStatusEvent(eventing.StatusEvent{
+					Failure: true,
+					Message: "Expander '" + done.SourceDescription + "' failed on resource: " + currentItem.ID,
+					Timeout: time.Duration(time.Second * 15),
+				})
 			}
 			if done.IsPrimaryResponse {
 				if hasPrimaryResponse {
@@ -201,7 +222,12 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newItems = append(newItems, *done.Nodes...)
 			span.Finish()
 		case <-timeout:
-			panic("Expander timed out after 45seconds") // Todo: Replace panic with status update
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				Failure: true,
+				Message: "Timed out opening:" + currentItem.ID,
+				Timeout: time.Duration(time.Second * 10),
+			})
+			return
 		}
 	}
 
@@ -223,7 +249,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	w.title = w.title + ">" + currentItem.Name
-
+	done()
 }
 
 // ChangeSelection updates the selected item
