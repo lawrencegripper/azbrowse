@@ -171,6 +171,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	spanQuery.Finish()
 
 	// Lets give all the expanders 45secs to completed (unless debugging)
+	hasPrimaryResponse := false
 	var timeout <-chan time.Time
 	if enableTracing {
 		timeout = time.After(time.Second * 600)
@@ -184,6 +185,14 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			// Did it fail?
 			if done.Err != nil {
 				panic(done.Err) // Todo: Replace panic with status update
+			}
+			if done.IsPrimaryResponse {
+				if hasPrimaryResponse {
+					panic("Two handlers returned a primary response for this item... failing")
+				}
+				// Log that we have a primary response
+				hasPrimaryResponse = true
+				w.contentView.SetContent(done.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
 			}
 			if done.Nodes == nil {
 				continue
@@ -204,13 +213,14 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	// Use the default handler to get the resource JSON for display
-	defaultHandler := handlers.DefaultExpander{}
-	result := defaultHandler.Expand(ctx, currentItem)
-	if result.Err != nil {
-		panic(result.Err)
+	if !hasPrimaryResponse {
+		defaultHandler := handlers.DefaultExpander{}
+		result := defaultHandler.Expand(ctx, currentItem)
+		if result.Err != nil {
+			panic(result.Err)
+		}
+		w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
 	}
-
-	w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
 
 	w.title = w.title + ">" + currentItem.Name
 

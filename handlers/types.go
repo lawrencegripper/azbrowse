@@ -21,6 +21,9 @@ type ExpanderResult struct {
 	Nodes             *[]TreeNode
 	Err               error
 	SourceDescription string
+	// When set to true this causes the response
+	// in the result to be displayed in the content panel
+	IsPrimaryResponse bool
 }
 
 // Register tracks all the current handlers
