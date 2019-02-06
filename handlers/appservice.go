@@ -19,13 +19,9 @@ type AppServiceResourceExpander struct {
 
 type handledType struct {
 	name     string
+	display  string
 	endpoint endpoints.EndpointInfo
-	children []child
-}
-
-type child struct {
-	Display  string
-	Endpoint endpoints.EndpointInfo
+	children []handledType
 }
 
 // Name returns the name of the expander
@@ -39,60 +35,56 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 			{
 				name:     "site",
 				endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
-				children: []child{
+				children: []handledType{
 					{
-						Display:  "config",
-						Endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
+						display:  "config",
+						endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
+						children: []handledType{
+							{
+								display:  "appsettings",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "authsettings",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "connectionstrings",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "logs",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "metadata",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "publishingcredentials",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "pushsettings",
+								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01", "POST"),
+							},
+							{
+								display:  "slotConfigNames",
+								endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames", "2018-02-01"),
+							},
+							{
+								display:  "virtualNetwork",
+								endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/virtualNetwork", "2018-02-01"),
+							},
+							{
+								display:  "web",
+								endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
+							},
+						},
 					},
 					{
-						Display:  "siteextensions",
-						Endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
-					},
-				},
-			},
-			{
-				name:     "site/config",
-				endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
-				children: []child{
-					{
-						Display:  "appsettings",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "authsettings",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "connectionstrings",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "logs",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "metadata",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "publishingcredentials",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "pushsettings",
-						Endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01", "POST"),
-					},
-					{
-						Display:  "slotConfigNames",
-						Endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames", "2018-02-01"),
-					},
-					{
-						Display:  "virtualNetwork",
-						Endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/virtualNetwork", "2018-02-01"),
-					},
-					{
-						Display:  "web",
-						Endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
+						display:  "siteextensions",
+						endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
 					},
 				},
 			},
@@ -113,11 +105,15 @@ func getEndpointInfoFromURLWithVerbAndPanicOnError(url string, apiVersion string
 	return endpoint
 }
 
-func (e *AppServiceResourceExpander) getHandledTypeForURL(url string) *handledType {
-	for _, handledType := range e.handledTypes {
+func getHandledTypeForURL(url string, handledTypes []handledType) *handledType {
+	for _, handledType := range handledTypes {
 		matchResult := handledType.endpoint.Match(url)
 		if matchResult.IsMatch {
 			return &handledType
+		}
+		result := getHandledTypeForURL(url, handledType.children)
+		if result != nil {
+			return result
 		}
 	}
 	return nil
@@ -127,7 +123,7 @@ func (e *AppServiceResourceExpander) getHandledTypeForURL(url string) *handledTy
 func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
 	e.ensureInitialized()
 	if currentItem.ItemType == resourceType {
-		item := e.getHandledTypeForURL(currentItem.ExpandURL)
+		item := getHandledTypeForURL(currentItem.ExpandURL, e.handledTypes)
 		if item != nil {
 			return true, nil
 		}
@@ -142,7 +138,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name+":"+currentItem.ID, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	handledType := e.getHandledTypeForURL(currentItem.ExpandURL)
+	handledType := getHandledTypeForURL(currentItem.ExpandURL, e.handledTypes)
 	if handledType == nil {
 		panic(fmt.Errorf("Node Item not found"))
 	}
@@ -169,16 +165,16 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 	templateValues := matchResult.Values
 	for _, child := range handledType.children {
 
-		url, err := child.Endpoint.BuildURL(templateValues)
+		url, err := child.endpoint.BuildURL(templateValues)
 		if err != nil {
-			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
+			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.display, err)
 			panic(err)
 		}
 		newItems = append(newItems, TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "appservice",
-			Name:      child.Display,
-			Display:   child.Display,
+			Name:      child.display,
+			Display:   child.display,
 			ExpandURL: url,
 			ItemType:  resourceType,
 			DeleteURL: "NotSupported",
