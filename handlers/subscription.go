@@ -65,5 +65,6 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem TreeNode)
 		Nodes:             &newItems,
 		Response:          string(data),
 		SourceDescription: "Resource Group Request",
+		IsPrimaryResponse: true,
 	}
 }

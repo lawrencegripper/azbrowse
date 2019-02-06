@@ -88,5 +88,6 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		Nodes:             &newItems,
 		Response:          string(data),
 		SourceDescription: "Resources Request",
+		IsPrimaryResponse: true,
 	}
 }
