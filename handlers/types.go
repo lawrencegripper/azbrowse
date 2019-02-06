@@ -33,6 +33,7 @@ var Register = []Expander{
 	&ResourceGroupResourceExpander{},
 	&SubscriptionExpander{},
 	&ActionExpander{},
+	&AppServiceResourceExpander{},
 }
 
 // TreeNode is an item in the ListWidget
