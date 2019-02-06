@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// TODO: Migrate to a handler...maybe
+
 // LoadActionsView Shows available actions for the current resource
 func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	list.statusView.Status("Getting available Actions", true)
@@ -41,7 +43,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 					Name:             op.DisplayName,
 					Display:          op.DisplayName,
 					ExpandURL:        currentItem.ID + "/" + actionURL,
-					ExpandReturnType: actionType,
+					ExpandReturnType: handlers.ActionType,
 					ItemType:         "action",
 				})
 			}

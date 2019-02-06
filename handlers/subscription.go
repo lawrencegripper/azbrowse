@@ -18,7 +18,7 @@ func (e *SubscriptionExpander) Name() string {
 
 // DoesExpand checks if this is an RG
 func (e *SubscriptionExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
-	if currentItem.ItemType == subscriptionType {
+	if currentItem.ItemType == SubscriptionType {
 		return true, nil
 	}
 

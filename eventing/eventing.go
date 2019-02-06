@@ -61,7 +61,7 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 	return s, doneFunc
 }
 
-// SubscribeToStatusEvents creates a channel which will recieve
+// SubscribeToStatusEvents creates a channel which will receive
 // new `StatusEvent` types
 func SubscribeToStatusEvents() chan interface{} {
 	return pubSub.Sub("statusEvent")

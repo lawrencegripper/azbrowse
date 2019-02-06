@@ -11,14 +11,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/tracing"
 )
 
-const (
-	subscriptionType  = "subscription"
-	resourceGroupType = "resourcegroup"
-	resourceType      = "resource"
-	deploymentType    = "deployment"
-	actionType        = "action"
-)
-
 // ResourceGroupResourceExpander expands resource under an RG
 type ResourceGroupResourceExpander struct{}
 

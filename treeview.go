@@ -14,14 +14,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/style"
 )
 
-const (
-	subscriptionType  = "subscription"
-	resourceGroupType = "resourcegroup"
-	resourceType      = "resource"
-	deploymentType    = "deployment"
-	actionType        = "action"
-)
-
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
 	x, y        int
@@ -102,15 +94,15 @@ func (w *ListWidget) SetNodes(nodes []handlers.TreeNode) {
 
 // SetSubscriptions starts vaidation with the subs found
 func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
+	//Todo: Evaluate moving this to a handler
 	newList := []handlers.TreeNode{}
 	for _, sub := range subs.Subs {
 		newList = append(newList, handlers.TreeNode{
-			Display:          sub.DisplayName,
-			Name:             sub.DisplayName,
-			ID:               sub.ID,
-			ExpandURL:        sub.ID + "/resourceGroups?api-version=2018-05-01",
-			ItemType:         subscriptionType,
-			ExpandReturnType: resourceGroupType,
+			Display:   sub.DisplayName,
+			Name:      sub.DisplayName,
+			ID:        sub.ID,
+			ExpandURL: sub.ID + "/resourceGroups?api-version=2018-05-01",
+			ItemType:  handlers.SubscriptionType,
 		})
 	}
 
@@ -137,7 +129,7 @@ func (w *ListWidget) GoBack() {
 func (w *ListWidget) ExpandCurrentSelection() {
 
 	currentItem := w.items[w.selected]
-	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != actionType {
+	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != handlers.ActionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
 			Data:      w.contentView.GetContent(),
@@ -208,6 +200,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	// or return the default experience for and unknown item
 	if len(newItems) > 0 {
 		w.items = newItems
+		w.selected = 0
 	}
 
 	// Use the default handler to get the resource JSON for display
@@ -219,7 +212,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
 
-	w.selected = 0
 	w.title = w.title + ">" + currentItem.Name
 
 }

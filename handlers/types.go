@@ -29,6 +29,7 @@ type ExpanderResult struct {
 var Register = []Expander{
 	&ResourceGroupResourceExpander{},
 	&SubscriptionExpander{},
+	&ActionExpander{},
 }
 
 // TreeNode is an item in the ListWidget
@@ -44,5 +45,14 @@ type TreeNode struct {
 	Namespace        string            // The ARM Namespace of the item eg StorageAccount
 	ArmType          string            // The ARM type of the item eg Microsoft.Storage/StorageAccount
 	Metadata         map[string]string // Metadata is used to pass arbritray data between `Expander`'s
-
 }
+
+const (
+	// SubscriptionType defines a sub
+	SubscriptionType  = "subscription"
+	resourceGroupType = "resourcegroup"
+	resourceType      = "resource"
+	deploymentType    = "deployment"
+	// ActionType defines an action like `listkey` etc
+	ActionType = "action"
+)
