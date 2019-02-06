@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/tracing"
 	"strings"
 	"time"
+
+	"github.com/lawrencegripper/azbrowse/tracing"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
@@ -167,17 +168,23 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			continue
 		}
 
-		// Fire each handler in parellel
+		// Fire each handler in parallel
+		hCurrent := h // capture current iteration variable
 		go func() {
-			completedExpands <- h.Expand(ctx, currentItem)
+			completedExpands <- hCurrent.Expand(ctx, currentItem)
 		}()
 
 		handlerExpanding = handlerExpanding + 1
 	}
 	spanQuery.Finish()
 
-	// Lets give all the expanders 45secs to completed
-	timeout := time.After(time.Second * 45)
+	// Lets give all the expanders 45secs to completed (unless debugging)
+	var timeout <-chan time.Time
+	if enableTracing {
+		timeout = time.After(time.Second * 600)
+	} else {
+		timeout = time.After(time.Second * 45)
+	}
 	for index := 0; index < handlerExpanding; index++ {
 		select {
 		case done := <-completedExpands:
