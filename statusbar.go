@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/eventing"
 	"github.com/lawrencegripper/azbrowse/style"
 )
 
@@ -13,26 +14,79 @@ type StatusbarWidget struct {
 	name            string
 	x, y            int
 	w               int
-	message         string
+	messages        map[string]eventing.StatusEvent
+	currentMessage  eventing.StatusEvent
 	messageAddition string
-	loading         bool
 }
 
 // NewStatusbarWidget create new instance and start go routine for spinner
 func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
-	widget := &StatusbarWidget{name: "statusBarWidget", x: x, y: y, w: w}
+	widget := &StatusbarWidget{
+		name:     "statusBarWidget",
+		x:        x,
+		y:        y,
+		w:        w,
+		messages: map[string]eventing.StatusEvent{},
+	}
+
+	newEvents := eventing.SubscribeToStatusEvents()
 	// Start loop for showing loading in statusbar
 	go func() {
 		for {
-			time.Sleep(time.Second)
+			// Wait for a second to see if we have any new messages
+			timeout := time.After(time.Second)
+			select {
+			case eventObj := <-newEvents:
+				// See if we have any new events
+				event := eventObj.(eventing.StatusEvent)
+				widget.messages[event.ID()] = event
+				if widget.currentMessage.ID() == event.ID() {
+					widget.currentMessage = event
+				}
+			case <-timeout:
+				// Update the UI
+				continue
+			}
+
+			// Set the current message
+			if widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
+				// Remove the current message
+				delete(widget.messages, widget.currentMessage.ID())
+
+				widget.currentMessage = eventing.StatusEvent{}
+
+				for _, message := range widget.messages {
+					// Remove any that have now expired
+					if message.HasExpired() {
+						delete(widget.messages, message.ID())
+						continue
+					}
+
+					if message.InProgress {
+						widget.currentMessage = message
+					}
+				}
+
+				// // If there are no in-progress messages set the first
+				// // non-expired message
+				// if !messageSet {
+				// 	for _, message := range widget.messages {
+				// 		widget.currentMessage = message
+				// 		messageSet = true
+				// 	}
+				// }
+			}
+
 			g.Update(func(gui *gocui.Gui) error {
-				if widget.loading {
+				if widget.currentMessage.InProgress {
 					widget.messageAddition = widget.messageAddition + "."
 				} else {
 					widget.messageAddition = ""
 				}
 				return nil
 			})
+
+			time.Sleep(time.Second)
 
 		}
 	}()
@@ -49,10 +103,10 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Title = `Status [CTRL+I -> Help]`
 	v.Wrap = true
 
-	if w.loading {
-		fmt.Fprint(v, style.Loading("⏳  "+w.message))
+	if w.currentMessage.InProgress {
+		fmt.Fprint(v, style.Loading("⏳  "+w.currentMessage.Message))
 	} else {
-		fmt.Fprint(v, style.Completed("✓ "+w.message))
+		fmt.Fprint(v, style.Completed("✓ "+w.currentMessage.Message))
 	}
 	fmt.Fprint(v, w.messageAddition)
 
@@ -60,7 +114,11 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 }
 
 // Status updates the message in the status bar and whether to show loading indicator
-func (w *StatusbarWidget) Status(message string, loading bool) {
-	w.message = message
-	w.loading = loading
+func (w *StatusbarWidget) Status(message string, loading bool) func() {
+	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+		Message:    message,
+		InProgress: loading,
+		Timeout:    time.Duration(time.Second * 3),
+	})
+	return done
 }

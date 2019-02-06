@@ -2,43 +2,23 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/tracing"
 	"strings"
+	"time"
+
+	"github.com/lawrencegripper/azbrowse/tracing"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/handlers"
 	"github.com/lawrencegripper/azbrowse/style"
 )
-
-const (
-	subscriptionType  = "subscription"
-	resourceGroupType = "resourcegroup"
-	resourceType      = "resource"
-	deploymentType    = "deployment"
-	actionType        = "action"
-)
-
-// TreeNode is an item in the ListWidget
-type TreeNode struct {
-	parentid         string // The ID of the parent resource
-	id               string // The ID of the resource in ARM
-	name             string // The name of the object returned by the API
-	display          string // The Text used to draw the object in the list
-	expandURL        string // The URL to call to expand the item
-	itemType         string // The type of item either subscription, resourcegroup, resource, deployment or action
-	expandReturnType string // The type of the items returned by the expandURL
-	deleteURL        string // The URL to call to delete the current resource
-	namespace        string // The ARM Namespace of the item eg StorageAccount
-	armType          string // The ARM type of the item eg Microsoft.Storage/StorageAccount
-}
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
 	x, y        int
 	w, h        int
-	items       []TreeNode
+	items       []handlers.TreeNode
 	contentView *ItemWidget
 	statusView  *StatusbarWidget
 	navStack    Stack
@@ -78,7 +58,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		} else {
 			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.display + "\n" + style.Separator("  ---") + "\n"
+		itemToShow = itemToShow + s.Display + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)
@@ -99,7 +79,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 }
 
 // SetNodes allows others to set the list nodes
-func (w *ListWidget) SetNodes(nodes []TreeNode) {
+func (w *ListWidget) SetNodes(nodes []handlers.TreeNode) {
 	w.selected = 0
 	// Capture current view to navstack
 	w.navStack.Push(&Page{
@@ -114,15 +94,15 @@ func (w *ListWidget) SetNodes(nodes []TreeNode) {
 
 // SetSubscriptions starts vaidation with the subs found
 func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
-	newList := []TreeNode{}
+	//Todo: Evaluate moving this to a handler
+	newList := []handlers.TreeNode{}
 	for _, sub := range subs.Subs {
-		newList = append(newList, TreeNode{
-			display:          sub.DisplayName,
-			name:             sub.DisplayName,
-			id:               sub.ID,
-			expandURL:        sub.ID + "/resourceGroups?api-version=2018-05-01",
-			itemType:         subscriptionType,
-			expandReturnType: resourceGroupType,
+		newList = append(newList, handlers.TreeNode{
+			Display:   sub.DisplayName,
+			Name:      sub.DisplayName,
+			ID:        sub.ID,
+			ExpandURL: sub.ID + "/resourceGroups?api-version=2018-05-01",
+			ItemType:  handlers.SubscriptionType,
 		})
 	}
 
@@ -149,7 +129,7 @@ func (w *ListWidget) GoBack() {
 func (w *ListWidget) ExpandCurrentSelection() {
 
 	currentItem := w.items[w.selected]
-	if currentItem.expandReturnType != "none" && currentItem.expandReturnType != actionType {
+	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != handlers.ActionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
 			Data:      w.contentView.GetContent(),
@@ -158,103 +138,81 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			Selection: w.selected,
 		})
 	}
-	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.itemType+":"+currentItem.name, tracing.SetTag("item", currentItem))
+
+	newItems := []handlers.TreeNode{}
+
+	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	method := "GET"
-	if currentItem.expandReturnType == actionType {
-		method = "POST"
-	}
-	w.statusView.Status("Requesting:"+currentItem.expandURL, true)
+	// New handler approach
+	handlerExpanding := 0
+	completedExpands := make(chan handlers.ExpanderResult)
 
-	data, err := armclient.DoRequest(ctx, method, currentItem.expandURL)
-	if err != nil {
-		w.statusView.Status("Failed"+err.Error()+currentItem.expandURL, false)
-	} else if currentItem.expandReturnType == actionType {
-		w.title = "Action Succeeded: " + currentItem.expandURL
-	}
-
-	if currentItem.expandReturnType == resourceGroupType {
-		var rgResponse armclient.ResourceGroupResponse
-		err := json.Unmarshal([]byte(data), &rgResponse)
+	// Check which expanders are interested and kick them off
+	spanQuery, _ := tracing.StartSpanFromContext(ctx, "querexpanders", tracing.SetTag("item", currentItem))
+	for _, h := range handlers.Register {
+		doesExpand, err := h.DoesExpand(w.ctx, currentItem)
+		spanQuery.SetTag(h.Name(), doesExpand)
 		if err != nil {
 			panic(err)
 		}
-
-		newItems := []TreeNode{}
-		for _, rg := range rgResponse.Groups {
-			newItems = append(newItems, TreeNode{
-				name:             rg.Name,
-				display:          rg.Name + " " + drawStatus(rg.Properties.ProvisioningState),
-				id:               rg.ID,
-				parentid:         currentItem.id,
-				expandURL:        rg.ID + "/resources?api-version=2017-05-10",
-				expandReturnType: resourceType,
-				itemType:         resourceGroupType,
-				deleteURL:        rg.ID + "?api-version=2017-05-10",
-			})
+		if !doesExpand {
+			continue
 		}
-		w.items = newItems
-		w.selected = 0
-		w.title = currentItem.name + ">Resource Groups"
+
+		// Fire each handler in parallel
+		hCurrent := h // capture current iteration variable
+		go func() {
+			completedExpands <- hCurrent.Expand(ctx, currentItem)
+		}()
+
+		handlerExpanding = handlerExpanding + 1
 	}
+	spanQuery.Finish()
 
-	if currentItem.expandReturnType == resourceType {
-		var resourceResponse armclient.ResourceReseponse
-		err = json.Unmarshal([]byte(data), &resourceResponse)
-		if err != nil {
-			panic(err)
-		}
-
-		newItems := []TreeNode{}
-		// Add Deployments
-		if currentItem.itemType == resourceGroupType {
-			newItems = append(newItems, TreeNode{
-				parentid:         currentItem.id,
-				namespace:        "None",
-				display:          style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
-				name:             "Deployments",
-				id:               currentItem.id,
-				expandURL:        currentItem.id + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
-				expandReturnType: deploymentType,
-				itemType:         resourceType,
-				deleteURL:        "NotSupported",
-			})
-		}
-		for _, rg := range resourceResponse.Resources {
-			resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
-			if err != nil {
-				w.statusView.Status("Failed to find an api version: "+err.Error(), false)
-			}
-			newItems = append(newItems, TreeNode{
-				display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
-				name:             rg.Name,
-				parentid:         currentItem.id,
-				namespace:        strings.Split(rg.Type, "/")[0], // We just want the namespace not the subresource
-				armType:          rg.Type,
-				id:               rg.ID,
-				expandURL:        rg.ID + "?api-version=" + resourceAPIVersion,
-				expandReturnType: "none",
-				itemType:         resourceType,
-				deleteURL:        rg.ID + "?api-version=" + resourceAPIVersion,
-			})
-		}
-		w.items = newItems
-		w.selected = 0
-		w.title = w.title + ">" + currentItem.name
-	}
-
-	if currentItem.expandReturnType == "none" {
-		w.title = w.title + ">" + currentItem.name
-		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.name)
-		w.view.Title = w.title
+	// Lets give all the expanders 45secs to completed (unless debugging)
+	var timeout <-chan time.Time
+	if enableTracing {
+		timeout = time.After(time.Second * 600)
 	} else {
-		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen] "+currentItem.name)
+		timeout = time.After(time.Second * 45)
+	}
+	for index := 0; index < handlerExpanding; index++ {
+		select {
+		case done := <-completedExpands:
+			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+done.SourceDescription, tracing.SetTag("result", done))
+			// Did it fail?
+			if done.Err != nil {
+				panic(done.Err) // Todo: Replace panic with status update
+			}
+			if done.Nodes == nil {
+				continue
+			}
+			// Add the items it found
+			newItems = append(newItems, *done.Nodes...)
+			span.Finish()
+		case <-timeout:
+			panic("Expander timed out after 45seconds") // Todo: Replace panic with status update
+		}
 	}
 
-	if err == nil {
-		w.statusView.Status("Fetching item completed:"+currentItem.expandURL, false)
+	// Update the list if we have sub items from the expanders
+	// or return the default experience for and unknown item
+	if len(newItems) > 0 {
+		w.items = newItems
+		w.selected = 0
 	}
+
+	// Use the default handler to get the resource JSON for display
+	defaultHandler := handlers.DefaultExpander{}
+	result := defaultHandler.Expand(ctx, currentItem)
+	if result.Err != nil {
+		panic(result.Err)
+	}
+
+	w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+
+	w.title = w.title + ">" + currentItem.Name
 
 }
 
@@ -272,32 +230,6 @@ func (w *ListWidget) CurrentSelection() int {
 }
 
 // CurrentItem returns the selected item as a treenode
-func (w *ListWidget) CurrentItem() *TreeNode {
+func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 	return &w.items[w.selected]
-}
-
-func drawStatus(s string) string {
-	switch s {
-	case "Deleting":
-		return "☠"
-	case "Updating":
-		return "⚙️"
-	case "Resuming":
-		return "⚙️"
-	case "Starting":
-		return "⚙️"
-	case "Provisioning":
-		return "⌛"
-	case "Creating":
-		return "🧱"
-	case "Preparing":
-		return "🧱"
-	case "Scaling":
-		return "𝄩"
-	case "Suspended":
-		return "⛔"
-	case "Suspending":
-		return "⛔"
-	}
-	return ""
 }
