@@ -76,6 +76,15 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		fmt.Fprintf(v, item)
 	}
 
+	// If the title is getting too long trim things
+	// down from the front
+	if len(w.title) > w.w {
+		trimLength := len(w.title) - w.w + 5 // Add five for spacing and elipsis
+		w.title = ".." + w.title[trimLength:]
+	}
+
+	w.view.Title = w.title
+
 	return nil
 }
 
@@ -109,7 +118,6 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 
 	w.title = "Subscriptions"
 	w.items = newList
-	w.view.Title = w.title
 }
 
 // GoBack takes the user back to preview view
@@ -123,11 +131,14 @@ func (w *ListWidget) GoBack() {
 	w.items = previousPage.Value
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
-	w.view.Title = w.title
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
+	if w.title == "Subscriptions" {
+		w.title = ""
+	}
+
 	currentItem := w.items[w.selected]
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
