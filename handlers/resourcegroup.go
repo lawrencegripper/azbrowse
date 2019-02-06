@@ -22,6 +22,11 @@ const (
 // ResourceGroupResourceExpander expands resource under an RG
 type ResourceGroupResourceExpander struct{}
 
+// Name returns the name of the expander
+func (e *ResourceGroupResourceExpander) Name() string {
+	return "ResourceGroupExpander"
+}
+
 // DoesExpand checks if this is an RG
 func (e *ResourceGroupResourceExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
 	if currentItem.ItemType == resourceGroupType {
@@ -88,7 +93,8 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	}
 
 	return ExpanderResult{
-		Nodes:    &newItems,
-		Response: string(data),
+		Nodes:             &newItems,
+		Response:          string(data),
+		SourceDescription: "Resources Request",
 	}
 }

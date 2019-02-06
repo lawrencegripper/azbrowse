@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/lawrencegripper/azbrowse/tracing"
 	"strings"
@@ -147,58 +146,20 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		})
 	}
 
-	w.items = []handlers.TreeNode{}
+	newItems := []handlers.TreeNode{}
 
 	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
-
-	method := "GET"
-	if currentItem.ExpandReturnType == actionType {
-		method = "POST"
-	}
-
-	done := w.statusView.Status("Requesting:"+currentItem.ExpandURL, true)
-	defer done()
-
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
-	if err != nil {
-		w.statusView.Status("Failed"+err.Error()+currentItem.ExpandURL, false)
-	} else if currentItem.ExpandReturnType == actionType {
-		w.title = "Action Succeeded: " + currentItem.ExpandURL
-	}
-
-	if currentItem.ExpandReturnType == resourceGroupType {
-		var rgResponse armclient.ResourceGroupResponse
-		err := json.Unmarshal([]byte(data), &rgResponse)
-		if err != nil {
-			panic(err)
-		}
-
-		newItems := []handlers.TreeNode{}
-		for _, rg := range rgResponse.Groups {
-			newItems = append(newItems, handlers.TreeNode{
-				Name:             rg.Name,
-				Display:          rg.Name + " " + drawStatus(rg.Properties.ProvisioningState),
-				ID:               rg.ID,
-				Parentid:         currentItem.ID,
-				ExpandURL:        rg.ID + "/resources?api-version=2017-05-10",
-				ExpandReturnType: resourceType,
-				ItemType:         resourceGroupType,
-				DeleteURL:        rg.ID + "?api-version=2017-05-10",
-			})
-		}
-		w.items = newItems
-		w.selected = 0
-		w.title = currentItem.Name + ">Resource Groups"
-	}
 
 	// New handler approach
 	handlerExpanding := 0
 	completedExpands := make(chan handlers.ExpanderResult)
 
 	// Check which expanders are interested and kick them off
+	spanQuery, _ := tracing.StartSpanFromContext(ctx, "querexpanders", tracing.SetTag("item", currentItem))
 	for _, h := range handlers.Register {
 		doesExpand, err := h.DoesExpand(w.ctx, currentItem)
+		spanQuery.SetTag(h.Name(), doesExpand)
 		if err != nil {
 			panic(err)
 		}
@@ -213,36 +174,46 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 		handlerExpanding = handlerExpanding + 1
 	}
+	spanQuery.Finish()
 
 	// Lets give all the expanders 45secs to completed
 	timeout := time.After(time.Second * 45)
 	for index := 0; index < handlerExpanding; index++ {
 		select {
 		case done := <-completedExpands:
+			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+done.SourceDescription, tracing.SetTag("result", done))
 			// Did it fail?
 			if done.Err != nil {
-				panic(err) // Todo: Replace panic with status update
+				panic(done.Err) // Todo: Replace panic with status update
 			}
 			if done.Nodes == nil {
 				continue
 			}
 			// Add the items it found
-			w.items = append(w.items, *done.Nodes...)
+			newItems = append(newItems, *done.Nodes...)
+			span.Finish()
 		case <-timeout:
 			panic("Expander timed out after 45seconds") // Todo: Replace panic with status update
 		}
 	}
 
+	// Update the list if we have sub items from the expanders
+	// or return the default experience for and unknown item
+	if len(newItems) > 0 {
+		w.items = newItems
+	}
+
+	// Use the default handler to get the resource JSON for display
+	defaultHandler := handlers.DefaultExpander{}
+	result := defaultHandler.Expand(ctx, currentItem)
+	if result.Err != nil {
+		panic(result.Err)
+	}
+
+	w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+
 	w.selected = 0
 	w.title = w.title + ">" + currentItem.Name
-
-	if currentItem.ExpandReturnType == "none" {
-		w.title = w.title + ">" + currentItem.Name
-		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
-		w.view.Title = w.title
-	} else {
-		w.contentView.SetContent(data, "[CTRL+F -> Fullscreen] "+currentItem.Name)
-	}
 
 }
 
@@ -262,30 +233,4 @@ func (w *ListWidget) CurrentSelection() int {
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 	return &w.items[w.selected]
-}
-
-func drawStatus(s string) string {
-	switch s {
-	case "Deleting":
-		return "☠"
-	case "Updating":
-		return "⚙️"
-	case "Resuming":
-		return "⚙️"
-	case "Starting":
-		return "⚙️"
-	case "Provisioning":
-		return "⌛"
-	case "Creating":
-		return "🧱"
-	case "Preparing":
-		return "🧱"
-	case "Scaling":
-		return "𝄩"
-	case "Suspended":
-		return "⛔"
-	case "Suspending":
-		return "⛔"
-	}
-	return ""
 }

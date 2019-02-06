@@ -12,13 +12,15 @@ import (
 type Expander interface {
 	DoesExpand(ctx context.Context, currentNode TreeNode) (bool, error)
 	Expand(ctx context.Context, currentNode TreeNode) ExpanderResult
+	Name() string
 }
 
 // ExpanderResult used to wrap mult-value return for use in channels
 type ExpanderResult struct {
-	Response string
-	Nodes    *[]TreeNode
-	Err      error
+	Response          string
+	Nodes             *[]TreeNode
+	Err               error
+	SourceDescription string
 }
 
 // Register tracks all the current handlers
@@ -26,6 +28,7 @@ type ExpanderResult struct {
 // processing of items in the
 var Register = []Expander{
 	&ResourceGroupResourceExpander{},
+	&SubscriptionExpander{},
 }
 
 // TreeNode is an item in the ListWidget
