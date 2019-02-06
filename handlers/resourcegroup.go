@@ -76,7 +76,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	for _, rg := range resourceResponse.Resources {
 		resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
 		if err != nil {
-			// w.statusView.Status("Failed to find an api version: "+err.Error(), false)
+			panic(err)
 		}
 		newItems = append(newItems, TreeNode{
 			Display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
