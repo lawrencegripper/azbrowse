@@ -29,20 +29,37 @@ type ResourceGroupResponse struct {
 
 // ResourceReseponse Resources list rest type
 type ResourceReseponse struct {
-	Resources []struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
-		Type string `json:"type"`
-		Sku  struct {
+	Resources []Resource `json:"value"`
+}
+
+type ResourceQueryResponse struct {
+	TotalRecords int `json:"totalRecords"`
+	Count        int `json:"count"`
+	Data         struct {
+		Columns []struct {
 			Name string `json:"name"`
-			Tier string `json:"tier"`
-		} `json:"sku"`
-		Kind     string `json:"kind"`
-		Location string `json:"location"`
-		Tags     struct {
-			MsResourceUsage string `json:"ms-resource-usage"`
-		} `json:"tags"`
-	} `json:"value"`
+			Type string `json:"type"`
+		} `json:"columns"`
+		Rows [][]interface{} `json:"rows"`
+	} `json:"data"`
+	Facets          []interface{} `json:"facets"`
+	ResultTruncated string        `json:"resultTruncated"`
+}
+
+// Resource is a resource in azure
+type Resource struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Type string `json:"type"`
+	Sku  struct {
+		Name string `json:"name"`
+		Tier string `json:"tier"`
+	} `json:"sku"`
+	Kind     string `json:"kind"`
+	Location string `json:"location"`
+	Tags     struct {
+		MsResourceUsage string `json:"ms-resource-usage"`
+	} `json:"tags"`
 }
 
 // ProvidersResponse providers list rest type

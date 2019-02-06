@@ -34,20 +34,27 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	method := "GET"
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	query := "where resourceGroup=='" + currentItem.Name + "' | project name, id, sku, kind, location, tags, properties.provisioningState"
+	data, err := armclient.DoResourceGraphQuery(ctx, currentItem.SubscriptionID, query)
 	if err != nil {
 		return ExpanderResult{
-			Nodes:    nil,
-			Response: string(data),
-			Err:      fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+			Nodes:             nil,
+			Response:          currentItem.Name + query + string(data),
+			IsPrimaryResponse: true,
+			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
 		}
 	}
 
-	var resourceResponse armclient.ResourceReseponse
+	var resourceResponse []armclient.Resource
 	err = json.Unmarshal([]byte(data), &resourceResponse)
 	if err != nil {
-		panic(err)
+
+		return ExpanderResult{
+			Nodes:             nil,
+			Response:          string(data),
+			IsPrimaryResponse: true,
+			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+		}
 	}
 
 	newItems := []TreeNode{}
@@ -63,9 +70,10 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 			ExpandReturnType: deploymentType,
 			ItemType:         resourceType,
 			DeleteURL:        "NotSupported",
+			SubscriptionID:   currentItem.SubscriptionID,
 		})
 	}
-	for _, rg := range resourceResponse.Resources {
+	for _, rg := range resourceResponse {
 		resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
 		if err != nil {
 			panic(err)
@@ -81,12 +89,13 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 			ExpandReturnType: "none",
 			ItemType:         resourceType,
 			DeleteURL:        rg.ID + "?api-version=" + resourceAPIVersion,
+			SubscriptionID:   currentItem.SubscriptionID,
 		})
 	}
 
 	return ExpanderResult{
 		Nodes:             &newItems,
-		Response:          string(data),
+		Response:          currentItem.Name + query + string(data),
 		SourceDescription: "Resources Request",
 		IsPrimaryResponse: true,
 	}

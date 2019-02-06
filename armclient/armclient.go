@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/lawrencegripper/azbrowse/storage"
 	"github.com/lawrencegripper/azbrowse/tracing"
@@ -32,6 +33,10 @@ func GetTenantID() string {
 
 // DoRequest makes an ARM rest request
 func DoRequest(ctx context.Context, method, path string) (string, error) {
+	return doRequestWithBody(ctx, method, path, "")
+}
+
+func doRequestWithBody(ctx context.Context, method, path, body string) (string, error) {
 	span, ctx := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
 	defer span.Finish()
 
@@ -40,9 +45,8 @@ func DoRequest(ctx context.Context, method, path string) (string, error) {
 		return "", err
 	}
 
-	var reqBody string
 	client := &http.Client{}
-	req, _ := http.NewRequest(method, url, bytes.NewReader([]byte(reqBody)))
+	req, _ := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
 
 	cliToken, err := aquireTokenFromAzCLI()
 	if err != nil {
@@ -84,11 +88,19 @@ func DoRequest(ctx context.Context, method, path string) (string, error) {
 	prettyOutput := prettyJSON(buf)
 	if tracing.IsDebug() {
 		span.SetTag("responseBody", truncateString(prettyOutput, 800))
-		span.SetTag("requestBody", reqBody)
+		span.SetTag("requestBody", body)
 		span.SetTag("url", url)
 	}
 
 	return prettyOutput, responseErr
+}
+
+// DoResourceGraphQuery performs an azure graph query
+func DoResourceGraphQuery(ctx context.Context, subscription, query string) (string, error) {
+	messageBody := `{"subscriptions": ["SUB_HERE"], "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0}}`
+	messageBody = strings.Replace(messageBody, "SUB_HERE", subscription, -1)
+	messageBody = strings.Replace(messageBody, "QUERY_HERE", query, -1)
+	return doRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
 }
 
 var resourceAPIVersionLookup map[string]string

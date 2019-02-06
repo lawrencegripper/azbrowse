@@ -108,11 +108,12 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	newList := []handlers.TreeNode{}
 	for _, sub := range subs.Subs {
 		newList = append(newList, handlers.TreeNode{
-			Display:   sub.DisplayName,
-			Name:      sub.DisplayName,
-			ID:        sub.ID,
-			ExpandURL: sub.ID + "/resourceGroups?api-version=2018-05-01",
-			ItemType:  handlers.SubscriptionType,
+			Display:        sub.DisplayName,
+			Name:           sub.DisplayName,
+			ID:             sub.ID,
+			ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
+			ItemType:       handlers.SubscriptionType,
+			SubscriptionID: sub.SubscriptionID,
 		})
 	}
 
@@ -195,6 +196,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	} else {
 		timeout = time.After(time.Second * 45)
 	}
+
+	observedError := false
 	for index := 0; index < handlerExpanding; index++ {
 		select {
 		case done := <-completedExpands:
@@ -203,9 +206,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			if done.Err != nil {
 				eventing.SendStatusEvent(eventing.StatusEvent{
 					Failure: true,
-					Message: "Expander '" + done.SourceDescription + "' failed on resource: " + currentItem.ID,
+					Message: "Expander '" + done.SourceDescription + "' failed on resource: " + currentItem.ID + "Err: " + done.Err.Error(),
 					Timeout: time.Duration(time.Second * 15),
 				})
+				observedError = true
 			}
 			if done.IsPrimaryResponse {
 				if hasPrimaryResponse {
@@ -249,7 +253,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	w.title = w.title + ">" + currentItem.Name
-	done()
+	if !observedError {
+		done()
+	}
 }
 
 // ChangeSelection updates the selected item

@@ -49,6 +49,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem TreeNode)
 				ExpandReturnType: resourceType,
 				ItemType:         resourceGroupType,
 				DeleteURL:        rg.ID + "?api-version=2017-05-10",
+				SubscriptionID:   currentItem.SubscriptionID,
 			})
 		}
 	}
