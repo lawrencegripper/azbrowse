@@ -16,7 +16,7 @@ func (e *SubscriptionExpander) Name() string {
 }
 
 // DoesExpand checks if this is an RG
-func (e *SubscriptionExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
+func (e *SubscriptionExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	if currentItem.ItemType == SubscriptionType {
 		return true, nil
 	}
@@ -25,11 +25,11 @@ func (e *SubscriptionExpander) DoesExpand(ctx context.Context, currentItem TreeN
 }
 
 // Expand returns Resources in the RG
-func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem TreeNode) ExpanderResult {
+func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
 
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
-	newItems := []TreeNode{}
+	newItems := []*TreeNode{}
 
 	//    \/ It's not the usual ... look out
 	if err == nil {
@@ -40,7 +40,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem TreeNode)
 		}
 
 		for _, rg := range rgResponse.Groups {
-			newItems = append(newItems, TreeNode{
+			newItems = append(newItems, &TreeNode{
 				Name:             rg.Name,
 				Display:          rg.Name + " " + drawStatus(rg.Properties.ProvisioningState),
 				ID:               rg.ID,
@@ -56,7 +56,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem TreeNode)
 
 	return ExpanderResult{
 		Err:               err,
-		Nodes:             &newItems,
+		Nodes:             newItems,
 		Response:          string(data),
 		SourceDescription: "Resource Group Request",
 		IsPrimaryResponse: true,

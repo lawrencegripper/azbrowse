@@ -10,15 +10,15 @@ import (
 // `DoesExpand` should return true if this expander can expand the resource
 // `Expand` returns the list of sub items from the resource
 type Expander interface {
-	DoesExpand(ctx context.Context, currentNode TreeNode) (bool, error)
-	Expand(ctx context.Context, currentNode TreeNode) ExpanderResult
+	DoesExpand(ctx context.Context, currentNode *TreeNode) (bool, error)
+	Expand(ctx context.Context, currentNode *TreeNode) ExpanderResult
 	Name() string
 }
 
 // ExpanderResult used to wrap mult-value return for use in channels
 type ExpanderResult struct {
 	Response          string
-	Nodes             *[]TreeNode
+	Nodes             []*TreeNode
 	Err               error
 	SourceDescription string
 	// When set to true this causes the response

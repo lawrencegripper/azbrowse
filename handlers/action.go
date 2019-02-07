@@ -17,7 +17,7 @@ func (e *ActionExpander) Name() string {
 }
 
 // DoesExpand checks if it is an action
-func (e *ActionExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
+func (e *ActionExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	if currentItem.ItemType == ActionType {
 		return true, nil
 	}
@@ -26,7 +26,7 @@ func (e *ActionExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (
 }
 
 // Expand performs the action
-func (e *ActionExpander) Expand(ctx context.Context, currentItem TreeNode) ExpanderResult {
+func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "POST"
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{

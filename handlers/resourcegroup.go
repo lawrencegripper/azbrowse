@@ -29,7 +29,7 @@ func (e *ResourceGroupResourceExpander) Name() string {
 }
 
 // DoesExpand checks if this is an RG
-func (e *ResourceGroupResourceExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
+func (e *ResourceGroupResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	if currentItem.ItemType == resourceGroupType {
 		return true, nil
 	}
@@ -38,7 +38,7 @@ func (e *ResourceGroupResourceExpander) DoesExpand(ctx context.Context, currentI
 }
 
 // Expand returns Resources in the RG
-func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem TreeNode) ExpanderResult {
+func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
@@ -87,8 +87,8 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	}()
 
 	// Add deployment item
-	newItems := []TreeNode{}
-	newItems = append(newItems, TreeNode{
+	newItems := []*TreeNode{}
+	newItems = append(newItems, &TreeNode{
 		Parentid:         currentItem.ID,
 		Namespace:        "None",
 		Display:          style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
@@ -134,7 +134,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		if err != nil {
 			panic(err)
 		}
-		item := TreeNode{
+		item := &TreeNode{
 			Display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
 			Name:             rg.Name,
 			Parentid:         currentItem.ID,
@@ -157,7 +157,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	}
 
 	return ExpanderResult{
-		Nodes:             &newItems,
+		Nodes:             newItems,
 		Response:          armResponse.Result,
 		SourceDescription: "Resources Request",
 		IsPrimaryResponse: true,

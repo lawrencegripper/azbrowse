@@ -29,7 +29,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 		panic(err)
 	}
 
-	items := []handlers.TreeNode{}
+	items := []*handlers.TreeNode{}
 	for _, resOps := range opsRequest.ResourceTypes {
 		if resOps.Name == strings.Split(list.CurrentItem().ArmType, "/")[1] {
 			for _, op := range resOps.Operations {
@@ -39,7 +39,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 				}
 				stripArmType := strings.Replace(op.Name, currentItem.ArmType, "", -1)
 				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + resourceAPIVersion
-				items = append(items, handlers.TreeNode{
+				items = append(items, &handlers.TreeNode{
 					Name:             op.DisplayName,
 					Display:          op.DisplayName,
 					ExpandURL:        currentItem.ID + "/" + actionURL,

@@ -18,7 +18,7 @@ import (
 type ListWidget struct {
 	x, y        int
 	w, h        int
-	items       []handlers.TreeNode
+	items       []*handlers.TreeNode
 	contentView *ItemWidget
 	statusView  *StatusbarWidget
 	navStack    Stack
@@ -88,7 +88,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 }
 
 // SetNodes allows others to set the list nodes
-func (w *ListWidget) SetNodes(nodes []handlers.TreeNode) {
+func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 	w.selected = 0
 	// Capture current view to navstack
 	w.navStack.Push(&Page{
@@ -104,9 +104,9 @@ func (w *ListWidget) SetNodes(nodes []handlers.TreeNode) {
 // SetSubscriptions starts vaidation with the subs found
 func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	//Todo: Evaluate moving this to a handler
-	newList := []handlers.TreeNode{}
+	newList := []*handlers.TreeNode{}
 	for _, sub := range subs.Subs {
-		newList = append(newList, handlers.TreeNode{
+		newList = append(newList, &handlers.TreeNode{
 			Display:        sub.DisplayName,
 			Name:           sub.DisplayName,
 			ID:             sub.ID,
@@ -168,7 +168,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		})
 	}
 
-	newItems := []handlers.TreeNode{}
+	newItems := []*handlers.TreeNode{}
 
 	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
@@ -234,7 +234,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				continue
 			}
 			// Add the items it found
-			newItems = append(newItems, *done.Nodes...)
+			newItems = append(newItems, done.Nodes...)
 			span.Finish()
 		case <-timeout:
 			eventing.SendStatusEvent(eventing.StatusEvent{
@@ -284,5 +284,5 @@ func (w *ListWidget) CurrentSelection() int {
 
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
-	return &w.items[w.selected]
+	return w.items[w.selected]
 }

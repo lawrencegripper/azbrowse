@@ -4,7 +4,7 @@ import "github.com/lawrencegripper/azbrowse/handlers"
 
 // Page represents a previous view in the nav stack
 type Page struct {
-	Value     []handlers.TreeNode
+	Value     []*handlers.TreeNode
 	Data      string
 	Title     string
 	Selection int
