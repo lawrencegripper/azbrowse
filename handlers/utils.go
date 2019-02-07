@@ -7,7 +7,7 @@ func drawStatus(s string) string {
 	case "Failed":
 		return "⛈"
 	case "Updating":
-		return "⚙️"
+		return "⟳"
 	case "Resuming":
 		return "⛅"
 	case "Starting":
