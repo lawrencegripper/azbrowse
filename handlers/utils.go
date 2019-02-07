@@ -1,6 +1,7 @@
 package handlers
 
-func drawStatus(s string) string {
+// DrawStatus converts a status string to an icon
+func DrawStatus(s string) string {
 	switch s {
 	case "Deleting":
 		return "☠"

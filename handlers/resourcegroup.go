@@ -150,7 +150,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 		state, exists := stateMap[item.ID]
 		if exists {
-			item.Display = item.Display + " " + drawStatus(state)
+			item.StatusIndicator = DrawStatus(state)
 		}
 
 		newItems = append(newItems, item)

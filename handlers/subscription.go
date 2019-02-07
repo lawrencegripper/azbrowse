@@ -42,7 +42,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 		for _, rg := range rgResponse.Groups {
 			newItems = append(newItems, &TreeNode{
 				Name:             rg.Name,
-				Display:          rg.Name + " " + drawStatus(rg.Properties.ProvisioningState),
+				Display:          rg.Name,
 				ID:               rg.ID,
 				Parentid:         currentItem.ID,
 				ExpandURL:        rg.ID + "/resources?api-version=2017-05-10",
@@ -50,6 +50,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 				ItemType:         resourceGroupType,
 				DeleteURL:        rg.ID + "?api-version=2017-05-10",
 				SubscriptionID:   currentItem.SubscriptionID,
+				StatusIndicator:  DrawStatus(rg.Properties.ProvisioningState),
 			})
 		}
 	}

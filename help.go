@@ -45,9 +45,15 @@ func DrawHelp(v *gocui.View) {
 | CTLT+S              | Save JSON to clipboard    | Saves the last JSON response to the clipboard for export                           |                                                                                                                                                                                                           
 | CTLT+A              | View Actions for resource | This allows things like ListKeys on storage or Restart on VMs                      |                                                                                                                                                                                                           
                                                                                                                                                                                                            
-For bugs, issue or to contribute visit: https://github.com/lawrencegripper/azbrowse                                                                        
+For bugs, issue or to contribute visit: https://github.com/lawrencegripper/azbrowse                                                                                                                                                                                                                                 
+                                                                                                                                                                                                           
+# Status Icons                                                                                                                                                                                                           
+                                                                                                                                                                                                           
+Deleting: ☠ Failed: ⛈  Updating: ⟳  Resuming/Starting:    ⛅  Provisioning: ⌛                                                                                                                                                                                                            
+Creating\Preparing: 🏗  Scaling:  ⚖   Suspended/Suspending: ⛔  Succeeded:   🌣                                                                                                                                                                                                                                                             
                                                                                                                                                                                                                                                                                                                                                             
 --> PRESS CTRL+I TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH CRTL+I AT ANY TIME. <--                                                                                                                                                                                                            
+
 `))
 
 }

@@ -58,7 +58,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		} else {
 			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.Display + "\n" + style.Separator("  ---") + "\n"
+		itemToShow = itemToShow + s.Display + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		allItems = append(allItems, itemToShow)

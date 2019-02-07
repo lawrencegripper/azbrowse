@@ -49,6 +49,7 @@ type TreeNode struct {
 	ArmType          string            // The ARM type of the item eg Microsoft.Storage/StorageAccount
 	Metadata         map[string]string // Metadata is used to pass arbritray data between `Expander`'s
 	SubscriptionID   string            // The SubId of this item
+	StatusIndicator  string            // Displays the resources status
 }
 
 const (

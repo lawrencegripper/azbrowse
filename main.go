@@ -294,7 +294,7 @@ func main() {
 		// If we're up and running clear and redraw the view
 		// if w.g != nil {
 		if showHelp {
-			v, err := g.SetView("helppopup", 1, 1, 140, 32)
+			v, err := g.SetView("helppopup", 1, 1, 140, 38)
 			if err != nil && err != gocui.ErrUnknownView {
 				panic(err)
 			}
