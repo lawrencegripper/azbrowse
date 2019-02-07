@@ -37,9 +37,12 @@ type ResourceReseponse struct {
 			Name string `json:"name"`
 			Tier string `json:"tier"`
 		} `json:"sku"`
-		Kind     string `json:"kind"`
-		Location string `json:"location"`
-		Tags     struct {
+		Kind       string `json:"kind"`
+		Location   string `json:"location"`
+		Properties struct {
+			ProvisioningState string `json:"provisioningState"`
+		} `json:"properties"`
+		Tags struct {
 			MsResourceUsage string `json:"ms-resource-usage"`
 		} `json:"tags"`
 	} `json:"value"`

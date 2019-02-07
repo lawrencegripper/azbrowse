@@ -102,6 +102,10 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Title = `Status [CTRL+I -> Help]`
 	v.Wrap = true
 
+	if hideGuids {
+		w.currentMessage.Message = stripSecretVals(w.currentMessage.Message)
+	}
+
 	if w.currentMessage.InProgress {
 		fmt.Fprint(v, style.Loading("⏳  "+w.currentMessage.Message))
 	} else if w.currentMessage.Failure {
