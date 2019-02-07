@@ -14,10 +14,10 @@ import (
 	"github.com/valyala/fastjson"
 )
 
-var fastJsonParser fastjson.Parser
+var fastJSONParser fastjson.Parser
 
 func init() {
-	fastJsonParser = fastjson.Parser{}
+	fastJSONParser = fastjson.Parser{}
 }
 
 // ResourceGroupResourceExpander expands resource under an RG
@@ -45,7 +45,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 	queryDoneChan := make(chan map[string]string)
 	go func() {
-		// Use resource graph to enrich respones
+		// Use resource graph to enrich response
 		query := "where resourceGroup=='" + currentItem.Name + "' | project name, id, sku, kind, location, tags, properties.provisioningState"
 		queryData, err := armclient.DoResourceGraphQuery(ctx, currentItem.SubscriptionID, query)
 		span.SetTag("queryResponse", queryData)
@@ -59,7 +59,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 			})
 		}
 
-		queryValue, err := fastJsonParser.Parse(string(queryData))
+		queryValue, err := fastJSONParser.Parse(string(queryData))
 		if err != nil {
 			eventing.SendStatusEvent(eventing.StatusEvent{
 				InProgress: false,
