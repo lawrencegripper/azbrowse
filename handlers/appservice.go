@@ -18,7 +18,6 @@ type AppServiceResourceExpander struct {
 }
 
 type handledType struct {
-	name     string
 	display  string
 	endpoint endpoints.EndpointInfo
 	children []handledType
@@ -33,7 +32,6 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 	if !e.initialized {
 		e.handledTypes = []handledType{
 			{
-				name:     "site",
 				endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
 				children: []handledType{
 					{

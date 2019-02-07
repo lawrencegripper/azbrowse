@@ -13,9 +13,12 @@ type EndpointInfo struct {
 	Verb        string
 }
 
+// EndpointSegment reprsesents a segment of a template URL
 type EndpointSegment struct {
+	// holds a literal to match for fixed segments (e.g. /subscriptions/)
 	Match string
-	Name  string
+	// holds the name of a templated segment (e.g. 'name' for /{name}/)
+	Name string
 }
 
 // MatchResult holds information about an EndPointInfo match
