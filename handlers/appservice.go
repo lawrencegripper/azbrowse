@@ -34,57 +34,57 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 		e.handledTypes = []handledType{
 			{
 				name:     "site",
-				endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
+				endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
 				children: []handledType{
 					{
 						display:  "config",
-						endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
+						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
 						children: []handledType{
 							{
 								display:  "appsettings",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "authsettings",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "connectionstrings",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "logs",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "metadata",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "publishingcredentials",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "pushsettings",
-								endpoint: getEndpointInfoFromURLWithVerbAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01", "POST"),
+								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01", "POST"),
 							},
 							{
 								display:  "slotConfigNames",
-								endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames", "2018-02-01"),
+								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames", "2018-02-01"),
 							},
 							{
 								display:  "virtualNetwork",
-								endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/virtualNetwork", "2018-02-01"),
+								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/virtualNetwork", "2018-02-01"),
 							},
 							{
 								display:  "web",
-								endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
+								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
 							},
 						},
 					},
 					{
 						display:  "siteextensions",
-						endpoint: getEndpointInfoFromURLAndPanicOnError("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
+						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
 					},
 				},
 			},
@@ -93,10 +93,10 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 	}
 }
 
-func getEndpointInfoFromURLAndPanicOnError(url string, apiVersion string) endpoints.EndpointInfo {
-	return getEndpointInfoFromURLWithVerbAndPanicOnError(url, apiVersion, "GET")
+func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.EndpointInfo {
+	return mustGetEndpointInfoFromURLWithVerb(url, apiVersion, "GET")
 }
-func getEndpointInfoFromURLWithVerbAndPanicOnError(url string, apiVersion string, verb string) endpoints.EndpointInfo {
+func mustGetEndpointInfoFromURLWithVerb(url string, apiVersion string, verb string) endpoints.EndpointInfo {
 	endpoint, err := endpoints.GetEndpointInfoFromURL(url, apiVersion)
 	if err != nil {
 		panic(err)
