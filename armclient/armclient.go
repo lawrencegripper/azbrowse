@@ -31,6 +31,25 @@ func GetTenantID() string {
 	return tenantID
 }
 
+// RequestResult used with async channel
+type RequestResult struct {
+	Result string
+	Error  error
+}
+
+// DoRequestAsync makes an ARM rest request
+func DoRequestAsync(ctx context.Context, method, path string) chan RequestResult {
+	requestResultChan := make(chan RequestResult)
+	go func() {
+		data, err := doRequestWithBody(ctx, method, path, "")
+		requestResultChan <- RequestResult{
+			Error:  err,
+			Result: data,
+		}
+	}()
+	return requestResultChan
+}
+
 // DoRequest makes an ARM rest request
 func DoRequest(ctx context.Context, method, path string) (string, error) {
 	return doRequestWithBody(ctx, method, path, "")
@@ -87,7 +106,7 @@ func doRequestWithBody(ctx context.Context, method, path, body string) (string, 
 
 	prettyOutput := prettyJSON(buf)
 	if tracing.IsDebug() {
-		span.SetTag("responseBody", truncateString(prettyOutput, 800))
+		span.SetTag("responseBody", truncateString(prettyOutput, 1500))
 		span.SetTag("requestBody", body)
 		span.SetTag("url", url)
 	}

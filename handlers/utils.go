@@ -4,24 +4,28 @@ func drawStatus(s string) string {
 	switch s {
 	case "Deleting":
 		return "☠"
+	case "Failed":
+		return "⛈"
 	case "Updating":
 		return "⚙️"
 	case "Resuming":
-		return "⚙️"
+		return "⛅"
 	case "Starting":
-		return "⚙️"
+		return "⛅"
 	case "Provisioning":
 		return "⌛"
 	case "Creating":
-		return "🧱"
+		return "🏗"
 	case "Preparing":
-		return "🧱"
+		return "🏗"
 	case "Scaling":
-		return "𝄩"
+		return "⚖"
 	case "Suspended":
 		return "⛔"
 	case "Suspending":
 		return "⛔"
+	case "Succeeded":
+		return "🌣"
 	}
 	return ""
 }

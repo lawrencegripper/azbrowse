@@ -27,11 +27,12 @@ type ResourceGroupResponse struct {
 	} `json:"value"`
 }
 
-// ResourceReseponse Resources list rest type
-type ResourceReseponse struct {
+// ResourceResponse Resources list rest type
+type ResourceResponse struct {
 	Resources []Resource `json:"value"`
 }
 
+// ResourceQueryResponse list query response
 type ResourceQueryResponse struct {
 	TotalRecords int `json:"totalRecords"`
 	Count        int `json:"count"`

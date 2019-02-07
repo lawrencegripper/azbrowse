@@ -3,16 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/eventing"
 	"strings"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/tracing"
-
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/eventing"
 	"github.com/lawrencegripper/azbrowse/handlers"
 	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/tracing"
 )
 
 // ListWidget hosts the left panel showing resources and controls the navigation
