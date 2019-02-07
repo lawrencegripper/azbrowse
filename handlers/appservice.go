@@ -182,8 +182,8 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 	}
 
 	return ExpanderResult{
-		Nodes:    &newItems,
-		Response: string(data),
+		Nodes:             &newItems,
+		Response:          string(data),
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
 }
