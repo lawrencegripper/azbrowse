@@ -121,6 +121,18 @@ func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
 	w.items = newList
 }
 
+// Refresh refreshes the current view
+func (w *ListWidget) Refresh() {
+	w.statusView.Status("Refreshing", true)
+	currentSelection := w.CurrentSelection()
+
+	w.GoBack()
+	w.ExpandCurrentSelection()
+
+	w.ChangeSelection(currentSelection)
+	w.statusView.Status("Done refreshing", false)
+}
+
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
 	previousPage := w.navStack.Pop()

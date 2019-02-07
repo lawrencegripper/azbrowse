@@ -60,6 +60,9 @@ type Resource struct {
 	Tags     struct {
 		MsResourceUsage string `json:"ms-resource-usage"`
 	} `json:"tags"`
+	Properties struct {
+		ProvisioningState string `json:"provisioningState"`
+	} `json:"properties"`
 }
 
 // ProvidersResponse providers list rest type
