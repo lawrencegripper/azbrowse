@@ -3,9 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/eventing"
 	"strings"
 	"time"
+
+	"github.com/lawrencegripper/azbrowse/eventing"
 
 	"github.com/lawrencegripper/azbrowse/tracing"
 
@@ -245,7 +246,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	// Update the list if we have sub items from the expanders
 	// or return the default experience for and unknown item
-	if len(newItems) > 0 {
+	if hasPrimaryResponse || len(newItems) > 0 {
 		w.items = newItems
 		w.selected = 0
 	}
