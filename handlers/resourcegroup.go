@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/lawrencegripper/azbrowse/eventing"
 	"strings"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/armclient"
 	"github.com/lawrencegripper/azbrowse/style"
@@ -68,7 +70,11 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	for _, rg := range resourceResponse.Resources {
 		resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
 		if err != nil {
-			panic(err)
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				Failure: true,
+				Message: "Failed to get resouceVersion for the Type:" + rg.Type,
+				Timeout: time.Duration(time.Second * 5),
+			})
 		}
 		newItems = append(newItems, TreeNode{
 			Display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
