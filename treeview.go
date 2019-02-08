@@ -248,7 +248,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	// Update the list if we have sub items from the expanders
 	// or return the default experience for and unknown item
-	if len(newItems) > 0 {
+	if hasPrimaryResponse || len(newItems) > 0 {
 		w.items = newItems
 		w.selected = 0
 	}

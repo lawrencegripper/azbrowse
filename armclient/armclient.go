@@ -128,7 +128,7 @@ var resourceAPIVersionLookup map[string]string
 func GetAPIVersion(armType string) (string, error) {
 	value, exists := resourceAPIVersionLookup[armType]
 	if !exists {
-		return "", fmt.Errorf("API not found for the resource: %s", armType)
+		return "MISSING", fmt.Errorf("API not found for the resource: %s", armType)
 	}
 	return value, nil
 }
