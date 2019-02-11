@@ -118,7 +118,7 @@ func getHandledTypeForURL(url string, handledTypes []handledType) *handledType {
 }
 
 // DoesExpand checks if this is an RG
-func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem TreeNode) (bool, error) {
+func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	e.ensureInitialized()
 	if currentItem.ItemType == resourceType {
 		item := getHandledTypeForURL(currentItem.ExpandURL, e.handledTypes)
@@ -131,7 +131,7 @@ func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem
 }
 
 // Expand returns Resources in the RG
-func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem TreeNode) ExpanderResult {
+func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name+":"+currentItem.ID, tracing.SetTag("item", currentItem))
 	defer span.Finish()
@@ -151,14 +151,14 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 		}
 	}
 
-	var resourceResponse armclient.ResourceReseponse
+	var resourceResponse armclient.ResourceResponse
 	err = json.Unmarshal([]byte(data), &resourceResponse)
 	if err != nil {
 		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
 		panic(err)
 	}
 
-	newItems := []TreeNode{}
+	newItems := []*TreeNode{}
 	matchResult := handledType.endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
 	templateValues := matchResult.Values
 	for _, child := range handledType.children {
@@ -168,7 +168,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.display, err)
 			panic(err)
 		}
-		newItems = append(newItems, TreeNode{
+		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "appservice",
 			Name:      child.display,
@@ -180,7 +180,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 	}
 
 	return ExpanderResult{
-		Nodes:             &newItems,
+		Nodes:             newItems,
 		Response:          string(data),
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
