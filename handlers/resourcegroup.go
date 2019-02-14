@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/lawrencegripper/azbrowse/eventing"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/armclient"
@@ -44,6 +45,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	defer span.Finish()
 
 	queryDoneChan := make(chan map[string]string)
+	// Refactor this into DoResourceGraphQueryAync
 	go func() {
 		// Use resource graph to enrich response
 		query := "where resourceGroup=='" + currentItem.Name + "' | project name, id, sku, kind, location, tags, properties.provisioningState"
@@ -105,8 +107,38 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	method := "GET"
 	responseChan := armclient.DoRequestAsync(ctx, method, currentItem.ExpandURL)
 
-	stateMap := <-queryDoneChan
-	armResponse := <-responseChan
+	stateMap := map[string]string{}
+	armResponse := &armclient.RequestResult{}
+
+	// Here be dragons.....
+	// This block does the following:
+	// 1. Wait for the ARM request (gets latest resource in the group) to complete
+	// 2. Then give the GraphQuery (gets resource status) another second to complete
+	// or give up on it.
+	// This is because the status information is a value add and we don't want
+	// to slow down browsing as a result of the graph query going slowly
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	timeoutGraphQuery := make(chan bool)
+	go func() {
+		result := <-responseChan
+		armResponse = &result
+		wg.Done()
+		//Give the graph query an extra second to complete
+		<-time.After(time.Second * 1)
+		timeoutGraphQuery <- true
+	}()
+
+	// Give the graphQuery some time to complete or timeout
+	select {
+	case stateMap = <-queryDoneChan:
+		wg.Done()
+	case <-timeoutGraphQuery:
+		span.SetTag("graphQueryTimedout", true)
+		wg.Done()
+	}
+	wg.Wait()
+	// .....
 
 	err := armResponse.Error
 
