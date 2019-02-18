@@ -32,143 +32,6 @@ func (e *AppServiceResourceExpander) Name() string {
 	return "AppServiceResourceExpander"
 }
 
-func (e *AppServiceResourceExpander) ensureInitialized() {
-	if !e.initialized {
-		e.handledTypes = []handledType{
-			{
-				endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
-				children: []handledType{
-					{
-						display:  "config",
-						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
-						children: []handledType{
-							{
-								display:  "appsettings",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "authsettings",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "connectionstrings",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "logs",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "metadata",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "publishingcredentials",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "pushsettings",
-								endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01", "POST"),
-							},
-							{
-								display:  "slotConfigNames",
-								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames", "2018-02-01"),
-							},
-							{
-								display:  "virtualNetwork",
-								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/virtualNetwork", "2018-02-01"),
-							},
-							{
-								display:  "web",
-								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
-							},
-						},
-					},
-					{
-						display:  "siteextensions",
-						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
-						subResources: []handledType{
-							{
-								display:  "siteextension: {siteExtensionId}",
-								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}", "2018-02-01"),
-							},
-						},
-					},
-					{
-						display:  "slots",
-						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots", "2018-02-01"),
-						subResources: []handledType{
-							{
-								display:  "slot: {slot}",
-								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
-								children: []handledType{
-									{
-										display:  "config",
-										endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config", "2018-02-01"),
-										children: []handledType{
-											{
-												display:  "appsettings",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "authsettings",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "connectionstrings",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "logs",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "metadata",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "publishingcredentials",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/publishingcredentials/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "pushsettings",
-												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings/list", "2018-02-01", "POST"),
-											},
-											{
-												display:  "slotConfigNames",
-												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/slotConfigNames", "2018-02-01"),
-											},
-											{
-												display:  "virtualNetwork",
-												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/virtualNetwork", "2018-02-01"),
-											},
-											{
-												display:  "web",
-												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web", "2018-02-01"),
-											},
-										},
-									},
-									{
-										display:  "siteextensions",
-										endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions", "2018-02-01"),
-										subResources: []handledType{
-											{
-												display:  "siteextension: {siteExtensionId}",
-												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}", "2018-02-01"),
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		}
-		e.initialized = true
-	}
-}
-
 func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.EndpointInfo {
 	return mustGetEndpointInfoFromURLWithVerb(url, apiVersion, "GET")
 }
@@ -195,6 +58,12 @@ func getHandledTypeForURL(url string, handledTypes []handledType) *handledType {
 		}
 	}
 	return nil
+}
+func (e *AppServiceResourceExpander) ensureInitialized() {
+	if !e.initialized {
+		e.handledTypes = e.getHandledTypes()
+		e.initialized = true
+	}
 }
 
 // DoesExpand checks if this is an RG
@@ -247,16 +116,12 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 			subResourceEndpoint := getHandledTypeForURL(resource.ID, handledType.subResources)
 			subResourceTemplateValues := subResourceEndpoint.endpoint.Match(resource.ID).Values
 			name := substituteValues(subResourceEndpoint.display, subResourceTemplateValues)
-			resourceAPIVersion, err := armclient.GetAPIVersion(resource.Type)
-			if err != nil {
-				panic(err)
-			}
 			newItems = append(newItems, &TreeNode{
 				Parentid:  currentItem.ID,
 				Namespace: "appservice",
 				Name:      name,
 				Display:   name,
-				ExpandURL: resource.ID + "?api-version=" + resourceAPIVersion,
+				ExpandURL: resource.ID + "?api-version=" + subResourceEndpoint.endpoint.APIVersion,
 				ItemType:  resourceType,
 				DeleteURL: "TODO",
 			})
