@@ -94,7 +94,8 @@ getPackage() {
         echo "Installed verion:"
         echo
         azbrowse --version
-        bash
+        
+        echo "You may need to reload your terminal to pick up the new var"
     fi
     
 }

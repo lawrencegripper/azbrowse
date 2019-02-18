@@ -24,6 +24,8 @@ Grab the binaries from the release page or for MacOS and Linux run this script
 curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scripts/install_azbrowse.sh | sudo sh
 ```
 
+You may need to reload your terminal to pick up `azbrowse` after the script completes. 
+
 ### Usage
 
 ## Navigation 
