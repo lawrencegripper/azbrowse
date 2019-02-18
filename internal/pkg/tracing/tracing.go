@@ -22,6 +22,16 @@ func SetTag(key string, value interface{}) opentracing.Tag {
 	return opentracing.Tag{Key: key, Value: value}
 }
 
+// SetTagOnCtx is a shortcut to create tags easily
+func SetTagOnCtx(ctx context.Context, key string, value interface{}) {
+	span := opentracing.SpanFromContext(ctx)
+	if span == nil {
+		return
+	}
+
+	span.SetTag(key, value)
+}
+
 // StartSpanFromContext create a span for the context
 func StartSpanFromContext(ctx context.Context, operationName string, opts ...opentracing.StartSpanOption) (opentracing.Span, context.Context) {
 	// without a tracing specified this call will fail

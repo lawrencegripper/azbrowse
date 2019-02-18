@@ -119,6 +119,7 @@ func DoResourceGraphQuery(ctx context.Context, subscription, query string) (stri
 	messageBody := `{"subscriptions": ["SUB_HERE"], "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0}}`
 	messageBody = strings.Replace(messageBody, "SUB_HERE", subscription, -1)
 	messageBody = strings.Replace(messageBody, "QUERY_HERE", query, -1)
+	tracing.SetTagOnCtx(ctx, "query", messageBody)
 	return doRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
 }
 
