@@ -20,13 +20,13 @@ type AppServiceResourceExpander struct {
 
 // ResourceType holds information about resources that can be displayed
 type ResourceType struct {
-	display  string
-	endpoint endpoints.EndpointInfo
-	verb     string
-	// children are auto-loaded (must be able to build the URL => no additional template URL values)
-	children []ResourceType
-	// subResources are not auto-loaded (these come from the request to the endpoint)
-	subResources []ResourceType
+	Display  string
+	Endpoint endpoints.EndpointInfo
+	Verb     string
+	// Children are auto-loaded (must be able to build the URL => no additional template URL values)
+	Children []ResourceType
+	// SubResources are not auto-loaded (these come from the request to the endpoint)
+	SubResources []ResourceType
 }
 
 // Name returns the name of the expander
@@ -44,14 +44,14 @@ func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.Endpoin
 
 func getResourceTypeForURL(url string, resourceTypes []ResourceType) *ResourceType {
 	for _, resourceType := range resourceTypes {
-		matchResult := resourceType.endpoint.Match(url)
+		matchResult := resourceType.Endpoint.Match(url)
 		if matchResult.IsMatch {
 			return &resourceType
 		}
-		if result := getResourceTypeForURL(url, resourceType.subResources); result != nil {
+		if result := getResourceTypeForURL(url, resourceType.SubResources); result != nil {
 			return result
 		}
-		if result := getResourceTypeForURL(url, resourceType.children); result != nil {
+		if result := getResourceTypeForURL(url, resourceType.Children); result != nil {
 			return result
 		}
 	}
@@ -88,7 +88,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 		panic(fmt.Errorf("Node Item not found"))
 	}
 
-	method := resourceType.endpoint.Verb
+	method := resourceType.Verb
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
@@ -99,10 +99,10 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 	}
 
 	newItems := []*TreeNode{}
-	matchResult := resourceType.endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
+	matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
 	templateValues := matchResult.Values
 
-	if len(resourceType.subResources) > 0 {
+	if len(resourceType.SubResources) > 0 {
 		// We have defined subResources - Unmarshal the ARM response and add these to newItems
 		var resourceResponse armclient.ResourceResponse
 		err = json.Unmarshal([]byte(data), &resourceResponse)
@@ -111,29 +111,29 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 			panic(err)
 		}
 		for _, resource := range resourceResponse.Resources {
-			subResourceType := getResourceTypeForURL(resource.ID, resourceType.subResources)
-			subResourceTemplateValues := subResourceType.endpoint.Match(resource.ID).Values
-			name := substituteValues(subResourceType.display, subResourceTemplateValues)
+			subResourceType := getResourceTypeForURL(resource.ID, resourceType.SubResources)
+			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
+			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
 			newItems = append(newItems, &TreeNode{
 				Parentid:  currentItem.ID,
 				Namespace: "appservice",
 				Name:      name,
 				Display:   name,
-				ExpandURL: resource.ID + "?api-version=" + subResourceType.endpoint.APIVersion,
+				ExpandURL: resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
 				ItemType:  "resource",
 				DeleteURL: "TODO",
 			})
 		}
 	}
 	// Add any children to newItems
-	for _, child := range resourceType.children {
+	for _, child := range resourceType.Children {
 
-		url, err := child.endpoint.BuildURL(templateValues)
+		url, err := child.Endpoint.BuildURL(templateValues)
 		if err != nil {
-			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.display, err)
+			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
 			panic(err)
 		}
-		display := substituteValues(child.display, templateValues)
+		display := substituteValues(child.Display, templateValues)
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "appservice",

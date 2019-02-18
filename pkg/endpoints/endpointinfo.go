@@ -10,7 +10,6 @@ type EndpointInfo struct {
 	TemplateURL string
 	APIVersion  string
 	URLSegments []EndpointSegment
-	Verb        string
 }
 
 // EndpointSegment reprsesents a segment of a template URL
