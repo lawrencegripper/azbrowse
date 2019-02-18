@@ -55,7 +55,7 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 
 	doneFunc := func() {
 		s.InProgress = false
-		SendStatusEvent(s)
+		s.Update()
 	}
 
 	pubSub.Pub(s, "statusEvent")
