@@ -46,11 +46,24 @@ type SwaggerPathVerb struct {
 
 func main() {
 	// TODO - stream input to json decoder rather than loading full doc in memory
-	doc := loadDoc()
-
-	swaggerPaths := getSortedPaths(doc)
-
 	var paths []*Path
+
+	doc := loadDoc("cmd/swagger-codegen/sample-specs/WebApps.json")
+	paths = mergeSwaggerDoc(paths, &doc)
+
+	doc = loadDoc("cmd/swagger-codegen/sample-specs/AppServicePlans.json")
+	paths = mergeSwaggerDoc(paths, &doc)
+
+	writer := os.Stdout // TODO - take filename as argument to write to
+
+	writeHeader(writer)
+	writePaths(writer, paths, "")
+	writeFooter(writer)
+	// dumpPaths(writer, paths, "")
+}
+
+func mergeSwaggerDoc(paths []*Path, doc *SwaggerDoc) []*Path {
+	swaggerPaths := getSortedPaths(doc)
 	for _, swaggerPath := range swaggerPaths {
 		parent := findDeepestPath(paths, swaggerPath)
 		endpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, doc.Info.Version)
@@ -73,13 +86,7 @@ func main() {
 			}
 		}
 	}
-
-	writer := os.Stdout // TODO - take filename as argument to write to
-
-	writeHeader(writer)
-	writePaths(writer, paths, "")
-	writeFooter(writer)
-	// dumpPaths(writer, paths, "")
+	return paths
 }
 
 func countNameSegments(endpoint *endpoints.EndpointInfo) int {
@@ -159,8 +166,7 @@ func findDeepestPath(paths []*Path, pathString string) *Path {
 	}
 	return nil
 }
-func loadDoc() SwaggerDoc {
-	path := "cmd/swagger-codegen/sample-specs/WebApps.json"
+func loadDoc(path string) SwaggerDoc {
 	swaggerBuf, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Panicf("Error opening Swagger: %s", err)
@@ -173,7 +179,7 @@ func loadDoc() SwaggerDoc {
 	}
 	return doc
 }
-func getSortedPaths(doc SwaggerDoc) []string {
+func getSortedPaths(doc *SwaggerDoc) []string {
 	paths := make([]string, len(doc.Paths))
 	i := 0
 	for key := range doc.Paths {
