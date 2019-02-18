@@ -125,7 +125,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		armResponse = &result
 		wg.Done()
 		//Give the graph query an extra second to complete
-		<-time.After(time.Second * 1)
+		<-time.After(time.Second * 2)
 		timeoutGraphQuery <- true
 	}()
 
