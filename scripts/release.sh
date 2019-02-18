@@ -17,12 +17,16 @@ BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
 GO_VERSION=$(go version | awk '{print $3}')
 echo "Building version: $VERSION"
 
-
+echo "->Installing tools"
 bash -f ./install.sh
 cd ../
 
+echo "->Running dep"
 make dep
+echo "->Installing tests"
 make test
+
+echo "->Building for x-plat"
 
 platforms=("linux/amd64" "windows/amd64" "windows/386" "darwin/amd64" "linux/386" "linux/arm")
 
@@ -43,7 +47,7 @@ do
         -X github.com/lawrencegripper/azbrowse/version.BuildDataGitCommit=${GIT_COMMIT} \
         -X github.com/lawrencegripper/azbrowse/version.BuildDataBuildDate=${BUILD_DATE} \
         -X github.com/lawrencegripper/azbrowse/version.BuildDataGoVersion=${GO_VERSION}" \
-        -a -installsuffix cgo -o $output_name
+        -a -installsuffix cgo -o $output_name ./cmd/azbrowse
 
     if [ $? -ne 0 ]; then
         echo 'An error has occurred! Aborting the script execution...'
