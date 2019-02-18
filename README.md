@@ -14,6 +14,16 @@ It's an MVP to prove out the use case. Basic navigation and operations with a bo
 
 Currently I'm using it every day **but it is experimental so use with caution on a production environment!!**
 
+![Demo](./docs/quickdemo-azbrowse.gif)
+
+### Install
+
+Grab the binaries from the release page or for MacOS and Linux run this script
+
+```
+curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scripts/install_azbrowse.sh | sudo sh
+```
+
 ### Usage
 
 ## Navigation 
@@ -35,7 +45,6 @@ Currently I'm using it every day **but it is experimental so use with caution on
 | CTLT+S:             | Save JSON to clipboard    | Saves the last JSON response to the clipboard for export                           |
 | CTLT+A:             | View Actions for resource | This allows things like ListKeys on storage or Restart on VMs                      |
 
-![Demo](./docs/quickdemo-azbrowse.gif)
 
 
 ## Debugging
