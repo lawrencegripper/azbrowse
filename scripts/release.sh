@@ -21,9 +21,8 @@ echo "Building version: $VERSION"
 bash -f ./install.sh
 cd ../
 
-dep ensure 
-gometalinter --vendor --disable-all --enable=vet --enable=gofmt --enable=golint --enable=deadcode --enable=varcheck --enable=structcheck --enable=misspell --deadline=15m ./...
-
+make dep
+make test
 
 platforms=("linux/amd64" "windows/amd64" "windows/386" "darwin/amd64" "linux/386" "linux/arm")
 

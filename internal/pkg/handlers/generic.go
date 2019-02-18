@@ -3,10 +3,10 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"github.com/lawrencegripper/azbrowse/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/armclient"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // DefaultExpander expands RGs under a subscription

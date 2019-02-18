@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 )
 
 // ToggleHelpView shows and hides the help view

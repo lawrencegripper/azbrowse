@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/style"
-	"github.com/lawrencegripper/azbrowse/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/valyala/fastjson"
 )
 

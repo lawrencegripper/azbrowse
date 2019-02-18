@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowse/eventing"
-	"github.com/lawrencegripper/azbrowse/style"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 )
 
 // StatusbarWidget controls the statusbar

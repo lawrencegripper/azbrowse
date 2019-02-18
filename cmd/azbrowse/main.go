@@ -12,11 +12,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/search"
-	"github.com/lawrencegripper/azbrowse/storage"
-	"github.com/lawrencegripper/azbrowse/tracing"
-	"github.com/lawrencegripper/azbrowse/version"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/version"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"

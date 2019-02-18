@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // ActionExpander handles actions

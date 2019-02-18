@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/jroimartin/gocui"
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/eventing"
-	"github.com/lawrencegripper/azbrowse/handlers"
-	"github.com/lawrencegripper/azbrowse/style"
-	"github.com/lawrencegripper/azbrowse/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // ListWidget hosts the left panel showing resources and controls the navigation

@@ -1,6 +1,6 @@
 package main
 
-import "github.com/lawrencegripper/azbrowse/handlers"
+import "github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 
 // Page represents a previous view in the nav stack
 type Page struct {

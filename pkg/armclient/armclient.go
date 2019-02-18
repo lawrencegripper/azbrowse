@@ -10,8 +10,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/lawrencegripper/azbrowse/storage"
-	"github.com/lawrencegripper/azbrowse/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
 const (

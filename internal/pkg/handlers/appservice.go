@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lawrencegripper/azbrowse/endpoints"
+	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // AppServiceResourceExpander expands resource under an AppService

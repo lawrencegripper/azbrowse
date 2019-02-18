@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/handlers"
-	"github.com/lawrencegripper/azbrowse/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"strings"
 )
 

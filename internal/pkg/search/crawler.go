@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/armclient"
-	"github.com/lawrencegripper/azbrowse/storage"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/schollz/closestmatch"
 )
 

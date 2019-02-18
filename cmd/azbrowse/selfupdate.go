@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	"github.com/lawrencegripper/azbrowse/version"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/version"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
