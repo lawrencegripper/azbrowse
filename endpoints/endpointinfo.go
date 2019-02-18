@@ -106,7 +106,7 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 		if segment.Match == "" {
 			value := values[segment.Name]
 			if value == "" {
-				return "", fmt.Errorf("No value was found with name1 '%s'", segment.Match)
+				return "", fmt.Errorf("No value was found with name '%s'", segment.Match)
 			}
 			url += "/" + value
 		} else {
