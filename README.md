@@ -46,7 +46,7 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ## Developing 
 
-Clone the repository then use `go build` or `go install` to build the tool and run it locally. Before submitting a PR you can test the CI process locally by running `./scripts/ci.sh` this requires `docker` be installed and configured on your box. 
+Clone the repository then use `make` to run checks and build (or `make ci-docker` to build the tool and run it locally using docker). You an also use `make install-azbrowse` to install your local development version.
 
 ## Plans
 
