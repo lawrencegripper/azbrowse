@@ -9,14 +9,17 @@ import (
 	"os"
 	"sort"
 	"strings"
+
+	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
-// Endpoint represents an endpoint to output
-type Endpoint struct {
+// Path represents an URL to output
+type Path struct {
 	// TODO Name
 	Verbs    map[string]SwaggerPathVerb // TODO - create a new type that is easier to work with
-	Path     string
-	Children []*Endpoint
+	Endpoint *endpoints.EndpointInfo
+	Children []*Path
+	SubPaths []*Path
 }
 
 // SwaggerDoc is a type to represent the relevant parts of a swagger document
@@ -45,41 +48,111 @@ func main() {
 	// TODO - stream input to json decoder rather than loading full doc in memory
 	doc := loadDoc()
 
-	paths := getSortedPaths(doc)
+	swaggerPaths := getSortedPaths(doc)
 
-	var endpoints []*Endpoint
-	for _, path := range paths {
-		parent := findPath(endpoints, path)
-		endpoint := Endpoint{
-			Path:  path,
-			Verbs: doc.Paths[path],
+	var paths []*Path
+	for _, swaggerPath := range swaggerPaths {
+		parent := findDeepestPath(paths, swaggerPath)
+		endpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, doc.Info.Version)
+		if err != nil {
+			panic(err)
+		}
+		path := Path{
+			Endpoint: &endpoint,
+			Verbs:    doc.Paths[swaggerPath],
 		}
 		if parent == nil {
-			endpoints = append(endpoints, &endpoint)
+			paths = append(paths, &path)
 		} else {
-			parent.Children = append(parent.Children, &endpoint)
+			if countNameSegments(parent.Endpoint) == countNameSegments(path.Endpoint) {
+				// this is a child
+				parent.Children = append(parent.Children, &path)
+			} else {
+				// this is a sub-resource
+				parent.SubPaths = append(parent.SubPaths, &path)
+			}
 		}
 	}
 
-	dumpPaths(os.Stdout, endpoints, "")
-}
-func dumpPaths(w io.Writer, endpoints []*Endpoint, prefix string) {
+	writer := os.Stdout // TODO - take filename as argument to write to
 
-	for _, endpoint := range endpoints {
-		fmt.Fprintf(w, "%s%s\n", prefix, endpoint.Path)
-		for verb, verbInfo := range endpoint.Verbs {
+	writeHeader(writer)
+	writePaths(writer, paths, "")
+	writeFooter(writer)
+	// dumpPaths(writer, paths, "")
+}
+
+func countNameSegments(endpoint *endpoints.EndpointInfo) int {
+	count := 0
+	for _, segment := range endpoint.URLSegments {
+		if segment.Name != "" {
+			count++
+		}
+	}
+	return count
+}
+
+func writeHeader(w io.Writer) {
+	w.Write([]byte("package handlers\n"))
+	w.Write([]byte("\n"))
+	w.Write([]byte("func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {\n"))
+	w.Write([]byte("\treturn []ResourceType{\n"))
+
+}
+func writeFooter(w io.Writer) {
+	w.Write([]byte("\t}\n"))
+	w.Write([]byte("}\n"))
+}
+func writePaths(w io.Writer, paths []*Path, prefix string) {
+	for _, path := range paths {
+		if path.Verbs["get"].OperationID != "" {
+			fmt.Fprintf(w, "\t%s\tResourceType{\n", prefix)
+			lastSegment := path.Endpoint.URLSegments[len(path.Endpoint.URLSegments)-1]
+			name := lastSegment.Match
+			if name == "" {
+				name = "{" + lastSegment.Name + "}"
+			}
+			fmt.Fprintf(w, "\t%s\t\tDisplay: \"%s\",\n", prefix, name)
+			fmt.Fprintf(w, "\t%s\t\tEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, path.Endpoint.TemplateURL, path.Endpoint.APIVersion)
+			if len(path.Children) > 0 {
+				fmt.Fprintf(w, "\t%s\t\tChildren: []ResourceType {\n", prefix)
+				writePaths(w, path.Children, prefix+"\t\t")
+				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
+			}
+			if len(path.SubPaths) > 0 {
+				fmt.Fprintf(w, "\t%s\t\tSubResources: []ResourceType {\n", prefix)
+				writePaths(w, path.SubPaths, prefix+"\t\t")
+				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
+			}
+			fmt.Fprintf(w, "\t%s\t},\n", prefix)
+		}
+	}
+}
+func dumpPaths(w io.Writer, paths []*Path, prefix string) {
+
+	for _, path := range paths {
+		fmt.Fprintf(w, "%s%s\n", prefix, path.Endpoint.TemplateURL)
+		for verb, verbInfo := range path.Verbs {
 			fmt.Printf("%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
 		}
-		dumpPaths(w, endpoint.Children, prefix+"  ")
+		fmt.Printf("%s   * Children\n", prefix)
+		dumpPaths(w, path.Children, prefix+"    ")
+		fmt.Printf("%s   * SubPaths\n", prefix)
+		dumpPaths(w, path.SubPaths, prefix+"    ")
 	}
 }
-func findPath(endpoints []*Endpoint, path string) *Endpoint {
-	for _, endpoint := range endpoints {
-		if strings.HasPrefix(path, endpoint.Path) {
+
+// findDeepestPath searches the endpoints tree to find the deepest point that the specified path can be nested at (used to build up the endpoint hierarchy)
+func findDeepestPath(paths []*Path, pathString string) *Path {
+	for _, path := range paths {
+		if strings.HasPrefix(pathString, path.Endpoint.TemplateURL) {
 			// matches endpoint. Check children
-			match := findPath(endpoint.Children, path)
+			match := findDeepestPath(path.Children, pathString)
 			if match == nil {
-				return endpoint
+				match = findDeepestPath(path.SubPaths, pathString)
+				if match == nil {
+					return path
+				}
 			}
 			return match
 		}
