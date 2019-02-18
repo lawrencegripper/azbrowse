@@ -1,14 +1,14 @@
 package handlers
 
-func (e *AppServiceResourceExpander) getHandledTypes() []handledType {
-	return []handledType{
+func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
+	return []ResourceType{
 		{
 			endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
-			children: []handledType{
+			children: []ResourceType{
 				{
 					display:  "config",
 					endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
-					children: []handledType{
+					children: []ResourceType{
 						{
 							display:  "appsettings",
 							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01"),
@@ -61,7 +61,7 @@ func (e *AppServiceResourceExpander) getHandledTypes() []handledType {
 				{
 					display:  "siteextensions",
 					endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
-					subResources: []handledType{
+					subResources: []ResourceType{
 						{
 							display:  "siteextension: {siteExtensionId}",
 							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}", "2018-02-01"),
@@ -71,15 +71,15 @@ func (e *AppServiceResourceExpander) getHandledTypes() []handledType {
 				{
 					display:  "slots",
 					endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots", "2018-02-01"),
-					subResources: []handledType{
+					subResources: []ResourceType{
 						{
 							display:  "slot: {slot}",
 							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
-							children: []handledType{
+							children: []ResourceType{
 								{
 									display:  "config",
 									endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config", "2018-02-01"),
-									children: []handledType{
+									children: []ResourceType{
 										{
 											display:  "appsettings",
 											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings/list", "2018-02-01"),
@@ -131,7 +131,7 @@ func (e *AppServiceResourceExpander) getHandledTypes() []handledType {
 								{
 									display:  "siteextensions",
 									endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions", "2018-02-01"),
-									subResources: []handledType{
+									subResources: []ResourceType{
 										{
 											display:  "siteextension: {siteExtensionId}",
 											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}", "2018-02-01"),

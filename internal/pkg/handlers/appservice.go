@@ -14,18 +14,19 @@ import (
 
 // AppServiceResourceExpander expands resource under an AppService
 type AppServiceResourceExpander struct {
-	initialized  bool
-	handledTypes []handledType
+	initialized   bool
+	ResourceTypes []ResourceType
 }
 
-type handledType struct {
+// ResourceType holds information about resources that can be displayed
+type ResourceType struct {
 	display  string
 	endpoint endpoints.EndpointInfo
 	verb     string
 	// children are auto-loaded (must be able to build the URL => no additional template URL values)
-	children []handledType
+	children []ResourceType
 	// subResources are not auto-loaded (these come from the request to the endpoint)
-	subResources []handledType
+	subResources []ResourceType
 }
 
 // Name returns the name of the expander
@@ -41,16 +42,16 @@ func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.Endpoin
 	return endpoint
 }
 
-func getHandledTypeForURL(url string, handledTypes []handledType) *handledType {
-	for _, handledType := range handledTypes {
-		matchResult := handledType.endpoint.Match(url)
+func getResourceTypeForURL(url string, resourceTypes []ResourceType) *ResourceType {
+	for _, resourceType := range resourceTypes {
+		matchResult := resourceType.endpoint.Match(url)
 		if matchResult.IsMatch {
-			return &handledType
+			return &resourceType
 		}
-		if result := getHandledTypeForURL(url, handledType.subResources); result != nil {
+		if result := getResourceTypeForURL(url, resourceType.subResources); result != nil {
 			return result
 		}
-		if result := getHandledTypeForURL(url, handledType.children); result != nil {
+		if result := getResourceTypeForURL(url, resourceType.children); result != nil {
 			return result
 		}
 	}
@@ -58,7 +59,7 @@ func getHandledTypeForURL(url string, handledTypes []handledType) *handledType {
 }
 func (e *AppServiceResourceExpander) ensureInitialized() {
 	if !e.initialized {
-		e.handledTypes = e.getHandledTypes()
+		e.ResourceTypes = e.getResourceTypes()
 		e.initialized = true
 	}
 }
@@ -67,7 +68,7 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	e.ensureInitialized()
 	if currentItem.ItemType == resourceType {
-		item := getHandledTypeForURL(currentItem.ExpandURL, e.handledTypes)
+		item := getResourceTypeForURL(currentItem.ExpandURL, e.ResourceTypes)
 		if item != nil {
 			return true, nil
 		}
@@ -82,12 +83,12 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name+":"+currentItem.ID, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	handledType := getHandledTypeForURL(currentItem.ExpandURL, e.handledTypes)
-	if handledType == nil {
+	resourceType := getResourceTypeForURL(currentItem.ExpandURL, e.ResourceTypes)
+	if resourceType == nil {
 		panic(fmt.Errorf("Node Item not found"))
 	}
 
-	method := handledType.endpoint.Verb
+	method := resourceType.endpoint.Verb
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
@@ -98,10 +99,10 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 	}
 
 	newItems := []*TreeNode{}
-	matchResult := handledType.endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
+	matchResult := resourceType.endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
 	templateValues := matchResult.Values
 
-	if len(handledType.subResources) > 0 {
+	if len(resourceType.subResources) > 0 {
 		// We have defined subResources - Unmarshal the ARM response and add these to newItems
 		var resourceResponse armclient.ResourceResponse
 		err = json.Unmarshal([]byte(data), &resourceResponse)
@@ -110,22 +111,22 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 			panic(err)
 		}
 		for _, resource := range resourceResponse.Resources {
-			subResourceEndpoint := getHandledTypeForURL(resource.ID, handledType.subResources)
-			subResourceTemplateValues := subResourceEndpoint.endpoint.Match(resource.ID).Values
-			name := substituteValues(subResourceEndpoint.display, subResourceTemplateValues)
+			subResourceType := getResourceTypeForURL(resource.ID, resourceType.subResources)
+			subResourceTemplateValues := subResourceType.endpoint.Match(resource.ID).Values
+			name := substituteValues(subResourceType.display, subResourceTemplateValues)
 			newItems = append(newItems, &TreeNode{
 				Parentid:  currentItem.ID,
 				Namespace: "appservice",
 				Name:      name,
 				Display:   name,
-				ExpandURL: resource.ID + "?api-version=" + subResourceEndpoint.endpoint.APIVersion,
-				ItemType:  resourceType,
+				ExpandURL: resource.ID + "?api-version=" + subResourceType.endpoint.APIVersion,
+				ItemType:  "resource",
 				DeleteURL: "TODO",
 			})
 		}
 	}
 	// Add any children to newItems
-	for _, child := range handledType.children {
+	for _, child := range resourceType.children {
 
 		url, err := child.endpoint.BuildURL(templateValues)
 		if err != nil {
@@ -139,7 +140,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 			Name:      display,
 			Display:   display,
 			ExpandURL: url,
-			ItemType:  resourceType,
+			ItemType:  "resource",
 			DeleteURL: "NotSupported",
 		})
 	}
