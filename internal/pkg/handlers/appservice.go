@@ -21,6 +21,7 @@ type AppServiceResourceExpander struct {
 type handledType struct {
 	display  string
 	endpoint endpoints.EndpointInfo
+	verb     string
 	// children are auto-loaded (must be able to build the URL => no additional template URL values)
 	children []handledType
 	// subResources are not auto-loaded (these come from the request to the endpoint)
@@ -33,14 +34,10 @@ func (e *AppServiceResourceExpander) Name() string {
 }
 
 func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.EndpointInfo {
-	return mustGetEndpointInfoFromURLWithVerb(url, apiVersion, "GET")
-}
-func mustGetEndpointInfoFromURLWithVerb(url string, apiVersion string, verb string) endpoints.EndpointInfo {
 	endpoint, err := endpoints.GetEndpointInfoFromURL(url, apiVersion)
 	if err != nil {
 		panic(err)
 	}
-	endpoint.Verb = verb
 	return endpoint
 }
 

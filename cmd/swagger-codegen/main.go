@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -60,16 +61,16 @@ func main() {
 		}
 	}
 
-	dumpPaths(endpoints, "")
+	dumpPaths(os.Stdout, endpoints, "")
 }
-func dumpPaths(endpoints []*Endpoint, prefix string) {
+func dumpPaths(w io.Writer, endpoints []*Endpoint, prefix string) {
 
 	for _, endpoint := range endpoints {
-		fmt.Printf("%s%s\n", prefix, endpoint.Path)
+		fmt.Fprintf(w, "%s%s\n", prefix, endpoint.Path)
 		for verb, verbInfo := range endpoint.Verbs {
 			fmt.Printf("%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
 		}
-		dumpPaths(endpoint.Children, prefix+"  ")
+		dumpPaths(w, endpoint.Children, prefix+"  ")
 	}
 }
 func findPath(endpoints []*Endpoint, path string) *Endpoint {

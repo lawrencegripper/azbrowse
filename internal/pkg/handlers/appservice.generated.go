@@ -11,31 +11,38 @@ func (e *AppServiceResourceExpander) getHandledTypes() []handledType {
 					children: []handledType{
 						{
 							display:  "appsettings",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "authsettings",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "connectionstrings",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "logs",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "metadata",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "publishingcredentials",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "pushsettings",
-							endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01", "POST"),
+							endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list", "2018-02-01"),
+							verb:     "POST",
 						},
 						{
 							display:  "slotConfigNames",
@@ -75,31 +82,37 @@ func (e *AppServiceResourceExpander) getHandledTypes() []handledType {
 									children: []handledType{
 										{
 											display:  "appsettings",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings/list", "2018-02-01"),
+											verb:     "POST",
 										},
 										{
 											display:  "authsettings",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings/list", "2018-02-01"),
+											verb:     "POST",
 										},
 										{
 											display:  "connectionstrings",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings/list", "2018-02-01"),
+											verb:     "POST",
 										},
 										{
 											display:  "logs",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs/list", "2018-02-01"),
+											verb:     "POST",
 										},
 										{
 											display:  "metadata",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata/list", "2018-02-01"),
+											verb:     "POST",
 										},
 										{
 											display:  "publishingcredentials",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/publishingcredentials/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/publishingcredentials/list", "2018-02-01"),
+											verb:     "POST",
 										},
 										{
 											display:  "pushsettings",
-											endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings/list", "2018-02-01", "POST"),
+											endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings/list", "2018-02-01"),
 										},
 										{
 											display:  "slotConfigNames",
