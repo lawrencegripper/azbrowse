@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/lawrencegripper/azbrowse/endpoints"
 
@@ -20,7 +21,10 @@ type AppServiceResourceExpander struct {
 type handledType struct {
 	display  string
 	endpoint endpoints.EndpointInfo
+	// children are auto-loaded (must be able to build the URL => no additional template URL values)
 	children []handledType
+	// subResources are not auto-loaded (these come from the request to the endpoint)
+	subResources []handledType
 }
 
 // Name returns the name of the expander
@@ -83,6 +87,80 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 					{
 						display:  "siteextensions",
 						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
+						subResources: []handledType{
+							{
+								display:  "siteextension: {siteExtensionId}",
+								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}", "2018-02-01"),
+							},
+						},
+					},
+					{
+						display:  "slots",
+						endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots", "2018-02-01"),
+						subResources: []handledType{
+							{
+								display:  "slot: {slot}",
+								endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
+								children: []handledType{
+									{
+										display:  "config",
+										endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config", "2018-02-01"),
+										children: []handledType{
+											{
+												display:  "appsettings",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/appsettings/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "authsettings",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/authsettings/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "connectionstrings",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/connectionstrings/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "logs",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "metadata",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/metadata/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "publishingcredentials",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/publishingcredentials/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "pushsettings",
+												endpoint: mustGetEndpointInfoFromURLWithVerb("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/pushsettings/list", "2018-02-01", "POST"),
+											},
+											{
+												display:  "slotConfigNames",
+												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/slotConfigNames", "2018-02-01"),
+											},
+											{
+												display:  "virtualNetwork",
+												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/virtualNetwork", "2018-02-01"),
+											},
+											{
+												display:  "web",
+												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web", "2018-02-01"),
+											},
+										},
+									},
+									{
+										display:  "siteextensions",
+										endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions", "2018-02-01"),
+										subResources: []handledType{
+											{
+												display:  "siteextension: {siteExtensionId}",
+												endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}", "2018-02-01"),
+											},
+										},
+									},
+								},
+							},
+						},
 					},
 				},
 			},
@@ -109,8 +187,10 @@ func getHandledTypeForURL(url string, handledTypes []handledType) *handledType {
 		if matchResult.IsMatch {
 			return &handledType
 		}
-		result := getHandledTypeForURL(url, handledType.children)
-		if result != nil {
+		if result := getHandledTypeForURL(url, handledType.subResources); result != nil {
+			return result
+		}
+		if result := getHandledTypeForURL(url, handledType.children); result != nil {
 			return result
 		}
 	}
@@ -151,16 +231,38 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 		}
 	}
 
-	var resourceResponse armclient.ResourceReseponse
-	err = json.Unmarshal([]byte(data), &resourceResponse)
-	if err != nil {
-		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-		panic(err)
-	}
-
 	newItems := []TreeNode{}
 	matchResult := handledType.endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
 	templateValues := matchResult.Values
+
+	if len(handledType.subResources) > 0 {
+		// We have defined subResources - Unmarshal the ARM response and add these to newItems
+		var resourceResponse armclient.ResourceReseponse
+		err = json.Unmarshal([]byte(data), &resourceResponse)
+		if err != nil {
+			err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
+			panic(err)
+		}
+		for _, resource := range resourceResponse.Resources {
+			subResourceEndpoint := getHandledTypeForURL(resource.ID, handledType.subResources)
+			subResourceTemplateValues := subResourceEndpoint.endpoint.Match(resource.ID).Values
+			name := substituteValues(subResourceEndpoint.display, subResourceTemplateValues)
+			resourceAPIVersion, err := armclient.GetAPIVersion(resource.Type)
+			if err != nil {
+				panic(err)
+			}
+			newItems = append(newItems, TreeNode{
+				Parentid:  currentItem.ID,
+				Namespace: "appservice",
+				Name:      name,
+				Display:   name,
+				ExpandURL: resource.ID + "?api-version=" + resourceAPIVersion,
+				ItemType:  resourceType,
+				DeleteURL: "TODO",
+			})
+		}
+	}
+	// Add any children to newItems
 	for _, child := range handledType.children {
 
 		url, err := child.endpoint.BuildURL(templateValues)
@@ -168,11 +270,12 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.display, err)
 			panic(err)
 		}
+		display := substituteValues(child.display, templateValues)
 		newItems = append(newItems, TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "appservice",
-			Name:      child.display,
-			Display:   child.display,
+			Name:      display,
+			Display:   display,
 			ExpandURL: url,
 			ItemType:  resourceType,
 			DeleteURL: "NotSupported",
@@ -184,4 +287,12 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem Tre
 		Response:          string(data),
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
+}
+
+// substituteValues applys a value map to strings such as "Name: {name}"
+func substituteValues(fmtString string, values map[string]string) string {
+	for name, value := range values {
+		fmtString = strings.Replace(fmtString, "{"+name+"}", value, -1)
+	}
+	return fmtString
 }
