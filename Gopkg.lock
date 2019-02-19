@@ -237,6 +237,17 @@
   version = "v0.5.5"
 
 [[projects]]
+  digest = "1:35a609636092b0ddbf6d5a2d250c67a0476202ca8ebb0bb4d338b3744a522870"
+  name = "github.com/valyala/fastjson"
+  packages = [
+    ".",
+    "fastfloat",
+  ]
+  pruneopts = "UT"
+  revision = "ecda198f5d2b8600b6af67635a6b2bf6708e5a71"
+  version = "v1.4.0"
+
+[[projects]]
   branch = "master"
   digest = "1:f8b491a7c25030a895a0e579742d07136e6958e77ef2d46e769db8eec4e58fcd"
   name = "golang.org/x/net"
@@ -321,6 +332,7 @@
     "github.com/satori/go.uuid",
     "github.com/schollz/closestmatch",
     "github.com/skratchdot/open-golang/open",
+    "github.com/valyala/fastjson",
     "sourcegraph.com/sourcegraph/appdash",
     "sourcegraph.com/sourcegraph/appdash/opentracing",
     "sourcegraph.com/sourcegraph/appdash/traceapp",

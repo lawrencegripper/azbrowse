@@ -14,6 +14,18 @@ It's an MVP to prove out the use case. Basic navigation and operations with a bo
 
 Currently I'm using it every day **but it is experimental so use with caution on a production environment!!**
 
+![Demo](./docs/quickdemo-azbrowse.gif)
+
+### Install
+
+Grab the binaries from the release page or for MacOS and Linux run this script
+
+```
+curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scripts/install_azbrowse.sh | sudo sh
+```
+
+You may need to reload your terminal to pick up `azbrowse` after the script completes. 
+
 ### Usage
 
 ## Navigation 
@@ -35,7 +47,6 @@ Currently I'm using it every day **but it is experimental so use with caution on
 | CTLT+S:             | Save JSON to clipboard    | Saves the last JSON response to the clipboard for export                           |
 | CTLT+A:             | View Actions for resource | This allows things like ListKeys on storage or Restart on VMs                      |
 
-![Demo](./docs/quickdemo-azbrowse.gif)
 
 
 ## Debugging
@@ -46,7 +57,7 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ## Developing 
 
-Clone the repository then use `go build` or `go install` to build the tool and run it locally. Before submitting a PR you can test the CI process locally by running `./scripts/ci.sh` this requires `docker` be installed and configured on your box. 
+Clone the repository then use `make` to run checks and build (or `make ci-docker` to build the tool and run it locally using docker). You an also use `make install-azbrowse` to install your local development version.
 
 ## Plans
 

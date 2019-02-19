@@ -7,7 +7,7 @@ addons:
 services:
 - docker
 script:
-- bash ./scripts/ci.sh
+- make ci-docker
 
 before_deploy:
 - git tag "v1.0.$TRAVIS_BUILD_NUMBER"
