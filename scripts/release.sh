@@ -18,7 +18,7 @@ GO_VERSION=$(go version | awk '{print $3}')
 echo "Building version: $VERSION"
 
 echo "->Installing tools"
-bash -f ./install.sh
+bash -f ./install_dev_tools.sh
 cd ../
 
 echo "->Running dep"
