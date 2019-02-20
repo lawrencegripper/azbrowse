@@ -27,9 +27,9 @@ func (h ListRightHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (h ListRightHandler) Widget() string {
-	return "itemWidget"
+	return "listWidget"
 }
 
 func (h ListRightHandler) DefaultKey() gocui.Key {
-	return gocui.KeyArrowLeft
+	return gocui.KeyArrowRight
 }
