@@ -214,7 +214,7 @@ func main() {
 		if protalURL == "" {
 			protalURL = "https://portal.azure.com"
 		}
-		url := protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.Parentid + "/overview"
+		url := protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.ID
 		span, _ := tracing.StartSpanFromContext(ctx, "openportal:url")
 		open.Run(url)
 		span.Finish()
