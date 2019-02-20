@@ -3,43 +3,47 @@ package handlers
 func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 	return []ResourceType{
 		ResourceType{
-			Display: "sites",
+			Display:  "sites",
 			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Web/sites", "2018-02-01"),
 		},
 		ResourceType{
-			Display: "sites",
+			Display:  "sites",
 			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites", "2018-02-01"),
 			SubResources: []ResourceType {
 				ResourceType{
-					Display: "{name}",
+					Display:  "{name}",
 					Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
 					Children: []ResourceType {
 						ResourceType{
-							Display: "analyzeCustomHostname",
+							Display:  "analyzeCustomHostname",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/analyzeCustomHostname", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "config",
+							Display:  "config",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
 							Children: []ResourceType {
 								ResourceType{
-									Display: "logs",
+									Display:  "appsettings",
+									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01"),
+									Verb:     "POST"								},
+								ResourceType{
+									Display:  "logs",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/logs", "2018-02-01"),
 								},
 								ResourceType{
-									Display: "slotConfigNames",
+									Display:  "slotConfigNames",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/slotConfigNames", "2018-02-01"),
 								},
 								ResourceType{
-									Display: "web",
+									Display:  "web",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "snapshots",
+											Display:  "snapshots",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web/snapshots", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{snapshotId}",
+													Display:  "{snapshotId}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web/snapshots/{snapshotId}", "2018-02-01"),
 													Children: []ResourceType {
 													},
@@ -51,11 +55,11 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "continuouswebjobs",
+							Display:  "continuouswebjobs",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{webJobName}",
+									Display:  "{webJobName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs/{webJobName}", "2018-02-01"),
 									Children: []ResourceType {
 									},
@@ -63,15 +67,15 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "deployments",
+							Display:  "deployments",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{id}",
+									Display:  "{id}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments/{id}", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "log",
+											Display:  "log",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments/{id}/log", "2018-02-01"),
 										},
 									},
@@ -79,37 +83,37 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "domainOwnershipIdentifiers",
+							Display:  "domainOwnershipIdentifiers",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/domainOwnershipIdentifiers", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{domainOwnershipIdentifierName}",
+									Display:  "{domainOwnershipIdentifierName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/domainOwnershipIdentifiers/{domainOwnershipIdentifierName}", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "MSDeploy",
+							Display:  "MSDeploy",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy", "2018-02-01"),
 							Children: []ResourceType {
 								ResourceType{
-									Display: "log",
+									Display:  "log",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy/log", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "functions",
+							Display:  "functions",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions", "2018-02-01"),
 							Children: []ResourceType {
 								ResourceType{
-									Display: "token",
+									Display:  "token",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/admin/token", "2018-02-01"),
 								},
 							},
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{functionName}",
+									Display:  "{functionName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/{functionName}", "2018-02-01"),
 									Children: []ResourceType {
 									},
@@ -117,71 +121,71 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "hostNameBindings",
+							Display:  "hostNameBindings",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostNameBindings", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{hostName}",
+									Display:  "{hostName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostNameBindings/{hostName}", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "hybridConnectionRelays",
+							Display:  "hybridConnectionRelays",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionRelays", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "hybridconnection",
+							Display:  "hybridconnection",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{entityName}",
+									Display:  "{entityName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection/{entityName}", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "instances",
+							Display:  "instances",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "MSDeploy",
+									Display:  "MSDeploy",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "log",
+											Display:  "log",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy/log", "2018-02-01"),
 										},
 									},
 								},
 								ResourceType{
-									Display: "processes",
+									Display:  "processes",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes", "2018-02-01"),
 									SubResources: []ResourceType {
 										ResourceType{
-											Display: "{processId}",
+											Display:  "{processId}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}", "2018-02-01"),
 											Children: []ResourceType {
 												ResourceType{
-													Display: "dump",
+													Display:  "dump",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/dump", "2018-02-01"),
 												},
 												ResourceType{
-													Display: "modules",
+													Display:  "modules",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules", "2018-02-01"),
 													SubResources: []ResourceType {
 														ResourceType{
-															Display: "{baseAddress}",
+															Display:  "{baseAddress}",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
 														},
 													},
 												},
 												ResourceType{
-													Display: "threads",
+													Display:  "threads",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/threads", "2018-02-01"),
 													SubResources: []ResourceType {
 														ResourceType{
-															Display: "{threadId}",
+															Display:  "{threadId}",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/threads/{threadId}", "2018-02-01"),
 														},
 													},
@@ -193,67 +197,67 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "metricdefinitions",
+							Display:  "metricdefinitions",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/metricdefinitions", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "metrics",
+							Display:  "metrics",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/metrics", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "virtualNetwork",
+							Display:  "virtualNetwork",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkConfig/virtualNetwork", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "perfcounters",
+							Display:  "perfcounters",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/perfcounters", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "phplogging",
+							Display:  "phplogging",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/phplogging", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "premieraddons",
+							Display:  "premieraddons",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/premieraddons", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{premierAddOnName}",
+									Display:  "{premierAddOnName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/premieraddons/{premierAddOnName}", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "virtualNetworks",
+							Display:  "virtualNetworks",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/privateAccess/virtualNetworks", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "processes",
+							Display:  "processes",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{processId}",
+									Display:  "{processId}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "dump",
+											Display:  "dump",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/dump", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "modules",
+											Display:  "modules",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{baseAddress}",
+													Display:  "{baseAddress}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "threads",
+											Display:  "threads",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/threads", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{threadId}",
+													Display:  "{threadId}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/threads/{threadId}", "2018-02-01"),
 												},
 											},
@@ -263,57 +267,57 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "publicCertificates",
+							Display:  "publicCertificates",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/publicCertificates", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{publicCertificateName}",
+									Display:  "{publicCertificateName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/publicCertificates/{publicCertificateName}", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "siteextensions",
+							Display:  "siteextensions",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{siteExtensionId}",
+									Display:  "{siteExtensionId}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "slots",
+							Display:  "slots",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots", "2018-02-01"),
 							Children: []ResourceType {
 							},
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{slot}",
+									Display:  "{slot}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "analyzeCustomHostname",
+											Display:  "analyzeCustomHostname",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/analyzeCustomHostname", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "config",
+											Display:  "config",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config", "2018-02-01"),
 											Children: []ResourceType {
 												ResourceType{
-													Display: "logs",
+													Display:  "logs",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs", "2018-02-01"),
 												},
 												ResourceType{
-													Display: "web",
+													Display:  "web",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web", "2018-02-01"),
 													Children: []ResourceType {
 														ResourceType{
-															Display: "snapshots",
+															Display:  "snapshots",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web/snapshots", "2018-02-01"),
 															SubResources: []ResourceType {
 																ResourceType{
-																	Display: "{snapshotId}",
+																	Display:  "{snapshotId}",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web/snapshots/{snapshotId}", "2018-02-01"),
 																	Children: []ResourceType {
 																	},
@@ -325,11 +329,11 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "continuouswebjobs",
+											Display:  "continuouswebjobs",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{webJobName}",
+													Display:  "{webJobName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs/{webJobName}", "2018-02-01"),
 													Children: []ResourceType {
 													},
@@ -337,15 +341,15 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "deployments",
+											Display:  "deployments",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{id}",
+													Display:  "{id}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments/{id}", "2018-02-01"),
 													Children: []ResourceType {
 														ResourceType{
-															Display: "log",
+															Display:  "log",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments/{id}/log", "2018-02-01"),
 														},
 													},
@@ -353,37 +357,37 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "domainOwnershipIdentifiers",
+											Display:  "domainOwnershipIdentifiers",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/domainOwnershipIdentifiers", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{domainOwnershipIdentifierName}",
+													Display:  "{domainOwnershipIdentifierName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/domainOwnershipIdentifiers/{domainOwnershipIdentifierName}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "MSDeploy",
+											Display:  "MSDeploy",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy", "2018-02-01"),
 											Children: []ResourceType {
 												ResourceType{
-													Display: "log",
+													Display:  "log",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy/log", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "functions",
+											Display:  "functions",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions", "2018-02-01"),
 											Children: []ResourceType {
 												ResourceType{
-													Display: "token",
+													Display:  "token",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/admin/token", "2018-02-01"),
 												},
 											},
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{functionName}",
+													Display:  "{functionName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/{functionName}", "2018-02-01"),
 													Children: []ResourceType {
 													},
@@ -391,71 +395,71 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "hostNameBindings",
+											Display:  "hostNameBindings",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hostNameBindings", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{hostName}",
+													Display:  "{hostName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hostNameBindings/{hostName}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "hybridConnectionRelays",
+											Display:  "hybridConnectionRelays",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionRelays", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "hybridconnection",
+											Display:  "hybridconnection",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{entityName}",
+													Display:  "{entityName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection/{entityName}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "instances",
+											Display:  "instances",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "MSDeploy",
+													Display:  "MSDeploy",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy", "2018-02-01"),
 													Children: []ResourceType {
 														ResourceType{
-															Display: "log",
+															Display:  "log",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy/log", "2018-02-01"),
 														},
 													},
 												},
 												ResourceType{
-													Display: "processes",
+													Display:  "processes",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes", "2018-02-01"),
 													SubResources: []ResourceType {
 														ResourceType{
-															Display: "{processId}",
+															Display:  "{processId}",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}", "2018-02-01"),
 															Children: []ResourceType {
 																ResourceType{
-																	Display: "dump",
+																	Display:  "dump",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/dump", "2018-02-01"),
 																},
 																ResourceType{
-																	Display: "modules",
+																	Display:  "modules",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules", "2018-02-01"),
 																	SubResources: []ResourceType {
 																		ResourceType{
-																			Display: "{baseAddress}",
+																			Display:  "{baseAddress}",
 																			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
 																		},
 																	},
 																},
 																ResourceType{
-																	Display: "threads",
+																	Display:  "threads",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/threads", "2018-02-01"),
 																	SubResources: []ResourceType {
 																		ResourceType{
-																			Display: "{threadId}",
+																			Display:  "{threadId}",
 																			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/threads/{threadId}", "2018-02-01"),
 																		},
 																	},
@@ -467,71 +471,71 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "metricdefinitions",
+											Display:  "metricdefinitions",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/metricdefinitions", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "metrics",
+											Display:  "metrics",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/metrics", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "status",
+											Display:  "status",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/migratemysql/status", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "virtualNetwork",
+											Display:  "virtualNetwork",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkConfig/virtualNetwork", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "perfcounters",
+											Display:  "perfcounters",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/perfcounters", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "phplogging",
+											Display:  "phplogging",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/phplogging", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "premieraddons",
+											Display:  "premieraddons",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/premieraddons", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{premierAddOnName}",
+													Display:  "{premierAddOnName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/premieraddons/{premierAddOnName}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "virtualNetworks",
+											Display:  "virtualNetworks",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/privateAccess/virtualNetworks", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "processes",
+											Display:  "processes",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{processId}",
+													Display:  "{processId}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}", "2018-02-01"),
 													Children: []ResourceType {
 														ResourceType{
-															Display: "dump",
+															Display:  "dump",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/dump", "2018-02-01"),
 														},
 														ResourceType{
-															Display: "modules",
+															Display:  "modules",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules", "2018-02-01"),
 															SubResources: []ResourceType {
 																ResourceType{
-																	Display: "{baseAddress}",
+																	Display:  "{baseAddress}",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
 																},
 															},
 														},
 														ResourceType{
-															Display: "threads",
+															Display:  "threads",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/threads", "2018-02-01"),
 															SubResources: []ResourceType {
 																ResourceType{
-																	Display: "{threadId}",
+																	Display:  "{threadId}",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/threads/{threadId}", "2018-02-01"),
 																},
 															},
@@ -541,53 +545,53 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "publicCertificates",
+											Display:  "publicCertificates",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/publicCertificates", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{publicCertificateName}",
+													Display:  "{publicCertificateName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/publicCertificates/{publicCertificateName}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "siteextensions",
+											Display:  "siteextensions",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{siteExtensionId}",
+													Display:  "{siteExtensionId}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "snapshots",
+											Display:  "snapshots",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/snapshots", "2018-02-01"),
 											Children: []ResourceType {
 												ResourceType{
-													Display: "snapshotsdr",
+													Display:  "snapshotsdr",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/snapshotsdr", "2018-02-01"),
 												},
 											},
 										},
 										ResourceType{
-											Display: "web",
+											Display:  "web",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/sourcecontrols/web", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "triggeredwebjobs",
+											Display:  "triggeredwebjobs",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{webJobName}",
+													Display:  "{webJobName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}", "2018-02-01"),
 													Children: []ResourceType {
 														ResourceType{
-															Display: "history",
+															Display:  "history",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history", "2018-02-01"),
 															SubResources: []ResourceType {
 																ResourceType{
-																	Display: "{id}",
+																	Display:  "{id}",
 																	Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history/{id}", "2018-02-01"),
 																},
 															},
@@ -597,19 +601,19 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "usages",
+											Display:  "usages",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/usages", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "virtualNetworkConnections",
+											Display:  "virtualNetworkConnections",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{vnetName}",
+													Display:  "{vnetName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 													SubResources: []ResourceType {
 														ResourceType{
-															Display: "{gatewayName}",
+															Display:  "{gatewayName}",
 															Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}", "2018-02-01"),
 														},
 													},
@@ -617,11 +621,11 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "webjobs",
+											Display:  "webjobs",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/webjobs", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{webJobName}",
+													Display:  "{webJobName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/webjobs/{webJobName}", "2018-02-01"),
 												},
 											},
@@ -629,29 +633,29 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 									},
 									SubResources: []ResourceType {
 										ResourceType{
-											Display: "{relayName}",
+											Display:  "{relayName}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 											Children: []ResourceType {
 											},
 										},
 										ResourceType{
-											Display: "{view}",
+											Display:  "{view}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkFeatures/{view}", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "{operationId}",
+											Display:  "{operationId}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkTrace/operationresults/{operationId}", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "{operationId}",
+											Display:  "{operationId}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkTrace/{operationId}", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "{operationId}",
+											Display:  "{operationId}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkTraces/current/operationresults/{operationId}", "2018-02-01"),
 										},
 										ResourceType{
-											Display: "{operationId}",
+											Display:  "{operationId}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/networkTraces/{operationId}", "2018-02-01"),
 										},
 									},
@@ -659,33 +663,33 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "snapshots",
+							Display:  "snapshots",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/snapshots", "2018-02-01"),
 							Children: []ResourceType {
 								ResourceType{
-									Display: "snapshotsdr",
+									Display:  "snapshotsdr",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/snapshotsdr", "2018-02-01"),
 								},
 							},
 						},
 						ResourceType{
-							Display: "web",
+							Display:  "web",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/sourcecontrols/web", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "triggeredwebjobs",
+							Display:  "triggeredwebjobs",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{webJobName}",
+									Display:  "{webJobName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "history",
+											Display:  "history",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{id}",
+													Display:  "{id}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history/{id}", "2018-02-01"),
 												},
 											},
@@ -695,19 +699,19 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "usages",
+							Display:  "usages",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/usages", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "virtualNetworkConnections",
+							Display:  "virtualNetworkConnections",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{vnetName}",
+									Display:  "{vnetName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 									SubResources: []ResourceType {
 										ResourceType{
-											Display: "{gatewayName}",
+											Display:  "{gatewayName}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}", "2018-02-01"),
 										},
 									},
@@ -715,11 +719,11 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "webjobs",
+							Display:  "webjobs",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/webjobs", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{webJobName}",
+									Display:  "{webJobName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/webjobs/{webJobName}", "2018-02-01"),
 								},
 							},
@@ -727,29 +731,29 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 					},
 					SubResources: []ResourceType {
 						ResourceType{
-							Display: "{relayName}",
+							Display:  "{relayName}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 							Children: []ResourceType {
 							},
 						},
 						ResourceType{
-							Display: "{view}",
+							Display:  "{view}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkFeatures/{view}", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "{operationId}",
+							Display:  "{operationId}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkTrace/operationresults/{operationId}", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "{operationId}",
+							Display:  "{operationId}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkTrace/{operationId}", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "{operationId}",
+							Display:  "{operationId}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkTraces/current/operationresults/{operationId}", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "{operationId}",
+							Display:  "{operationId}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/networkTraces/{operationId}", "2018-02-01"),
 						},
 					},
@@ -757,63 +761,63 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 			},
 		},
 		ResourceType{
-			Display: "serverfarms",
+			Display:  "serverfarms",
 			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Web/serverfarms", "2018-02-01"),
 		},
 		ResourceType{
-			Display: "serverfarms",
+			Display:  "serverfarms",
 			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms", "2018-02-01"),
 			SubResources: []ResourceType {
 				ResourceType{
-					Display: "{name}",
+					Display:  "{name}",
 					Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}", "2018-02-01"),
 					Children: []ResourceType {
 						ResourceType{
-							Display: "capabilities",
+							Display:  "capabilities",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/capabilities", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "limit",
+							Display:  "limit",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionPlanLimits/limit", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "hybridConnectionRelays",
+							Display:  "hybridConnectionRelays",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionRelays", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "metricdefinitions",
+							Display:  "metricdefinitions",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/metricdefinitions", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "metrics",
+							Display:  "metrics",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/metrics", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "sites",
+							Display:  "sites",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/sites", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "skus",
+							Display:  "skus",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/skus", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "usages",
+							Display:  "usages",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/usages", "2018-02-01"),
 						},
 						ResourceType{
-							Display: "virtualNetworkConnections",
+							Display:  "virtualNetworkConnections",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections", "2018-02-01"),
 							SubResources: []ResourceType {
 								ResourceType{
-									Display: "{vnetName}",
+									Display:  "{vnetName}",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 									Children: []ResourceType {
 										ResourceType{
-											Display: "routes",
+											Display:  "routes",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes", "2018-02-01"),
 											SubResources: []ResourceType {
 												ResourceType{
-													Display: "{routeName}",
+													Display:  "{routeName}",
 													Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes/{routeName}", "2018-02-01"),
 												},
 											},
@@ -821,7 +825,7 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 									},
 									SubResources: []ResourceType {
 										ResourceType{
-											Display: "{gatewayName}",
+											Display:  "{gatewayName}",
 											Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}", "2018-02-01"),
 										},
 									},
@@ -831,11 +835,11 @@ func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {
 					},
 					SubResources: []ResourceType {
 						ResourceType{
-							Display: "{relayName}",
+							Display:  "{relayName}",
 							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 							Children: []ResourceType {
 								ResourceType{
-									Display: "sites",
+									Display:  "sites",
 									Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}/sites", "2018-02-01"),
 								},
 							},
