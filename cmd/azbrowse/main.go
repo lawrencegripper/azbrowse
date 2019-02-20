@@ -143,7 +143,9 @@ func main() {
 	keybindings.AddHandler(keyhandlers.ListNavigateDownHandler{List: list})
 	keybindings.AddHandler(keyhandlers.ListNavigateUpHandler{List: list})
 
-	keybindings.Bind(g) // apply late binding for keys
+	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
+		log.Panicln(err)
+	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ExpandCurrentSelection()
