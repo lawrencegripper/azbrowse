@@ -27,11 +27,12 @@ func NewWithFile(filePath string) KeyMap {
 		ListNavigateDown: gocui.KeyArrowDown,
 		ListNavigateUp:   gocui.KeyArrowUp,
 	}
-	var err error
-	keyMap, err = overrideKeyMapFromFile(filePath, keyMap)
-	if err != nil {
-		panic(fmt.Sprintf("Couldn't initialize keys, error: %+v", err))
-	}
+	if _, err := os.Stat(filePath); err == nil {
+		keyMap, err = overrideKeyMapFromFile(filePath, keyMap)
+		if err != nil {
+			panic(fmt.Sprintf("Couldn't initialize keys, error: %+v", err))
+		}
+	} // ignore file overrides if error
 	return keyMap
 }
 
