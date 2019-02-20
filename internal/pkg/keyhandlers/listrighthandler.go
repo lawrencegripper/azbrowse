@@ -5,7 +5,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const listRightId = "ListRight"
+const listRightId = 12
 
 type ListRightHandler struct {
 	List            *views.ListWidget
@@ -13,7 +13,7 @@ type ListRightHandler struct {
 }
 
 func (h ListRightHandler) Id() string {
-	return listRightId
+	return HandlerIds[listRightId]
 }
 
 func (h ListRightHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

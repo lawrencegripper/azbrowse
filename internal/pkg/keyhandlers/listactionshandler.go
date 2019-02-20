@@ -7,7 +7,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const listActionsId = "ListActions"
+const listActionsId = 7
 
 type ListActionsHandler struct {
 	List    *views.ListWidget
@@ -15,7 +15,7 @@ type ListActionsHandler struct {
 }
 
 func (h ListActionsHandler) Id() string {
-	return listActionsId
+	return HandlerIds[listActionsId]
 }
 
 func (h ListActionsHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

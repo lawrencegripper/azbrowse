@@ -5,14 +5,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const itemBackId = "ItemBack"
+const itemBackId = 5
 
 type ItemBackHandler struct {
 	List *views.ListWidget
 }
 
 func (h ItemBackHandler) Id() string {
-	return listBackId
+	return HandlerIds[itemBackId]
 }
 
 func (h ItemBackHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

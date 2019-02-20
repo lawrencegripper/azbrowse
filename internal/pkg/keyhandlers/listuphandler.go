@@ -5,14 +5,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const listUpId = "ListUp"
+const listUpId = 11
 
 type ListUpHandler struct {
 	List *views.ListWidget
 }
 
 func (h ListUpHandler) Id() string {
-	return listUpId
+	return HandlerIds[listUpId]
 }
 
 func (h ListUpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

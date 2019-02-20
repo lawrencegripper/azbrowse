@@ -5,7 +5,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const listEditId = "ListEdit"
+const listEditId = 13
 
 type ListEditHandler struct {
 	List            *views.ListWidget
@@ -13,7 +13,7 @@ type ListEditHandler struct {
 }
 
 func (h ListEditHandler) Id() string {
-	return listEditId
+	return HandlerIds[listEditId]
 }
 
 func (h ListEditHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

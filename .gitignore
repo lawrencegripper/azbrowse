@@ -2,3 +2,4 @@ azbrowse.db
 /bin
 /azbrowse
 bindings.json
+/cmd/azbrowse/azbrowse

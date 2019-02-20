@@ -11,7 +11,7 @@ import (
 // HACK: To prevent accidental deletes this method requires del to be pressed twice on a resource
 // before it will proceed
 
-const DeleteId = "Delete"
+const deleteId = 2
 
 type DeleteHandler struct {
 	DeleteConfirmItemID string
@@ -23,7 +23,7 @@ type DeleteHandler struct {
 }
 
 func (h DeleteHandler) Id() string {
-	return DeleteId
+	return HandlerIds[deleteId]
 }
 
 func (h DeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

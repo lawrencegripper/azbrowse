@@ -6,7 +6,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const CopyId = "Copy"
+const copyId = 1
 
 type CopyHandler struct {
 	Content   *views.ItemWidget
@@ -14,7 +14,7 @@ type CopyHandler struct {
 }
 
 func (h CopyHandler) Id() string {
-	return CopyId
+	return HandlerIds[copyId]
 }
 
 func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

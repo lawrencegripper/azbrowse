@@ -5,14 +5,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const listRefreshId = "ListRefresh"
+const listRefreshId = 16
 
 type ListRefreshHandler struct {
 	List *views.ListWidget
 }
 
 func (h ListRefreshHandler) Id() string {
-	return listRefreshId
+	return HandlerIds[listRefreshId]
 }
 
 func (h ListRefreshHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

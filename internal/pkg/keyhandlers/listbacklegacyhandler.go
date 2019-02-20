@@ -9,14 +9,14 @@ import (
 // A side-effect is that this key combination clashes with CTRL+H so we can't use that combination for help... oh well.
 // https://superuser.com/questions/375864/ctrlh-causing-backspace-instead-of-help-in-emacs-on-cygwin
 
-const listBackLegacyId = "ListBackLegacy"
+const listBackLegacyId = 9
 
 type ListBackLegacyHandler struct {
 	List *views.ListWidget
 }
 
 func (h ListBackLegacyHandler) Id() string {
-	return listBackLegacyId
+	return HandlerIds[listBackLegacyId]
 }
 
 func (h ListBackLegacyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

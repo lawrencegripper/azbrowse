@@ -7,7 +7,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const FullscreenId = "Fullscreen"
+const fullscreenId = 3
 
 type FullscreenHandler struct {
 	List         *views.ListWidget
@@ -16,7 +16,7 @@ type FullscreenHandler struct {
 }
 
 func (h FullscreenHandler) Id() string {
-	return listBackId
+	return HandlerIds[fullscreenId]
 }
 
 func toggle(b bool) bool {

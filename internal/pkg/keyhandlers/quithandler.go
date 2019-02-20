@@ -4,13 +4,13 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-const QuitId = "Quit"
+const QuitId = 1
 
 type QuitHandler struct {
 }
 
 func (h QuitHandler) Id() string {
-	return QuitId
+	return HandlerIds[QuitId]
 }
 
 func (h QuitHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

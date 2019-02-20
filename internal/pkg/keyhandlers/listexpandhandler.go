@@ -5,14 +5,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const listExpandId = "ListExpand"
+const listExpandId = 14
 
 type ListExpandHandler struct {
 	List *views.ListWidget
 }
 
 func (h ListExpandHandler) Id() string {
-	return listExpandId
+	return HandlerIds[listExpandId]
 }
 
 func (h ListExpandHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

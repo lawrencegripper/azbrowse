@@ -4,14 +4,14 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-const listLeftId = "ItemLeft"
+const itemLeftId = 6
 
 type ItemLeftHandler struct {
 	EditModeEnabled *bool
 }
 
 func (h ItemLeftHandler) Id() string {
-	return listLeftId
+	return HandlerIds[itemLeftId]
 }
 
 func (h ItemLeftHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

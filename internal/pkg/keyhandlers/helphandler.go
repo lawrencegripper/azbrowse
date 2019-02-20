@@ -5,14 +5,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-const HelpId = "Help"
+const helpId = 4
 
 type HelpHandler struct {
 	ShowHelp *bool
 }
 
 func (h HelpHandler) Id() string {
-	return HelpId
+	return HandlerIds[helpId]
 }
 
 func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {

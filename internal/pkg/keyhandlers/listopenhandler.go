@@ -11,7 +11,7 @@ import (
 	"github.com/skratchdot/open-golang/open"
 )
 
-const listOpenId = "ListOpen"
+const listOpenId = 15
 
 type ListOpenHandler struct {
 	List    *views.ListWidget
@@ -19,7 +19,7 @@ type ListOpenHandler struct {
 }
 
 func (h ListOpenHandler) Id() string {
-	return listOpenId
+	return HandlerIds[listOpenId]
 }
 
 func (h ListOpenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
