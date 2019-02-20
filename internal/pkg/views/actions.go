@@ -1,12 +1,13 @@
-package main
+package views
 
 import (
 	"context"
 	"encoding/json"
+	"strings"
+
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"strings"
 )
 
 // TODO: Migrate to a handler...maybe

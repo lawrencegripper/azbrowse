@@ -1,4 +1,4 @@
-package main
+package views
 
 import (
 	"context"
@@ -16,21 +16,22 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y        int
-	w, h        int
-	items       []*handlers.TreeNode
-	contentView *ItemWidget
-	statusView  *StatusbarWidget
-	navStack    Stack
-	title       string
-	ctx         context.Context
-	selected    int
-	view        *gocui.View
+	x, y          int
+	w, h          int
+	items         []*handlers.TreeNode
+	contentView   *ItemWidget
+	statusView    *StatusbarWidget
+	navStack      Stack
+	title         string
+	ctx           context.Context
+	selected      int
+	view          *gocui.View
+	enableTracing bool
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing}
 }
 
 // Layout draws the widget in the gocui view
@@ -202,7 +203,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	// Lets give all the expanders 45secs to completed (unless debugging)
 	hasPrimaryResponse := false
 	var timeout <-chan time.Time
-	if enableTracing {
+	if w.enableTracing {
 		timeout = time.After(time.Second * 600)
 	} else {
 		timeout = time.After(time.Second * 45)

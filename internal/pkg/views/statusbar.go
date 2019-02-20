@@ -1,4 +1,4 @@
-package main
+package views
 
 import (
 	"fmt"
@@ -14,19 +14,21 @@ type StatusbarWidget struct {
 	name            string
 	x, y            int
 	w               int
+	hideGuids       bool
 	messages        map[string]eventing.StatusEvent
 	currentMessage  *eventing.StatusEvent
 	messageAddition string
 }
 
 // NewStatusbarWidget create new instance and start go routine for spinner
-func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
+func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWidget {
 	widget := &StatusbarWidget{
-		name:     "statusBarWidget",
-		x:        x,
-		y:        y,
-		w:        w,
-		messages: map[string]eventing.StatusEvent{},
+		name:      "statusBarWidget",
+		x:         x,
+		y:         y,
+		w:         w,
+		hideGuids: hideGuids,
+		messages:  map[string]eventing.StatusEvent{},
 	}
 
 	widget.currentMessage = &eventing.StatusEvent{}
@@ -102,7 +104,7 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Title = `Status [CTRL+I -> Help]`
 	v.Wrap = true
 
-	if hideGuids {
+	if w.hideGuids {
 		w.currentMessage.Message = stripSecretVals(w.currentMessage.Message)
 	}
 

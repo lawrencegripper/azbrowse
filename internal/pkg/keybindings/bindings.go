@@ -1,104 +1,61 @@
 package keybindings
 
 import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
 	"os"
-	"reflect"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/keyhandlers"
 )
 
 type KeyMap map[string]gocui.Key
 
+// SemanticKeyMap properties should always
+// match the IDs of the associated handlers
 type SemanticKeyMap struct {
-	ListNavigateDown string `json:"list-navigate-down"`
-	ListNavigateUp   string `json:"list-navigate-up"`
+	ListNavigateDown string `json:"ListNavigateDown"`
+	ListNavigateUp   string `json:"ListNavigateUp"`
 }
 
-func New() KeyMap {
+var handlers []keyhandlers.KeyHandler
+var overrides KeyMap
+
+func Bind(g *gocui.Gui) error {
 	defaultFilePath := "bindings.json"
-	return NewWithFile(defaultFilePath)
+	return BindWithFileOverrides(g, defaultFilePath)
 }
 
-func NewWithFile(filePath string) KeyMap {
-	keyMap := KeyMap{
-		ListNavigateDown: gocui.KeyArrowDown,
-		ListNavigateUp:   gocui.KeyArrowUp,
-	}
+func BindWithFileOverrides(g *gocui.Gui, filePath string) error {
 	if _, err := os.Stat(filePath); err == nil {
-		keyMap, err = overrideKeyMapFromFile(filePath, keyMap)
+		err = initializeOverrides(filePath)
 		if err != nil {
-			panic(fmt.Sprintf("Couldn't initialize keys, error: %+v", err))
+			return err
 		}
 	} // ignore file overrides if error
-	return keyMap
+	if err := bindHandlersToKeys(g); err != nil {
+		return err
+	}
+	return nil
 }
 
-func overrideKeyMapFromFile(filePath string, keyMap KeyMap) (KeyMap, error) {
-	// Load string formatted bindings from file
-	semanticKeyMap, err := loadBindingsFromFile(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	// Convert to KeyMap
-	normalKeyMap, err := normalizeSemanticKeyMap(*semanticKeyMap)
-	if err != nil {
-		return nil, err
-	}
-
-	// Merge maps with file precedence
-	keys := mergeKeyMaps(keyMap, normalKeyMap)
-	return keys, nil
+func AddHandler(hnd keyhandlers.KeyHandler) {
+	handlers = append(handlers, hnd)
 }
 
-func loadBindingsFromFile(filePath string) (*SemanticKeyMap, error) {
-	jsonf, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonf.Close()
-	bytes, _ := ioutil.ReadAll(jsonf)
-	var semanticKeyMap SemanticKeyMap
-	if err := json.Unmarshal(bytes, &semanticKeyMap); err != nil {
-		return nil, err
-	}
-	return &semanticKeyMap, nil
-}
-
-func normalizeSemanticKeyMap(semanticKeyMap SemanticKeyMap) (KeyMap, error) {
-	keyMap := KeyMap{}
-
-	v := reflect.ValueOf(semanticKeyMap)
-	for i := 0; i < v.NumField(); i++ {
-		value := fmt.Sprintf("%s", v.Field(i).Interface())
-		normalValue, err := normalizeSemanticValue(value)
-		if err != nil {
-			return nil, err
+func bindHandlersToKeys(g *gocui.Gui) error {
+	for _, hnd := range handlers {
+		if err := bindHandlerToKey(g, hnd); err != nil {
+			return err
 		}
-		key := v.Type().Field(i).Name
-		keyMap[key] = normalValue
 	}
-	return keyMap, nil
+	return nil
 }
 
-func normalizeSemanticValue(key string) (gocui.Key, error) {
-	// TODO Parse semantics properly
-	switch key {
-	case "Up":
-		return gocui.KeyArrowUp, nil
-	case "Down":
-		return gocui.KeyArrowDown, nil
-	default:
-		return 0, fmt.Errorf("%s is an unsupported key", key)
+func bindHandlerToKey(g *gocui.Gui, hnd keyhandlers.KeyHandler) error {
+	var key gocui.Key
+	if k, ok := overrides[hnd.Id()]; ok {
+		key = k
+	} else {
+		key = hnd.DefaultKey()
 	}
-}
-
-func mergeKeyMaps(keymap1, keymap2 KeyMap) KeyMap {
-	for k, _ := range keymap1 {
-		keymap1[k] = keymap2[k]
-	}
-	return keymap1
+	return g.SetKeybinding(hnd.Widget(), key, gocui.ModNone, hnd.Fn())
 }

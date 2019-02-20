@@ -13,10 +13,12 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/keyhandlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/version"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
 	"github.com/atotto/clipboard"
@@ -131,34 +133,17 @@ func main() {
 
 	leftColumnWidth := 45
 
-	status := NewStatusbarWidget(1, maxY-2, maxX, g)
-	content := NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status)
+	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
+	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing)
 
 	g.SetManager(status, content, list)
 	g.SetCurrentView("listWidget")
 
-	keys := keybindings.New()
-	keybindings.RegisterHandler(&keybindings.Handler{
-		Id: keybindings.ListNavigateDown,
-		Fn: func(g *gocui.Gui, v *gocui.View) error {
-			list.ChangeSelection(list.CurrentSelection() + 1)
-			return nil
-		},
-		Widget: "listWidget",
-	})
+	keybindings.AddHandler(keyhandlers.ListNavigateDownHandler{List: list})
+	keybindings.AddHandler(keyhandlers.ListNavigateUpHandler{List: list})
 
-	keybindings.RegisterHandler(&keybindings.Handler{
-		Id: keybindings.ListNavigateUp,
-		Fn: func(g *gocui.Gui, v *gocui.View) error {
-			list.ChangeSelection(list.CurrentSelection() - 1)
-			return nil
-		},
-		Widget: "listWidget",
-	})
-
-	// Apply late binding for key handlers
-	keybindings.BindHandlersToKeys(g, keys)
+	keybindings.Bind(g) // apply late binding for keys
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ExpandCurrentSelection()
@@ -212,7 +197,7 @@ func main() {
 	}
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlA, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		return LoadActionsView(ctx, list)
+		return views.LoadActionsView(ctx, list)
 	}); err != nil {
 		log.Panicln(err)
 	}

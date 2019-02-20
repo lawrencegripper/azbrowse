@@ -1,7 +1,8 @@
-package main
+package views
 
 import (
 	"fmt"
+
 	"github.com/jroimartin/gocui"
 )
 
