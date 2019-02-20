@@ -12,8 +12,23 @@ type KeyMap map[string]gocui.Key
 // SemanticKeyMap properties should always
 // match the IDs of the associated handlers
 type SemanticKeyMap struct {
-	ListNavigateDown string `json:"ListNavigateDown"`
-	ListNavigateUp   string `json:"ListNavigateUp"`
+	ListDown       string `json:"ListDown,omitempty,omitempty"`
+	ListUp         string `json:"ListUp,omitempty"`
+	ListBack       string `json:"ListBack,omitempty"`
+	ListBackLegacy string `json:"ListBackLegacy,omitempty"`
+	ListEdit       string `json:"ListEdit,omitempty"`
+	ListExpand     string `json:"ListExpand,omitempty"`
+	ListOpen       string `json:"ListOpen,omitempty"`
+	ListRefresh    string `json:"ListRefresh,omitempty"`
+	ListRight      string `json:"ListRight,omitempty"`
+	ListActions    string `json:"ListActions,omitempty"`
+	ItemBack       string `json:"ItemBack,omitempty"`
+	ItemLeft       string `json:"ItemLeft,omitempty"`
+	Help           string `json:"Help,omitempty"`
+	Copy           string `json:"Copy,omitempty"`
+	Fullscreen     string `json:"Fullscreen,omitempty"`
+	Delete         string `json:"Delete,omitempty"`
+	Quit           string `json:"Quit,omitempty"`
 }
 
 var handlers []keyhandlers.KeyHandler

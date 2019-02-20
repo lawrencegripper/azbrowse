@@ -7,7 +7,6 @@ import (
 	"os"
 	"reflect"
 	"strings"
-	"unicode"
 
 	"github.com/jroimartin/gocui"
 )
@@ -49,9 +48,14 @@ func normalizeSemanticKeyMap(semanticKeyMap SemanticKeyMap) (KeyMap, error) {
 		value := fmt.Sprintf("%s", v.Field(i).Interface())
 		normalValue, err := normalizeSemanticValue(value)
 		if err != nil {
-			return nil, err
+			// Ignore invalid values
+			continue
 		}
 		key := v.Type().Field(i).Name
+		if key == "" {
+			// Ignore empty keys
+			continue
+		}
 		keyMap[key] = normalValue
 	}
 	return keyMap, nil
@@ -59,7 +63,8 @@ func normalizeSemanticKeyMap(semanticKeyMap SemanticKeyMap) (KeyMap, error) {
 
 func normalizeSemanticValue(value string) (gocui.Key, error) {
 	// TODO Parse semantics properly
-	switch rmWhitespace(strings.ToLower(value)) {
+	target := removeWhitespace(strings.ToLower(value))
+	switch target {
 	case "up":
 		return gocui.KeyArrowUp, nil
 	case "down":
@@ -195,11 +200,6 @@ func normalizeSemanticValue(value string) (gocui.Key, error) {
 	}
 }
 
-func rmWhitespace(str string) string {
-	return strings.Map(func(r rune) rune {
-		if unicode.IsSpace(r) {
-			return -1
-		}
-		return r
-	}, str)
+func removeWhitespace(str string) string {
+	return strings.Replace(str, " ", "", -1)
 }
