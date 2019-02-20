@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -137,19 +138,27 @@ func main() {
 	g.SetManager(status, content, list)
 	g.SetCurrentView("listWidget")
 
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ChangeSelection(list.CurrentSelection() + 1)
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
+	keys := keybindings.New()
+	keybindings.RegisterHandler(&keybindings.Handler{
+		Id: keybindings.ListNavigateDown,
+		Fn: func(g *gocui.Gui, v *gocui.View) error {
+			list.ChangeSelection(list.CurrentSelection() + 1)
+			return nil
+		},
+		Widget: "listWidget",
+	})
 
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowUp, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ChangeSelection(list.CurrentSelection() - 1)
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
+	keybindings.RegisterHandler(&keybindings.Handler{
+		Id: keybindings.ListNavigateUp,
+		Fn: func(g *gocui.Gui, v *gocui.View) error {
+			list.ChangeSelection(list.CurrentSelection() - 1)
+			return nil
+		},
+		Widget: "listWidget",
+	})
+
+	// Apply late binding for key handlers
+	keybindings.BindHandlersToKeys(g, keys)
 
 	if err := g.SetKeybinding("listWidget", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
 		list.ExpandCurrentSelection()
