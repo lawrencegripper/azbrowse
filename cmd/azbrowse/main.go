@@ -323,15 +323,18 @@ func main() {
 		if deleteConfirmCount > 1 {
 			done()
 			doneDelete := status.Status("Deleting item: "+item.DeleteURL, true)
-
-			res, err := armclient.DoRequest(ctx, "DELETE", item.DeleteURL)
-			if err != nil {
-				panic(err)
-			}
-			list.Refresh()
-			content.SetContent(res, "Delete response>"+item.Name)
-			doneDelete()
 			deleteConfirmItemID = ""
+
+			// Run in the background
+			go func() {
+				res, err := armclient.DoRequest(ctx, "DELETE", item.DeleteURL)
+				if err != nil {
+					panic(err)
+				}
+				// list.Refresh()
+				content.SetContent(res, "Delete response>"+item.Name)
+				doneDelete()
+			}()
 
 		}
 		return nil

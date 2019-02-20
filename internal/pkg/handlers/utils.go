@@ -1,5 +1,15 @@
 package handlers
 
+import (
+	"github.com/valyala/fastjson"
+)
+
+var fastJSONParser fastjson.Parser
+
+func init() {
+	fastJSONParser = fastjson.Parser{}
+}
+
 // DrawStatus converts a status string to an icon
 func DrawStatus(s string) string {
 	switch s {
@@ -8,6 +18,8 @@ func DrawStatus(s string) string {
 	case "Failed":
 		return "⛈"
 	case "Updating":
+		return "⟳"
+	case "Running":
 		return "⟳"
 	case "Resuming":
 		return "⛅"
