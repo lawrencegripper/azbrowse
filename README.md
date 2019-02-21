@@ -90,7 +90,7 @@ make build
 
 
 ``` bash
-make install-azbrowse
+make install
 ```
 
 #### Run Travis-CI build locally
