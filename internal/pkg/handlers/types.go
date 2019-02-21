@@ -4,6 +4,17 @@ import (
 	"context"
 )
 
+// Register tracks all the current handlers
+// add new handlers to the array to augment the
+// processing of items in the
+var Register = []Expander{
+	&ResourceGroupResourceExpander{},
+	&SubscriptionExpander{},
+	&ActionExpander{},
+	&AppServiceResourceExpander{},
+	&DeploymentsExpander{},
+}
+
 // Expander is used to open/expand items in the left list panel
 // a single item can be expanded by 1 or more expanders
 // each Expander provides two methods.
@@ -24,16 +35,6 @@ type ExpanderResult struct {
 	// When set to true this causes the response
 	// in the result to be displayed in the content panel
 	IsPrimaryResponse bool
-}
-
-// Register tracks all the current handlers
-// add new handlers to the array to augment the
-// processing of items in the
-var Register = []Expander{
-	&ResourceGroupResourceExpander{},
-	&SubscriptionExpander{},
-	&ActionExpander{},
-	&AppServiceResourceExpander{},
 }
 
 // TreeNode is an item in the ListWidget
@@ -59,6 +60,10 @@ const (
 	resourceGroupType = "resourcegroup"
 	resourceType      = "resource"
 	deploymentType    = "deployment"
+	subDeploymentType = "subDeployment"
 	// ActionType defines an action like `listkey` etc
 	ActionType = "action"
+
+	// ExpandURLNotSupported is used to identify items which don't support generic expansion
+	ExpandURLNotSupported = "notsupported"
 )

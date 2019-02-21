@@ -13,7 +13,7 @@ integration:
 build: test dep checks
 	go build ./cmd/azbrowse
 
-install-azbrowse: 
+install: 
 	go install ./cmd/azbrowse
 
 checks:

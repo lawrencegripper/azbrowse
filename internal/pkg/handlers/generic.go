@@ -12,17 +12,23 @@ import (
 // DefaultExpander expands RGs under a subscription
 type DefaultExpander struct{}
 
+// DefaultExpanderInstance provides an instance of the default expander for use
+var DefaultExpanderInstance DefaultExpander
+
 // Name returns the name of the expander
 func (e *DefaultExpander) Name() string {
 	return "DefaultExpander"
 }
 
-// DoesExpand checks if this is an RG
+// DoesExpand checks if this handler can expand this item
 func (e *DefaultExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	if currentItem.ExpandURL == ExpandURLNotSupported {
+		return false, nil
+	}
 	return true, nil
 }
 
-// Expand returns Resources in the RG
+// Expand returns resource
 func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
 
