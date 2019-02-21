@@ -178,9 +178,8 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 func writeHeader(w io.Writer) {
 	w.Write([]byte("package handlers\n"))
 	w.Write([]byte("\n"))
-	w.Write([]byte("func (e *AppServiceResourceExpander) getResourceTypes() []ResourceType {\n"))
+	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []ResourceType {\n"))
 	w.Write([]byte("\treturn []ResourceType{\n"))
-
 }
 func writeFooter(w io.Writer) {
 	w.Write([]byte("\t}\n"))

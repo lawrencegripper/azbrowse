@@ -12,8 +12,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-// AppServiceResourceExpander expands resource under an AppService
-type AppServiceResourceExpander struct {
+// SwaggerResourceExpander expands resource under an AppService
+type SwaggerResourceExpander struct {
 	initialized   bool
 	ResourceTypes []ResourceType
 }
@@ -30,8 +30,8 @@ type ResourceType struct {
 }
 
 // Name returns the name of the expander
-func (e *AppServiceResourceExpander) Name() string {
-	return "AppServiceResourceExpander"
+func (e *SwaggerResourceExpander) Name() string {
+	return "SwaggerResourceExpander"
 }
 
 func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.EndpointInfo {
@@ -57,7 +57,7 @@ func getResourceTypeForURL(url string, resourceTypes []ResourceType) *ResourceTy
 	}
 	return nil
 }
-func (e *AppServiceResourceExpander) ensureInitialized() {
+func (e *SwaggerResourceExpander) ensureInitialized() {
 	if !e.initialized {
 		e.ResourceTypes = e.getResourceTypes()
 		e.initialized = true
@@ -65,7 +65,7 @@ func (e *AppServiceResourceExpander) ensureInitialized() {
 }
 
 // DoesExpand checks if this is an RG
-func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
+func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	e.ensureInitialized()
 	if currentItem.ItemType == resourceType {
 		item := getResourceTypeForURL(currentItem.ExpandURL, e.ResourceTypes)
@@ -78,7 +78,7 @@ func (e *AppServiceResourceExpander) DoesExpand(ctx context.Context, currentItem
 }
 
 // Expand returns Resources in the RG
-func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name+":"+currentItem.ID, tracing.SetTag("item", currentItem))
 	defer span.Finish()
@@ -116,7 +116,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
 			newItems = append(newItems, &TreeNode{
 				Parentid:  currentItem.ID,
-				Namespace: "appservice",
+				Namespace: "swagger",
 				Name:      name,
 				Display:   name,
 				ExpandURL: resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
@@ -136,7 +136,7 @@ func (e *AppServiceResourceExpander) Expand(ctx context.Context, currentItem *Tr
 		display := substituteValues(child.Display, templateValues)
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
-			Namespace: "appservice",
+			Namespace: "swagger",
 			Name:      display,
 			Display:   display,
 			ExpandURL: url,

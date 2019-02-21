@@ -11,7 +11,7 @@ var Register = []Expander{
 	&ResourceGroupResourceExpander{},
 	&SubscriptionExpander{},
 	&ActionExpander{},
-	&AppServiceResourceExpander{},
+	&SwaggerResourceExpander{},
 	&DeploymentsExpander{},
 }
 
