@@ -1,4 +1,4 @@
-package keyhandlers
+package keybindings
 
 import "github.com/jroimartin/gocui"
 
@@ -27,4 +27,5 @@ var HandlerIds = []string{
 	"listexpand",     // 14
 	"listopen",       // 15
 	"listrefresh",    // 16
+	"save",           // 17
 }

@@ -16,17 +16,19 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y          int
-	w, h          int
-	items         []*handlers.TreeNode
-	contentView   *ItemWidget
-	statusView    *StatusbarWidget
-	navStack      Stack
-	title         string
-	ctx           context.Context
-	selected      int
-	view          *gocui.View
-	enableTracing bool
+	x, y                 int
+	w, h                 int
+	items                []*handlers.TreeNode
+	contentView          *ItemWidget
+	statusView           *StatusbarWidget
+	navStack             Stack
+	title                string
+	ctx                  context.Context
+	selected             int
+	view                 *gocui.View
+	enableTracing        bool
+	FullscreenKeyBinding string
+	ActionKeyBinding     string
 }
 
 // NewListWidget creates a new instance
@@ -229,7 +231,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				w.contentView.SetContent(done.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+				w.contentView.SetContent(done.Response, fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 			}
 			if done.Nodes == nil {
 				continue
@@ -261,7 +263,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		if result.Err != nil {
 			panic(result.Err)
 		}
-		w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+		w.contentView.SetContent(result.Response, fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 	}
 
 	w.title = w.title + ">" + currentItem.Name

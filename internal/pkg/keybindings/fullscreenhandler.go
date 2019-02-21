@@ -1,7 +1,8 @@
-package keyhandlers
+package keybindings
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
@@ -34,7 +35,8 @@ func (h FullscreenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			v.Editable = true
 			v.Frame = false
 			v.Wrap = true
-			v.Title = "JSON Response - Fullscreen (CTRL+F to exit)"
+			keyBindings := GetKeyBindingsAsStrings()
+			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(keyBindings["fullscreen"]))
 			fmt.Fprintf(v, h.Content.GetContent())
 			g.SetCurrentView("fullscreenContent")
 		} else {

@@ -1,4 +1,4 @@
-package keyhandlers
+package keybindings
 
 import (
 	"github.com/jroimartin/gocui"
@@ -27,7 +27,8 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			if err != nil && err != gocui.ErrUnknownView {
 				panic(err)
 			}
-			views.DrawHelp(v)
+			keyBindings := GetKeyBindingsAsStrings()
+			views.DrawHelp(keyBindings, v)
 		} else {
 			g.DeleteView("helppopup")
 		}

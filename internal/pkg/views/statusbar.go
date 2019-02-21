@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/jroimartin/gocui"
@@ -18,6 +19,7 @@ type StatusbarWidget struct {
 	messages        map[string]eventing.StatusEvent
 	currentMessage  *eventing.StatusEvent
 	messageAddition string
+	HelpKeyBinding  string
 }
 
 // NewStatusbarWidget create new instance and start go routine for spinner
@@ -101,7 +103,7 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
-	v.Title = `Status [CTRL+I -> Help]`
+	v.Title = fmt.Sprintf(`Status [%s -> Help]`, strings.ToUpper(w.HelpKeyBinding))
 	v.Wrap = true
 
 	if w.hideGuids {
