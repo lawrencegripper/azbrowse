@@ -142,28 +142,29 @@ func main() {
 	var showHelp bool
 	var deleteConfirmItemID string
 	var deleteConfirmCount int
+
 	// List handlers
-	keybindings.AddHandler(keybindings.ListDownHandler{List: list})
-	keybindings.AddHandler(keybindings.ListUpHandler{List: list})
-	keybindings.AddHandler(keybindings.ListExpandHandler{List: list})
-	keybindings.AddHandler(keybindings.ListRefreshHandler{List: list})
-	keybindings.AddHandler(keybindings.ListBackHandler{List: list})
-	keybindings.AddHandler(keybindings.ListBackLegacyHandler{List: list})
-	keybindings.AddHandler(keybindings.ListActionsHandler{List: list, Context: ctx})
-	keybindings.AddHandler(keybindings.ListRightHandler{List: list, EditModeEnabled: &editModeEnabled})
-	keybindings.AddHandler(keybindings.ListEditHandler{List: list, EditModeEnabled: &editModeEnabled})
-	keybindings.AddHandler(keybindings.ListOpenHandler{List: list, Context: ctx})
+	keybindings.AddHandler(keybindings.NewListDownHandler(list))
+	keybindings.AddHandler(keybindings.NewListUpHandler(list))
+	keybindings.AddHandler(keybindings.NewListExpandHandler(list))
+	keybindings.AddHandler(keybindings.NewListRefreshHandler(list))
+	keybindings.AddHandler(keybindings.NewListBackHandler(list))
+	keybindings.AddHandler(keybindings.NewListBackLegacyHandler(list))
+	keybindings.AddHandler(keybindings.NewListActionsHandler(list, ctx))
+	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
+	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
+	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
 
 	// Item handlers
-	keybindings.AddHandler(keybindings.ItemBackHandler{List: list})
-	keybindings.AddHandler(keybindings.ItemLeftHandler{EditModeEnabled: &editModeEnabled})
+	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
+	keybindings.AddHandler(keybindings.NewItemLeftHandler(&editModeEnabled))
 
 	// Global handlers
-	keybindings.AddHandler(keybindings.FullscreenHandler{List: list, IsFullscreen: &isFullscreen, Content: content})
-	keybindings.AddHandler(keybindings.CopyHandler{StatusBar: status, Content: content})
-	keybindings.AddHandler(keybindings.HelpHandler{ShowHelp: &showHelp})
-	keybindings.AddHandler(keybindings.DeleteHandler{List: list, StatusBar: status, Content: content, Context: ctx, DeleteConfirmItemID: deleteConfirmItemID, DeleteConfirmCount: deleteConfirmCount})
-	keybindings.AddHandler(keybindings.QuitHandler{})
+	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
+	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
+	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
+	keybindings.AddHandler(keybindings.NewDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
+	keybindings.AddHandler(keybindings.NewQuitHandler())
 
 	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
 		log.Panicln(err)
