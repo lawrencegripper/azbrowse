@@ -154,6 +154,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
+	keybindings.AddHandler(keybindings.NewListDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
 
 	// Item handlers
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
@@ -163,7 +164,6 @@ func main() {
 	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
 	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
-	keybindings.AddHandler(keybindings.NewDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 
 	if err := keybindings.Bind(g); err != nil { // apply late binding for keys

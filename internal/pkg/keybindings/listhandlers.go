@@ -266,3 +266,61 @@ func (h ListRefreshHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 }
 
 ////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ListDeleteHandler struct {
+	ListHandler
+	DeleteConfirmItemID string
+	DeleteConfirmCount  int
+	StatusBar           *views.StatusbarWidget
+	Content             *views.ItemWidget
+	List                *views.ListWidget
+	Context             context.Context
+}
+
+func NewListDeleteHandler(content *views.ItemWidget,
+	statusbar *views.StatusbarWidget,
+	list *views.ListWidget,
+	deleteConfirmItemId string,
+	deleteConfirmCount int,
+	context context.Context) *ListDeleteHandler {
+	handler := &ListDeleteHandler{
+		Content:             content,
+		StatusBar:           statusbar,
+		List:                list,
+		DeleteConfirmCount:  deleteConfirmCount,
+		DeleteConfirmItemID: deleteConfirmItemId,
+		Context:             context,
+	}
+	handler.Index = 2
+	return handler
+}
+
+func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		item := h.List.CurrentItem()
+		if h.DeleteConfirmItemID != item.ID {
+			h.DeleteConfirmItemID = item.ID
+			h.DeleteConfirmCount = 0
+		}
+		done := h.StatusBar.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.DeleteURL, true)
+		h.DeleteConfirmCount++
+
+		if h.DeleteConfirmCount > 1 {
+			done()
+			doneDelete := h.StatusBar.Status("Deleting item: "+item.DeleteURL, true)
+
+			res, err := armclient.DoRequest(h.Context, "DELETE", item.DeleteURL)
+			if err != nil {
+				panic(err)
+			}
+			h.List.Refresh()
+			h.Content.SetContent(res, "Delete response>"+item.Name)
+			doneDelete()
+			h.DeleteConfirmItemID = ""
+		}
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
