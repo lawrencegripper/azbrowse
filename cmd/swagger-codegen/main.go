@@ -70,6 +70,43 @@ func main() {
 		return
 	}
 
+	config := getConfig()
+	var paths []*Path
+
+	topFileInfos, err := ioutil.ReadDir("swagger-specs")
+	if err != nil {
+		panic(fmt.Errorf)
+	}
+	for _, topFileInfo := range topFileInfos {
+		if topFileInfo.IsDir() {
+			fmt.Printf("Processing folder: %s\n", topFileInfo.Name())
+			fileInfos, err := ioutil.ReadDir("swagger-specs/" + topFileInfo.Name())
+			if err != nil {
+				panic(fmt.Errorf)
+			}
+			for _, fileInfo := range fileInfos {
+				if !fileInfo.IsDir() && strings.HasSuffix(fileInfo.Name(), ".json") {
+					fmt.Printf("\tprocessing %s\n", fileInfo.Name())
+					doc := loadDoc("swagger-specs/" + topFileInfo.Name() + "/" + fileInfo.Name())
+					paths = mergeSwaggerDoc(paths, &config, &doc)
+				}
+			}
+		}
+	}
+
+	writer, err := os.Create(*outputFileFlag)
+	if err != nil {
+		panic(fmt.Errorf("Error opening file: %s", err))
+	}
+
+	writeHeader(writer)
+	writePaths(writer, paths, &config, "")
+	writeFooter(writer)
+	// dumpPaths(writer, paths, "")
+}
+
+func getConfig() Config {
+
 	pathOverrides := map[string]string{
 		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list":           "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings",
 		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list":          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings",
@@ -94,26 +131,8 @@ func main() {
 		PathOverrides: pathOverrides,
 		GetOverrides:  getOverrides,
 	}
-
-	// TODO - stream input to json decoder rather than loading full doc in memory
-	var paths []*Path
-	doc := loadDoc("swagger-specs/Microsoft.Web/WebApps.json")
-	paths = mergeSwaggerDoc(paths, &config, &doc)
-
-	doc = loadDoc("swagger-specs/Microsoft.Web/AppServicePlans.json")
-	paths = mergeSwaggerDoc(paths, &config, &doc)
-
-	writer, err := os.Create(*outputFileFlag)
-	if err != nil {
-		panic(fmt.Errorf("Error opening file: %s", err))
-	}
-
-	writeHeader(writer)
-	writePaths(writer, paths, &config, "")
-	writeFooter(writer)
-	// dumpPaths(writer, paths, "")
+	return config
 }
-
 func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 	swaggerPaths := getSortedPaths(doc)
 	for _, swaggerPath := range swaggerPaths {
