@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -55,7 +56,19 @@ type Config struct {
 	GetOverrides map[string]string
 }
 
+func showUsage() {
+	fmt.Println("swagger-codegen")
+	fmt.Println("===============")
+	fmt.Println("")
+	flag.Usage()
+}
 func main() {
+	outputFileFlag := flag.String("output-file", "", "path to the file to output the generated code to")
+	flag.Parse()
+	if *outputFileFlag == "" {
+		showUsage()
+		return
+	}
 
 	pathOverrides := map[string]string{
 		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list":           "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings",
@@ -84,14 +97,16 @@ func main() {
 
 	// TODO - stream input to json decoder rather than loading full doc in memory
 	var paths []*Path
-
-	doc := loadDoc("cmd/swagger-codegen/sample-specs/WebApps.json")
+	doc := loadDoc("swagger-specs/Microsoft.Web/WebApps.json")
 	paths = mergeSwaggerDoc(paths, &config, &doc)
 
-	doc = loadDoc("cmd/swagger-codegen/sample-specs/AppServicePlans.json")
+	doc = loadDoc("swagger-specs/Microsoft.Web/AppServicePlans.json")
 	paths = mergeSwaggerDoc(paths, &config, &doc)
 
-	writer := os.Stdout // TODO - take filename as argument to write to
+	writer, err := os.Create(*outputFileFlag)
+	if err != nil {
+		panic(fmt.Errorf("Error opening file: %s", err))
+	}
 
 	writeHeader(writer)
 	writePaths(writer, paths, &config, "")
