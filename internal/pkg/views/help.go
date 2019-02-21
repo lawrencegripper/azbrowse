@@ -78,7 +78,7 @@ Creating\Preparing: 🏗  Scaling:  ⚖   Suspended/Suspending: ⛔  Succeeded: 
 		keyBindings["fullscreen"],
 		keyBindings["listopen"],
 		keyBindings["delete"],
-		keyBindings["save"],
+		keyBindings["copy"],
 		keyBindings["listactions"],
 		keyBindings["help"],
 		keyBindings["help"])))

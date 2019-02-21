@@ -28,6 +28,8 @@ You may need to reload your terminal to pick up `azbrowse` after the script comp
 
 ### Usage
 
+Below is a table containing the default key bindings. If you'd like to customise the key bindings to be more suitable for your setup, please refer to the section on [custom key bindings](#custom-key-bindings).
+
 ## Navigation 
 
 | Key       | Does                 | 
@@ -49,6 +51,7 @@ You may need to reload your terminal to pick up `azbrowse` after the script comp
 
 
 
+
 ## Debugging
 
 Running `azbrowse --debug` will start an in-memory collector for the `opentracing` and a GUI to browse this at http://localhost:8700. You can use this to look at tracing information output by `azbrowse` as it runs.
@@ -58,6 +61,115 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 ## Developing 
 
 Clone the repository then use `make` to run checks and build (or `make ci-docker` to build the tool and run it locally using docker). You an also use `make install-azbrowse` to install your local development version.
+
+## Custom Key Bindings
+
+If you wish to override the default key bindings, create a `bindings.json` file in the same directory as your `azbrowse` binary.
+
+The file should be formated like so:
+```json
+{
+    ...
+    "Copy": "F8",
+    "Help": "Ctrl+H",
+    ...
+}
+```
+
+In the file you can override the keys for actions using keys from the lists below.
+
+### Actions
+
+| Actions:       | Does                                  |
+| ------------------------ | --------------------------------------|
+| Quit                     | Terminates the program                |
+| Copy                     | Copies the resource JSON to clipboard |
+| Delete                   | Deletes a resources                   |
+| Fullscreen               | Toggles fullscreen                    |
+| Help                     | Toggles help view                     |
+| ItemBack                 | Go back from an item to a list        |
+| ItemLeft                 | Switch from the item json to the menu |
+| ListActions              | List available actions on a resource  |
+| ListBack                 | Go back on a list                     |
+| ListBackLegacy           | Go back on a list (legacy terminals)  |
+| ListDown                 | Navigate down a list                  |
+| ListUp                   | Navigate up a list                    |
+| ListRight                | Switch from the list to an item view  |
+| ListEdit                 | Toggle edit mode on a resource        |
+| ListExpand               | Expand a selected resource            |
+| ListOpen                 | Open a resource in the Azure portal   |
+| ListRefresh              | Refresh a list                        |
+
+### Keys
+
+- Up
+- Down
+- Left
+- Right
+- Backspace
+- Backspace2
+- Delete
+- Home
+- End
+- PageUp
+- PageDown
+- Insert
+- Tab
+- Space
+- Esc
+- Enter
+- Ctrl+2
+- Ctrl+3
+- Ctrl+4
+- Ctrl+5
+- Ctrl+6
+- Ctrl+7
+- Ctrl+8
+- Ctrl+[
+- Ctrl+]
+- Ctrl+Space
+- Ctrl+_
+- Ctrl+~
+- Ctrl+A
+- Ctrl+B
+- Ctrl+C
+- Ctrl+D
+- Ctrl+E
+- Ctrl+F
+- Ctrl+G
+- Ctrl+H
+- Ctrl+I
+- Ctrl+J
+- Ctrl+K
+- Ctrl+L
+- Ctrl+M
+- Ctrl+N
+- Ctrl+O
+- Ctrl+P
+- Ctrl+Q
+- Ctrl+R
+- Ctrl+S
+- Ctrl+T
+- Ctrl+U
+- Ctrl+V
+- Ctrl+W
+- Ctrl+X
+- Ctrl+Y
+- Ctrl+Z
+- F1
+- F2
+- F3
+- F4
+- F5
+- F6
+- F7
+- F8
+- F9
+- F10
+- F11
+- F12
+
+> For compatibility reasons you may notice some keys will have multiple mappings.
 
 ## Plans
 

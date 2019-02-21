@@ -163,7 +163,6 @@ func main() {
 	keybindings.AddHandler(keybindings.CopyHandler{StatusBar: status, Content: content})
 	keybindings.AddHandler(keybindings.HelpHandler{ShowHelp: &showHelp})
 	keybindings.AddHandler(keybindings.DeleteHandler{List: list, StatusBar: status, Content: content, Context: ctx, DeleteConfirmItemID: deleteConfirmItemID, DeleteConfirmCount: deleteConfirmCount})
-	keybindings.AddHandler(keybindings.SaveHandler{StatusBar: status, Content: content})
 	keybindings.AddHandler(keybindings.QuitHandler{})
 
 	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
