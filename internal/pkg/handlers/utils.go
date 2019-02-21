@@ -38,7 +38,7 @@ func DrawStatus(s string) string {
 	case "Suspending":
 		return "⛔"
 	case "Succeeded":
-		return "🌣"
+		return "☼"
 	}
 	return ""
 }
