@@ -2,6 +2,14 @@
 
 
 [[projects]]
+  branch = "master"
+  digest = "1:59c503e688bf1b6b10774db6d99fb54518231655b780492dd9084bc451bee06f"
+  name = "github.com/TylerBrock/colorjson"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "95ec53f28296f47af86a81eb73f0d7fe2b23a322"
+
+[[projects]]
   digest = "1:1ca95505ec8a6d69762d2b5d9ab7e66ae619365b2e26031e220b675ff6fb010b"
   name = "github.com/atotto/clipboard"
   packages = ["."]
@@ -321,6 +329,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/TylerBrock/colorjson",
     "github.com/atotto/clipboard",
     "github.com/blang/semver",
     "github.com/boltdb/bolt",

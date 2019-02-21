@@ -137,3 +137,46 @@ type SubResourcesResponse struct {
 	} `json:"value"`
 	NextLink string `json:"nextLink"`
 }
+
+// DeploymentsResponse is returned by a request for deployments in an RG
+type DeploymentsResponse struct {
+	Value []struct {
+		ID         string `json:"id"`
+		Name       string `json:"name"`
+		Properties struct {
+			CorrelationID string `json:"correlationId"`
+			Dependencies  []struct {
+				DependsOn []struct {
+					ID           string `json:"id"`
+					ResourceName string `json:"resourceName"`
+					ResourceType string `json:"resourceType"`
+				} `json:"dependsOn"`
+				ID           string `json:"id"`
+				ResourceName string `json:"resourceName"`
+				ResourceType string `json:"resourceType"`
+			} `json:"dependencies"`
+			Duration        string `json:"duration"`
+			Mode            string `json:"mode"`
+			OutputResources []struct {
+				ID string `json:"id"`
+			} `json:"outputResources"`
+			Outputs    map[string]interface{} `json:"outputs"`
+			Parameters map[string]interface{} `json:"parameters"`
+			Providers  []struct {
+				Namespace     string `json:"namespace"`
+				ResourceTypes []struct {
+					Locations    []string `json:"locations"`
+					ResourceType string   `json:"resourceType"`
+				} `json:"resourceTypes"`
+			} `json:"providers"`
+			ProvisioningState string                 `json:"provisioningState"`
+			TemplateHash      string                 `json:"templateHash"`
+			Template          map[string]interface{} `json:"template"`
+			TemplateLink      struct {
+				ContentVersion string `json:"contentVersion"`
+				URI            string `json:"uri"`
+			} `json:"templateLink"`
+			Timestamp string `json:"timestamp"`
+		} `json:"properties"`
+	} `json:"value"`
+}

@@ -60,3 +60,7 @@
 [[constraint]]
   name = "github.com/valyala/fastjson"
   version = "1.4.0"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/TylerBrock/colorjson"
