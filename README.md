@@ -6,7 +6,7 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 
 # Quick Start
 
-Simply download the binary suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it. 
+Simply download the binary suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it.
 
 ### Status
 
@@ -24,14 +24,14 @@ Grab the binaries from the release page or for MacOS and Linux run this script
 curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scripts/install_azbrowse.sh | sudo sh
 ```
 
-You may need to reload your terminal to pick up `azbrowse` after the script completes. 
+You may need to reload your terminal to pick up `azbrowse` after the script completes.
 
 ### Usage
 
-## Navigation 
+## Navigation
 
-| Key       | Does                 | 
-| --------- | -------------------- | 
+| Key       | Does                 |
+| --------- | -------------------- |
 | ↑/↓       | Select resource      |
 | Backspace | Go back              |
 | ENTER     | Expand/View resource |
@@ -55,10 +55,62 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ![tracing ui](docs/trace.png)
 
-## Developing 
+## Developing
 
-Clone the repository then use `make` to run checks and build (or `make ci-docker` to build the tool and run it locally using docker). You an also use `make install-azbrowse` to install your local development version.
+### Environment Setup
+
+First, clone this repository. `azbrowse` is written in [Go][golang] and so you will want to set up your Go development environment first. If this is your first time, the [offical install guide][installguide] is probably a good place to start. Make sure you have `GOPATH/bin` in your `PATH`, using the instructions [here][gopath] as guidance on doing that.
+
+In addition to installing [Go][golang], there are a couple of tool dependencies you'll need. These are:
+
+- [Go Meta Linter][gometalinter]
+- [Dep; Go dependency management tool][golang]
+
+You can install these yourself following the instructions on their github pages, or you can run...
+
+ ``` bash
+ make setup
+ ```
+
+ This runs the script `scripts/install_dev_tools.sh`, which will install these tools for you.
+
+### Building
+
+With your Go development environment set up, use `make` to build `azbrowse`.
+
+Take a look at the `Makefile` yourself, but the main rules are:
+
+#### Run Tests and Build
+
+``` bash
+make build
+```
+
+#### Install Local Development Build
+
+
+``` bash
+make install
+```
+
+#### Run Travis-CI build locally
+
+``` bash
+make ci-docker
+```
+
+To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` environment variable defined, so running it as follows may be easier:
+
+```bash
+TRAVIS_BUILD_NUMBER=0.1 make ci-docker
+```
 
 ## Plans
 
 [Issues on the repository track plans](https://github.com/lawrencegripper/azbrowse/issues), I'd love help so feel free to comment on an issue you'd like to work on and we'll go from there.
+
+[golang]: https://golang.org/
+[installguide]: https://golang.org/doc/install
+[gometalinter]: https://github.com/alecthomas/gometalinter
+[golangdep]: https://github.com/golang/dep
+[gopath]: https://golang.org/doc/code.html#GOPATH
