@@ -6,7 +6,7 @@ import "github.com/jroimartin/gocui"
 var HandlerIds = []string{
 	"quit",           // 0
 	"copy",           // 1
-	"delete",         // 2
+	"listdelete",     // 2
 	"fullscreen",     // 3
 	"help",           // 4
 	"itemback",       // 5

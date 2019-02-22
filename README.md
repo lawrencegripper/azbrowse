@@ -130,7 +130,7 @@ In the file you can override the keys for actions using keys from the lists belo
 | ------------------------ | --------------------------------------|
 | Quit                     | Terminates the program                |
 | Copy                     | Copies the resource JSON to clipboard |
-| Delete                   | Deletes a resources                   |
+| ListDelete               | Deletes a resources                   |
 | Fullscreen               | Toggles fullscreen                    |
 | Help                     | Toggles help view                     |
 | ItemBack                 | Go back from an item to a list        |

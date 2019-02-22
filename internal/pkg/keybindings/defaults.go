@@ -6,7 +6,7 @@ import "github.com/jroimartin/gocui"
 var DefaultKeys = map[string]gocui.Key{
 	"quit":           gocui.KeyCtrlC,
 	"copy":           gocui.KeyCtrlS,
-	"delete":         gocui.KeyDelete,
+	"listdelete":     gocui.KeyDelete,
 	"fullscreen":     gocui.KeyCtrlF,
 	"help":           gocui.KeyCtrlI,
 	"itemback":       gocui.KeyBackspace2,

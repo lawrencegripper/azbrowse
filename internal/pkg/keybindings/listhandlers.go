@@ -2,7 +2,9 @@ package keybindings
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -303,7 +305,8 @@ func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			h.DeleteConfirmItemID = item.ID
 			h.DeleteConfirmCount = 0
 		}
-		done := h.StatusBar.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.DeleteURL, true)
+		keyBindings := GetKeyBindingsAsStrings()
+		done := h.StatusBar.Status(fmt.Sprintf("Delete item? Really? PRESS %s TO CONFIRM: %s", strings.ToUpper(keyBindings["listdelete"]), item.DeleteURL), true)
 		h.DeleteConfirmCount++
 
 		if h.DeleteConfirmCount > 1 {
