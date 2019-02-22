@@ -47,10 +47,14 @@ type SwaggerPathVerb struct {
 
 // Config handles configuration of url handling
 type Config struct {
-	// Path overrides is keyed on actual path. value is the logical path to use
-	PathOverrides map[string]string
-	// GetOverrides is keyed on url. value is the verb to use as a logical GET for the path
-	GetOverrides map[string]string
+	// Overrides is keyed on url and
+	Overrides map[string]SwaggerPathOverride
+}
+
+// SwaggerPathOverride captures Path and/or Verb overrides
+type SwaggerPathOverride struct {
+	Path    string // actual url to use
+	GetVerb string // Verb to use for logical GET requests
 }
 
 func showUsage() {
@@ -103,37 +107,48 @@ func main() {
 }
 
 func getConfig() Config {
-
-	pathOverrides := map[string]string{
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list":           "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list":          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts/list":  "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup/list":                "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list":     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list":              "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list": "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list":          "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings",
-	}
-	getOverrides := map[string]string{
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list":           "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list":          "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts/list":  "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup/list":                "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list":     "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list":              "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list": "post",
-		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list":          "post",
-	}
 	config := Config{
-		PathOverrides: pathOverrides,
-		GetOverrides:  getOverrides,
+		Overrides: map[string]SwaggerPathOverride{
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/authsettings",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/azurestorageaccounts",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/backup",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/connectionstrings",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/metadata",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/publishingcredentials",
+				GetVerb: "post",
+			},
+			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings/list": {
+				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/pushsettings",
+				GetVerb: "post",
+			},
+		},
 	}
 	return config
 }
 func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 	swaggerPaths := getSortedPaths(doc)
 	for _, swaggerPath := range swaggerPaths {
-		searchPath := config.PathOverrides[swaggerPath]
+		searchPath := config.Overrides[swaggerPath].Path
 		if searchPath == "" {
 			searchPath = swaggerPath
 		}
@@ -184,14 +199,14 @@ func writeFooter(w io.Writer) {
 }
 func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) {
 	for _, path := range paths {
-		pathVerb := config.GetOverrides[path.Endpoint.TemplateURL]
+		pathVerb := config.Overrides[path.Endpoint.TemplateURL].GetVerb
 		if pathVerb == "" {
 			pathVerb = "get"
 		}
 		if path.Verbs[pathVerb].OperationID != "" {
 			fmt.Fprintf(w, "\t%s\tResourceType{\n", prefix)
 			endpointForName := path.Endpoint
-			if pathOverride := config.PathOverrides[path.Endpoint.TemplateURL]; pathOverride != "" {
+			if pathOverride := config.Overrides[path.Endpoint.TemplateURL].Path; pathOverride != "" {
 				endpointOverride, err := endpoints.GetEndpointInfoFromURL(pathOverride, "")
 				if err != nil {
 					panic(fmt.Errorf("Error parsing pathOverride '%s': %s", pathOverride, err))
@@ -230,11 +245,11 @@ func dumpPaths(w io.Writer, paths []*Path, prefix string) {
 	for _, path := range paths {
 		fmt.Fprintf(w, "%s%s\n", prefix, path.Endpoint.TemplateURL)
 		for verb, verbInfo := range path.Verbs {
-			fmt.Printf("%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
+			fmt.Fprintf(w, "%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
 		}
-		fmt.Printf("%s   * Children\n", prefix)
+		fmt.Fprintf(w, "%s   * Children\n", prefix)
 		dumpPaths(w, path.Children, prefix+"    ")
-		fmt.Printf("%s   * SubPaths\n", prefix)
+		fmt.Fprintf(w, "%s   * SubPaths\n", prefix)
 		dumpPaths(w, path.SubPaths, prefix+"    ")
 	}
 }
