@@ -1,9 +1,9 @@
 #/bin/bash
 set -e
 
-# Download and install dep
-curl -sI https://github.com/golang/dep/releases/latest | grep -Fi Location  | tr -d '\r' | sed "s/tag/download/g" | awk -F " " '{ print $2 "/dep-linux-amd64"}' | wget --output-document=$GOPATH/bin/dep -i -
-chmod +x $GOPATH/bin/dep
-# Install linters 
+# Download and install dep (https://github.com/golang/dep)
+curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+# Download and install gometalinter (https://github.com/alecthomas/gometalinter)
 go get -u github.com/alecthomas/gometalinter
 gometalinter --install
