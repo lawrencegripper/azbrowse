@@ -99,7 +99,7 @@ Creating\Preparing:  🏗   Scaling:  ⚖   Suspended/Suspending:  ⛔   Succeed
 		rightPadLen := maxWidth - len(line)
 		pad := ""
 		if rightPadLen > 0 {
-			pad = strings.Repeat(" ", maxWidth-len(line))
+			pad = strings.Repeat(" ", rightPadLen)
 		}
 		paddedView = fmt.Sprintf("%s%s%s\n", paddedView, line, pad)
 		lineCount++
