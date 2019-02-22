@@ -21,9 +21,9 @@ type SwaggerResourceExpander struct {
 // ResourceType holds information about resources that can be displayed
 type ResourceType struct {
 	Display        string
-	Endpoint       endpoints.EndpointInfo
+	Endpoint       *endpoints.EndpointInfo
 	Verb           string
-	SupportsDelete bool
+	DeleteEndpoint *endpoints.EndpointInfo
 	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
 	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
 }
@@ -33,12 +33,12 @@ func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"
 }
 
-func mustGetEndpointInfoFromURL(url string, apiVersion string) endpoints.EndpointInfo {
+func mustGetEndpointInfoFromURL(url string, apiVersion string) *endpoints.EndpointInfo {
 	endpoint, err := endpoints.GetEndpointInfoFromURL(url, apiVersion)
 	if err != nil {
 		panic(err)
 	}
-	return endpoint
+	return &endpoint
 }
 
 func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []ResourceType) *ResourceType {
@@ -126,8 +126,11 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
 			deleteURL := ""
-			if subResourceType.SupportsDelete {
-				deleteURL = currentItem.ID
+			if subResourceType.DeleteEndpoint != nil {
+				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
+				if err != nil {
+					panic(fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err))
+				}
 			}
 			newItems = append(newItems, &TreeNode{
 				Parentid:            currentItem.ID,
@@ -151,8 +154,11 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		}
 		display := substituteValues(child.Display, templateValues)
 		deleteURL := ""
-		if child.SupportsDelete {
-			deleteURL = currentItem.ID
+		if child.DeleteEndpoint != nil {
+			deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+			if err != nil {
+				panic(fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err))
+			}
 		}
 		newItems = append(newItems, &TreeNode{
 			Parentid:            currentItem.ID,

@@ -14,14 +14,49 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
-// Path represents an URL to output
+/////////////////////////////////////////////////////////////////////////////
+// Path models
+
+// Path represents a path that we want to consider emitting in code-gen. It is derived from
 type Path struct {
-	// TODO Name
-	Verbs    map[string]SwaggerPathVerb // TODO - create a new type that is easier to work with
-	Endpoint *endpoints.EndpointInfo
-	Children []*Path
-	SubPaths []*Path
+	Name       string
+	Endpoint   *endpoints.EndpointInfo // The logical endpoint. May be overridden for an operation
+	Operations PathOperations
+	Children   []*Path
+	SubPaths   []*Path
 }
+
+// PathOperations gives details on the operations for a resource
+type PathOperations struct {
+	Get    PathOperation
+	Delete PathOperation
+	Patch  PathOperation
+	Post   PathOperation
+	Put    PathOperation
+}
+
+// PathOperation represents an operation on the path (GET, PUT, ...)
+type PathOperation struct {
+	Permitted bool                    // true if the operation is permitted for the path
+	Verb      string                  // Empty unless the Verb is overridden for the operation
+	Endpoint  *endpoints.EndpointInfo // nil unless the endpoint is overridden for the operation
+}
+
+/*
+	Path
+		Endpoint (logical)
+		Operations
+			GET
+				Accepted
+				Verb (overridden)
+				Endpoint (overridden)
+			PUT
+			POST
+			DELETE
+*/
+
+/////////////////////////////////////////////////////////////////////////////
+// Swagger parsing models
 
 // SwaggerDoc is a type to represent the relevant parts of a swagger document
 type SwaggerDoc struct {
@@ -44,6 +79,9 @@ type SwaggerPathVerbs map[string]SwaggerPathVerb
 type SwaggerPathVerb struct {
 	OperationID string `json:"operationId"`
 }
+
+/////////////////////////////////////////////////////////////////////////////
+// Config
 
 // Config handles configuration of url handling
 type Config struct {
@@ -148,20 +186,59 @@ func getConfig() Config {
 func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 	swaggerPaths := getSortedPaths(doc)
 	for _, swaggerPath := range swaggerPaths {
-		searchPath := config.Overrides[swaggerPath].Path
+		override := config.Overrides[swaggerPath]
+
+		searchPath := override.Path
 		if searchPath == "" {
 			searchPath = swaggerPath
 		}
 
-		parent := findDeepestPath(paths, searchPath)
-		endpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, doc.Info.Version)
+		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, doc.Info.Version) // logical path
 		if err != nil {
 			panic(err)
 		}
+		lastSegment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
+		name := lastSegment.Match
+		if name == "" {
+			name = "{" + lastSegment.Name + "}"
+		}
 		path := Path{
 			Endpoint: &endpoint,
-			Verbs:    doc.Paths[swaggerPath],
+			Name:     name,
 		}
+
+		getVerb := override.GetVerb
+		if getVerb == "" {
+			getVerb = "get"
+		}
+		if doc.Paths[swaggerPath][getVerb].OperationID != "" {
+			path.Operations.Get.Permitted = true
+			if getVerb != "get" {
+				path.Operations.Get.Verb = getVerb
+			}
+			if override.Path != "" {
+				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, doc.Info.Version)
+				if err != nil {
+					panic(err)
+				}
+				path.Operations.Get.Endpoint = &overriddenEndpoint
+			}
+		}
+		if doc.Paths[swaggerPath]["delete"].OperationID != "" && getVerb != "delete" {
+			path.Operations.Delete.Permitted = true
+		}
+		if doc.Paths[swaggerPath]["patch"].OperationID != "" && getVerb != "patch" {
+			path.Operations.Patch.Permitted = true
+		}
+		if doc.Paths[swaggerPath]["post"].OperationID != "" && getVerb != "post" {
+			path.Operations.Post.Permitted = true
+		}
+		if doc.Paths[swaggerPath]["put"].OperationID != "" && getVerb != "put" {
+			path.Operations.Put.Permitted = true
+		}
+
+		// Add endpoint to paths
+		parent := findDeepestPath(paths, searchPath)
 		if parent == nil {
 			paths = append(paths, &path)
 		} else {
@@ -197,34 +274,27 @@ func writeFooter(w io.Writer) {
 	w.Write([]byte("\t}\n"))
 	w.Write([]byte("}\n"))
 }
-func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) {
+func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // TODO want to not need config here
 	for _, path := range paths {
 		pathVerb := config.Overrides[path.Endpoint.TemplateURL].GetVerb
 		if pathVerb == "" {
 			pathVerb = "get"
 		}
-		if path.Verbs[pathVerb].OperationID != "" {
+		if path.Operations.Get.Permitted {
 			fmt.Fprintf(w, "\t%s\tResourceType{\n", prefix)
-			endpointForName := path.Endpoint
-			if pathOverride := config.Overrides[path.Endpoint.TemplateURL].Path; pathOverride != "" {
-				endpointOverride, err := endpoints.GetEndpointInfoFromURL(pathOverride, "")
-				if err != nil {
-					panic(fmt.Errorf("Error parsing pathOverride '%s': %s", pathOverride, err))
-				}
-				endpointForName = &endpointOverride
+			getEndpoint := path.Operations.Get.Endpoint
+			if getEndpoint == nil {
+				getEndpoint = path.Endpoint
 			}
-			lastSegment := endpointForName.URLSegments[len(endpointForName.URLSegments)-1]
-			name := lastSegment.Match
-			if name == "" {
-				name = "{" + lastSegment.Name + "}"
+			fmt.Fprintf(w, "\t%s\t\tDisplay:  \"%s\",\n", prefix, path.Name)
+
+			fmt.Fprintf(w, "\t%s\t\tEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, getEndpoint.TemplateURL, getEndpoint.APIVersion)
+
+			if path.Operations.Get.Verb != "" {
+				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\",\n", prefix, strings.ToUpper(path.Operations.Get.Verb))
 			}
-			fmt.Fprintf(w, "\t%s\t\tDisplay:  \"%s\",\n", prefix, name)
-			fmt.Fprintf(w, "\t%s\t\tEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, path.Endpoint.TemplateURL, path.Endpoint.APIVersion)
-			if pathVerb != "get" {
-				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\",\n", prefix, strings.ToUpper(pathVerb))
-			}
-			if path.Verbs["delete"].OperationID != "" {
-				fmt.Fprintf(w, "\t%s\t\tSupportsDelete:     true,\n", prefix)
+			if path.Operations.Delete.Permitted {
+				fmt.Fprintf(w, "\t%s\t\tDeleteEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, path.Endpoint.TemplateURL, path.Endpoint.APIVersion)
 			}
 			if len(path.Children) > 0 {
 				fmt.Fprintf(w, "\t%s\t\tChildren: []ResourceType {\n", prefix)
@@ -244,9 +314,35 @@ func dumpPaths(w io.Writer, paths []*Path, prefix string) {
 
 	for _, path := range paths {
 		fmt.Fprintf(w, "%s%s\n", prefix, path.Endpoint.TemplateURL)
-		for verb, verbInfo := range path.Verbs {
-			fmt.Fprintf(w, "%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
+		// for verb, verbInfo := range path.Verbs {
+		// 	fmt.Fprintf(w, "%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
+		// }
+		verbs := ""
+		separator := ""
+		if path.Operations.Get.Permitted {
+			verbs += separator + "get"
+			if path.Operations.Get.Endpoint != nil {
+				verbs += "(" + path.Operations.Get.Endpoint.TemplateURL + ")"
+			}
+			separator = ", "
 		}
+		if path.Operations.Delete.Permitted {
+			verbs += separator + "delete"
+			separator = ", "
+		}
+		if path.Operations.Patch.Permitted {
+			verbs += separator + "path"
+			separator = ", "
+		}
+		if path.Operations.Put.Permitted {
+			verbs += separator + "post"
+			separator = ", "
+		}
+		if path.Operations.Put.Permitted {
+			verbs += separator + "put"
+			separator = ", "
+		}
+		fmt.Fprintf(w, "%s   * Verbs: %s\n", prefix, verbs)
 		fmt.Fprintf(w, "%s   * Children\n", prefix)
 		dumpPaths(w, path.Children, prefix+"    ")
 		fmt.Fprintf(w, "%s   * SubPaths\n", prefix)
