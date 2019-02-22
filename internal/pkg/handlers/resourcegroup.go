@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -91,7 +92,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		ID:             currentItem.ID,
 		ExpandURL:      currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
 		ItemType:       deploymentType,
-		DeleteURL:      "NotSupported",
+		DeleteURL:      "",
 		SubscriptionID: currentItem.SubscriptionID,
 	})
 
