@@ -20,13 +20,12 @@ type SwaggerResourceExpander struct {
 
 // ResourceType holds information about resources that can be displayed
 type ResourceType struct {
-	Display  string
-	Endpoint endpoints.EndpointInfo
-	Verb     string
-	// Children are auto-loaded (must be able to build the URL => no additional template URL values)
-	Children []ResourceType
-	// SubResources are not auto-loaded (these come from the request to the endpoint)
-	SubResources []ResourceType
+	Display        string
+	Endpoint       endpoints.EndpointInfo
+	Verb           string
+	SupportsDelete bool
+	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
+	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
 }
 
 // Name returns the name of the expander
@@ -126,6 +125,10 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			}
 			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
+			deleteURL := ""
+			if subResourceType.SupportsDelete {
+				deleteURL = currentItem.ID
+			}
 			newItems = append(newItems, &TreeNode{
 				Parentid:            currentItem.ID,
 				Namespace:           "swagger",
@@ -133,7 +136,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				Display:             name,
 				ExpandURL:           resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
 				ItemType:            "resource",
-				DeleteURL:           "TODO",
+				DeleteURL:           deleteURL,
 				SwaggerResourceType: subResourceType,
 			})
 		}
@@ -147,6 +150,10 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			panic(err)
 		}
 		display := substituteValues(child.Display, templateValues)
+		deleteURL := ""
+		if child.SupportsDelete {
+			deleteURL = currentItem.ID
+		}
 		newItems = append(newItems, &TreeNode{
 			Parentid:            currentItem.ID,
 			Namespace:           "swagger",
@@ -154,7 +161,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			Display:             display,
 			ExpandURL:           url,
 			ItemType:            "resource",
-			DeleteURL:           "NotSupported",
+			DeleteURL:           deleteURL,
 			SwaggerResourceType: &loopChild,
 		})
 	}

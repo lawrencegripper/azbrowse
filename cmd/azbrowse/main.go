@@ -317,6 +317,9 @@ func main() {
 			deleteConfirmItemID = item.ID
 			deleteConfirmCount = 0
 		}
+		if item.DeleteURL == "" {
+			return nil
+		}
 		done := status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.DeleteURL, true)
 		deleteConfirmCount++
 

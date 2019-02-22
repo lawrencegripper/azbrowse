@@ -206,7 +206,10 @@ func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) {
 			fmt.Fprintf(w, "\t%s\t\tDisplay:  \"%s\",\n", prefix, name)
 			fmt.Fprintf(w, "\t%s\t\tEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, path.Endpoint.TemplateURL, path.Endpoint.APIVersion)
 			if pathVerb != "get" {
-				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\"", prefix, strings.ToUpper(pathVerb))
+				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\",\n", prefix, strings.ToUpper(pathVerb))
+			}
+			if path.Verbs["delete"].OperationID != "" {
+				fmt.Fprintf(w, "\t%s\t\tSupportsDelete:     true,\n", prefix)
 			}
 			if len(path.Children) > 0 {
 				fmt.Fprintf(w, "\t%s\t\tChildren: []ResourceType {\n", prefix)
