@@ -251,15 +251,15 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	// Update the list if we have sub items from the expanders
 	// or return the default experience for and unknown item
-	if hasPrimaryResponse || len(newItems) > 0 {
+	if len(newItems) > 0 {
 		w.items = newItems
 		w.selected = 0
 	}
 
 	// Use the default handler to get the resource JSON for display
-	if !hasPrimaryResponse {
-		defaultHandler := handlers.DefaultExpander{}
-		result := defaultHandler.Expand(ctx, currentItem)
+	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
+	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
+		result := handlers.DefaultExpanderInstance.Expand(ctx, currentItem)
 		if result.Err != nil {
 			panic(result.Err)
 		}

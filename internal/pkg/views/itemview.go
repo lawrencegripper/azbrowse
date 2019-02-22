@@ -1,8 +1,10 @@
 package views
 
 import (
+	"encoding/json"
 	"fmt"
 
+	"github.com/TylerBrock/colorjson"
 	"github.com/jroimartin/gocui"
 )
 
@@ -38,7 +40,17 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		w.content = stripSecretVals(w.content)
 	}
 
-	fmt.Fprint(v, w.content)
+	var obj map[string]interface{}
+	json.Unmarshal([]byte(w.content), &obj)
+
+	f := colorjson.NewFormatter()
+	f.Indent = 2
+	s, err := f.Marshal(obj)
+	if err != nil {
+		fmt.Fprint(v, w.content)
+	} else {
+		fmt.Fprint(v, string(s))
+	}
 
 	return nil
 }

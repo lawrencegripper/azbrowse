@@ -12,14 +12,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"github.com/valyala/fastjson"
 )
-
-var fastJSONParser fastjson.Parser
-
-func init() {
-	fastJSONParser = fastjson.Parser{}
-}
 
 // ResourceGroupResourceExpander expands resource under an RG
 type ResourceGroupResourceExpander struct{}
@@ -91,16 +84,15 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	// Add deployment item
 	newItems := []*TreeNode{}
 	newItems = append(newItems, &TreeNode{
-		Parentid:         currentItem.ID,
-		Namespace:        "None",
-		Display:          style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
-		Name:             "Deployments",
-		ID:               currentItem.ID,
-		ExpandURL:        currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
-		ExpandReturnType: deploymentType,
-		ItemType:         resourceType,
-		DeleteURL:        "NotSupported",
-		SubscriptionID:   currentItem.SubscriptionID,
+		Parentid:       currentItem.ID,
+		Namespace:      "None",
+		Display:        style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
+		Name:           "Deployments",
+		ID:             currentItem.ID,
+		ExpandURL:      currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
+		ItemType:       deploymentType,
+		DeleteURL:      "NotSupported",
+		SubscriptionID: currentItem.SubscriptionID,
 	})
 
 	// Get the latest from the ARM API
