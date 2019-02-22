@@ -24,6 +24,8 @@ type ResourceType struct {
 	Endpoint       *endpoints.EndpointInfo
 	Verb           string
 	DeleteEndpoint *endpoints.EndpointInfo
+	PatchEndpoint  *endpoints.EndpointInfo
+	PutEndpoint    *endpoints.EndpointInfo
 	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
 	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
 }

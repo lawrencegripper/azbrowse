@@ -300,6 +300,20 @@ func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // 
 				}
 				fmt.Fprintf(w, "\t%s\t\tDeleteEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, deleteEndpoint.TemplateURL, deleteEndpoint.APIVersion)
 			}
+			if path.Operations.Patch.Permitted {
+				patchEndpoint := path.Endpoint
+				if path.Operations.Patch.Endpoint != nil {
+					patchEndpoint = path.Operations.Delete.Endpoint
+				}
+				fmt.Fprintf(w, "\t%s\t\tPatchEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, patchEndpoint.TemplateURL, patchEndpoint.APIVersion)
+			}
+			if path.Operations.Put.Permitted {
+				putEndpoint := path.Endpoint
+				if path.Operations.Put.Endpoint != nil {
+					putEndpoint = path.Operations.Put.Endpoint
+				}
+				fmt.Fprintf(w, "\t%s\t\tPutEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, putEndpoint.TemplateURL, putEndpoint.APIVersion)
+			}
 			if len(path.Children) > 0 {
 				fmt.Fprintf(w, "\t%s\t\tChildren: []ResourceType {\n", prefix)
 				writePaths(w, path.Children, config, prefix+"\t\t")
