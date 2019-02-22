@@ -45,10 +45,7 @@ type SwaggerPathVerb struct {
 	OperationID string `json:"operationId"`
 }
 
-type swaggerOverride struct {
-	TreatAsPath string
-	TreatAsVerb string
-}
+// Config handles configuration of url handling
 type Config struct {
 	// Path overrides is keyed on actual path. value is the logical path to use
 	PathOverrides map[string]string

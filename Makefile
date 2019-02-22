@@ -22,5 +22,7 @@ checks:
 ci-docker:
 	docker run -it -e BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.10 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
 
-run-codegen:
+swagger-codegen:
 	go run cmd/swagger-codegen/main.go --output-file ./internal/pkg/handlers/swagger.generated.go 
+	gofmt -s -w internal/pkg/handlers/swagger.generated.go
+	
