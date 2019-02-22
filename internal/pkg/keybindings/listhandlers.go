@@ -314,12 +314,12 @@ func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 
 			// Run in the background
 			go func() {
-				res, err := armclient.DoRequest(ctx, "DELETE", item.DeleteURL)
+				res, err := armclient.DoRequest(h.Context, "DELETE", item.DeleteURL)
 				if err != nil {
 					panic(err)
 				}
 				// list.Refresh()
-				content.SetContent(res, "Delete response>"+item.Name)
+				h.Content.SetContent(res, "Delete response>"+item.Name)
 				doneDelete()
 			}()
 		}
