@@ -234,7 +234,7 @@ func (h ListOpenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		if portalURL == "" {
 			portalURL = "https://portal.azure.com"
 		}
-		url := portalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.Parentid + "/overview"
+		url := portalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.ID
 		span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
 		open.Run(url)
 		span.Finish()
@@ -310,14 +310,18 @@ func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			done()
 			doneDelete := h.StatusBar.Status("Deleting item: "+item.DeleteURL, true)
 
-			res, err := armclient.DoRequest(h.Context, "DELETE", item.DeleteURL)
-			if err != nil {
-				panic(err)
-			}
-			h.List.Refresh()
-			h.Content.SetContent(res, "Delete response>"+item.Name)
-			doneDelete()
 			h.DeleteConfirmItemID = ""
+
+			// Run in the background
+			go func() {
+				res, err := armclient.DoRequest(ctx, "DELETE", item.DeleteURL)
+				if err != nil {
+					panic(err)
+				}
+				// list.Refresh()
+				content.SetContent(res, "Delete response>"+item.Name)
+				doneDelete()
+			}()
 		}
 		return nil
 	}
