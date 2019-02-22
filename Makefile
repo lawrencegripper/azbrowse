@@ -1,6 +1,9 @@
 .PHONY: dep checks test build
 all: dep checks test build
 
+setup:
+	./scripts/install_dev_tools.sh
+
 dep:
 	dep ensure -v --vendor-only
 
@@ -13,7 +16,7 @@ integration:
 build: test dep checks
 	go build ./cmd/azbrowse
 
-install: 
+install:
 	go install ./cmd/azbrowse
 
 checks:
