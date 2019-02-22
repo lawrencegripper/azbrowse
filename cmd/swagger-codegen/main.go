@@ -294,7 +294,11 @@ func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // 
 				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\",\n", prefix, strings.ToUpper(path.Operations.Get.Verb))
 			}
 			if path.Operations.Delete.Permitted {
-				fmt.Fprintf(w, "\t%s\t\tDeleteEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, path.Endpoint.TemplateURL, path.Endpoint.APIVersion)
+				deleteEndpoint := path.Endpoint
+				if path.Operations.Delete.Endpoint != nil {
+					deleteEndpoint = path.Operations.Delete.Endpoint
+				}
+				fmt.Fprintf(w, "\t%s\t\tDeleteEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, deleteEndpoint.TemplateURL, deleteEndpoint.APIVersion)
 			}
 			if len(path.Children) > 0 {
 				fmt.Fprintf(w, "\t%s\t\tChildren: []ResourceType {\n", prefix)
