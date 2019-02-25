@@ -5,8 +5,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
+	"os/exec"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -344,6 +346,106 @@ func main() {
 	}); err != nil {
 		log.Panicln(err)
 	}
+	if err := g.SetKeybinding("", gocui.KeyCtrlU, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
+
+		item := list.CurrentExpandedItem()
+		if item == nil ||
+			item.SwaggerResourceType == nil ||
+			item.SwaggerResourceType.PutEndpoint == nil {
+			return nil
+		}
+
+		tmpFile, err := ioutil.TempFile(os.TempDir(), "azbrowse-")
+		if err != nil {
+			status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
+			return err
+		}
+
+		err = tmpFile.Close()
+		if err != nil {
+			status.Status(fmt.Sprintf("Cannot close temporary file: %s", err), false)
+			return err
+		}
+
+		newFilename := tmpFile.Name() + ".json"
+		err = os.Rename(tmpFile.Name(), newFilename)
+		if err != nil {
+			status.Status(fmt.Sprintf("Cannot rename temporary file: %s", err), false)
+			return err
+		}
+
+		tmpFile, err = os.Create(newFilename)
+		if err != nil {
+			status.Status(fmt.Sprintf("Cannot open renamed temporary file: %s", err), false)
+			return err
+		}
+
+		// Remember to clean up the file afterwards
+		defer os.Remove(newFilename)
+
+		originalJSON := content.GetContent()
+		clipboard.WriteAll(originalJSON)
+
+		tmpFile.WriteString(originalJSON)
+		tmpFile.Close()
+
+		status.Status("Opening JSON in editor...", false)
+		err = openEditor(tmpFile.Name())
+		if err != nil {
+			status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
+			return nil
+		}
+
+		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
+		if err != nil {
+			status.Status(fmt.Sprintf("Cannot open edited file: %s", err), false)
+			return nil
+		}
+
+		updatedJSON := string(updatedJSONBytes)
+		if updatedJSON == originalJSON {
+			status.Status("No changes to JSON - no further action.", false)
+			return nil
+		}
+		if updatedJSON == "" {
+			status.Status("Updated JSON empty - no further action.", false)
+			return nil
+		}
+
+		matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+		if !matchResult.IsMatch {
+			status.Status(fmt.Sprintf("item.ExpandURL didn't match current Endpoint"), false)
+			return err
+		}
+		putURL, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+		if err != nil {
+			status.Status(fmt.Sprintf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err), false)
+			return nil
+		}
+
+		done := status.Status(fmt.Sprintf("Making PUT request: %s", putURL), true)
+		data, err := armclient.DoRequestWithBody(ctx, "PUT", putURL, string(updatedJSON))
+		done()
+		if err != nil {
+			status.Status(fmt.Sprintf("Error making PUT request: %s", err), false)
+			return nil
+		}
+
+		errorMessage, err := getAPIErrorMessage(data)
+		if err != nil {
+			status.Status(fmt.Sprintf("Error checking for API Error message: %s: %s", data, err), false)
+			return nil
+		}
+		if errorMessage != "" {
+			status.Status(fmt.Sprintf("Error: %s", errorMessage), false)
+			return nil
+		}
+		status.Status("Done", false)
+
+		return nil
+	}); err != nil {
+		log.Panicln(err)
+	}
 
 	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
 		log.Panicln(err)
@@ -382,6 +484,32 @@ func main() {
 		log.Panicln(err)
 	}
 
+}
+func openEditor(filename string) error {
+	cmd := exec.Command("code", "--wait", filename) // TODO - make this configurable!
+	return cmd.Run()
+}
+func getAPIErrorMessage(responseString string) (string, error) {
+	var response map[string]interface{}
+
+	err := json.Unmarshal([]byte(responseString), &response)
+	if err != nil {
+		err = fmt.Errorf("Error parsing API response: %s: %s", responseString, err)
+		return "", err
+	}
+	if response["error"] != nil {
+		serializedError, err := json.Marshal(response["error"])
+		if err != nil {
+			err = fmt.Errorf("Error serializing error message: %s: %s", responseString, err)
+			return "", err
+		}
+		message := string(serializedError)
+		message = strings.Replace(message, "\r", "", -1)
+		message = strings.Replace(message, "\n", "", -1)
+		return message, nil
+		// could dig into the JSON to pull out the error message property
+	}
+	return "", nil
 }
 
 func getSubscriptions(ctx context.Context) (armclient.SubResponse, string) {
