@@ -246,12 +246,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-	// Update the list if we have sub items from the expanders
-	// or return the default experience for and unknown item
-	if len(newItems) > 0 {
-		w.items = newItems
-		w.selected = 0
-	}
+	w.items = newItems
+	w.selected = 0
 
 	// Use the default handler to get the resource JSON for display
 	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
