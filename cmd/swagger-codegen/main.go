@@ -242,18 +242,46 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 		if parent == nil {
 			paths = append(paths, &path)
 		} else {
-			if countNameSegments(parent.Endpoint) == countNameSegments(path.Endpoint) {
-				// this is a child
-				parent.Children = append(parent.Children, &path)
+			if parent.Endpoint.TemplateURL == path.Endpoint.TemplateURL {
+				// we have multiple entries with the same path (e.g. when applying a URL override)
+				// merge the two entries
+				// TODO Consider checking if there is a clash when merging operations
+				if path.Operations.Get.Permitted {
+					copyOperationFrom(path.Operations.Get, &parent.Operations.Get)
+				}
+				if path.Operations.Delete.Permitted {
+					copyOperationFrom(path.Operations.Delete, &parent.Operations.Delete)
+				}
+				if path.Operations.Patch.Permitted {
+					copyOperationFrom(path.Operations.Patch, &parent.Operations.Patch)
+				}
+				if path.Operations.Post.Permitted {
+					copyOperationFrom(path.Operations.Post, &parent.Operations.Post)
+				}
+				if path.Operations.Put.Permitted {
+					copyOperationFrom(path.Operations.Put, &parent.Operations.Put)
+				}
+				parent.Children = append(parent.Children, path.Children...)
+				parent.SubPaths = append(parent.SubPaths, path.SubPaths...)
 			} else {
-				// this is a sub-resource
-				parent.SubPaths = append(parent.SubPaths, &path)
+				if countNameSegments(parent.Endpoint) == countNameSegments(path.Endpoint) {
+					// this is a child
+					parent.Children = append(parent.Children, &path)
+				} else {
+					// this is a sub-resource
+					parent.SubPaths = append(parent.SubPaths, &path)
+				}
 			}
 		}
 	}
 	return paths
 }
 
+func copyOperationFrom(from PathOperation, to *PathOperation) {
+	to.Permitted = from.Permitted
+	to.Endpoint = from.Endpoint
+	to.Verb = from.Verb
+}
 func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 	count := 0
 	for _, segment := range endpoint.URLSegments {
@@ -371,8 +399,7 @@ func dumpPaths(w io.Writer, paths []*Path, prefix string) {
 // findDeepestPath searches the endpoints tree to find the deepest point that the specified path can be nested at (used to build up the endpoint hierarchy)
 func findDeepestPath(paths []*Path, pathString string) *Path {
 	for _, path := range paths {
-		if strings.HasPrefix(pathString, path.Endpoint.TemplateURL) &&
-			pathString != path.Endpoint.TemplateURL { // short-circuit if we're overriding the path and we have a match. Temporary approach to put items on same parent (until we handle merging and tracking original urls)
+		if strings.HasPrefix(pathString, path.Endpoint.TemplateURL) {
 			// matches endpoint. Check children
 			match := findDeepestPath(path.Children, pathString)
 			if match == nil {
