@@ -21,6 +21,17 @@ echo "->Installing tools"
 bash -f ./install_dev_tools.sh
 cd ../
 
+
+echo "->Checking swagger-generated code is up-to-date"
+make swagger-codegen
+if [[ $(git diff --stat) != '' ]]; then
+  echo "Failed swagger-generated caused changes, please run `make swagger-generate` and commit changes for build to pass"
+  exit 1
+else
+  echo '`swagger-gen` ran and no changes detected in code: Success'
+fi
+
+
 echo "->Running dep"
 make dep
 echo "->Installing tests"

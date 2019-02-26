@@ -16,16 +16,17 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y        int
-	w, h        int
-	items       []*handlers.TreeNode
-	contentView *ItemWidget
-	statusView  *StatusbarWidget
-	navStack    Stack
-	title       string
-	ctx         context.Context
-	selected    int
-	view        *gocui.View
+	x, y             int
+	w, h             int
+	items            []*handlers.TreeNode
+	contentView      *ItemWidget
+	statusView       *StatusbarWidget
+	navStack         Stack
+	title            string
+	ctx              context.Context
+	selected         int
+	expandedNodeItem *handlers.TreeNode
+	view             *gocui.View
 }
 
 // NewListWidget creates a new instance
@@ -92,12 +93,12 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 	w.selected = 0
 	// Capture current view to navstack
 	w.navStack.Push(&Page{
-		Data:      w.contentView.GetContent(),
-		Value:     w.items,
-		Title:     w.title,
-		Selection: w.selected,
+		Data:             w.contentView.GetContent(),
+		Value:            w.items,
+		Title:            w.title,
+		Selection:        w.selected,
+		ExpandedNodeItem: w.CurrentItem(),
 	})
-
 	w.items = nodes
 }
 
@@ -143,6 +144,7 @@ func (w *ListWidget) GoBack() {
 	w.items = previousPage.Value
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
+	w.expandedNodeItem = previousPage.ExpandedNodeItem
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
@@ -161,10 +163,11 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != handlers.ActionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
-			Data:      w.contentView.GetContent(),
-			Value:     w.items,
-			Title:     w.title,
-			Selection: w.selected,
+			Data:             w.contentView.GetContent(),
+			Value:            w.items,
+			Title:            w.title,
+			Selection:        w.selected,
+			ExpandedNodeItem: w.CurrentItem(),
 		})
 	}
 
@@ -246,12 +249,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-	// Update the list if we have sub items from the expanders
-	// or return the default experience for and unknown item
-	if len(newItems) > 0 {
-		w.items = newItems
-		w.selected = 0
-	}
+	w.items = newItems
+	w.selected = 0
+	w.expandedNodeItem = currentItem
 
 	// Use the default handler to get the resource JSON for display
 	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
@@ -285,4 +285,9 @@ func (w *ListWidget) CurrentSelection() int {
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 	return w.items[w.selected]
+}
+
+// CurrentExpandedItem returns the currently expanded item as a treenode
+func (w *ListWidget) CurrentExpandedItem() *handlers.TreeNode {
+	return w.expandedNodeItem
 }
