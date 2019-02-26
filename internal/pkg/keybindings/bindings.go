@@ -2,6 +2,7 @@ package keybindings
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,6 +16,7 @@ type KeyMap map[string]gocui.Key
 
 var handlers []KeyHandler
 var overrides KeyMap
+var usedKeys map[string]string
 
 func Bind(g *gocui.Gui) error {
 	user, _ := user.Current()
@@ -29,10 +31,7 @@ func BindWithFileOverrides(g *gocui.Gui, filePath string) error {
 			return err
 		}
 	} // ignore file overrides if error
-	if err := bindHandlersToKeys(g); err != nil {
-		return err
-	}
-	return nil
+	return bindHandlersToKeys(g)
 }
 
 func AddHandler(hnd KeyHandler) {
@@ -61,11 +60,13 @@ func GetKeyBindingsAsStrings() map[string]string {
 }
 
 func bindHandlersToKeys(g *gocui.Gui) error {
+	usedKeys = map[string]string{}
 	for _, hnd := range handlers {
 		if err := bindHandlerToKey(g, hnd); err != nil {
 			return err
 		}
 	}
+	// panic(usedKeys)
 	return nil
 }
 
@@ -76,7 +77,32 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 	} else {
 		key = hnd.DefaultKey()
 	}
+
+	if err := checkKeyNotAlreadyInUse(hnd.Widget(), hnd.Id(), key); err != nil {
+		return err
+	}
+
 	return g.SetKeybinding(hnd.Widget(), key, gocui.ModNone, hnd.Fn())
+}
+
+const reuseKeyError = "Please update your `~/.azbrowse-bindings.json` file to a valid configuration and restart"
+
+func checkKeyNotAlreadyInUse(widget, id string, key gocui.Key) error {
+	keyString := KeyToStr[key]
+	// Check key isn't already use globally
+	if usedBy, alreadyInUse := usedKeys[KeyToStr[key]]; alreadyInUse {
+		return errors.New("Failed when configurig `" + id + "`. The key `" + keyString + "` is already in use by `" + usedBy + "`(Global binding). " + reuseKeyError)
+	}
+	// Check key isn't already in use by a widget
+	if usedBy, alreadyInUse := usedKeys[widget+keyString]; alreadyInUse {
+		return errors.New("Failed when configurig `" + id + "`. The key `" + keyString + "` is already in use by `" + usedBy + "`. " + reuseKeyError)
+	}
+
+	// Track which keys are in use using a compound key of "WidgetKeyName"
+	// this allows a key to be used by multiple widgets but not multiple times within a widget
+	usedKeys[widget+keyString] = id
+
+	return nil
 }
 
 func initializeOverrides(filePath string) error {

@@ -143,6 +143,14 @@ func main() {
 	var deleteConfirmItemID string
 	var deleteConfirmCount int
 
+	// Global handlers
+	// NOTE> Global handlers must be registered first to
+	//       ensure double key registration is prevented
+	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
+	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
+	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
+	keybindings.AddHandler(keybindings.NewQuitHandler())
+
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListUpHandler(list))
@@ -161,14 +169,11 @@ func main() {
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
 	keybindings.AddHandler(keybindings.NewItemLeftHandler(&editModeEnabled))
 
-	// Global handlers
-	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
-	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
-	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
-	keybindings.AddHandler(keybindings.NewQuitHandler())
-
 	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
-		log.Panicln(err)
+		g.Close()
+
+		fmt.Println("\n \n" + err.Error())
+		os.Exit(1)
 	}
 
 	// Update views with keybindings
