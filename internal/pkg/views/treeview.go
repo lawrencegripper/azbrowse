@@ -1,4 +1,4 @@
-package main
+package views
 
 import (
 	"context"
@@ -16,22 +16,25 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y             int
-	w, h             int
-	items            []*handlers.TreeNode
-	contentView      *ItemWidget
-	statusView       *StatusbarWidget
-	navStack         Stack
-	title            string
-	ctx              context.Context
-	selected         int
-	expandedNodeItem *handlers.TreeNode
-	view             *gocui.View
+	x, y                 int
+	w, h                 int
+	items                []*handlers.TreeNode
+	contentView          *ItemWidget
+	statusView           *StatusbarWidget
+	navStack             Stack
+	title                string
+	ctx                  context.Context
+	selected             int
+	expandedNodeItem     *handlers.TreeNode
+	view                 *gocui.View
+	enableTracing        bool
+	FullscreenKeyBinding string
+	ActionKeyBinding     string
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing}
 }
 
 // Layout draws the widget in the gocui view
@@ -205,7 +208,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	// Lets give all the expanders 45secs to completed (unless debugging)
 	hasPrimaryResponse := false
 	var timeout <-chan time.Time
-	if enableTracing {
+	if w.enableTracing {
 		timeout = time.After(time.Second * 600)
 	} else {
 		timeout = time.After(time.Second * 45)
@@ -231,7 +234,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				w.contentView.SetContent(done.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+				w.contentView.SetContent(done.Response, fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 			}
 			if done.Nodes == nil {
 				continue
@@ -260,7 +263,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		if result.Err != nil {
 			panic(result.Err)
 		}
-		w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+		w.contentView.SetContent(result.Response, fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 	}
 
 	w.title = w.title + ">" + currentItem.Name
