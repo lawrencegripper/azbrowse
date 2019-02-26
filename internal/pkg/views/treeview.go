@@ -1,4 +1,4 @@
-package main
+package views
 
 import (
 	"context"
@@ -16,21 +16,25 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y        int
-	w, h        int
-	items       []*handlers.TreeNode
-	contentView *ItemWidget
-	statusView  *StatusbarWidget
-	navStack    Stack
-	title       string
-	ctx         context.Context
-	selected    int
-	view        *gocui.View
+	x, y                 int
+	w, h                 int
+	items                []*handlers.TreeNode
+	contentView          *ItemWidget
+	statusView           *StatusbarWidget
+	navStack             Stack
+	title                string
+	ctx                  context.Context
+	selected             int
+	expandedNodeItem     *handlers.TreeNode
+	view                 *gocui.View
+	enableTracing        bool
+	FullscreenKeyBinding string
+	ActionKeyBinding     string
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing}
 }
 
 // Layout draws the widget in the gocui view
@@ -92,12 +96,12 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 	w.selected = 0
 	// Capture current view to navstack
 	w.navStack.Push(&Page{
-		Data:      w.contentView.GetContent(),
-		Value:     w.items,
-		Title:     w.title,
-		Selection: w.selected,
+		Data:             w.contentView.GetContent(),
+		Value:            w.items,
+		Title:            w.title,
+		Selection:        w.selected,
+		ExpandedNodeItem: w.CurrentItem(),
 	})
-
 	w.items = nodes
 }
 
@@ -143,6 +147,7 @@ func (w *ListWidget) GoBack() {
 	w.items = previousPage.Value
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
+	w.expandedNodeItem = previousPage.ExpandedNodeItem
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
@@ -161,10 +166,11 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != handlers.ActionType {
 		// Capture current view to navstack
 		w.navStack.Push(&Page{
-			Data:      w.contentView.GetContent(),
-			Value:     w.items,
-			Title:     w.title,
-			Selection: w.selected,
+			Data:             w.contentView.GetContent(),
+			Value:            w.items,
+			Title:            w.title,
+			Selection:        w.selected,
+			ExpandedNodeItem: w.CurrentItem(),
 		})
 	}
 
@@ -202,7 +208,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	// Lets give all the expanders 45secs to completed (unless debugging)
 	hasPrimaryResponse := false
 	var timeout <-chan time.Time
-	if enableTracing {
+	if w.enableTracing {
 		timeout = time.After(time.Second * 600)
 	} else {
 		timeout = time.After(time.Second * 45)
@@ -228,7 +234,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				w.contentView.SetContent(done.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+				w.contentView.SetContent(done.Response, fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 			}
 			if done.Nodes == nil {
 				continue
@@ -246,12 +252,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-	// Update the list if we have sub items from the expanders
-	// or return the default experience for and unknown item
-	if len(newItems) > 0 {
-		w.items = newItems
-		w.selected = 0
-	}
+	w.items = newItems
+	w.selected = 0
+	w.expandedNodeItem = currentItem
 
 	// Use the default handler to get the resource JSON for display
 	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
@@ -260,7 +263,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		if result.Err != nil {
 			panic(result.Err)
 		}
-		w.contentView.SetContent(result.Response, "[CTRL+F -> Fullscreen|CTRL+A -> Actions] "+currentItem.Name)
+		w.contentView.SetContent(result.Response, fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 	}
 
 	w.title = w.title + ">" + currentItem.Name
@@ -285,4 +288,9 @@ func (w *ListWidget) CurrentSelection() int {
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 	return w.items[w.selected]
+}
+
+// CurrentExpandedItem returns the currently expanded item as a treenode
+func (w *ListWidget) CurrentExpandedItem() *handlers.TreeNode {
+	return w.expandedNodeItem
 }

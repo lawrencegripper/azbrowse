@@ -38,10 +38,31 @@ func TestNonMatchOnExtraSegment(t *testing.T) {
 
 func TestMatch(t *testing.T) {
 
-	//shouldn't match because url has extra "config" segment
+	//should match
 	matchResult := getMatchResult(
 		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config",
 		"/subscriptions/random/resourceGroups/aaaaa/providers/Microsoft.Web/sites/azbrowsetest/config")
+
+	if !matchResult.IsMatch {
+		t.Error("Expected IsMatch to be true")
+	} else {
+		t.Log("verifying values")
+		verifyMap(
+			t,
+			map[string]string{
+				"subscriptionId":    "random",
+				"resourceGroupName": "aaaaa",
+				"name":              "azbrowsetest",
+			},
+			matchResult.Values)
+	}
+}
+func TestMatchDifferentCase(t *testing.T) {
+
+	//should match even though case differs on literal segments
+	matchResult := getMatchResult(
+		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config",
+		"/subscriptions/random/resourcegroups/aaaaa/providers/microsoft.web/SITES/azbrowsetest/config")
 
 	if !matchResult.IsMatch {
 		t.Error("Expected IsMatch to be true")

@@ -1,13 +1,14 @@
-package main
+package views
 
 import "github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 
 // Page represents a previous view in the nav stack
 type Page struct {
-	Value     []*handlers.TreeNode
-	Data      string
-	Title     string
-	Selection int
+	Value            []*handlers.TreeNode
+	Data             string
+	Title            string
+	Selection        int
+	ExpandedNodeItem *handlers.TreeNode
 }
 
 // Stack is a basic LIFO stack that resizes as needed.

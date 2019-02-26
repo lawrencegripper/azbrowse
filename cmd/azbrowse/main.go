@@ -12,16 +12,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/version"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
-	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
 	opentracing "github.com/opentracing/opentracing-go"
-	open "github.com/skratchdot/open-golang/open"
 )
 
 var enableTracing bool
@@ -119,7 +119,7 @@ func main() {
 	if firstRun == "" || err != nil {
 		go func() {
 			time.Sleep(time.Second * 1)
-			ToggleHelpView(g)
+			views.ToggleHelpView(g)
 			storage.PutCache("firstrun", version.BuildDataVersion)
 		}()
 	}
@@ -130,221 +130,58 @@ func main() {
 
 	leftColumnWidth := 45
 
-	status := NewStatusbarWidget(1, maxY-2, maxX, g)
-	content := NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status)
+	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
+	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing)
 
 	g.SetManager(status, content, list)
 	g.SetCurrentView("listWidget")
 
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowDown, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ChangeSelection(list.CurrentSelection() + 1)
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowUp, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ChangeSelection(list.CurrentSelection() - 1)
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyEnter, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.ExpandCurrentSelection()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyF5, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.Refresh()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyF6, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-
-		list.Refresh()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	// Handle backspace for modern terminals
-	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.GoBack()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	// When back is pressed in the itemWidget go back and also move
-	// focus to the list of resources
-	if err := g.SetKeybinding("itemWidget", gocui.KeyBackspace2, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		g.SetCurrentView("listWidget")
-		g.Cursor = false
-		list.GoBack()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	// Handle backspace for out-dated terminals
-	// A side-effect is that this key combination clashes with CTRL+H so we can't use that combination for help... oh well.
-	// https://superuser.com/questions/375864/ctrlh-causing-backspace-instead-of-help-in-emacs-on-cygwin
-	if err := g.SetKeybinding("listWidget", gocui.KeyBackspace, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		list.GoBack()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlA, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		return LoadActionsView(ctx, list)
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyCtrlO, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		item := list.CurrentItem()
-		protalURL := os.Getenv("AZURE_PORTAL_URL")
-		if protalURL == "" {
-			protalURL = "https://portal.azure.com"
-		}
-		url := protalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.ID
-		span, _ := tracing.StartSpanFromContext(ctx, "openportal:url")
-		open.Run(url)
-		span.Finish()
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	editModelEnabled := false
-	if err := g.SetKeybinding("", gocui.KeyCtrlE, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		editModelEnabled = !editModelEnabled
-		if editModelEnabled {
-			g.Cursor = true
-			g.SetCurrentView("itemWidget")
-		} else {
-			g.Cursor = false
-			g.SetCurrentView("listWidget")
-		}
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("listWidget", gocui.KeyArrowRight, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		editModelEnabled = true
-		g.Cursor = true
-		g.SetCurrentView("itemWidget")
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("itemWidget", gocui.KeyArrowLeft, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		editModelEnabled = false
-		g.Cursor = false
-		g.SetCurrentView("listWidget")
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	isFullScreen := false
-	if err := g.SetKeybinding("", gocui.KeyCtrlF, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		isFullScreen = !isFullScreen
-		if isFullScreen {
-			g.Cursor = true
-			maxX, maxY := g.Size()
-			v, _ := g.SetView("fullscreenContent", 0, 0, maxX, maxY)
-			v.Editable = true
-			v.Frame = false
-			v.Wrap = true
-			v.Title = "JSON Response - Fullscreen (CTRL+F to exit)"
-			fmt.Fprintf(v, content.GetContent())
-			g.SetCurrentView("fullscreenContent")
-		} else {
-			g.Cursor = false
-			g.DeleteView("fullscreenContent")
-			g.SetCurrentView("listWidget")
-		}
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	if err := g.SetKeybinding("", gocui.KeyCtrlS, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		clipboard.WriteAll(content.GetContent())
-		status.Status("Current resource's JSON copied to clipboard", false)
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
+	var editModeEnabled bool
+	var isFullscreen bool
 	var showHelp bool
-	if err := g.SetKeybinding("", gocui.KeyCtrlI, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		showHelp = !showHelp
-
-		// If we're up and running clear and redraw the view
-		// if w.g != nil {
-		if showHelp {
-			v, err := g.SetView("helppopup", 1, 1, 140, 38)
-			if err != nil && err != gocui.ErrUnknownView {
-				panic(err)
-			}
-			DrawHelp(v)
-		} else {
-			g.DeleteView("helppopup")
-		}
-		return nil
-	}); err != nil {
-		log.Panicln(err)
-	}
-
-	// HACK: To prevent accidental deletes this method requires del to be pressed twice on a resource
-	// before it will proceed
 	var deleteConfirmItemID string
 	var deleteConfirmCount int
-	if err := g.SetKeybinding("", gocui.KeyDelete, gocui.ModNone, func(g *gocui.Gui, v *gocui.View) error {
-		item := list.CurrentItem()
-		if deleteConfirmItemID != item.ID {
-			deleteConfirmItemID = item.ID
-			deleteConfirmCount = 0
-		}
-		done := status.Status("Delete item? Really? PRESS DEL TO CONFIRM: "+item.DeleteURL, true)
-		deleteConfirmCount++
 
-		if deleteConfirmCount > 1 {
-			done()
-			doneDelete := status.Status("Deleting item: "+item.DeleteURL, true)
-			deleteConfirmItemID = ""
+	// Global handlers
+	// NOTE> Global handlers must be registered first to
+	//       ensure double key registration is prevented
+	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
+	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
+	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
+	keybindings.AddHandler(keybindings.NewQuitHandler())
 
-			// Run in the background
-			go func() {
-				res, err := armclient.DoRequest(ctx, "DELETE", item.DeleteURL)
-				if err != nil {
-					panic(err)
-				}
-				// list.Refresh()
-				content.SetContent(res, "Delete response>"+item.Name)
-				doneDelete()
-			}()
+	// List handlers
+	keybindings.AddHandler(keybindings.NewListDownHandler(list))
+	keybindings.AddHandler(keybindings.NewListUpHandler(list))
+	keybindings.AddHandler(keybindings.NewListExpandHandler(list))
+	keybindings.AddHandler(keybindings.NewListRefreshHandler(list))
+	keybindings.AddHandler(keybindings.NewListBackHandler(list))
+	keybindings.AddHandler(keybindings.NewListBackLegacyHandler(list))
+	keybindings.AddHandler(keybindings.NewListActionsHandler(list, ctx))
+	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
+	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
+	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
+	keybindings.AddHandler(keybindings.NewListDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
+	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
 
-		}
-		return nil
-	}); err != nil {
-		log.Panicln(err)
+	// Item handlers
+	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
+	keybindings.AddHandler(keybindings.NewItemLeftHandler(&editModeEnabled))
+
+	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
+		g.Close()
+
+		fmt.Println("\n \n" + err.Error())
+		os.Exit(1)
 	}
 
-	if err := g.SetKeybinding("", gocui.KeyCtrlC, gocui.ModNone, quit); err != nil {
-		log.Panicln(err)
-	}
+	// Update views with keybindings
+	keyBindings := keybindings.GetKeyBindingsAsStrings()
+	status.HelpKeyBinding = keyBindings["help"]
+	list.ActionKeyBinding = keyBindings["listactions"]
+	list.FullscreenKeyBinding = keyBindings["fullscreen"]
+
 	go func() {
 		time.Sleep(time.Second * 1)
 
@@ -397,8 +234,4 @@ func getSubscriptions(ctx context.Context) (armclient.SubResponse, string) {
 		panic(err)
 	}
 	return subRequest, data
-}
-
-func quit(g *gocui.Gui, v *gocui.View) error {
-	return gocui.ErrQuit
 }
