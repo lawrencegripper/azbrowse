@@ -16,12 +16,19 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/version"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
 	"github.com/jroimartin/gocui"
 	opentracing "github.com/opentracing/opentracing-go"
+)
+
+// Overridden via ldflags
+var (
+	version   = "99.0.1-devbuild"
+	commit    = "unknown"
+	date      = "unknown"
+	goversion = "unknown"
 )
 
 var enableTracing bool
@@ -32,11 +39,11 @@ func main() {
 	if len(os.Args) >= 2 {
 		arg := os.Args[1]
 		if strings.Contains(arg, "version") {
-			fmt.Println(version.BuildDataVersion)
-			fmt.Println(version.BuildDataGitCommit)
-			fmt.Println(version.BuildDataGoVersion)
+			fmt.Println(version)
+			fmt.Println(commit)
+			fmt.Println(date)
+			fmt.Println(goversion)
 			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
-			fmt.Println(version.BuildDataBuildDate)
 			os.Exit(0)
 		}
 
@@ -120,7 +127,7 @@ func main() {
 		go func() {
 			time.Sleep(time.Second * 1)
 			views.ToggleHelpView(g)
-			storage.PutCache("firstrun", version.BuildDataVersion)
+			storage.PutCache("firstrun", version)
 		}()
 	}
 
