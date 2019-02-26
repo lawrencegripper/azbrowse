@@ -26,6 +26,14 @@ curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scri
 
 You may need to reload your terminal to pick up `azbrowse` after the script completes.
 
+### Run via Docker 
+
+Ensure you have the `az` command setup on your machine and are logged in. You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
+
+```
+docker run -it -v $HOME:/root lawrencegripper/azbrowse
+```
+
 ### Usage
 
 Below is a table containing the default key bindings. If you'd like to customise the key bindings to be more suitable for your setup, please refer to the section on [custom key bindings](#custom-key-bindings).

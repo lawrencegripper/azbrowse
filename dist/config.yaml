@@ -81,10 +81,25 @@ snapcraft:
   grade: stable
   confinement: classic
 snapshot:
-  name_template: '{{ .Tag }}-next'
+  name_template: SNAPSHOT-{{ .ShortCommit }}
 checksum:
   name_template: checksums.txt
   algorithm: sha256
+dockers:
+- binaries:
+  - azbrowse
+  goos: linux
+  goarch: amd64
+  dockerfile: Dockerfile
+  image_templates:
+  - lawrencegripper/azbrowse:latest
+  - lawrencegripper/azbrowse:{{ .Tag }}
+  - lawrencegripper/azbrowse:v{{ .Major }}
+  skip_push: true
+  build_flag_templates:
+  - --label=org.label-schema.schema-version=1.0
+  - --label=org.label-schema.version={{.Version}}
+  - --label=org.label-schema.name={{.ProjectName}}
 changelog:
   filters:
     exclude:

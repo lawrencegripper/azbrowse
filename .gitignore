@@ -5,3 +5,4 @@ bindings.json
 /cmd/azbrowse/azbrowse
 /swagger-codegen
 /dist
+scripts/bin/

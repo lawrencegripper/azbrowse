@@ -11,4 +11,4 @@ jobs:
     working_directory: /go/src/github.com/lawrencegripper/azbrowse
     steps:
       - checkout 
-      - run: bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
+      - run: sudo bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/install_release_tools.sh && bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh

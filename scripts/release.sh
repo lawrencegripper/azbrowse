@@ -12,11 +12,8 @@ export GOVERSION=$(go version)
 
 echo "->Installing dev tools"
 bash -f ./install_dev_tools.sh
-cd ../
 
-
-echo "->Installing release tools"
-bash -f ./install_release_tools.sh
+echo "->Move to root directory"
 cd ../
 
 
@@ -35,4 +32,5 @@ make dep
 echo "->Installing tests"
 make test
 
-goreleaser release --skip-publish --rm-dist
+echo "->Run go releaser"
+curl -sL https://git.io/goreleaser | bash -s -- --skip-publish --rm-dist
