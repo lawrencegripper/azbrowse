@@ -355,33 +355,14 @@ func main() {
 			return nil
 		}
 
-		tmpFile, err := ioutil.TempFile(os.TempDir(), "azbrowse-")
+		tmpFile, err := ioutil.TempFile(os.TempDir(), "azbrowse-*.json")
 		if err != nil {
 			status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
 			return err
 		}
 
-		err = tmpFile.Close()
-		if err != nil {
-			status.Status(fmt.Sprintf("Cannot close temporary file: %s", err), false)
-			return err
-		}
-
-		newFilename := tmpFile.Name() + ".json"
-		err = os.Rename(tmpFile.Name(), newFilename)
-		if err != nil {
-			status.Status(fmt.Sprintf("Cannot rename temporary file: %s", err), false)
-			return err
-		}
-
-		tmpFile, err = os.Create(newFilename)
-		if err != nil {
-			status.Status(fmt.Sprintf("Cannot open renamed temporary file: %s", err), false)
-			return err
-		}
-
 		// Remember to clean up the file afterwards
-		defer os.Remove(newFilename)
+		defer os.Remove(tmpFile.Name())
 
 		originalJSON := content.GetContent()
 		clipboard.WriteAll(originalJSON)

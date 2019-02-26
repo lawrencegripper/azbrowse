@@ -5,7 +5,7 @@ dep:
 	dep ensure -v --vendor-only
 
 test:
-	go test -short ./...
+	go test -v -short ./...
 
 integration:
 	go test ./...
@@ -28,4 +28,6 @@ swagger-codegen:
 	gofmt -s -w internal/pkg/handlers/swagger.generated.go
 	# Build the generated go files to check for any go build issues
 	go build internal/pkg/handlers/swagger.generated.go internal/pkg/handlers/swagger.go internal/pkg/handlers/types.go 
+	# Test the generated code initalizes
+	go test -v internal/pkg/handlers/swagger_test.go internal/pkg/handlers/swagger.generated.go internal/pkg/handlers/swagger.go internal/pkg/handlers/types.go
 	
