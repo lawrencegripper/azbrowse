@@ -1,8 +1,11 @@
 package armclient
 
 import (
+	"context"
 	"encoding/json"
 	"os/exec"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
 type azCLIToken struct {
@@ -10,6 +13,36 @@ type azCLIToken struct {
 	TokenType    string `json:"tokenType"`
 	Tenant       string `json:"tenant"`
 	Subscription string `json:"subscription"`
+	ExpiresOn    string `json:"expiresOn"`
+}
+
+var cachedToken azCLIToken
+
+func checkTokenIsValid(token azCLIToken) (azCLIToken, bool) {
+	if token.ExpiresOn == "" {
+		return azCLIToken{}, false
+	}
+
+	return token, true
+}
+
+func aquireAccessToken(ctx context.Context) (azCLIToken, error) {
+
+	span, ctx := tracing.StartSpanFromContext(ctx, "aquireAccessToken")
+	defer span.Finish()
+
+	token, valid := checkTokenIsValid(cachedToken)
+	if valid {
+		return token, nil
+	}
+
+	token, err := aquireTokenFromAzCLI()
+	if err != nil {
+		return azCLIToken{}, err
+	}
+
+	cachedToken = token
+	return token, nil
 }
 
 func aquireTokenFromAzCLI() (azCLIToken, error) {

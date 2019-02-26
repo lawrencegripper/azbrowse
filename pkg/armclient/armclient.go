@@ -67,7 +67,7 @@ func doRequestWithBody(ctx context.Context, method, path, body string) (string, 
 	client := &http.Client{}
 	req, _ := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
 
-	cliToken, err := aquireTokenFromAzCLI()
+	cliToken, err := aquireAccessToken(ctx)
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
