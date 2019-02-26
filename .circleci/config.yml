@@ -1,0 +1,14 @@
+# Golang CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-go/ for more details
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.11.5-stretch
+    environment:
+      BUILD_NUMBER: ${CIRCLE_BUILD_NUM}
+    working_directory: /go/src/github.com/lawrencegripper/azbrowse
+    steps:
+      - checkout 
+      - run: bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
