@@ -1,6 +1,9 @@
 .PHONY: dep checks test build
 all: dep checks test build
 
+setup:
+	./scripts/install_dev_tools.sh
+
 dep:
 	dep ensure -v --vendor-only
 
@@ -13,14 +16,14 @@ integration:
 build: test dep checks
 	go build ./cmd/azbrowse
 
-install: 
+install:
 	go install ./cmd/azbrowse
 
 checks:
 	gometalinter --vendor --disable-all --enable=vet --enable=gofmt --enable=golint --enable=deadcode --enable=varcheck --enable=structcheck --enable=misspell --deadline=15m ./...
 
 ci-docker:
-	docker run -it -e BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.12 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
+	docker run -it -e BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.11 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
 
 swagger-codegen:
 	go run cmd/swagger-codegen/main.go --output-file ./internal/pkg/handlers/swagger.generated.go 
