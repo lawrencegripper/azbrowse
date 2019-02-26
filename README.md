@@ -62,6 +62,8 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ### Environment Setup
 
+> Note: Golang 1.12 is recommended. 
+
 First, clone this repository. `azbrowse` is written in [Go][golang] and so you will want to set up your Go development environment first. If this is your first time, the [offical install guide][installguide] is probably a good place to start. Make sure you have `GOPATH/bin` in your `PATH`, using the instructions [here][gopath] as guidance on doing that.
 
 In addition to installing [Go][golang], there are a couple of tool dependencies you'll need. These are:

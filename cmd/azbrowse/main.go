@@ -155,6 +155,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
+	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
 
 	// Item handlers
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))

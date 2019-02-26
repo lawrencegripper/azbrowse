@@ -10,7 +10,6 @@ type EndpointInfo struct {
 	TemplateURL string
 	APIVersion  string
 	URLSegments []EndpointSegment
-	Verb        string
 }
 
 // EndpointSegment reprsesents a segment of a template URL
@@ -75,8 +74,8 @@ func (ei *EndpointInfo) Match(url string) MatchResult {
 		matches := make(map[string]string)
 		for i, segment := range ei.URLSegments {
 			if segment.Name == "" {
-				// literal match
-				if segment.Match != urlSegments[i] {
+				// literal match (ignore case)
+				if !strings.EqualFold(segment.Match, urlSegments[i]) {
 					isMatch = false
 					break
 				}

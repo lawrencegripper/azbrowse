@@ -2,8 +2,12 @@ package keybindings
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"github.com/atotto/clipboard"
+	"io/ioutil"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/jroimartin/gocui"
@@ -328,6 +332,135 @@ func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 		return nil
 	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ListUpdateHandler struct {
+	ListHandler
+	List    *views.ListWidget
+	status  *views.StatusbarWidget
+	Context context.Context
+	Content *views.ItemWidget
+}
+
+func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidget, ctx context.Context, content *views.ItemWidget) *ListUpdateHandler {
+	handler := &ListUpdateHandler{
+		List:    list,
+		status:  statusbar,
+		Context: ctx,
+		Content: content,
+	}
+	handler.Index = 17
+	return handler
+}
+
+func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		item := h.List.CurrentExpandedItem()
+		if item == nil ||
+			item.SwaggerResourceType == nil ||
+			item.SwaggerResourceType.PutEndpoint == nil {
+			return nil
+		}
+
+		tmpFile, err := ioutil.TempFile(os.TempDir(), "azbrowse-*.json")
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
+			return err
+		}
+
+		// Remember to clean up the file afterwards
+		defer os.Remove(tmpFile.Name())
+
+		originalJSON := h.Content.GetContent()
+		clipboard.WriteAll(originalJSON)
+
+		tmpFile.WriteString(originalJSON)
+		tmpFile.Close()
+
+		h.status.Status("Opening JSON in editor...", false)
+		err = openEditor(tmpFile.Name())
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
+			return nil
+		}
+
+		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Cannot open edited file: %s", err), false)
+			return nil
+		}
+
+		updatedJSON := string(updatedJSONBytes)
+		if updatedJSON == originalJSON {
+			h.status.Status("No changes to JSON - no further action.", false)
+			return nil
+		}
+		if updatedJSON == "" {
+			h.status.Status("Updated JSON empty - no further action.", false)
+			return nil
+		}
+
+		matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+		if !matchResult.IsMatch {
+			h.status.Status(fmt.Sprintf("item.ExpandURL didn't match current Endpoint"), false)
+			return err
+		}
+		putURL, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err), false)
+			return nil
+		}
+
+		done := h.status.Status(fmt.Sprintf("Making PUT request: %s", putURL), true)
+		data, err := armclient.DoRequestWithBody(h.Context, "PUT", putURL, string(updatedJSON))
+		done()
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Error making PUT request: %s", err), false)
+			return nil
+		}
+
+		errorMessage, err := getAPIErrorMessage(data)
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Error checking for API Error message: %s: %s", data, err), false)
+			return nil
+		}
+		if errorMessage != "" {
+			h.status.Status(fmt.Sprintf("Error: %s", errorMessage), false)
+			return nil
+		}
+		h.status.Status("Done", false)
+		return nil
+	}
+}
+
+func openEditor(filename string) error {
+	cmd := exec.Command("code", "--wait", filename) // TODO - make this configurable!
+	return cmd.Run()
+}
+func getAPIErrorMessage(responseString string) (string, error) {
+	var response map[string]interface{}
+
+	err := json.Unmarshal([]byte(responseString), &response)
+	if err != nil {
+		err = fmt.Errorf("Error parsing API response: %s: %s", responseString, err)
+		return "", err
+	}
+	if response["error"] != nil {
+		serializedError, err := json.Marshal(response["error"])
+		if err != nil {
+			err = fmt.Errorf("Error serializing error message: %s: %s", responseString, err)
+			return "", err
+		}
+		message := string(serializedError)
+		message = strings.Replace(message, "\r", "", -1)
+		message = strings.Replace(message, "\n", "", -1)
+		return message, nil
+		// could dig into the JSON to pull out the error message property
+	}
+	return "", nil
 }
 
 ////////////////////////////////////////////////////////////////////

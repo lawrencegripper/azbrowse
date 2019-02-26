@@ -3,3 +3,4 @@ azbrowse.db
 /azbrowse
 bindings.json
 /cmd/azbrowse/azbrowse
+/swagger-codegen

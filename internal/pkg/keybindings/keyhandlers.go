@@ -21,6 +21,7 @@ var HandlerIds = []string{
 	"listexpand",     // 14
 	"listopen",       // 15
 	"listrefresh",    // 16
+	"listupdate",     // 17
 }
 
 // The KeyHandler interface that all key handlers must implement

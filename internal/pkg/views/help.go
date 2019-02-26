@@ -59,6 +59,7 @@ func DrawHelp(keyBindings map[string]string, v *gocui.View) {
 | Delete resource          | %s
 | Save JSON to clipboard   | %s
 | View actions for resource| %s
+| Edit Resource            | %s
  
 For bugs, issue or to contribute visit: https://github.com/lawrencegripper/azbrowse
  
@@ -82,9 +83,10 @@ Creating\Preparing:  🏗   Scaling:  ⚖   Suspended/Suspending:  ⛔   Succeed
 		keyBindings["listedit"],
 		keyBindings["fullscreen"],
 		keyBindings["listopen"],
-		keyBindings["delete"],
+		keyBindings["listdelete"],
 		keyBindings["copy"],
 		keyBindings["listactions"],
+		keyBindings["listupdate"],
 		keyBindings["help"],
 		keyBindings["help"])
 
