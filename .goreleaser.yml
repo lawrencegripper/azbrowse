@@ -1,15 +1,9 @@
-# This is an example goreleaser.yaml file with some sane defaults.
-# Make sure to check the documentation at http://goreleaser.com
-before:
-  hooks:
-    # Make sure we're ready to cut a release
-    - bash -f ./scripts/pre-release.sh
 builds:
 - env:
   - CGO_ENABLED=0
   main: ./cmd/azbrowse/
   ldflags:
-   - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}} -X main.goversion={{.Env.GOVERSION}}
+   - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}} -X "main.goversion={{.Env.GOVERSION}}"
 archive:
   replacements:
     darwin: Darwin
@@ -21,6 +15,28 @@ checksum:
   name_template: 'checksums.txt'
 snapshot:
   name_template: "{{ .Tag }}-next"
+nfpm:
+  name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  homepage:  https://github.com/lawrencegripper/azbrowse
+  description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+  maintainer: Lawrence Gripper <info@grippers.co.uk>
+  license: MIT
+  vendor: LawrenceGripper
+  formats:
+  - deb
+  - rpm
+  dependencies:
+  - git
+  recommends:
+  - rpm
+snapcraft:
+  name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  summary: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+  description: |
+    Browse and interact with Azure from this quick, simple and powerfull interactive CLI app.
+  grade: stable
+  confinement: classic
+  publish: false
 changelog:
   sort: asc
   filters:

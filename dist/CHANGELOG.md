@@ -8,7 +8,7 @@ a833344 Added support for dynamic views
 6b65bf1 Apply open fix
 a7327c2 Check binding file exists first
 1561786 Dynamically pad the help view
-d01d730 Early attempt to move to go-releaser
+cd3bf63 Early attempt to move to go-releaser
 99afe10 Extracted out handlers into independent modules
 108fcb1 Fix bug in listrighthandler
 558def8 Fixed delete handler
