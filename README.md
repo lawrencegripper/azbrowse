@@ -57,6 +57,8 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ## Developing 
 
+> Note: Golang 1.12 is recommended. 
+
 Clone the repository then use `make` to run checks and build (or `make ci-docker` to build the tool and run it locally using docker). You an also use `make install-azbrowse` to install your local development version.
 
 ## Plans
