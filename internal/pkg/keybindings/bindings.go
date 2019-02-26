@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/user"
 	"strings"
 
 	"github.com/jroimartin/gocui"
@@ -16,7 +17,8 @@ var handlers []KeyHandler
 var overrides KeyMap
 
 func Bind(g *gocui.Gui) error {
-	defaultFilePath := "bindings.json"
+	user, _ := user.Current()
+	defaultFilePath := user.HomeDir + "/.azbrowse-bindings.json"
 	return BindWithFileOverrides(g, defaultFilePath)
 }
 

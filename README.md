@@ -112,7 +112,7 @@ TRAVIS_BUILD_NUMBER=0.1 make ci-docker
 
 ## Custom Key Bindings
 
-If you wish to override the default key bindings, create a `bindings.json` file in the same directory as your `azbrowse` binary.
+If you wish to override the default key bindings, create a `~/.azbrowse-bindings.json` file (where `~` is your users home directory).
 
 The file should be formated like so:
 ```json
