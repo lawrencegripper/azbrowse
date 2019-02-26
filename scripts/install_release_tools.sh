@@ -1,4 +1,5 @@
 #/bin/bash
 set -e
 echo "->Installing release tools"
-apt-get install rpm
+apt-get update
+apt-get install -y rpm

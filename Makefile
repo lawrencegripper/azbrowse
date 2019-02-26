@@ -20,7 +20,8 @@ install:
 	go install ./cmd/azbrowse
 
 checks:
-	#golangci-lint run
+	# Moving to a more strict linting set from commit: 0b4b09bfbf67e533d3b831d29e14c8250e2b53ca
+	golangci-lint run --new-from-rev=0b4b09bfbf67e533d3b831d29e14c8250e2b53ca
 
 ci-docker:
 	docker run -it -e BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.11 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
