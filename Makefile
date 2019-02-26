@@ -24,5 +24,8 @@ ci-docker:
 
 swagger-codegen:
 	go run cmd/swagger-codegen/main.go --output-file ./internal/pkg/handlers/swagger.generated.go 
+	# Format the generated code
 	gofmt -s -w internal/pkg/handlers/swagger.generated.go
+	# Build the generated go files to check for any go build issues
+	go build internal/pkg/handlers/swagger.generated.go internal/pkg/handlers/swagger.go internal/pkg/handlers/types.go 
 	
