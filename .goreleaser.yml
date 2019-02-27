@@ -40,7 +40,7 @@ dockers:
     - "lawrencegripper/azbrowse:latest"
     - "lawrencegripper/azbrowse:{{ .Tag }}"
     - "lawrencegripper/azbrowse:v{{ .Major }}"
-    skip_push: true
+    skip_push: false
     dockerfile: Dockerfile
     # Template of the docker build flags.
     build_flag_templates:
