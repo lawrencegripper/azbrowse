@@ -9,7 +9,7 @@ import (
 func TestGeneratedCodeInitialises(t *testing.T) {
 
 	expander := SwaggerResourceExpander{}
-	// Ensure that the generated types can be initalized
+	// Ensure that the generated types can be initialized
 	resources := expander.getResourceTypes()
 
 	t.Log(fmt.Printf("Generated swagger resources found: %v", len(resources)))

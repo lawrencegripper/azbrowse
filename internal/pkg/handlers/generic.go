@@ -33,6 +33,13 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	method := "GET"
 
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			Response:          string(data),
+			SourceDescription: "Resource Group Request",
+		}
+	}
 
 	var resource armclient.Resource
 	err = json.Unmarshal([]byte(data), &resource)

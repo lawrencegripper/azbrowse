@@ -66,9 +66,7 @@ func fetchAndStoreGroups(ctx context.Context, url string) error {
 			Name: r.Name,
 		})
 	}
-	storage.PutResourceBatch(url, rgToStore)
-
-	return nil
+	return storage.PutResourceBatch(url, rgToStore)
 }
 
 // fetchAndStoreURL takes a link to a page of '/resources'
@@ -93,7 +91,10 @@ func fetchAndStoreResourceURL(ctx context.Context, url string) error {
 	if len(resourcesToStore) == 0 {
 		return nil
 	}
-	storage.PutResourceBatch(url, resourcesToStore)
+	err = storage.PutResourceBatch(url, resourcesToStore)
+	if err != nil {
+		return err
+	}
 
 	if resourceResponse.NextLink != "" {
 		// Next links are fully formed, including 'https://management.azure.com/'

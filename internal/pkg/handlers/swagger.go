@@ -44,7 +44,7 @@ func mustGetEndpointInfoFromURL(url string, apiVersion string) *endpoints.Endpoi
 }
 
 func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []ResourceType) *ResourceType {
-	span, ctx := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
+	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
 	defer span.Finish()
 	return getResourceTypeForURLInner(url, resourceTypes)
 }

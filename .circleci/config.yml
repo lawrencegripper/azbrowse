@@ -1,0 +1,15 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: golang:1.11.5
+    working_directory: /go/src/github.com/lawrencegripper/azbrowse
+    steps:
+      - checkout 
+      - setup_remote_docker
+      - run:
+          name: Should publish?
+          command: bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/circleci/should_publish.sh
+      - run: 
+          name: Build and Publish
+          command: export BUILD_NUMBER=${CIRCLE_BUILD_NUM} && bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/ci.sh
