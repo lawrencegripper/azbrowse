@@ -33,10 +33,13 @@ echo "->Installing tests"
 make test
 
 echo "->Run go releaser"
-if [ -z ${GITHUB_TOKEN} ]; then
-  echo "Running with --skip-publish as GITHUB_TOKEN not set"
+if [ -z ${PUBLISH} ]; then
+  echo "Running with --skip-publish as PUBLISH not set"
   curl -sL https://git.io/goreleaser | bash -s -- --skip-publish --rm-dist
 else 
   echo "Publishing"
   curl -sL https://git.io/goreleaser | bash
 fi
+
+
+if [ -z $CIRCLE_PR_NUMBER && $CIRCLE_BRANCH == "master"]; then; export PUBLISH=true; fi
