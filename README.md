@@ -18,15 +18,11 @@ Currently I'm using it every day **but it is experimental so use with caution on
 
 ### Install
 
-Grab the binaries from the release page or for MacOS and Linux run this script
+#### DIY
 
-```
-curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scripts/install_azbrowse.sh | sudo sh
-```
+Grab the zipped binaries, deb or rpm's from the release page and install.
 
-You may need to reload your terminal to pick up `azbrowse` after the script completes.
-
-### Run via Docker 
+#### Run via Docker 
 
 Ensure you have the `az` command setup on your machine and are logged in. You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
@@ -76,7 +72,7 @@ First, clone this repository. `azbrowse` is written in [Go][golang] and so you w
 
 In addition to installing [Go][golang], there are a couple of tool dependencies you'll need. These are:
 
-- [Go Meta Linter][gometalinter]
+- [Golang CI linter][golangcilinter]
 - [Dep; Go dependency management tool][golang]
 
 You can install these yourself following the instructions on their github pages, or you can run...
@@ -233,6 +229,6 @@ In the file you can override the keys for actions using keys from the lists belo
 
 [golang]: https://golang.org/
 [installguide]: https://golang.org/doc/install
-[gometalinter]: https://github.com/alecthomas/gometalinter
+[golangcilinter]: https://github.com/golangci/golangci-lint
 [golangdep]: https://github.com/golang/dep
 [gopath]: https://golang.org/doc/code.html#GOPATH

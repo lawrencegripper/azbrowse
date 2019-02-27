@@ -40,6 +40,3 @@ else
   echo "Publishing"
   curl -sL https://git.io/goreleaser | bash
 fi
-
-
-if [ -z $CIRCLE_PR_NUMBER && $CIRCLE_BRANCH == "master"]; then; export PUBLISH=true; fi
