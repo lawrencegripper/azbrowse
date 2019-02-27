@@ -1,5 +1,6 @@
 FROM ubuntu:18.04
-RUN apt-get update && apt-get install apt-transport-https lsb-release software-properties-common dirmngr -y && \
+# Install Azure CLI and root CAs 
+RUN apt-get update && apt-get install apt-transport-https lsb-release software-properties-common dirmngr ca-certificates -y && \
     AZ_REPO=$(lsb_release -cs) && \
     echo "deb [arch=amd64] https://packages.microsoft.com/repos/azure-cli/ $AZ_REPO main" | \
     tee /etc/apt/sources.list.d/azure-cli.list && \
