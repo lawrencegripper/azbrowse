@@ -22,7 +22,6 @@
 
 [linters]
   enable = ["vet", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet"]
-  # disable = ["ineffassign"]
 
 [issues]
   exclude-use-default = false
@@ -31,9 +30,6 @@
   exclude = []
   
   #Ignore gocui funcs
-  [[issues.exclude-rules]]
-    path = "cmd/swagger-codegen/main.go"
-    linters = ["errcheck"]
   [[issues.exclude-rules]]
     text = "Error return value of `g.DeleteView` is not checked"
     linters = ["errcheck"]
