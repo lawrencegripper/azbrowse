@@ -17,7 +17,7 @@ var DefaultExpanderInstance DefaultExpander
 
 // Name returns the name of the expander
 func (e *DefaultExpander) Name() string {
-	return "DefaultExpander"
+	return "GenericExpander"
 }
 
 // DoesExpand checks if this handler can expand this item
