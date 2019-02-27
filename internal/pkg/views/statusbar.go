@@ -46,7 +46,7 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				// See if we have any new events
 				event := eventObj.(eventing.StatusEvent)
 				widget.messages[event.ID()] = event
-				// Favour the most recent message
+				// Favor the most recent message
 				widget.currentMessage = &event
 			case <-timeout:
 				// Update the UI
@@ -61,7 +61,7 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				}
 			}
 
-			// Set the current message to a non-expired message favour in-progress messages
+			// Set the current message to a non-expired message favor in-progress messages
 			if !widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
 				foundInProgress := false
 				for _, message := range widget.messages {
