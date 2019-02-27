@@ -38,6 +38,10 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	w.view = v
 	v.Clear()
 
+	if w.content == "" {
+		return nil
+	}
+
 	if w.hideGuids {
 		w.content = stripSecretVals(w.content)
 	}

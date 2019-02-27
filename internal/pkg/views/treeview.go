@@ -163,16 +163,14 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		Message:    "Opening: " + currentItem.ID,
 	})
 
-	if currentItem.ExpandReturnType != "none" && currentItem.ExpandReturnType != handlers.ActionType {
-		// Capture current view to navstack
-		w.navStack.Push(&Page{
-			Data:             w.contentView.GetContent(),
-			Value:            w.items,
-			Title:            w.title,
-			Selection:        w.selected,
-			ExpandedNodeItem: w.CurrentItem(),
-		})
-	}
+	// Capture current view to navstack
+	w.navStack.Push(&Page{
+		Data:             w.contentView.GetContent(),
+		Value:            w.items,
+		Title:            w.title,
+		Selection:        w.selected,
+		ExpandedNodeItem: w.CurrentItem(),
+	})
 
 	newItems := []*handlers.TreeNode{}
 
@@ -252,8 +250,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-	w.items = newItems
-	w.selected = 0
+	if len(newItems) > 0 {
+		w.items = newItems
+		w.selected = 0
+	}
 	w.expandedNodeItem = currentItem
 
 	// Use the default handler to get the resource JSON for display
@@ -261,7 +261,11 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
 		result := handlers.DefaultExpanderInstance.Expand(ctx, currentItem)
 		if result.Err != nil {
-			panic(result.Err)
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				InProgress: true,
+				Message:    "Failed to expand resource: " + result.Err.Error(),
+				Timeout:    time.Duration(time.Second * 3),
+			})
 		}
 		w.contentView.SetContent(result.Response, fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
 	}

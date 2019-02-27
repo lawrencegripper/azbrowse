@@ -21,7 +21,7 @@
     locale = "US"
 
 [linters]
-  enable = ["vet", "golint", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet"]
+  enable = ["vet", "golint", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet", "ineffassign"]
 
 [issues]
   exclude-use-default = false

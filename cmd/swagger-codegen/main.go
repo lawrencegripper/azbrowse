@@ -293,10 +293,10 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 }
 
 func writeHeader(w io.Writer) {
-	w.Write([]byte("package handlers\n"))                                                      //nolint: errcheck
-	w.Write([]byte("\n"))                                                                      //nolint: errcheck
-	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []ResourceType {\n")) //nolint: errcheck
-	w.Write([]byte("\treturn []ResourceType{\n"))                                              //nolint: errcheck
+	w.Write([]byte("package handlers\n"))                                                             //nolint: errcheck
+	w.Write([]byte("\n"))                                                                             //nolint: errcheck
+	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []SwaggerResourceType {\n")) //nolint: errcheck
+	w.Write([]byte("\treturn []SwaggerResourceType{\n"))                                              //nolint: errcheck
 }
 func writeFooter(w io.Writer) {
 	w.Write([]byte("\t}\n")) //nolint: errcheck
@@ -310,7 +310,7 @@ func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // 
 			pathVerb = "get"
 		}
 		if path.Operations.Get.Permitted {
-			fmt.Fprintf(w, "\t%s\tResourceType{\n", prefix)
+			fmt.Fprintf(w, "\t%s\tSwaggerResourceType{\n", prefix)
 			getEndpoint := path.Operations.Get.Endpoint
 			if getEndpoint == nil {
 				getEndpoint = path.Endpoint
@@ -344,12 +344,12 @@ func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // 
 				fmt.Fprintf(w, "\t%s\t\tPutEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, putEndpoint.TemplateURL, putEndpoint.APIVersion)
 			}
 			if len(path.Children) > 0 {
-				fmt.Fprintf(w, "\t%s\t\tChildren: []ResourceType {\n", prefix)
+				fmt.Fprintf(w, "\t%s\t\tChildren: []SwaggerResourceType {\n", prefix)
 				writePaths(w, path.Children, config, prefix+"\t\t")
 				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
 			}
 			if len(path.SubPaths) > 0 {
-				fmt.Fprintf(w, "\t%s\t\tSubResources: []ResourceType {\n", prefix)
+				fmt.Fprintf(w, "\t%s\t\tSubResources: []SwaggerResourceType {\n", prefix)
 				writePaths(w, path.SubPaths, config, prefix+"\t\t")
 				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
 			}
