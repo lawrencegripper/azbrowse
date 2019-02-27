@@ -1,7 +1,8 @@
-package main
+package views
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/jroimartin/gocui"
@@ -14,19 +15,22 @@ type StatusbarWidget struct {
 	name            string
 	x, y            int
 	w               int
+	hideGuids       bool
 	messages        map[string]eventing.StatusEvent
 	currentMessage  *eventing.StatusEvent
 	messageAddition string
+	HelpKeyBinding  string
 }
 
 // NewStatusbarWidget create new instance and start go routine for spinner
-func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
+func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWidget {
 	widget := &StatusbarWidget{
-		name:     "statusBarWidget",
-		x:        x,
-		y:        y,
-		w:        w,
-		messages: map[string]eventing.StatusEvent{},
+		name:      "statusBarWidget",
+		x:         x,
+		y:         y,
+		w:         w,
+		hideGuids: hideGuids,
+		messages:  map[string]eventing.StatusEvent{},
 	}
 
 	widget.currentMessage = &eventing.StatusEvent{}
@@ -42,7 +46,7 @@ func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
 				// See if we have any new events
 				event := eventObj.(eventing.StatusEvent)
 				widget.messages[event.ID()] = event
-				// Favour the most recent message
+				// Favor the most recent message
 				widget.currentMessage = &event
 			case <-timeout:
 				// Update the UI
@@ -57,7 +61,7 @@ func NewStatusbarWidget(x, y, w int, g *gocui.Gui) *StatusbarWidget {
 				}
 			}
 
-			// Set the current message to a non-expired message favour in-progress messages
+			// Set the current message to a non-expired message favor in-progress messages
 			if !widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
 				foundInProgress := false
 				for _, message := range widget.messages {
@@ -99,10 +103,10 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
-	v.Title = `Status [CTRL+I -> Help]`
+	v.Title = fmt.Sprintf(`Status [%s -> Help]`, strings.ToUpper(w.HelpKeyBinding))
 	v.Wrap = true
 
-	if hideGuids {
+	if w.hideGuids {
 		w.currentMessage.Message = stripSecretVals(w.currentMessage.Message)
 	}
 

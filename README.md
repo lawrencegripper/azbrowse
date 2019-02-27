@@ -18,15 +18,21 @@ Currently I'm using it every day **but it is experimental so use with caution on
 
 ### Install
 
-Grab the binaries from the release page or for MacOS and Linux run this script
+#### DIY
+
+Grab the zipped binaries, deb or rpm's from the release page and install.
+
+#### Run via Docker 
+
+Ensure you have the `az` command setup on your machine and are logged in. You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
 ```
-curl -sSL https://raw.githubusercontent.com/lawrencegripper/azbrowse/master/scripts/install_azbrowse.sh | sudo sh
+docker run -it -v $HOME:/root lawrencegripper/azbrowse
 ```
-
-You may need to reload your terminal to pick up `azbrowse` after the script completes.
 
 ### Usage
+
+Below is a table containing the default key bindings. If you'd like to customise the key bindings to be more suitable for your setup, please refer to the section on [custom key bindings](#custom-key-bindings).
 
 ## Navigation
 
@@ -49,6 +55,7 @@ You may need to reload your terminal to pick up `azbrowse` after the script comp
 
 
 
+
 ## Debugging
 
 Running `azbrowse --debug` will start an in-memory collector for the `opentracing` and a GUI to browse this at http://localhost:8700. You can use this to look at tracing information output by `azbrowse` as it runs.
@@ -65,7 +72,7 @@ First, clone this repository. `azbrowse` is written in [Go][golang] and so you w
 
 In addition to installing [Go][golang], there are a couple of tool dependencies you'll need. These are:
 
-- [Go Meta Linter][gometalinter]
+- [Golang CI linter][golangcilinter]
 - [Dep; Go dependency management tool][golang]
 
 You can install these yourself following the instructions on their github pages, or you can run...
@@ -107,12 +114,121 @@ To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` en
 TRAVIS_BUILD_NUMBER=0.1 make ci-docker
 ```
 
+## Custom Key Bindings
+
+If you wish to override the default key bindings, create a `~/.azbrowse-bindings.json` file (where `~` is your users home directory).
+
+The file should be formated like so:
+```json
+{
+    ...
+    "Copy": "F8",
+    "Help": "Ctrl+H",
+    ...
+}
+```
+
+In the file you can override the keys for actions using keys from the lists below.
+
+### Actions
+
+| Actions:       | Does                                  |
+| ------------------------ | --------------------------------------|
+| Quit                     | Terminates the program                |
+| Copy                     | Copies the resource JSON to clipboard |
+| ListDelete               | Deletes a resources                   |
+| Fullscreen               | Toggles fullscreen                    |
+| Help                     | Toggles help view                     |
+| ItemBack                 | Go back from an item to a list        |
+| ItemLeft                 | Switch from the item json to the menu |
+| ListActions              | List available actions on a resource  |
+| ListBack                 | Go back on a list                     |
+| ListBackLegacy           | Go back on a list (legacy terminals)  |
+| ListDown                 | Navigate down a list                  |
+| ListUp                   | Navigate up a list                    |
+| ListRight                | Switch from the list to an item view  |
+| ListEdit                 | Toggle edit mode on a resource        |
+| ListExpand               | Expand a selected resource            |
+| ListOpen                 | Open a resource in the Azure portal   |
+| ListRefresh              | Refresh a list                        |
+
+### Keys
+
+- Up
+- Down
+- Left
+- Right
+- Backspace
+- Backspace2
+- Delete
+- Home
+- End
+- PageUp
+- PageDown
+- Insert
+- Tab
+- Space
+- Esc
+- Enter
+- Ctrl+2
+- Ctrl+3
+- Ctrl+4
+- Ctrl+5
+- Ctrl+6
+- Ctrl+7
+- Ctrl+8
+- Ctrl+[
+- Ctrl+]
+- Ctrl+Space
+- Ctrl+_
+- Ctrl+~
+- Ctrl+A
+- Ctrl+B
+- Ctrl+C
+- Ctrl+D
+- Ctrl+E
+- Ctrl+F
+- Ctrl+G
+- Ctrl+H
+- Ctrl+I
+- Ctrl+J
+- Ctrl+K
+- Ctrl+L
+- Ctrl+M
+- Ctrl+N
+- Ctrl+O
+- Ctrl+P
+- Ctrl+Q
+- Ctrl+R
+- Ctrl+S
+- Ctrl+T
+- Ctrl+U
+- Ctrl+V
+- Ctrl+W
+- Ctrl+X
+- Ctrl+Y
+- Ctrl+Z
+- F1
+- F2
+- F3
+- F4
+- F5
+- F6
+- F7
+- F8
+- F9
+- F10
+- F11
+- F12
+
+> For compatibility reasons you may notice some keys will have multiple mappings.
+
 ## Plans
 
 [Issues on the repository track plans](https://github.com/lawrencegripper/azbrowse/issues), I'd love help so feel free to comment on an issue you'd like to work on and we'll go from there.
 
 [golang]: https://golang.org/
 [installguide]: https://golang.org/doc/install
-[gometalinter]: https://github.com/alecthomas/gometalinter
+[golangcilinter]: https://github.com/golangci/golangci-lint
 [golangdep]: https://github.com/golang/dep
 [gopath]: https://golang.org/doc/code.html#GOPATH

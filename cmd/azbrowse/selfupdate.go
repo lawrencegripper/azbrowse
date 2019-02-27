@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/blang/semver"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/version"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
@@ -18,7 +17,7 @@ func confirmAndSelfUpdate() {
 		return
 	}
 
-	v, err := semver.Parse(version.BuildDataVersion)
+	v, err := semver.Parse(version)
 	if err != nil {
 		log.Panicln(err.Error())
 	}

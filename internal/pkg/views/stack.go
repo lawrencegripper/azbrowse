@@ -1,4 +1,4 @@
-package main
+package views
 
 import "github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 
