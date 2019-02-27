@@ -2,6 +2,8 @@
 set -e
 cd `dirname $0`
 
+bash -f ./install_release_tools.sh
+
 if [ -z ${CIRCLECI} ]; then
   echo "Not running in circle, skipping cirlce setup"
 else 
@@ -14,5 +16,5 @@ else
     echo "Skipping publish as is from PR: $CIRCLE_PR_NUMBER or not master BRANCH: $CIRCLE_BRANCH"
   fi
 fi
-bash -f ./install_release_tools.sh
+
 bash -f ./release.sh
