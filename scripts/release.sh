@@ -7,7 +7,7 @@ if [ -z "$BUILD_NUMBER" ]; then
     exit 1
 fi 
 
-git tag -f v1.0.$BUILD_NUMBER
+git tag -f v1.1.$BUILD_NUMBER
 export GOVERSION=$(go version)
 
 echo "->Installing dev tools"
@@ -33,4 +33,10 @@ echo "->Installing tests"
 make test
 
 echo "->Run go releaser"
-curl -sL https://git.io/goreleaser | bash -s -- --skip-publish --rm-dist
+if [ -z ${GITHUB_TOKEN} ]; then
+  echo "Running with --skip-publish as GITHUB_TOKEN not set"
+  curl -sL https://git.io/goreleaser | bash -s -- --skip-publish --rm-dist
+else 
+  echo "Publishing"
+  curl -sL https://git.io/goreleaser | bash
+fi

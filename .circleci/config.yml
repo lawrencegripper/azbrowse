@@ -7,5 +7,4 @@ jobs:
     steps:
       - checkout 
       - setup_remote_docker
-      - run: bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-18.06.3-ce.tgz && tar --strip-components=1 -xvzf docker-18.06.3-ce.tgz -C /usr/local/bin"
-      - run: export BUILD_NUMBER=${CIRCLE_BUILD_NUM} && bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/install_release_tools.sh && bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/release.sh
+      - run: export BUILD_NUMBER=${CIRCLE_BUILD_NUM} && bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/ci.sh

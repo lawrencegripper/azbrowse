@@ -7,10 +7,9 @@ addons:
 services:
 - docker
 script:
-- make ci-docker
+- export BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} && bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/ci.sh
 
 before_deploy:
-- git tag "v1.0.$TRAVIS_BUILD_NUMBER"
 - export BODY=$(git log -1  --pretty='%s')
 
 deploy:
