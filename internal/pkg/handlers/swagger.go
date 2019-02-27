@@ -15,19 +15,19 @@ import (
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
 	initialized   bool
-	ResourceTypes []ResourceType
+	ResourceTypes []SwaggerResourceType
 }
 
-// ResourceType holds information about resources that can be displayed
-type ResourceType struct {
+// SwaggerResourceType holds information about resources that can be displayed
+type SwaggerResourceType struct {
 	Display        string
 	Endpoint       *endpoints.EndpointInfo
 	Verb           string
 	DeleteEndpoint *endpoints.EndpointInfo
 	PatchEndpoint  *endpoints.EndpointInfo
 	PutEndpoint    *endpoints.EndpointInfo
-	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
-	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
+	Children       []SwaggerResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
+	SubResources   []SwaggerResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
 }
 
 // Name returns the name of the expander
@@ -43,12 +43,12 @@ func mustGetEndpointInfoFromURL(url string, apiVersion string) *endpoints.Endpoi
 	return &endpoint
 }
 
-func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []ResourceType) *ResourceType {
+func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []SwaggerResourceType) *SwaggerResourceType {
 	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
 	defer span.Finish()
 	return getResourceTypeForURLInner(url, resourceTypes)
 }
-func getResourceTypeForURLInner(url string, resourceTypes []ResourceType) *ResourceType {
+func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType) *SwaggerResourceType {
 	for _, resourceType := range resourceTypes {
 		matchResult := resourceType.Endpoint.Match(url)
 		if matchResult.IsMatch {
@@ -73,7 +73,7 @@ func (e *SwaggerResourceExpander) ensureInitialized() {
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	e.ensureInitialized()
-	if currentItem.ItemType == resourceType {
+	if currentItem.ItemType == ResourceType {
 		if currentItem.SwaggerResourceType != nil {
 			return true, nil
 		}
@@ -140,7 +140,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				Name:                name,
 				Display:             name,
 				ExpandURL:           resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
-				ItemType:            "resource",
+				ItemType:            SubResourceType,
 				DeleteURL:           deleteURL,
 				SwaggerResourceType: subResourceType,
 			})
@@ -168,7 +168,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			Name:                display,
 			Display:             display,
 			ExpandURL:           url,
-			ItemType:            "resource",
+			ItemType:            SubResourceType,
 			DeleteURL:           deleteURL,
 			SwaggerResourceType: &loopChild,
 		})

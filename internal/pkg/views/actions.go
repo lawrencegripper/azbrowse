@@ -16,11 +16,28 @@ import (
 func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	list.statusView.Status("Getting available Actions", true)
 
+	var namespace string
+	var armType string
 	currentItem := list.CurrentItem()
+	if currentItem.ItemType == handlers.ResourceType {
+		namespace = currentItem.Namespace
+		armType = currentItem.ArmType
+	}
+
+	currentExpandedItem := list.CurrentExpandedItem()
+	if currentExpandedItem.ItemType == handlers.ResourceType {
+		namespace = currentExpandedItem.Namespace
+		armType = currentExpandedItem.ArmType
+	}
+
+	if namespace == "" || armType == "" {
+		return nil
+	}
+
 	span, ctx := tracing.StartSpanFromContext(ctx, "actions:"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	data, err := armclient.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+list.CurrentItem().Namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
+	data, err := armclient.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
 	if err != nil {
 		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}
@@ -32,7 +49,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 
 	items := []*handlers.TreeNode{}
 	for _, resOps := range opsRequest.ResourceTypes {
-		if resOps.Name == strings.Split(list.CurrentItem().ArmType, "/")[1] {
+		if resOps.Name == strings.Split(armType, "/")[1] {
 			for _, op := range resOps.Operations {
 				resourceAPIVersion, err := armclient.GetAPIVersion(currentItem.ArmType)
 				if err != nil {

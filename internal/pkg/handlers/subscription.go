@@ -46,7 +46,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 				ID:               rg.ID,
 				Parentid:         currentItem.ID,
 				ExpandURL:        rg.ID + "/resources?api-version=2017-05-10",
-				ExpandReturnType: resourceType,
+				ExpandReturnType: ResourceType,
 				ItemType:         resourceGroupType,
 				DeleteURL:        rg.ID + "?api-version=2017-05-10",
 				SubscriptionID:   currentItem.SubscriptionID,

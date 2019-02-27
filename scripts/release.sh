@@ -17,20 +17,14 @@ echo "->Move to root directory"
 cd ../
 
 
-echo "->Checking swagger-generated code is up-to-date"
-make swagger-codegen
+echo "->Use make build to codegen, lint and check"
+make build
 if [[ $(git diff --stat) != '' ]]; then
   echo "Ditry GIT: Failing as swagger-generated caused changes, please run `make swagger-generate` and commit changes for build to pass"
   exit 1
 else
   echo '`swagger-gen` ran and no changes detected in code: Success'
 fi
-
-
-echo "->Running dep"
-make dep
-echo "->Installing tests"
-make test
 
 echo "->Run go releaser"
 if [ -z ${PUBLISH} ]; then

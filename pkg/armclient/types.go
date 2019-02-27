@@ -1,5 +1,9 @@
 package armclient
 
+import (
+	"time"
+)
+
 // SubResponse Subscriptions REST type
 type SubResponse struct {
 	Subs []struct {
@@ -178,5 +182,84 @@ type DeploymentsResponse struct {
 			} `json:"templateLink"`
 			Timestamp string `json:"timestamp"`
 		} `json:"properties"`
+	} `json:"value"`
+}
+
+// ActivityLogResource is returned when requesting activity logs for an RG
+type ActivityLogResource struct {
+	Value []struct {
+		Authorization struct {
+			Action string `json:"action"`
+			Scope  string `json:"scope"`
+		} `json:"authorization"`
+		Caller   string `json:"caller"`
+		Channels string `json:"channels"`
+		Claims   struct {
+			Aud                                                       string `json:"aud"`
+			Iss                                                       string `json:"iss"`
+			Iat                                                       string `json:"iat"`
+			Nbf                                                       string `json:"nbf"`
+			Exp                                                       string `json:"exp"`
+			Aio                                                       string `json:"aio"`
+			Appid                                                     string `json:"appid"`
+			Appidacr                                                  string `json:"appidacr"`
+			HTTPSchemasMicrosoftComIdentityClaimsIdentityprovider     string `json:"http://schemas.microsoft.com/identity/claims/identityprovider"`
+			HTTPSchemasMicrosoftComIdentityClaimsObjectidentifier     string `json:"http://schemas.microsoft.com/identity/claims/objectidentifier"`
+			HTTPSchemasXmlsoapOrgWs200505IdentityClaimsNameidentifier string `json:"http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"`
+			HTTPSchemasMicrosoftComIdentityClaimsTenantid             string `json:"http://schemas.microsoft.com/identity/claims/tenantid"`
+			Uti                                                       string `json:"uti"`
+			Ver                                                       string `json:"ver"`
+		} `json:"claims"`
+		CorrelationID string `json:"correlationId"`
+		Description   string `json:"description"`
+		EventDataID   string `json:"eventDataId"`
+		EventName     struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"eventName"`
+		Category struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"category"`
+		ID                   string `json:"id"`
+		Level                string `json:"level"`
+		ResourceGroupName    string `json:"resourceGroupName"`
+		ResourceProviderName struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"resourceProviderName"`
+		ResourceID   string `json:"resourceId"`
+		ResourceType struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"resourceType"`
+		OperationID   string `json:"operationId"`
+		OperationName struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"operationName"`
+		Properties struct {
+			IsComplianceCheck string `json:"isComplianceCheck"`
+			ResourceLocation  string `json:"resourceLocation"`
+			Ancestors         string `json:"ancestors"`
+			Policies          string `json:"policies"`
+		} `json:"properties,omitempty"`
+		Status struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"status"`
+		SubStatus struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"subStatus"`
+		EventTimestamp      time.Time `json:"eventTimestamp"`
+		SubmissionTimestamp time.Time `json:"submissionTimestamp"`
+		SubscriptionID      string    `json:"subscriptionId"`
+		TenantID            string    `json:"tenantId"`
+		HTTPRequest         struct {
+			ClientRequestID string `json:"clientRequestId"`
+			ClientIPAddress string `json:"clientIpAddress"`
+			Method          string `json:"method"`
+		} `json:"httpRequest,omitempty"`
 	} `json:"value"`
 }
