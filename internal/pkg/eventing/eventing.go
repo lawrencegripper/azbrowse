@@ -9,7 +9,7 @@ import (
 
 // pubSub is the eventbus for the app
 // it is then wrapped in methods for use
-// to allow future changes
+// to allow future changes 
 var pubSub = pubsub.New(1)
 
 // StatusEvent is used to show status information

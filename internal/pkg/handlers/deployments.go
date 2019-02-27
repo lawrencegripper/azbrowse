@@ -37,6 +37,14 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 	method := "GET"
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			Response:          "",
+			SourceDescription: "Deployments Subdeployment",
+			IsPrimaryResponse: true,
+		}
+	}
 	newItems := []*TreeNode{}
 
 	var deployments armclient.DeploymentsResponse

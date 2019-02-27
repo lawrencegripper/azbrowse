@@ -3,6 +3,8 @@ package views
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"time"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/jroimartin/gocui"
@@ -41,7 +43,17 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	}
 
 	var obj map[string]interface{}
-	json.Unmarshal([]byte(w.content), &obj)
+	err = json.Unmarshal([]byte(w.content), &obj)
+	if err != nil {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Failed to display as JSON: " + err.Error(),
+			Timeout:    time.Duration(time.Second * 4),
+		})
+		fmt.Fprint(v, w.content)
+		return nil
+	}
 
 	f := colorjson.NewFormatter()
 	f.Indent = 2
@@ -61,8 +73,8 @@ func (w *ItemWidget) SetContent(content string, title string) {
 		w.content = content
 		// Reset the cursor and origin (scroll poisition)
 		// so we don't start at the bottom of a new doc
-		w.view.SetCursor(0, 0)
-		w.view.SetOrigin(0, 0)
+		w.view.SetCursor(0, 0) //nolint: errcheck
+		w.view.SetOrigin(0, 0) //nolint: errcheck
 		w.view.Title = title
 		return nil
 	})

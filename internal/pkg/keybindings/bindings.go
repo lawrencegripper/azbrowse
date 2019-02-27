@@ -124,7 +124,7 @@ func loadBindingsFromFile(filePath string) (map[string]string, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer jsonf.Close()
+	defer jsonf.Close() //nolint: errcheck
 	bytes, _ := ioutil.ReadAll(jsonf)
 	var rawKeyMap map[string]string
 	if err := json.Unmarshal(bytes, &rawKeyMap); err != nil {

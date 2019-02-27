@@ -14,7 +14,6 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -124,16 +123,6 @@ func main() {
 	// Padding
 	maxX = maxX - 2
 	maxY = maxY - 2
-
-	// Show help if this is the first time the app has run
-	firstRun, err := storage.GetCache("firstrun")
-	if firstRun == "" || err != nil {
-		go func() {
-			time.Sleep(time.Second * 1)
-			views.ToggleHelpView(g)
-			storage.PutCache("firstrun", version) //nolint:errcheck
-		}()
-	}
 
 	if maxX < 72 {
 		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
