@@ -22,6 +22,7 @@
 
 [linters]
   enable = ["vet", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet"]
+  disable = ["ineffassign"]
 
 [issues]
   exclude-use-default = false
@@ -31,3 +32,10 @@
   [[issues.exclude-rules]]
     path = "cmd/swagger-codegen/main.go"
     linters = ["errcheck"]
+  [[issues.exclude-rules]]
+    text = "Error return value of `g.SetCurrentView` is not checked"
+    linters = ["errcheck"]
+  [[issues.exclude-rules]]
+    text = """declaration of "err" shadows declaration at *"""
+    linters = ["govet"]
+

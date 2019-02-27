@@ -50,7 +50,10 @@ func main() {
 		if strings.Contains(arg, "search") {
 			fmt.Print("Getting resources \n")
 			subRequest, _ := getSubscriptions(context.Background())
-			search.CrawlResources(context.Background(), subRequest)
+			err := search.CrawlResources(context.Background(), subRequest)
+			if err != nil {
+				panic(err)
+			}
 			fmt.Print("Build suggester \n")
 
 			suggester, _ := search.NewSuggester()
@@ -89,7 +92,8 @@ func main() {
 				fmt.Printf("A crash occurred: %s", r)
 				debug.PrintStack()
 				fmt.Printf("To see the trace details for the session visit: %s. \n Visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
-				bufio.NewReader(os.Stdin).ReadString('\n')
+
+				bufio.NewReader(os.Stdin).ReadString('\n') //nolint:golint,errcheck
 			}
 		}()
 	} else {
@@ -127,7 +131,7 @@ func main() {
 		go func() {
 			time.Sleep(time.Second * 1)
 			views.ToggleHelpView(g)
-			storage.PutCache("firstrun", version)
+			storage.PutCache("firstrun", version) //nolint:errcheck
 		}()
 	}
 
@@ -176,7 +180,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
 	keybindings.AddHandler(keybindings.NewItemLeftHandler(&editModeEnabled))
 
-	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
+	if err = keybindings.Bind(g); err != nil { // apply late binding for keys
 		g.Close()
 
 		fmt.Println("\n \n" + err.Error())
