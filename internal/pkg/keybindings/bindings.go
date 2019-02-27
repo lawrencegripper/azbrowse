@@ -12,19 +12,21 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// KeyMap reprsents the current mappings from Handler -> Key
 type KeyMap map[string]gocui.Key
 
 var handlers []KeyHandler
 var overrides KeyMap
 var usedKeys map[string]string
 
+// Bind sets up key bindings for AzBrowse
 func Bind(g *gocui.Gui) error {
 	user, _ := user.Current()
 	defaultFilePath := user.HomeDir + "/.azbrowse-bindings.json"
-	return BindWithFileOverrides(g, defaultFilePath)
+	return bindWithFileOverrides(g, defaultFilePath)
 }
 
-func BindWithFileOverrides(g *gocui.Gui, filePath string) error {
+func bindWithFileOverrides(g *gocui.Gui, filePath string) error {
 	if _, err := os.Stat(filePath); err == nil {
 		err = initializeOverrides(filePath)
 		if err != nil {
@@ -34,25 +36,27 @@ func BindWithFileOverrides(g *gocui.Gui, filePath string) error {
 	return bindHandlersToKeys(g)
 }
 
+// AddHandler Adds a keybinding handler for use in Bind
 func AddHandler(hnd KeyHandler) {
 	handlers = append(handlers, hnd)
 }
 
-func GetKeyBindings() KeyMap {
+func getKeyBindings() KeyMap {
 	keyBindings := KeyMap{}
 	for _, handler := range handlers {
-		if override, ok := overrides[handler.Id()]; ok {
-			keyBindings[handler.Id()] = override
+		if override, ok := overrides[handler.ID()]; ok {
+			keyBindings[handler.ID()] = override
 		} else {
-			keyBindings[handler.Id()] = handler.DefaultKey()
+			keyBindings[handler.ID()] = handler.DefaultKey()
 		}
 	}
 	return keyBindings
 }
 
+// GetKeyBindingsAsStrings provides a map of Handler->Key in string format
 func GetKeyBindingsAsStrings() map[string]string {
 	keyBindings := map[string]string{}
-	keys := GetKeyBindings()
+	keys := getKeyBindings()
 	for k, v := range keys {
 		keyBindings[k] = KeyToStr[v]
 	}
@@ -72,13 +76,13 @@ func bindHandlersToKeys(g *gocui.Gui) error {
 
 func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 	var key gocui.Key
-	if k, ok := overrides[hnd.Id()]; ok {
+	if k, ok := overrides[hnd.ID()]; ok {
 		key = k
 	} else {
 		key = hnd.DefaultKey()
 	}
 
-	if err := checkKeyNotAlreadyInUse(hnd.Widget(), hnd.Id(), key); err != nil {
+	if err := checkKeyNotAlreadyInUse(hnd.Widget(), hnd.ID(), key); err != nil {
 		return err
 	}
 

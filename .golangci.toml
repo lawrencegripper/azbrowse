@@ -21,7 +21,7 @@
     locale = "US"
 
 [linters]
-  enable = ["vet", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet"]
+  enable = ["vet", "golint", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet"]
 
 [issues]
   exclude-use-default = false
@@ -47,3 +47,14 @@
   [[issues.exclude-rules]]
     text = """declaration of "ctx" shadows declaration at *"""
     linters = ["govet"]
+
+  #Ignore comments for KeyBinding Handler funcs
+  [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/listhandlers.go"
+    linters = ["golint"]
+  [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/itemhandlers.go"
+    linters = ["golint"]
+  [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/globalhandlers.go"
+    linters = ["golint"]

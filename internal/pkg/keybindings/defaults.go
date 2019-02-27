@@ -2,7 +2,7 @@ package keybindings
 
 import "github.com/jroimartin/gocui"
 
-// Theses are the default key bindings for each handler.
+// DefaultKeys are the default key bindings for each handler.
 var DefaultKeys = map[string]gocui.Key{
 	"quit":           gocui.KeyCtrlC,
 	"copy":           gocui.KeyCtrlS,
