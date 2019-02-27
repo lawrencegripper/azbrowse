@@ -25,6 +25,9 @@ checks:
 ci-docker:
 	docker run -it -e BUILD_NUMBER=999-localci -v /var/run/docker.sock:/var/run/docker.sock -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.11.5 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/ci.sh
 
+swagger-update:
+	./scripts/update-swagger.sh
+	
 swagger-codegen:
 	go run cmd/swagger-codegen/main.go --output-file ./internal/pkg/handlers/swagger.generated.go 
 	# Format the generated code

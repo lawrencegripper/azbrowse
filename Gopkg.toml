@@ -64,3 +64,11 @@
 [[constraint]]
   branch = "master"
   name = "github.com/TylerBrock/colorjson"
+
+[[constraint]]
+  name = "github.com/go-openapi/spec"
+  version = "0.18.0"
+
+[[constraint]]
+  name = "github.com/go-openapi/loads"
+  version = "0.18.0"

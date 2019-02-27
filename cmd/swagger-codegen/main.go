@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,6 +12,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/go-openapi/loads"
+	"github.com/go-openapi/spec"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
@@ -112,22 +115,34 @@ func main() {
 	config := getConfig()
 	var paths []*Path
 
-	topFileInfos, err := ioutil.ReadDir("swagger-specs")
+	serviceFileInfos, err := ioutil.ReadDir("swagger-specs/top-level")
 	if err != nil {
-		panic(fmt.Errorf)
+		panic(err)
 	}
-	for _, topFileInfo := range topFileInfos {
-		if topFileInfo.IsDir() {
-			fmt.Printf("Processing folder: %s\n", topFileInfo.Name())
-			fileInfos, err := ioutil.ReadDir("swagger-specs/" + topFileInfo.Name())
+	for _, serviceFileInfo := range serviceFileInfos {
+		if serviceFileInfo.IsDir() {
+			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
+			resourceTypeFileInfos, err := ioutil.ReadDir("swagger-specs/top-level/" + serviceFileInfo.Name())
 			if err != nil {
-				panic(fmt.Errorf)
+				panic(err)
 			}
-			for _, fileInfo := range fileInfos {
-				if !fileInfo.IsDir() && strings.HasSuffix(fileInfo.Name(), ".json") {
-					fmt.Printf("\tprocessing %s\n", fileInfo.Name())
-					doc := loadDoc("swagger-specs/" + topFileInfo.Name() + "/" + fileInfo.Name())
-					paths = mergeSwaggerDoc(paths, &config, &doc)
+			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
+				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
+					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath("swagger-specs/top-level/" + serviceFileInfo.Name() + "/" + resourceTypeFileInfo.Name()))
+					swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
+					if err != nil {
+						panic(err)
+					}
+					for _, swaggerFileInfo := range swaggerFileInfos {
+						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
+							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
+							doc2 := loadDoc2(swaggerPath + "/" + swaggerFileInfo.Name())
+							// TODO merge!
+							_ = doc2
+							// doc := loadDoc("swagger-specs/" + serviceFileInfo.Name() + "/" + resourceTypeFileInfo.Name() + "/" + swaggerFileInfo.Name())
+							// paths = mergeSwaggerDoc(paths, &config, &doc)
+						}
+					}
 				}
 			}
 		}
@@ -142,6 +157,21 @@ func main() {
 	writePaths(writer, paths, &config, "")
 	writeFooter(writer)
 	// dumpPaths(writer, paths, "")
+}
+
+func getFirstNonCommonPath(path string) string {
+	// get the first non `common` path
+
+	subfolders, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+	for _, subpath := range subfolders {
+		if subpath.IsDir() && subpath.Name() != "common" {
+			return path + "/" + subpath.Name()
+		}
+	}
+	panic(fmt.Errorf("No suitable path found"))
 }
 
 func getConfig() Config {
@@ -376,17 +406,44 @@ func findDeepestPath(paths []*Path, pathString string) *Path {
 	return nil
 }
 func loadDoc(path string) SwaggerDoc {
-	swaggerBuf, err := ioutil.ReadFile(path)
+	file, err := os.Open(path)
 	if err != nil {
 		log.Panicf("Error opening Swagger: %s", err)
 	}
 
+	reader := bufio.NewReader(file)
+
+	rune, _, err := reader.ReadRune()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if rune != '\uFEFF' {
+		reader.UnreadRune() // Not a BOM -- put the rune back
+	}
+
 	var doc SwaggerDoc
-	err = json.Unmarshal(swaggerBuf, &doc)
+	decoder := json.NewDecoder(reader)
+	err = decoder.Decode(&doc)
+
+	// err = json.Unmarshal(swaggerBuf, &doc)
 	if err != nil {
 		log.Panicf("Error unmarshaling json: %s", err)
 	}
 	return doc
+}
+func loadDoc2(path string) *loads.Document {
+
+	document, err := loads.Spec(path)
+	if err != nil {
+		log.Panicf("Error opening Swagger: %s", err)
+	}
+
+	document, err = document.Expanded(&spec.ExpandOptions{RelativeBase: path})
+	if err != nil {
+		log.Panicf("Error opening Swagger: %s", err)
+	}
+
+	return document
 }
 func getSortedPaths(doc *SwaggerDoc) []string {
 	paths := make([]string, len(doc.Paths))
