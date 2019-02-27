@@ -12,8 +12,12 @@ var db *bolt.DB
 
 func init() {
 	fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
-	user, _ := user.Current()
-	dbCreate, err := bolt.Open(user.HomeDir+"/.azbrowse.db", 0600, nil)
+	dbLocation := "/root/.azbrowse.db"
+	user, err := user.Current()
+	if err == nil {
+		dbLocation = user.HomeDir + "/.azbrowse.db"
+	}
+	dbCreate, err := bolt.Open(dbLocation, 0600, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
