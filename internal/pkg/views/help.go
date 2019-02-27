@@ -9,20 +9,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 )
 
-type keyBindings struct {
-	help string
-}
-
-// ToggleHelpView shows and hides the help view
-func ToggleHelpView(g *gocui.Gui) {
-
-	// }
-}
-
-func drawLine(content string, minWidth int) string {
-	return fmt.Sprintf("%s%s", content, strings.Repeat(" ", minWidth-len(content)))
-}
-
 // DrawHelp renders the popup help view
 func DrawHelp(keyBindings map[string]string, v *gocui.View) {
 

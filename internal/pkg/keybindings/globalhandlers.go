@@ -46,7 +46,11 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 
 func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		clipboard.WriteAll(h.Content.GetContent())
+		err := clipboard.WriteAll(h.Content.GetContent())
+		if err != nil {
+			h.StatusBar.Status("Failed to copy to clipboard", false)
+			return nil
+		}
 		h.StatusBar.Status("Current resource's JSON copied to clipboard", false)
 		return nil
 	}
@@ -85,7 +89,7 @@ func (h FullscreenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			v.Wrap = true
 			keyBindings := GetKeyBindingsAsStrings()
 			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(keyBindings["fullscreen"]))
-			fmt.Fprintf(v, h.Content.GetContent())
+			fmt.Fprint(v, h.Content.GetContent())
 			g.SetCurrentView("fullscreenContent")
 		} else {
 			g.Cursor = false

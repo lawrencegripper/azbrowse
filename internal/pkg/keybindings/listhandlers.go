@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/atotto/clipboard"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -242,7 +243,16 @@ func (h ListOpenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 		url := portalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.ID
 		span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
-		open.Run(url)
+		err := open.Run(url)
+		if err != nil {
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				InProgress: false,
+				Failure:    true,
+				Message:    "Failed opening resources in browser: " + err.Error(),
+				Timeout:    time.Duration(time.Second * 4),
+			})
+			return nil
+		}
 		span.Finish()
 		return nil
 	}
@@ -372,13 +382,30 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		// Remember to clean up the file afterwards
-		defer os.Remove(tmpFile.Name())
+		defer os.Remove(tmpFile.Name()) //nolint: errcheck
 
 		originalJSON := h.Content.GetContent()
-		clipboard.WriteAll(originalJSON)
 
-		tmpFile.WriteString(originalJSON)
-		tmpFile.Close()
+		_, err = tmpFile.WriteString(originalJSON)
+		if err != nil {
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				InProgress: false,
+				Failure:    true,
+				Message:    "Failed saving file for editing: " + err.Error(),
+				Timeout:    time.Duration(time.Second * 4),
+			})
+			return nil
+		}
+		err = tmpFile.Close()
+		if err != nil {
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				InProgress: false,
+				Failure:    true,
+				Message:    "Failed closing file: " + err.Error(),
+				Timeout:    time.Duration(time.Second * 4),
+			})
+			return nil
+		}
 
 		h.status.Status("Opening JSON in editor...", false)
 		err = openEditor(tmpFile.Name())

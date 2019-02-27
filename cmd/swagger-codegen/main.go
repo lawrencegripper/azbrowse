@@ -293,18 +293,19 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 }
 
 func writeHeader(w io.Writer) {
-	w.Write([]byte("package handlers\n"))
-	w.Write([]byte("\n"))
-	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []ResourceType {\n"))
-	w.Write([]byte("\treturn []ResourceType{\n"))
+	w.Write([]byte("package handlers\n"))                                                      //nolint: errcheck
+	w.Write([]byte("\n"))                                                                      //nolint: errcheck
+	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []ResourceType {\n")) //nolint: errcheck
+	w.Write([]byte("\treturn []ResourceType{\n"))                                              //nolint: errcheck
 }
 func writeFooter(w io.Writer) {
-	w.Write([]byte("\t}\n"))
-	w.Write([]byte("}\n"))
+	w.Write([]byte("\t}\n")) //nolint: errcheck
+	w.Write([]byte("}\n"))   //nolint: errcheck
 }
 func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // TODO want to not need config here
 	for _, path := range paths {
-		pathVerb := config.Overrides[path.Endpoint.TemplateURL].GetVerb
+		var pathVerb string //nolint: gosimple
+		pathVerb = config.Overrides[path.Endpoint.TemplateURL].GetVerb
 		if pathVerb == "" {
 			pathVerb = "get"
 		}
@@ -354,45 +355,6 @@ func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // 
 			}
 			fmt.Fprintf(w, "\t%s\t},\n", prefix)
 		}
-	}
-}
-func dumpPaths(w io.Writer, paths []*Path, prefix string) {
-
-	for _, path := range paths {
-		fmt.Fprintf(w, "%s%s\n", prefix, path.Endpoint.TemplateURL)
-		// for verb, verbInfo := range path.Verbs {
-		// 	fmt.Fprintf(w, "%s   - %v\t%v\n", prefix, verb, verbInfo.OperationID)
-		// }
-		verbs := ""
-		separator := ""
-		if path.Operations.Get.Permitted {
-			verbs += separator + "get"
-			if path.Operations.Get.Endpoint != nil {
-				verbs += "(" + path.Operations.Get.Endpoint.TemplateURL + ")"
-			}
-			separator = ", "
-		}
-		if path.Operations.Delete.Permitted {
-			verbs += separator + "delete"
-			separator = ", "
-		}
-		if path.Operations.Patch.Permitted {
-			verbs += separator + "path"
-			separator = ", "
-		}
-		if path.Operations.Put.Permitted {
-			verbs += separator + "post"
-			separator = ", "
-		}
-		if path.Operations.Put.Permitted {
-			verbs += separator + "put"
-			separator = ", "
-		}
-		fmt.Fprintf(w, "%s   * Verbs: %s\n", prefix, verbs)
-		fmt.Fprintf(w, "%s   * Children\n", prefix)
-		dumpPaths(w, path.Children, prefix+"    ")
-		fmt.Fprintf(w, "%s   * SubPaths\n", prefix)
-		dumpPaths(w, path.SubPaths, prefix+"    ")
 	}
 }
 

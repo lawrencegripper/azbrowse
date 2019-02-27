@@ -76,7 +76,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		if w.selected > maxItemsCanShow && i < w.selected {
 			continue
 		}
-		fmt.Fprintf(v, item)
+		fmt.Fprint(v, item)
 	}
 
 	// If the title is getting too long trim things

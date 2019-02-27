@@ -57,7 +57,7 @@ func DoRequest(ctx context.Context, method, path string) (string, error) {
 
 // DoRequestWithBody makes an ARM rest request
 func DoRequestWithBody(ctx context.Context, method, path, body string) (string, error) {
-	span, ctx := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
+	span, _ := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
 	defer span.Finish()
 
 	url, err := getRequestURL(path)
@@ -96,7 +96,7 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		responseErr = fmt.Errorf("Request returned a non-success status code of %v with a status message of %s", response.StatusCode, response.Status)
 	}
 
-	defer response.Body.Close()
+	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
 
 	if err != nil {
@@ -175,11 +175,10 @@ func PopulateResourceAPILookup(ctx context.Context) {
 			}
 			providerData = string(bytes)
 
-			storage.PutCache(providerCacheKey, providerData)
-			// w.statusView.Status("Getting provider data from API: Completed", false)
+			storage.PutCache(providerCacheKey, providerData) //nolint: errcheck
 
 		} else {
-			span.LogEvent("Data read from cache")
+			span.SetTag("Data read from cache", true)
 			var providerCache map[string]string
 			err = json.Unmarshal([]byte(providerData), &providerCache)
 			if err != nil {
@@ -188,8 +187,6 @@ func PopulateResourceAPILookup(ctx context.Context) {
 				panic(err)
 			}
 			resourceAPIVersionLookup = providerCache
-			// w.statusView.Status("Getting provider data from cache: Completed", false)
-
 		}
 		span.Finish()
 

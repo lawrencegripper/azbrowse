@@ -1,0 +1,60 @@
+[run]
+  deadline = "5m"
+  skip-files = []
+
+[linters-settings]
+
+  [linters-settings.govet]
+    check-shadowing = true
+
+  [linters-settings.gocyclo]
+    min-complexity = 12.0
+
+  [linters-settings.maligned]
+    suggest-new = true
+
+  [linters-settings.goconst]
+    min-len = 3.0
+    min-occurrences = 3.0
+
+  [linters-settings.misspell]
+    locale = "US"
+
+[linters]
+  enable = ["vet", "golint", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet"]
+
+[issues]
+  exclude-use-default = false
+  max-per-linter = 0
+  max-same-issues = 0
+  exclude = []
+  
+  #Ignore gocui funcs
+  [[issues.exclude-rules]]
+    text = "Error return value of `g.DeleteView` is not checked"
+    linters = ["errcheck"]
+  [[issues.exclude-rules]]
+    text = "Error return value of `g.SetCurrentView` is not checked"
+    linters = ["errcheck"]
+  [[issues.exclude-rules]]
+    text = "Error return value of `*.SetCursor` is not checked"
+    linters = ["errcheck"]
+
+  #Ignore shadowed err and ctx variables
+  [[issues.exclude-rules]]
+    text = """declaration of "err" shadows declaration at *"""
+    linters = ["govet"]
+  [[issues.exclude-rules]]
+    text = """declaration of "ctx" shadows declaration at *"""
+    linters = ["govet"]
+
+  #Ignore comments for KeyBinding Handler funcs
+  [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/listhandlers.go"
+    linters = ["golint"]
+  [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/itemhandlers.go"
+    linters = ["golint"]
+  [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/globalhandlers.go"
+    linters = ["golint"]

@@ -4,6 +4,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+// StrToKey maps a string representing they key to a gocui key
 var StrToKey = map[string]gocui.Key{
 	"up":         gocui.KeyArrowUp,
 	"down":       gocui.KeyArrowDown,
@@ -73,6 +74,7 @@ var StrToKey = map[string]gocui.Key{
 	"enter":      gocui.KeyEnter,
 }
 
+// KeyToStr maps a gocui key to a string
 var KeyToStr = map[gocui.Key]string{
 	gocui.KeyArrowUp:        "up",
 	gocui.KeyArrowDown:      "down",
