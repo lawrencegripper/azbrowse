@@ -2,7 +2,7 @@
 
 An interactive CLI for browsing azure resources, inspired by [resources.azure.com](https://resources.azure.com)
 
-[![Build Status](https://travis-ci.com/lawrencegripper/azbrowse.svg?branch=master)](https://travis-ci.com/lawrencegripper/azbrowse)
+[![CircleCI](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master.svg?style=svg)](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master)
 
 # Quick Start
 
