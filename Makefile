@@ -13,7 +13,7 @@ test:
 integration:
 	go test ./...
 
-build: test dep checks
+build: dep swagger-codegen test checks 
 	go build ./cmd/azbrowse
 
 install:
@@ -33,4 +33,9 @@ swagger-codegen:
 	go build internal/pkg/handlers/swagger.generated.go internal/pkg/handlers/swagger.go internal/pkg/handlers/types.go 
 	# Test the generated code initalizes
 	go test -v internal/pkg/handlers/swagger_test.go internal/pkg/handlers/swagger.generated.go internal/pkg/handlers/swagger.go internal/pkg/handlers/types.go
-	
+
+debug:
+	go build ./cmd/azbrowse &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
+
+run: checks install
+	azbrowse

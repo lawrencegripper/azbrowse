@@ -21,8 +21,12 @@ var usedKeys map[string]string
 
 // Bind sets up key bindings for AzBrowse
 func Bind(g *gocui.Gui) error {
-	user, _ := user.Current()
-	defaultFilePath := user.HomeDir + "/.azbrowse-bindings.json"
+	configLocation := "/root/.azbrowse-bindings.json"
+	user, err := user.Current()
+	if err == nil {
+		configLocation = user.HomeDir + "/.azbrowse-bindings.json"
+	}
+	defaultFilePath := configLocation
 	return bindWithFileOverrides(g, defaultFilePath)
 }
 

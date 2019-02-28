@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"github.com/valyala/fastjson"
+
+	"strings"
 )
 
 var fastJSONParser fastjson.Parser
@@ -41,4 +43,8 @@ func DrawStatus(s string) string {
 		return "☼"
 	}
 	return ""
+}
+
+func getNamespaceFromARMType(s string) string {
+	return strings.Split(s, "/")[0]
 }

@@ -17,7 +17,7 @@ var DefaultExpanderInstance DefaultExpander
 
 // Name returns the name of the expander
 func (e *DefaultExpander) Name() string {
-	return "DefaultExpander"
+	return "GenericExpander"
 }
 
 // DoesExpand checks if this handler can expand this item
@@ -44,7 +44,11 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	var resource armclient.Resource
 	err = json.Unmarshal([]byte(data), &resource)
 	if err != nil {
-		panic(err)
+		return ExpanderResult{
+			Err:               err,
+			Response:          string(data),
+			SourceDescription: "Resource Group Request",
+		}
 	}
 
 	// Update the existing state as we have more up-to-date info

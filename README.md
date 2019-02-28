@@ -18,7 +18,26 @@ Currently I'm using it every day **but it is experimental so use with caution on
 
 ### Install
 
-#### DIY
+#### Mac (via [HomeBrew](https://brew.sh/))
+
+```
+brew install lawrencegripper/tap/azbrowse
+```
+
+### Windows (via [Scoop](https://scoop.sh/))
+
+[Install Scoop]([Scoop](https://scoop.sh/))
+```
+iex (new-object net.webclient).downloadstring('https://get.scoop.sh')
+```
+
+Install AzBrowse using Scoop
+```
+scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
+scoop install azbrowse
+```
+
+#### DIY/Linux
 
 Grab the zipped binaries, deb or rpm's from the release page and install.
 
