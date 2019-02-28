@@ -4,10 +4,6 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 
 [![CircleCI](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master.svg?style=svg)](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master)
 
-# Quick Start
-
-Simply download the binary suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it.
-
 ### Status
 
 It's an MVP to prove out the use case. Basic navigation and operations with a boltdb based cache for expensive (slow) API calls.
@@ -17,6 +13,8 @@ Currently I'm using it every day **but it is experimental so use with caution on
 ![Demo](./docs/quickdemo-azbrowse.gif)
 
 ### Install
+
+> Pre-req: Ensure you have the [`az` command from Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) setup on your machine and are logged-in otherwise `azbrowse` won't work!
 
 #### Mac (via [HomeBrew](https://brew.sh/))
 
@@ -37,13 +35,15 @@ scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
 
-#### DIY/Linux
+#### DIY
 
-Grab the zipped binaries, deb or rpm's from the release page and install.
+Simply download the archive/package suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it. 
 
-#### Run via Docker 
+Bonus: Add it to your `$PATH` so you can run `azbrowse` anywhere. 
 
-Ensure you have the `az` command setup on your machine and are logged in. You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
+#### Test out via Docker 
+
+You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
 ```
 docker run -it -v $HOME:/root lawrencegripper/azbrowse
