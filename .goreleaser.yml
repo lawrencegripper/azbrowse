@@ -1,6 +1,13 @@
 builds:
 - env:
   - CGO_ENABLED=0
+  goos:
+    - linux
+    - darwin
+    - windows
+  goarch:
+    - 386
+    - amd64
   main: ./cmd/azbrowse/
   ldflags:
    - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}} -X "main.goversion={{.Env.GOVERSION}}"
@@ -10,9 +17,7 @@ checksum:
 
 archive:
   name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-  format_overrides:
-  - goos: windows
-    format: zip
+  format: binary
 
 nfpm:
   name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
