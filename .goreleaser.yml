@@ -47,6 +47,16 @@ dockers:
     - "--label=org.label-schema.version={{.Version}}"
     - "--label=org.label-schema.name={{.ProjectName}}"
 
+brew:
+  github:
+    owner: lawrencegripper
+    name: homebrew-tap
+  folder: Formula
+  homepage:  https://github.com/lawrencegripper/azbrowse
+  description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+  test: |
+    system "#{bin}/azbrowse --version"
+
 changelog:
   sort: asc
   filters:
