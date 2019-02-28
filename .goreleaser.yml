@@ -57,6 +57,14 @@ brew:
   test: |
     system "#{bin}/azbrowse --version"
 
+scoop:
+  bucket:
+    owner: lawrencegripper
+    name: scoop-bucket
+  homepage:  https://github.com/lawrencegripper/azbrowse
+  description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+  license: MIT
+
 changelog:
   sort: asc
   filters:
