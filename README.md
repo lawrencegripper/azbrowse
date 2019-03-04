@@ -46,7 +46,7 @@ Bonus: Add it to your `$PATH` so you can run `azbrowse` anywhere.
 You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
 ```
-docker run -it -v $HOME:/root lawrencegripper/azbrowse
+docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrencegripper/azbrowse
 ```
 
 ### Usage
