@@ -3,6 +3,8 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"net/url"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -75,4 +77,13 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
 	}
+}
+
+// GetActivityLogExpandURL gets the urls which should be used to get activity logs
+func GetActivityLogExpandURL(subscriptionID, resourceName string) string {
+	queryString := `eventTimestamp ge '` + time.Now().AddDate(0, 0, -30).Format("2006-01-02T15:04:05Z07:00") + `' and eventTimestamp le '` +
+		time.Now().Format("2006-01-02T15:04:05Z07:00") + `' and eventChannels eq 'Admin, Operation' and resourceGroupName eq '` +
+		resourceName + `' and levels eq 'Critical,Error,Warning,Informational'`
+	return `/subscriptions/` + subscriptionID + `/providers/microsoft.insights/eventtypes/management/values?api-version=2017-03-01-preview&$filter=` +
+		url.QueryEscape(queryString)
 }

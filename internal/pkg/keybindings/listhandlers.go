@@ -326,7 +326,7 @@ func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		if h.DeleteConfirmCount > 1 {
 			done()
 			doneDelete := h.StatusBar.Status("Deleting item: "+item.DeleteURL, true)
-
+			defer doneDelete()
 			h.DeleteConfirmItemID = ""
 
 			// Run in the background
@@ -337,7 +337,6 @@ func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 				}
 				// list.Refresh()
 				h.Content.SetContent(res, "Delete response>"+item.Name)
-				doneDelete()
 			}()
 		}
 		return nil
