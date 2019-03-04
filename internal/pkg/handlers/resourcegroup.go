@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
 	"sync"
 	"time"
 
@@ -103,7 +102,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		Display:        style.Subtle("[Microsoft.Insights]") + "\n  Activity Log",
 		Name:           "Activity Log",
 		ID:             currentItem.ID,
-		ExpandURL:      `/subscriptions/5774ad8f-d51e-4456-a72e-0447910568d3/providers/microsoft.insights/eventtypes/management/values?api-version=2017-03-01-preview&$filter=` + url.QueryEscape(`eventTimestamp ge '2019-02-26T17:10:54Z' and eventTimestamp le '2019-02-27T17:10:54Z' and eventChannels eq 'Admin, Operation' and resourceGroupName eq '`+currentItem.Name+`' and levels eq 'Critical,Error,Warning,Informational'`),
+		ExpandURL:      GetActivityLogExpandURL(currentItem.SubscriptionID, currentItem.Name),
 		ItemType:       activityLogType,
 		DeleteURL:      "",
 		SubscriptionID: currentItem.SubscriptionID,

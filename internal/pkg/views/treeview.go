@@ -163,15 +163,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		Message:    "Opening: " + currentItem.ID,
 	})
 
-	// Capture current view to navstack
-	w.navStack.Push(&Page{
-		Data:             w.contentView.GetContent(),
-		Value:            w.items,
-		Title:            w.title,
-		Selection:        w.selected,
-		ExpandedNodeItem: w.CurrentItem(),
-	})
-
 	newItems := []*handlers.TreeNode{}
 
 	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
@@ -251,6 +242,15 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	if len(newItems) > 0 {
+		// Capture current view to navstack as we're viewing an item with children
+		w.navStack.Push(&Page{
+			Data:             w.contentView.GetContent(),
+			Value:            w.items,
+			Title:            w.title,
+			Selection:        w.selected,
+			ExpandedNodeItem: w.CurrentItem(),
+		})
+		// Show new items and move cursor to top
 		w.items = newItems
 		w.selected = 0
 	}
