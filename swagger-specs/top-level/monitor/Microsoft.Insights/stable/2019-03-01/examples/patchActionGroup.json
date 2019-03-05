@@ -3,7 +3,7 @@
         "subscriptionId": "187f412d-1758-44d9-b052-169e2564721d",
         "resourceGroupName": "Default-NotificationRules",
         "actionGroupName": "SampleActionGroup",
-        "api-version": "2018-08-01",
+        "api-version": "2019-03-01",
         "actionGroupPatch": {
             "tags": { "key1": "value1", "key2": "value2" },
             "properties": {
@@ -27,12 +27,14 @@
                         {
                             "name": "John Doe's email",
                             "emailAddress": "johndoe@email.com",
-                            "status": "Enabled"
+                            "status": "Enabled",
+                            "useUnifiedSchema": true
                         },
                         {
                             "name": "Jane Smith's email",
                             "emailAddress": "janesmith@email.com",
-                            "status": "Enabled"
+                            "status": "Enabled",
+                            "useUnifiedSchema": true
                         }
                     ],
                     "smsReceivers":[
@@ -52,7 +54,8 @@
                     "webhookReceivers":[
                         {
                             "name": "Sample webhook",
-                            "serviceUri": "http://www.example.com/webhook"
+                            "serviceUri": "http://www.example.com/webhook",
+                            "useUnifiedSchema": false
                         }
                     ]
                 }

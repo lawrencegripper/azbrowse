@@ -5,7 +5,7 @@
         "x-ms-code-generation-settings": {
             "name": "MonitorManagementClient"
         },
-        "version": "2018-09-01"
+        "version": "2019-03-01"
     },
     "host": "management.azure.com",
     "schemes": [
@@ -504,6 +504,10 @@
                     "type": "string",
                     "description": "The email address of this receiver."
                 },
+                "useUnifiedSchema": {
+                    "type": "boolean",
+                    "description": "Indicates whether to use unified schema."
+                },
                 "status": {
                     "readOnly": true,
                     "$ref": "#/definitions/ReceiverStatus",
@@ -512,7 +516,8 @@
             },
             "required": [
                 "name",
-                "emailAddress"
+                "emailAddress",
+                "useUnifiedSchema"
             ]
         },
         "SmsReceiver": {
@@ -552,11 +557,16 @@
                 "serviceUri": {
                     "type": "string",
                     "description": "The URI where webhooks should be sent."
+                },
+                "useUnifiedSchema": {
+                    "type": "boolean",
+                    "description": "Indicates whether to use unified schema."
                 }
             },
             "required": [
                 "name",
-                "serviceUri"
+                "serviceUri",
+                "useUnifiedSchema"
             ]
         },
         "ItsmReceiver": {
@@ -634,13 +644,18 @@
                 "serviceUri": {
                     "type": "string",
                     "description": "The URI where webhooks should be sent."
+                },
+                "useUnifiedSchema": {
+                    "type": "boolean",
+                    "description": "Indicates whether to use unified schema."
                 }
             },
             "required": [
                 "automationAccountId",
                 "runbookName",
                 "webhookResourceId",
-                "isGlobalRunbook"
+                "isGlobalRunbook",
+                "useUnifiedSchema"
             ]
         },
         "VoiceReceiver": {
@@ -679,12 +694,17 @@
                 "callbackUrl": {
                     "type": "string",
                     "description": "The callback url where http request sent to."
+                },
+                "useUnifiedSchema": {
+                    "type": "boolean",
+                    "description": "Indicates whether to use unified schema."
                 }
             },
             "required": [
                 "name",
                 "resourceId",
-                "callbackUrl"
+                "callbackUrl",
+                "useUnifiedSchema"
             ]
         },
         "AzureFunctionReceiver": {
@@ -705,13 +725,18 @@
                 "httpTriggerUrl": {
                     "type": "string",
                     "description": "The http trigger url where http request sent to."
+                },
+                "useUnifiedSchema": {
+                    "type": "boolean",
+                    "description": "Indicates whether to use unified schema."
                 }
             },
             "required": [
                 "name",
                 "functionAppResourceId",
                 "functionName",
-                "httpTriggerUrl"
+                "httpTriggerUrl",
+                "useUnifiedSchema"
             ]
         },
         "ArmRoleReceiver": {
@@ -724,11 +749,16 @@
                 "roleId": {
                     "type": "string",
                     "description": "The arm role id."
+                },
+                "useUnifiedSchema": {
+                    "type": "boolean",
+                    "description": "Indicates whether to use unified schema."
                 }
             },
             "required": [
                 "name",
-                "roleId"
+                "roleId",
+                "useUnifiedSchema"
             ]
         },
         "ReceiverStatus": {
