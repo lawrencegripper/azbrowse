@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bufio"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -12,6 +10,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/go-openapi/analysis"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
@@ -140,7 +139,7 @@ func main() {
 							// TODO merge!
 							_ = doc2
 							// doc := loadDoc("swagger-specs/" + serviceFileInfo.Name() + "/" + resourceTypeFileInfo.Name() + "/" + swaggerFileInfo.Name())
-							// paths = mergeSwaggerDoc(paths, &config, &doc)
+							paths = mergeSwaggerDoc(paths, &config, doc2)
 						}
 					}
 				}
@@ -213,8 +212,11 @@ func getConfig() Config {
 	}
 	return config
 }
-func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
-	swaggerPaths := getSortedPaths(doc)
+func mergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path {
+	swaggerVersion := doc.Spec().Info.Version
+	spec := doc.Analyzer
+	allPaths := spec.AllPaths()
+	swaggerPaths := getSortedPaths(spec)
 	for _, swaggerPath := range swaggerPaths {
 		override := config.Overrides[swaggerPath]
 
@@ -222,8 +224,7 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 		if searchPath == "" {
 			searchPath = swaggerPath
 		}
-
-		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, doc.Info.Version) // logical path
+		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, swaggerVersion) // logical path
 		if err != nil {
 			panic(err)
 		}
@@ -241,29 +242,31 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 		if getVerb == "" {
 			getVerb = "get"
 		}
-		if doc.Paths[swaggerPath][getVerb].OperationID != "" {
+		pathItem := allPaths[swaggerPath]
+		getOperation := getOperationByVerb(&pathItem, getVerb)
+		if getOperation != nil {
 			path.Operations.Get.Permitted = true
 			if getVerb != "get" {
 				path.Operations.Get.Verb = getVerb
 			}
 			if override.Path != "" {
-				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, doc.Info.Version)
+				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
 				if err != nil {
 					panic(err)
 				}
 				path.Operations.Get.Endpoint = &overriddenEndpoint
 			}
 		}
-		if doc.Paths[swaggerPath]["delete"].OperationID != "" && getVerb != "delete" {
+		if allPaths[swaggerPath].Delete != nil && getVerb != "delete" {
 			path.Operations.Delete.Permitted = true
 		}
-		if doc.Paths[swaggerPath]["patch"].OperationID != "" && getVerb != "patch" {
+		if allPaths[swaggerPath].Patch != nil && getVerb != "patch" {
 			path.Operations.Patch.Permitted = true
 		}
-		if doc.Paths[swaggerPath]["post"].OperationID != "" && getVerb != "post" {
+		if allPaths[swaggerPath].Post != nil && getVerb != "post" {
 			path.Operations.Post.Permitted = true
 		}
-		if doc.Paths[swaggerPath]["put"].OperationID != "" && getVerb != "put" {
+		if allPaths[swaggerPath].Put != nil && getVerb != "put" {
 			path.Operations.Put.Permitted = true
 		}
 
@@ -305,6 +308,26 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 		}
 	}
 	return paths
+}
+func getOperationByVerb(pathItem *spec.PathItem, verb string) *spec.Operation {
+	switch strings.ToLower(verb) {
+	case "get":
+		return pathItem.Get
+	case "delete":
+		return pathItem.Delete
+	case "head":
+		return pathItem.Head
+	case "options":
+		return pathItem.Options
+	case "patch":
+		return pathItem.Patch
+	case "post":
+		return pathItem.Post
+	case "put":
+		return pathItem.Put
+	default:
+		panic(fmt.Errorf("Unhandled verb: %s", verb))
+	}
 }
 
 func copyOperationFrom(from PathOperation, to *PathOperation) {
@@ -405,32 +428,6 @@ func findDeepestPath(paths []*Path, pathString string) *Path {
 	}
 	return nil
 }
-func loadDoc(path string) SwaggerDoc {
-	file, err := os.Open(path)
-	if err != nil {
-		log.Panicf("Error opening Swagger: %s", err)
-	}
-
-	reader := bufio.NewReader(file)
-
-	rune, _, err := reader.ReadRune()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if rune != '\uFEFF' {
-		reader.UnreadRune() // Not a BOM -- put the rune back
-	}
-
-	var doc SwaggerDoc
-	decoder := json.NewDecoder(reader)
-	err = decoder.Decode(&doc)
-
-	// err = json.Unmarshal(swaggerBuf, &doc)
-	if err != nil {
-		log.Panicf("Error unmarshaling json: %s", err)
-	}
-	return doc
-}
 func loadDoc2(path string) *loads.Document {
 
 	document, err := loads.Spec(path)
@@ -445,10 +442,10 @@ func loadDoc2(path string) *loads.Document {
 
 	return document
 }
-func getSortedPaths(doc *SwaggerDoc) []string {
-	paths := make([]string, len(doc.Paths))
+func getSortedPaths(spec *analysis.Spec) []string {
+	paths := make([]string, len(spec.AllPaths()))
 	i := 0
-	for key := range doc.Paths {
+	for key := range spec.AllPaths() {
 		paths[i] = key
 		i++
 	}
