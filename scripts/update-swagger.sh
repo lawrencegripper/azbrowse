@@ -140,7 +140,7 @@ done
 # Since the 2018-11-01 Certificates has no real difference (and has references to the 2018-02-01 folder)
 # manually copy back the 2018-02-01 files
 echo "WARNING: Forcing 2018-02-01 version of web/Microsoft.Web as a temporary fix"
-rm swagger-specs/top-level/web/Microsoft.Web/stable/2018-11-01 -r # this will fail if there is a newer versino than 2018-11-01, which is a good sanity check
+rm swagger-specs/top-level/web/Microsoft.Web/stable/2018-11-01 -r # this will fail if there is a newer version than 2018-11-01, which is a good sanity check
 mkdir swagger-specs/top-level/web/Microsoft.Web/stable/2018-02-01 --parents
 cp $ApiRepo/specification/web/resource-manager/Microsoft.Web/stable/2018-02-01/*.json swagger-specs/top-level/web/Microsoft.Web/stable/2018-02-01
 
