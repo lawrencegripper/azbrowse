@@ -58,31 +58,6 @@ type PathOperation struct {
 */
 
 /////////////////////////////////////////////////////////////////////////////
-// Swagger parsing models
-
-// SwaggerDoc is a type to represent the relevant parts of a swagger document
-type SwaggerDoc struct {
-	Swagger string                      `json:"swagger"`
-	Info    SwaggerInfo                 `json:"info"`
-	Host    string                      `json:"host"`
-	Paths   map[string]SwaggerPathVerbs `json:"paths"`
-}
-
-//SwaggerInfo represents the info for a swagger document
-type SwaggerInfo struct {
-	Version string `json:"version"`
-	Title   string `json:"title"`
-}
-
-// SwaggerPathVerbs are verbs keyed on path
-type SwaggerPathVerbs map[string]SwaggerPathVerb
-
-// SwaggerPathVerb contains the properties for a verb + endpoint
-type SwaggerPathVerb struct {
-	OperationID string `json:"operationId"`
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // Config
 
 // Config handles configuration of url handling
