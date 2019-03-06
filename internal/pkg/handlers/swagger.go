@@ -73,7 +73,7 @@ func (e *SwaggerResourceExpander) ensureInitialized() {
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	e.ensureInitialized()
-	if currentItem.ItemType == ResourceType {
+	if currentItem.ItemType == ResourceType || currentItem.ItemType == SubResourceType {
 		if currentItem.SwaggerResourceType != nil {
 			return true, nil
 		}
