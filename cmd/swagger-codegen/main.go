@@ -9,6 +9,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/go-openapi/analysis"
 	"github.com/go-openapi/loads"
@@ -110,11 +111,8 @@ func main() {
 					for _, swaggerFileInfo := range swaggerFileInfos {
 						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
 							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
-							doc2 := loadDoc2(swaggerPath + "/" + swaggerFileInfo.Name())
-							// TODO merge!
-							_ = doc2
-							// doc := loadDoc("swagger-specs/" + serviceFileInfo.Name() + "/" + resourceTypeFileInfo.Name() + "/" + swaggerFileInfo.Name())
-							paths = mergeSwaggerDoc(paths, &config, doc2)
+							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
+							paths = mergeSwaggerDoc(paths, &config, doc)
 						}
 					}
 				}
@@ -126,11 +124,14 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("Error opening file: %s", err))
 	}
+	defer func() {
+		err := writer.Close()
+		if err != nil {
+			panic(fmt.Errorf("Failed to close output file: %s", err))
+		}
+	}()
 
-	writeHeader(writer)
-	writePaths(writer, paths, &config, "")
-	writeFooter(writer)
-	// dumpPaths(writer, paths, "")
+	writeTemplate(writer, paths, &config)
 }
 
 func getFirstNonCommonPath(path string) string {
@@ -224,7 +225,9 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 			if getVerb != "get" {
 				path.Operations.Get.Verb = getVerb
 			}
-			if override.Path != "" {
+			if override.Path == "" {
+				path.Operations.Get.Endpoint = path.Endpoint
+			} else {
 				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
 				if err != nil {
 					panic(err)
@@ -234,15 +237,19 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 		}
 		if allPaths[swaggerPath].Delete != nil && getVerb != "delete" {
 			path.Operations.Delete.Permitted = true
+			path.Operations.Delete.Endpoint = path.Endpoint
 		}
 		if allPaths[swaggerPath].Patch != nil && getVerb != "patch" {
 			path.Operations.Patch.Permitted = true
+			path.Operations.Patch.Endpoint = path.Endpoint
 		}
 		if allPaths[swaggerPath].Post != nil && getVerb != "post" {
 			path.Operations.Post.Permitted = true
+			path.Operations.Post.Endpoint = path.Endpoint
 		}
 		if allPaths[swaggerPath].Put != nil && getVerb != "put" {
 			path.Operations.Put.Permitted = true
+			path.Operations.Put.Endpoint = path.Endpoint
 		}
 
 		// Add endpoint to paths
@@ -320,69 +327,24 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 	return count
 }
 
-func writeHeader(w io.Writer) {
-	w.Write([]byte("package handlers\n"))                                                             //nolint: errcheck
-	w.Write([]byte("\n"))                                                                             //nolint: errcheck
-	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []SwaggerResourceType {\n")) //nolint: errcheck
-	w.Write([]byte("\treturn []SwaggerResourceType{\n"))                                              //nolint: errcheck
-}
-func writeFooter(w io.Writer) {
-	w.Write([]byte("\t}\n")) //nolint: errcheck
-	w.Write([]byte("}\n"))   //nolint: errcheck
-}
-func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // TODO want to not need config here
-	for _, path := range paths {
-		var pathVerb string //nolint: gosimple
-		pathVerb = config.Overrides[path.Endpoint.TemplateURL].GetVerb
-		if pathVerb == "" {
-			pathVerb = "get"
-		}
-		if path.Operations.Get.Permitted {
-			fmt.Fprintf(w, "\t%s\tSwaggerResourceType{\n", prefix)
-			getEndpoint := path.Operations.Get.Endpoint
-			if getEndpoint == nil {
-				getEndpoint = path.Endpoint
-			}
-			fmt.Fprintf(w, "\t%s\t\tDisplay:  \"%s\",\n", prefix, path.Name)
+func writeTemplate(w io.Writer, paths []*Path, config *Config) {
 
-			fmt.Fprintf(w, "\t%s\t\tEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, getEndpoint.TemplateURL, getEndpoint.APIVersion)
+	funcMap := template.FuncMap{
+		"upper": strings.ToUpper,
+	}
+	t := template.Must(template.New("code-gen").Funcs(funcMap).Parse(tmpl))
 
-			if path.Operations.Get.Verb != "" {
-				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\",\n", prefix, strings.ToUpper(path.Operations.Get.Verb))
-			}
-			if path.Operations.Delete.Permitted {
-				deleteEndpoint := path.Endpoint
-				if path.Operations.Delete.Endpoint != nil {
-					deleteEndpoint = path.Operations.Delete.Endpoint
-				}
-				fmt.Fprintf(w, "\t%s\t\tDeleteEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, deleteEndpoint.TemplateURL, deleteEndpoint.APIVersion)
-			}
-			if path.Operations.Patch.Permitted {
-				patchEndpoint := path.Endpoint
-				if path.Operations.Patch.Endpoint != nil {
-					patchEndpoint = path.Operations.Delete.Endpoint
-				}
-				fmt.Fprintf(w, "\t%s\t\tPatchEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, patchEndpoint.TemplateURL, patchEndpoint.APIVersion)
-			}
-			if path.Operations.Put.Permitted {
-				putEndpoint := path.Endpoint
-				if path.Operations.Put.Endpoint != nil {
-					putEndpoint = path.Operations.Put.Endpoint
-				}
-				fmt.Fprintf(w, "\t%s\t\tPutEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, putEndpoint.TemplateURL, putEndpoint.APIVersion)
-			}
-			if len(path.Children) > 0 {
-				fmt.Fprintf(w, "\t%s\t\tChildren: []SwaggerResourceType {\n", prefix)
-				writePaths(w, path.Children, config, prefix+"\t\t")
-				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
-			}
-			if len(path.SubPaths) > 0 {
-				fmt.Fprintf(w, "\t%s\t\tSubResources: []SwaggerResourceType {\n", prefix)
-				writePaths(w, path.SubPaths, config, prefix+"\t\t")
-				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
-			}
-			fmt.Fprintf(w, "\t%s\t},\n", prefix)
-		}
+	type Context struct {
+		Paths []*Path
+	}
+
+	context := Context{
+		Paths: paths,
+	}
+
+	err := t.Execute(w, context)
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -403,7 +365,7 @@ func findDeepestPath(paths []*Path, pathString string) *Path {
 	}
 	return nil
 }
-func loadDoc2(path string) *loads.Document {
+func loadDoc(path string) *loads.Document {
 
 	document, err := loads.Spec(path)
 	if err != nil {

@@ -29,7 +29,7 @@ swagger-update:
 	./scripts/update-swagger.sh
 	
 swagger-codegen:
-	go run cmd/swagger-codegen/main.go --output-file ./internal/pkg/handlers/swagger.generated.go 
+	go run ./cmd/swagger-codegen/ --output-file ./internal/pkg/handlers/swagger.generated.go 
 	# Format the generated code
 	gofmt -s -w internal/pkg/handlers/swagger.generated.go
 	# Build the generated go files to check for any go build issues
