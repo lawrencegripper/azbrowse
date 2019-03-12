@@ -90,7 +90,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		Name:           "Deployments",
 		ID:             currentItem.ID,
 		ExpandURL:      currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2017-05-10",
-		ItemType:       deploymentType,
+		ItemType:       deploymentsType,
 		DeleteURL:      "",
 		SubscriptionID: currentItem.SubscriptionID,
 	})

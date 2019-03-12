@@ -18,7 +18,7 @@ func (e *DeploymentsExpander) Name() string {
 
 // DoesExpand checks if this is an RG
 func (e *DeploymentsExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ItemType == deploymentType {
+	if currentItem.ItemType == deploymentsType {
 		return true, nil
 	}
 	return false, nil
@@ -44,28 +44,17 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		panic(err)
 	}
 
-	value, err := fastJSONParser.Parse(data)
-	if err != nil {
-		panic(err)
-	}
-
-	for i, dep := range deployments.Value {
-		// Update the existing state as we have more up-to-date info
-		objectJSON := string(value.GetArray("value")[i].MarshalTo([]byte("")))
-
+	for _, dep := range deployments.Value {
 		newItems = append(newItems, &TreeNode{
 			Name:            dep.Name,
 			Display:         dep.Name + "\n   " + style.Subtle("Started:  "+dep.Properties.Timestamp) + "\n   " + style.Subtle("Duration: "+dep.Properties.Duration) + "\n   " + style.Subtle("DeploymentStatus: "+dep.Properties.ProvisioningState+""),
 			ID:              dep.ID,
 			Parentid:        currentItem.ID,
-			ExpandURL:       ExpandURLNotSupported,
-			ItemType:        subDeploymentType,
+			ExpandURL:       dep.ID + "/operations/?api-version=2017-05-10",
+			ItemType:        deploymentType,
 			DeleteURL:       dep.ID + "?api-version=2017-05-10",
 			SubscriptionID:  currentItem.SubscriptionID,
 			StatusIndicator: DrawStatus(dep.Properties.ProvisioningState),
-			Metadata: map[string]string{
-				"jsonItem": objectJSON,
-			},
 		})
 	}
 

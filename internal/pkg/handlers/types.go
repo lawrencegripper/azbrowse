@@ -51,11 +51,14 @@ const (
 	// ResourceType defines a top level resource such as a Storage Account or VM
 	ResourceType = "resource"
 	// SubResourceType defines a resource under a resource such as a VM Extension under a VM
-	SubResourceType    = "subResource"
-	deploymentType     = "deployment"
-	subDeploymentType  = "subDeployment"
-	activityLogType    = "activityLog"
-	subActivityLogType = "subActivityLog"
+	SubResourceType = "subResource"
+	// deploymentType represents a deployment node
+	deploymentType = "deployment"
+	// deploymentsType represents the "Deployments" placholder node
+	deploymentsType         = "deployments"
+	deploymentOperationType = "deploymentOperation"
+	activityLogType         = "activityLog"
+	subActivityLogType      = "subActivityLog"
 	// ActionType defines an action like `listkey` etc
 	ActionType = "action"
 
