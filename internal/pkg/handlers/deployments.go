@@ -44,7 +44,13 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		panic(err)
 	}
 
-	for _, dep := range deployments.Value {
+	value, err := fastJSONParser.Parse(data)
+	if err != nil {
+		panic(err)
+	}
+	for i, dep := range deployments.Value {
+		// Update the existing state as we have more up-to-date info
+		objectJSON := string(value.GetArray("value")[i].MarshalTo([]byte("")))
 		newItems = append(newItems, &TreeNode{
 			Name:            dep.Name,
 			Display:         dep.Name + "\n   " + style.Subtle("Started:  "+dep.Properties.Timestamp) + "\n   " + style.Subtle("Duration: "+dep.Properties.Duration) + "\n   " + style.Subtle("DeploymentStatus: "+dep.Properties.ProvisioningState+""),
@@ -55,6 +61,9 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 			DeleteURL:       dep.ID + "?api-version=2017-05-10",
 			SubscriptionID:  currentItem.SubscriptionID,
 			StatusIndicator: DrawStatus(dep.Properties.ProvisioningState),
+			Metadata: map[string]string{
+				"jsonItem": objectJSON,
+			},
 		})
 	}
 

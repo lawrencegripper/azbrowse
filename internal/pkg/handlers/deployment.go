@@ -73,6 +73,6 @@ func (e *DeploymentExpander) Expand(ctx context.Context, currentItem *TreeNode) 
 		Response:          string(data),
 		SourceDescription: "Deployments request",
 		Nodes:             newItems,
-		IsPrimaryResponse: true,
+		IsPrimaryResponse: false,
 	}
 }
