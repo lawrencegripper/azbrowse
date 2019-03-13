@@ -16,11 +16,13 @@ bash -f ./install_dev_tools.sh
 echo "->Move to root directory"
 cd ../
 
+echo "->Run 'make swagger-update' to make sure we're up to date on API Definitions"
+make swagger-update
 
 echo "->Use make build to codegen, lint and check"
 make build
 if [[ $(git diff --stat) != '' ]]; then
-  echo "Ditry GIT: Failing as swagger-generated caused changes, please run `make swagger-generate` and commit changes for build to pass"
+  echo "Ditry GIT: Failing as swagger-generated caused changes, please run `make swagger-update` and `make swagger-generate` and commit changes for build to pass"
   exit 1
 else
   echo '`swagger-gen` ran and no changes detected in code: Success'

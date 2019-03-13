@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -10,7 +9,11 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"text/template"
 
+	"github.com/go-openapi/analysis"
+	"github.com/go-openapi/loads"
+	"github.com/go-openapi/spec"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
@@ -56,31 +59,6 @@ type PathOperation struct {
 */
 
 /////////////////////////////////////////////////////////////////////////////
-// Swagger parsing models
-
-// SwaggerDoc is a type to represent the relevant parts of a swagger document
-type SwaggerDoc struct {
-	Swagger string                      `json:"swagger"`
-	Info    SwaggerInfo                 `json:"info"`
-	Host    string                      `json:"host"`
-	Paths   map[string]SwaggerPathVerbs `json:"paths"`
-}
-
-//SwaggerInfo represents the info for a swagger document
-type SwaggerInfo struct {
-	Version string `json:"version"`
-	Title   string `json:"title"`
-}
-
-// SwaggerPathVerbs are verbs keyed on path
-type SwaggerPathVerbs map[string]SwaggerPathVerb
-
-// SwaggerPathVerb contains the properties for a verb + endpoint
-type SwaggerPathVerb struct {
-	OperationID string `json:"operationId"`
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // Config
 
 // Config handles configuration of url handling
@@ -112,22 +90,31 @@ func main() {
 	config := getConfig()
 	var paths []*Path
 
-	topFileInfos, err := ioutil.ReadDir("swagger-specs")
+	serviceFileInfos, err := ioutil.ReadDir("swagger-specs/top-level")
 	if err != nil {
-		panic(fmt.Errorf)
+		panic(err)
 	}
-	for _, topFileInfo := range topFileInfos {
-		if topFileInfo.IsDir() {
-			fmt.Printf("Processing folder: %s\n", topFileInfo.Name())
-			fileInfos, err := ioutil.ReadDir("swagger-specs/" + topFileInfo.Name())
+	for _, serviceFileInfo := range serviceFileInfos {
+		if serviceFileInfo.IsDir() {
+			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
+			resourceTypeFileInfos, err := ioutil.ReadDir("swagger-specs/top-level/" + serviceFileInfo.Name())
 			if err != nil {
-				panic(fmt.Errorf)
+				panic(err)
 			}
-			for _, fileInfo := range fileInfos {
-				if !fileInfo.IsDir() && strings.HasSuffix(fileInfo.Name(), ".json") {
-					fmt.Printf("\tprocessing %s\n", fileInfo.Name())
-					doc := loadDoc("swagger-specs/" + topFileInfo.Name() + "/" + fileInfo.Name())
-					paths = mergeSwaggerDoc(paths, &config, &doc)
+			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
+				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
+					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath("swagger-specs/top-level/" + serviceFileInfo.Name() + "/" + resourceTypeFileInfo.Name()))
+					swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
+					if err != nil {
+						panic(err)
+					}
+					for _, swaggerFileInfo := range swaggerFileInfos {
+						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
+							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
+							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
+							paths = mergeSwaggerDoc(paths, &config, doc)
+						}
+					}
 				}
 			}
 		}
@@ -137,11 +124,29 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("Error opening file: %s", err))
 	}
+	defer func() {
+		err := writer.Close()
+		if err != nil {
+			panic(fmt.Errorf("Failed to close output file: %s", err))
+		}
+	}()
 
-	writeHeader(writer)
-	writePaths(writer, paths, &config, "")
-	writeFooter(writer)
-	// dumpPaths(writer, paths, "")
+	writeTemplate(writer, paths, &config)
+}
+
+func getFirstNonCommonPath(path string) string {
+	// get the first non `common` path
+
+	subfolders, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+	for _, subpath := range subfolders {
+		if subpath.IsDir() && subpath.Name() != "common" {
+			return path + "/" + subpath.Name()
+		}
+	}
+	panic(fmt.Errorf("No suitable path found"))
 }
 
 func getConfig() Config {
@@ -183,8 +188,11 @@ func getConfig() Config {
 	}
 	return config
 }
-func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
-	swaggerPaths := getSortedPaths(doc)
+func mergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path {
+	swaggerVersion := doc.Spec().Info.Version
+	spec := doc.Analyzer
+	allPaths := spec.AllPaths()
+	swaggerPaths := getSortedPaths(spec)
 	for _, swaggerPath := range swaggerPaths {
 		override := config.Overrides[swaggerPath]
 
@@ -192,8 +200,7 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 		if searchPath == "" {
 			searchPath = swaggerPath
 		}
-
-		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, doc.Info.Version) // logical path
+		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, swaggerVersion) // logical path
 		if err != nil {
 			panic(err)
 		}
@@ -211,30 +218,38 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 		if getVerb == "" {
 			getVerb = "get"
 		}
-		if doc.Paths[swaggerPath][getVerb].OperationID != "" {
+		pathItem := allPaths[swaggerPath]
+		getOperation := getOperationByVerb(&pathItem, getVerb)
+		if getOperation != nil {
 			path.Operations.Get.Permitted = true
 			if getVerb != "get" {
 				path.Operations.Get.Verb = getVerb
 			}
-			if override.Path != "" {
-				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, doc.Info.Version)
+			if override.Path == "" {
+				path.Operations.Get.Endpoint = path.Endpoint
+			} else {
+				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
 				if err != nil {
 					panic(err)
 				}
 				path.Operations.Get.Endpoint = &overriddenEndpoint
 			}
 		}
-		if doc.Paths[swaggerPath]["delete"].OperationID != "" && getVerb != "delete" {
+		if allPaths[swaggerPath].Delete != nil && getVerb != "delete" {
 			path.Operations.Delete.Permitted = true
+			path.Operations.Delete.Endpoint = path.Endpoint
 		}
-		if doc.Paths[swaggerPath]["patch"].OperationID != "" && getVerb != "patch" {
+		if allPaths[swaggerPath].Patch != nil && getVerb != "patch" {
 			path.Operations.Patch.Permitted = true
+			path.Operations.Patch.Endpoint = path.Endpoint
 		}
-		if doc.Paths[swaggerPath]["post"].OperationID != "" && getVerb != "post" {
+		if allPaths[swaggerPath].Post != nil && getVerb != "post" {
 			path.Operations.Post.Permitted = true
+			path.Operations.Post.Endpoint = path.Endpoint
 		}
-		if doc.Paths[swaggerPath]["put"].OperationID != "" && getVerb != "put" {
+		if allPaths[swaggerPath].Put != nil && getVerb != "put" {
 			path.Operations.Put.Permitted = true
+			path.Operations.Put.Endpoint = path.Endpoint
 		}
 
 		// Add endpoint to paths
@@ -276,6 +291,26 @@ func mergeSwaggerDoc(paths []*Path, config *Config, doc *SwaggerDoc) []*Path {
 	}
 	return paths
 }
+func getOperationByVerb(pathItem *spec.PathItem, verb string) *spec.Operation {
+	switch strings.ToLower(verb) {
+	case "get":
+		return pathItem.Get
+	case "delete":
+		return pathItem.Delete
+	case "head":
+		return pathItem.Head
+	case "options":
+		return pathItem.Options
+	case "patch":
+		return pathItem.Patch
+	case "post":
+		return pathItem.Post
+	case "put":
+		return pathItem.Put
+	default:
+		panic(fmt.Errorf("Unhandled verb: %s", verb))
+	}
+}
 
 func copyOperationFrom(from PathOperation, to *PathOperation) {
 	to.Permitted = from.Permitted
@@ -292,69 +327,24 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 	return count
 }
 
-func writeHeader(w io.Writer) {
-	w.Write([]byte("package handlers\n"))                                                             //nolint: errcheck
-	w.Write([]byte("\n"))                                                                             //nolint: errcheck
-	w.Write([]byte("func (e *SwaggerResourceExpander) getResourceTypes() []SwaggerResourceType {\n")) //nolint: errcheck
-	w.Write([]byte("\treturn []SwaggerResourceType{\n"))                                              //nolint: errcheck
-}
-func writeFooter(w io.Writer) {
-	w.Write([]byte("\t}\n")) //nolint: errcheck
-	w.Write([]byte("}\n"))   //nolint: errcheck
-}
-func writePaths(w io.Writer, paths []*Path, config *Config, prefix string) { // TODO want to not need config here
-	for _, path := range paths {
-		var pathVerb string //nolint: gosimple
-		pathVerb = config.Overrides[path.Endpoint.TemplateURL].GetVerb
-		if pathVerb == "" {
-			pathVerb = "get"
-		}
-		if path.Operations.Get.Permitted {
-			fmt.Fprintf(w, "\t%s\tSwaggerResourceType{\n", prefix)
-			getEndpoint := path.Operations.Get.Endpoint
-			if getEndpoint == nil {
-				getEndpoint = path.Endpoint
-			}
-			fmt.Fprintf(w, "\t%s\t\tDisplay:  \"%s\",\n", prefix, path.Name)
+func writeTemplate(w io.Writer, paths []*Path, config *Config) {
 
-			fmt.Fprintf(w, "\t%s\t\tEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, getEndpoint.TemplateURL, getEndpoint.APIVersion)
+	funcMap := template.FuncMap{
+		"upper": strings.ToUpper,
+	}
+	t := template.Must(template.New("code-gen").Funcs(funcMap).Parse(tmpl))
 
-			if path.Operations.Get.Verb != "" {
-				fmt.Fprintf(w, "\t%s\t\tVerb:     \"%s\",\n", prefix, strings.ToUpper(path.Operations.Get.Verb))
-			}
-			if path.Operations.Delete.Permitted {
-				deleteEndpoint := path.Endpoint
-				if path.Operations.Delete.Endpoint != nil {
-					deleteEndpoint = path.Operations.Delete.Endpoint
-				}
-				fmt.Fprintf(w, "\t%s\t\tDeleteEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, deleteEndpoint.TemplateURL, deleteEndpoint.APIVersion)
-			}
-			if path.Operations.Patch.Permitted {
-				patchEndpoint := path.Endpoint
-				if path.Operations.Patch.Endpoint != nil {
-					patchEndpoint = path.Operations.Delete.Endpoint
-				}
-				fmt.Fprintf(w, "\t%s\t\tPatchEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, patchEndpoint.TemplateURL, patchEndpoint.APIVersion)
-			}
-			if path.Operations.Put.Permitted {
-				putEndpoint := path.Endpoint
-				if path.Operations.Put.Endpoint != nil {
-					putEndpoint = path.Operations.Put.Endpoint
-				}
-				fmt.Fprintf(w, "\t%s\t\tPutEndpoint: mustGetEndpointInfoFromURL(\"%s\", \"%s\"),\n", prefix, putEndpoint.TemplateURL, putEndpoint.APIVersion)
-			}
-			if len(path.Children) > 0 {
-				fmt.Fprintf(w, "\t%s\t\tChildren: []SwaggerResourceType {\n", prefix)
-				writePaths(w, path.Children, config, prefix+"\t\t")
-				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
-			}
-			if len(path.SubPaths) > 0 {
-				fmt.Fprintf(w, "\t%s\t\tSubResources: []SwaggerResourceType {\n", prefix)
-				writePaths(w, path.SubPaths, config, prefix+"\t\t")
-				fmt.Fprintf(w, "\t%s\t\t},\n", prefix)
-			}
-			fmt.Fprintf(w, "\t%s\t},\n", prefix)
-		}
+	type Context struct {
+		Paths []*Path
+	}
+
+	context := Context{
+		Paths: paths,
+	}
+
+	err := t.Execute(w, context)
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -375,23 +365,24 @@ func findDeepestPath(paths []*Path, pathString string) *Path {
 	}
 	return nil
 }
-func loadDoc(path string) SwaggerDoc {
-	swaggerBuf, err := ioutil.ReadFile(path)
+func loadDoc(path string) *loads.Document {
+
+	document, err := loads.Spec(path)
 	if err != nil {
 		log.Panicf("Error opening Swagger: %s", err)
 	}
 
-	var doc SwaggerDoc
-	err = json.Unmarshal(swaggerBuf, &doc)
+	document, err = document.Expanded(&spec.ExpandOptions{RelativeBase: path})
 	if err != nil {
-		log.Panicf("Error unmarshaling json: %s", err)
+		log.Panicf("Error opening Swagger: %s", err)
 	}
-	return doc
+
+	return document
 }
-func getSortedPaths(doc *SwaggerDoc) []string {
-	paths := make([]string, len(doc.Paths))
+func getSortedPaths(spec *analysis.Spec) []string {
+	paths := make([]string, len(spec.AllPaths()))
 	i := 0
-	for key := range doc.Paths {
+	for key := range spec.AllPaths() {
 		paths[i] = key
 		i++
 	}
