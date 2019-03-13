@@ -1,12 +1,14 @@
 {
     "parameters": {
-      "api-version": "2018-03-31",
+      "api-version": "2019-02-01",
       "subscriptionId": "subid1",
       "resourceGroupName": "rg1",
       "resourceName": "clustername1",
       "parameters": {
-        "clientId": "clientid",
-        "secret": "secret"
+        "clientAppID": "clientappid",
+        "serverAppID": "serverappid",
+        "serverAppSecret": "serverappsecret",
+        "tenantID": "tenantid"
       }
     },
     "responses": {

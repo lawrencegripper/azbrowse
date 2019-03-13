@@ -1,6 +1,6 @@
 {
   "parameters": {
-    "api-version": "2018-03-31",
+    "api-version": "2019-02-01",
     "subscriptionId": "subid1",
     "resourceGroupName": "rg1",
     "resourceName": "clustername1",
@@ -37,7 +37,8 @@
         },
         "addonProfiles": {
         },
-        "enableRBAC": false
+        "enableRBAC": true,
+        "enablePodSecurityPolicy": true
       }
     }
   },
@@ -61,9 +62,10 @@
               "name": "nodepool1",
               "count": 3,
               "vmSize": "Standard_DS1_v2",
-              "storageProfile": "ManagedDisks",
               "maxPods": 110,
-              "osType": "Linux"
+              "osType": "Linux",
+              "provisioningState": "Succeeded",
+              "orchestratorVersion": "1.9.6"
             }
           ],
           "linuxProfile": {
@@ -80,7 +82,8 @@
             "clientId": "clientid"
           },
           "nodeResourceGroup": "MC_rg1_clustername1_location1",
-          "enableRBAC": false,
+          "enableRBAC": true,
+          "enablePodSecurityPolicy": true,
           "fqdn": "dnsprefix1-abcd1234.hcp.eastus.azmk8s.io",
           "networkProfile": {
             "networkPlugin": "kubenet",
@@ -111,9 +114,10 @@
               "name": "nodepool1",
               "count": 3,
               "vmSize": "Standard_DS1_v2",
-              "storageProfile": "ManagedDisks",
               "maxPods": 110,
-              "osType": "Linux"
+              "osType": "Linux",
+              "provisioningState": "Creating",
+              "orchestratorVersion": "1.9.6"
             }
           ],
           "linuxProfile": {
@@ -130,7 +134,8 @@
             "clientId": "clientid"
           },
           "nodeResourceGroup": "MC_rg1_clustername1_location1",
-          "enableRBAC": false,
+          "enableRBAC": true,
+          "enablePodSecurityPolicy": true,
           "networkProfile": {
             "networkPlugin": "kubenet",
             "podCidr": "10.244.0.0/16",

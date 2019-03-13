@@ -3,7 +3,7 @@
   "info": {
     "title": "ContainerServiceClient",
     "description": "The Container Service Client.",
-    "version": "2018-03-31"
+    "version": "2019-02-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -577,6 +577,12 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed. If the cluster doesn't exist, 404 (Not found) is returned.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -633,6 +639,12 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed. If the cluster doesn't exist, 404 (Not found) is returned.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -740,6 +752,27 @@
       "required": [
         "location"
       ],
+      "x-ms-azure-resource": true
+    },
+    "SubResource": {
+      "properties": {
+        "id": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Resource ID."
+        },
+        "name": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The name of the resource that is unique within a resource group. This name can be used to access the resource."
+        },
+        "type": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Resource type"
+        }
+      },
+      "description": "Reference to another subresource.",
       "x-ms-azure-resource": true
     },
     "TagsObject": {
@@ -1031,12 +1064,8 @@
       ],
       "description": "Profile for the container service master."
     },
-    "ManagedClusterAgentPoolProfile": {
+    "ManagedClusterAgentPoolProfileProperties": {
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
-        },
         "count": {
           "type": "integer",
           "format": "int32",
@@ -1053,11 +1082,6 @@
           "$ref": "#/definitions/ContainerServiceOSDisk",
           "description": "OS Disk Size in GB to be used to specify the disk size for every machine in this master/agent pool. If you specify 0, it will apply the default osDisk size according to the vmSize specified."
         },
-        "storageProfile": {
-          "readOnly": true,
-          "$ref": "#/definitions/ContainerServiceStorageProfile",
-          "description": "Storage profile specifies what kind of storage used. Defaults to ManagedDisks."
-        },
         "vnetSubnetID": {
           "$ref": "#/definitions/ContainerServiceVnetSubnetID",
           "description": "VNet SubnetID specifies the VNet's subnet identifier."
@@ -1070,13 +1094,112 @@
         "osType": {
           "$ref": "#/definitions/OSType",
           "description": "OsType to be used to specify os type. Choose from Linux and Windows. Default to Linux."
+        },
+        "maxCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Maximum number of nodes for auto-scaling"
+        },
+        "minCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Minimum number of nodes for auto-scaling"
+        },
+        "enableAutoScaling": {
+          "type": "boolean",
+          "description": "Whether to enable auto-scaler"
+        },
+        "type": {
+          "$ref": "#/definitions/AgentPoolType",
+          "description": "AgentPoolType represents types of an agent pool"
+        },
+        "orchestratorVersion": {
+          "type": "string",
+          "description": "Version of orchestrator specified when creating the managed cluster."
+        },
+        "provisioningState": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The current deployment or provisioning state, which only appears in the response."
+        },
+        "availabilityZones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "(PREVIEW) Availability zones for nodes. Must use VirtualMachineScaleSets AgentPoolType."
         }
       },
       "required": [
-        "name",
-        "vmSize"
+        "vmSize",
+        "count"
+      ],
+      "description": "Properties for the container service agent pool profile."
+    },
+    "ManagedClusterAgentPoolProfile": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ManagedClusterAgentPoolProfileProperties"
+        },
+        {
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "Unique name of the agent pool profile in the context of the subscription and resource group."
+            }
+          }
+        }
+      ],
+      "required": [
+        "name"
       ],
       "description": "Profile for the container service agent pool."
+    },
+    "AgentPoolType": {
+      "type": "string",
+      "enum": [
+        "VirtualMachineScaleSets",
+        "AvailabilitySet"
+      ],
+      "x-ms-enum": {
+        "name": "AgentPoolType",
+        "modelAsString": true
+      },
+      "description": "AgentPoolType represents types of an agent pool. VirtualMachineScaleSets type is still in PREVIEW."
+    },
+    "AgentPoolListResult": {
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AgentPool"
+          },
+          "description": "The list of agent pools."
+        },
+        "nextLink": {
+          "type": "string",
+          "description": "The URL to get the next set of agent pool results.",
+          "readOnly": true
+        }
+      },
+      "description": "The response from the List Agent Pools operation."
+    },
+    "AgentPool": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/SubResource"
+        },
+        {
+          "properties": {
+            "properties": {
+              "description": "Properties of an agent pool.",
+              "$ref": "#/definitions/ManagedClusterAgentPoolProfileProperties",
+              "x-ms-client-flatten": true
+            }
+          }
+        }
+      ],
+      "description": "Agent Pool."
     },
     "ContainerServiceWindowsProfile": {
       "properties": {
@@ -1133,7 +1256,8 @@
         "networkPolicy": {
           "type": "string",
           "enum": [
-            "calico"
+            "calico",
+            "azure"
           ],
           "x-ms-enum": {
             "name": "NetworkPolicy",
@@ -1283,7 +1407,7 @@
           "items": {
             "$ref": "#/definitions/ManagedClusterAgentPoolProfile"
           },
-          "description": "Properties of the agent pool. Currently only one agent pool can exist."
+          "description": "Properties of the agent pool."
         },
         "linuxProfile": {
           "$ref": "#/definitions/ContainerServiceLinuxProfile",
@@ -1308,6 +1432,10 @@
           "type": "boolean",
           "description": "Whether to enable Kubernetes Role-Based Access Control."
         },
+        "enablePodSecurityPolicy": {
+          "type": "boolean",
+          "description": "(PREVIEW) Whether to enable Kubernetes Pod security policy."
+        },
         "networkProfile": {
           "$ref": "#/definitions/ContainerServiceNetworkProfile",
           "description": "Profile of network configuration."
@@ -1315,6 +1443,13 @@
         "aadProfile": {
           "$ref": "#/definitions/ManagedClusterAADProfile",
           "description": "Profile of Azure Active Directory configuration."
+        },
+        "apiServerAuthorizedIPRanges": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "(PREVIEW) Authorized IP Ranges to kubernetes API server."
         }
       },
       "description": "Properties of the managed cluster."
@@ -1534,6 +1669,41 @@
         }
       },
       "description": "The credential result response."
+    },
+    "CloudError": {
+      "x-ms-external": true,
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/CloudErrorBody",
+          "description": "Details about the error."
+        }
+      },
+      "description": "An error response from the Container service."
+    },
+    "CloudErrorBody": {
+      "x-ms-external": true,
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "An identifier for the error. Codes are invariant and are intended to be consumed programmatically."
+        },
+        "message": {
+          "type": "string",
+          "description": "A message describing the error, intended to be suitable for display in a user interface."
+        },
+        "target": {
+          "type": "string",
+          "description": "The target of the particular error. For example, the name of the property in error."
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CloudErrorBody"
+          },
+          "description": "A list of additional details about the error."
+        }
+      },
+      "description": "An error response from the Container service."
     }
   },
   "parameters": {

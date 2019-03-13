@@ -1919,26 +1919,26 @@ func (e *SwaggerResourceExpander) getResourceTypes() []SwaggerResourceType {
 		},
 		{
 			Display:  "operations",
-			Endpoint: mustGetEndpointInfoFromURL("/providers/Microsoft.ContainerService/operations", "2018-03-31"),
+			Endpoint: mustGetEndpointInfoFromURL("/providers/Microsoft.ContainerService/operations", "2019-02-01"),
 		},
 		{
 			Display:  "managedClusters",
-			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ContainerService/managedClusters", "2018-03-31"),
+			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ContainerService/managedClusters", "2019-02-01"),
 		},
 		{
 			Display:  "managedClusters",
-			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters", "2018-03-31"),
+			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters", "2019-02-01"),
 			SubResources: []SwaggerResourceType{
 				{
 					Display:        "{resourceName}",
-					Endpoint:       mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2018-03-31"),
-					DeleteEndpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2018-03-31"),
-					PatchEndpoint:  mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2018-03-31"),
-					PutEndpoint:    mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2018-03-31"),
+					Endpoint:       mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-02-01"),
+					DeleteEndpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-02-01"),
+					PatchEndpoint:  mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-02-01"),
+					PutEndpoint:    mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-02-01"),
 					Children: []SwaggerResourceType{
 						{
 							Display:  "default",
-							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/upgradeProfiles/default", "2018-03-31"),
+							Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/upgradeProfiles/default", "2019-02-01"),
 						}},
 					SubResources: []SwaggerResourceType{},
 				}},
@@ -3897,6 +3897,16 @@ func (e *SwaggerResourceExpander) getResourceTypes() []SwaggerResourceType {
 		{
 			Display:  "operations",
 			Endpoint: mustGetEndpointInfoFromURL("/providers/Microsoft.MarketplaceOrdering/operations", "2015-06-01"),
+		},
+		{
+			Display:  "agreements",
+			Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.MarketplaceOrdering/agreements", "2015-06-01"),
+			SubResources: []SwaggerResourceType{
+				{
+					Display:  "{planId}",
+					Endpoint: mustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.MarketplaceOrdering/agreements/{publisherId}/offers/{offerId}/plans/{planId}", "2015-06-01"),
+					Children: []SwaggerResourceType{},
+				}},
 		},
 		{
 			Display:     "current",

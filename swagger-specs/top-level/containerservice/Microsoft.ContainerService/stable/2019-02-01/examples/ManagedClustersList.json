@@ -1,15 +1,14 @@
 {
   "parameters": {
-    "api-version": "2018-03-31",
-    "subscriptionId": "subid1",
-    "resourceGroupName": "rg1"
+    "api-version": "2019-02-01",
+    "subscriptionId": "subid1"
   },
   "responses": {
     "200": {
       "body": {
         "value": [
           {
-            "id": "/subscriptions/subid1/resourcegroups/rg1/providers/Microsoft.ContainerService/managedClusters",
+            "id": "/subscriptions/subid1/providers/Microsoft.ContainerService/managedClusters",
             "location": "location1",
             "name": "clustername1",
             "tags": {
@@ -27,9 +26,10 @@
                   "name": "nodepool1",
                   "count": 3,
                   "vmSize": "Standard_DS1_v2",
-                  "storageProfile": "ManagedDisks",
                   "maxPods": 110,
-                  "osType": "Linux"
+                  "osType": "Linux",
+                  "provisioningState": "Succeeded",
+                  "orchestratorVersion": "1.9.6"
                 }
               ],
               "linuxProfile": {
