@@ -9,7 +9,6 @@ var Register = []Expander{
 	&ActionExpander{},
 	&SwaggerResourceExpander{},
 	&DeploymentsExpander{},
-	&DeploymentExpander{},
 	&ActivityLogExpander{},
 	&JSONExpander{},
 }
