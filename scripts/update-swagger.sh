@@ -84,7 +84,11 @@ do
 
     # Get resource-type folders 
     { 
-        swaggerFolders=$(ls -d ${serviceFolder}resource-manager/*/)
+        swaggerFolders=""
+        if [[ -d "${serviceFolder}resource-manager" ]] 
+        then
+            swaggerFolders=$(ls -d ${serviceFolder}resource-manager/*/)
+        fi
     } || {
         swaggerFolders=""
     }
