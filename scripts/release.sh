@@ -16,9 +16,6 @@ bash -f ./install_dev_tools.sh
 echo "->Move to root directory"
 cd ../
 
-echo "->Run 'make swagger-update' to make sure we're up to date on API Definitions"
-make swagger-update
-
 echo "->Use make build to codegen, lint and check"
 make build
 if [[ $(git diff --stat) != '' ]]; then
