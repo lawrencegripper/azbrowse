@@ -6,6 +6,7 @@ import (
 
 	"github.com/atotto/clipboard"
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
@@ -89,7 +90,10 @@ func (h FullscreenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			v.Wrap = true
 			keyBindings := GetKeyBindingsAsStrings()
 			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(keyBindings["fullscreen"]))
-			fmt.Fprint(v, h.Content.GetContent())
+
+			content := h.Content.GetContent()
+			fmt.Fprint(v, style.ColorJSON(content))
+
 			g.SetCurrentView("fullscreenContent")
 		} else {
 			g.Cursor = false

@@ -3,11 +3,11 @@ package views
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"time"
 
 	"github.com/TylerBrock/colorjson"
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests
