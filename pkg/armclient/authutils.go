@@ -2,6 +2,7 @@ package armclient
 
 import (
 	"encoding/json"
+	"fmt"
 	"os/exec"
 )
 
@@ -13,9 +14,9 @@ type azCLIToken struct {
 }
 
 func aquireTokenFromAzCLI() (azCLIToken, error) {
-	out, err := exec.Command("az", "account", "get-access-token", "--output", "json").Output()
+	out, err := exec.Command("az", "account", "get-access-token", "--output", "json").CombinedOutput()
 	if err != nil {
-		return azCLIToken{}, err
+		return azCLIToken{}, fmt.Errorf("Error authenticating with using the AzCLI: %v %v", string(out), err)
 	}
 
 	var r azCLIToken
