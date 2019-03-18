@@ -185,6 +185,28 @@ type DeploymentsResponse struct {
 	} `json:"value"`
 }
 
+// DeploymentOperationsResponse is a struct to enable splitting out json value array
+type DeploymentOperationsResponse struct {
+	Value []struct {
+		ID          string `json:"id"`
+		OperationID string `json:"operationId"`
+		Properties  struct {
+			StatusCode            string      `json:"statusCode"`
+			StatusMessage         interface{} `json:"statusMessage"`
+			Timestamp             string      `json:"timestamp"`
+			Duration              string      `json:"duration"`
+			ProvisioningOperation string      `json:"provisioningOperation"`
+			ProvisioningState     string      `json:"provisioningState"`
+			TrackingID            string      `json:"trackingId"`
+			TargetResource        struct {
+				ID           string `json:"id"`
+				ResourceType string `json:"resourceType"`
+				ResourceName string `json:"resourceName"`
+			} `json:"targetResource"`
+		} `json:"properties"`
+	} `json:"value"`
+}
+
 // ActivityLogResource is returned when requesting activity logs for an RG
 type ActivityLogResource struct {
 	Value []struct {

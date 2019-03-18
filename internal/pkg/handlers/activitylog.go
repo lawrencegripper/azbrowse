@@ -61,7 +61,7 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 			ID:              log.ID,
 			Parentid:        currentItem.ID,
 			ExpandURL:       ExpandURLNotSupported,
-			ItemType:        subDeploymentType,
+			ItemType:        subActivityLogType,
 			SubscriptionID:  currentItem.SubscriptionID,
 			StatusIndicator: DrawStatus(log.Status.Value),
 			Metadata: map[string]string{
