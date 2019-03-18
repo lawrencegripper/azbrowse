@@ -86,10 +86,14 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 			// Update the existing state as we have more up-to-date info
 			objectJSON := string(value.GetArray("value")[i].MarshalTo([]byte("")))
 
-			display := operation.OperationID + "\n   " + style.Subtle("Started:"+operation.Properties.Timestamp) + "\n   " + style.Subtle("Duration: "+operation.Properties.Duration) + "\n   " + style.Subtle("DeploymentStatus: "+operation.Properties.ProvisioningState+"")
+			title := operation.OperationID
 			if operation.Properties.TargetResource.ResourceType != "" {
-				display += "\n   " + style.Subtle("ResourceType:"+operation.Properties.TargetResource.ResourceType) +
-					"\n   " + style.Subtle("ResourceName:"+operation.Properties.TargetResource.ResourceName)
+				title = operation.Properties.TargetResource.ResourceName
+			}
+
+			display := title + "\n   " + style.Subtle("Started:"+operation.Properties.Timestamp) + "\n   " + style.Subtle("Duration: "+operation.Properties.Duration) + "\n   " + style.Subtle("DeploymentStatus: "+operation.Properties.ProvisioningState+"")
+			if operation.Properties.TargetResource.ResourceType != "" {
+				display += "\n   " + style.Subtle("ResourceType:"+operation.Properties.TargetResource.ResourceType)
 			}
 			newItems = append(newItems, &TreeNode{
 				Name:           operation.OperationID,
