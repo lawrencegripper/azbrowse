@@ -278,8 +278,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 // ChangeSelection updates the selected item
 func (w *ListWidget) ChangeSelection(i int) {
-	if i >= len(w.items) || i < 0 {
-		return
+	if i >= len(w.items) {
+		i = len(w.items) - 1
+	} else if i < 0 {
+		i = 0
 	}
 	w.selected = i
 }
@@ -297,4 +299,40 @@ func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 // CurrentExpandedItem returns the currently expanded item as a treenode
 func (w *ListWidget) CurrentExpandedItem() *handlers.TreeNode {
 	return w.expandedNodeItem
+}
+
+// MovePageDown changes the selection to be a page further down the list
+func (w *ListWidget) MovePageDown() {
+	i := w.selected
+
+	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i < len(w.items); i++ {
+		item := w.items[i]
+		remainingLinesToPage -= strings.Count(item.Display, "\n") + 1 // +1 as there is an implicit newline
+		remainingLinesToPage--                                        // separator
+	}
+
+	w.ChangeSelection(i)
+}
+
+// MovePageUp changes the selection to be a page further up the list
+func (w *ListWidget) MovePageUp() {
+	i := w.selected
+
+	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i >= 0; i-- {
+		item := w.items[i]
+		remainingLinesToPage -= strings.Count(item.Display, "\n") + 1 // +1 as there is an implicit newline
+		remainingLinesToPage--                                        // separator
+	}
+
+	w.ChangeSelection(i)
+}
+
+// MoveHome changes the selection to the top of the list
+func (w *ListWidget) MoveHome() {
+	w.ChangeSelection(0)
+}
+
+// MoveEnd changes the selection to the bottom of the list
+func (w *ListWidget) MoveEnd() {
+	w.ChangeSelection(len(w.items) - 1)
 }

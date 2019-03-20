@@ -164,6 +164,10 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
 	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
+	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
+	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
+	keybindings.AddHandler(keybindings.NewListEndHandler(list))
+	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 
 	// Item handlers
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))

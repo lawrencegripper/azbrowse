@@ -162,6 +162,98 @@ func (h ListRightHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 
 ////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////
+type ListPageDownHandler struct {
+	ListHandler
+	List *views.ListWidget
+}
+
+func NewListPageDownHandler(list *views.ListWidget) *ListPageDownHandler {
+	handler := &ListPageDownHandler{
+		List: list,
+	}
+	handler.Index = 18
+	return handler
+}
+
+func (h ListPageDownHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.List.MovePageDown()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////
+type ListPageUpHandler struct {
+	ListHandler
+	List *views.ListWidget
+}
+
+func NewListPageUpHandler(list *views.ListWidget) *ListPageUpHandler {
+	handler := &ListPageUpHandler{
+		List: list,
+	}
+	handler.Index = 19
+	return handler
+}
+
+func (h ListPageUpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.List.MovePageUp()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////
+type ListEndHandler struct {
+	ListHandler
+	List *views.ListWidget
+}
+
+func NewListEndHandler(list *views.ListWidget) *ListEndHandler {
+	handler := &ListEndHandler{
+		List: list,
+	}
+	handler.Index = 20
+	return handler
+}
+
+func (h ListEndHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.List.MoveEnd()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////
+type ListHomeHandler struct {
+	ListHandler
+	List *views.ListWidget
+}
+
+func NewListHomeHandler(list *views.ListWidget) *ListHomeHandler {
+	handler := &ListHomeHandler{
+		List: list,
+	}
+	handler.Index = 21
+	return handler
+}
+
+func (h ListHomeHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.List.MoveHome()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
 ////////////////////////////////////////////////////////////////////
 type ListEditHandler struct {
 	ListHandler
