@@ -22,6 +22,10 @@ var HandlerIds = []string{
 	"listopen",       // 15
 	"listrefresh",    // 16
 	"listupdate",     // 17
+	"listpagedown",   // 18
+	"listpageup",     // 19
+	"listend",        // 20
+	"listhome",       // 21
 }
 
 // KeyHandler is an interface that all key handlers must implement
@@ -29,6 +33,7 @@ type KeyHandler interface {
 	ID() string
 	Fn() func(g *gocui.Gui, v *gocui.View) error
 	Widget() string
+
 	DefaultKey() gocui.Key
 }
 

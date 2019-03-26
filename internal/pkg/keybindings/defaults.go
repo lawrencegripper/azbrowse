@@ -22,4 +22,8 @@ var DefaultKeys = map[string]gocui.Key{
 	"listopen":       gocui.KeyCtrlO,
 	"listrefresh":    gocui.KeyF5,
 	"listupdate":     gocui.KeyCtrlU,
+	"listpagedown":   gocui.KeyPgdn,
+	"listpageup":     gocui.KeyPgup,
+	"listend":        gocui.KeyEnd,
+	"listhome":       gocui.KeyHome,
 }
