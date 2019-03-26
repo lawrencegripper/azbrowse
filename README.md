@@ -55,11 +55,13 @@ Below is a table containing the default key bindings. If you'd like to customise
 
 ## Navigation
 
-| Key       | Does                 |
-| --------- | -------------------- |
-| ↑/↓       | Select resource      |
-| Backspace | Go back              |
-| ENTER     | Expand/View resource |
+| Key       | Does                                       |
+| --------- | ------------------------------------------ |
+| ↑/↓       | Select resource                            |
+| PgDn/PgUp | Move up or down a page of resources        |
+| Home/End  | Move to the top or bottom of the resources |
+| Backspace | Go back                                    |
+| ENTER     | Expand/View resource                       |
 
 ## Operations
 
