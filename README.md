@@ -35,6 +35,12 @@ scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
 
+### Install via `azure-cli` extention
+
+Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
+
+[This extension from Noel Bundick lets you do just that](https://github.com/noelbundick/azure-cli-extension-noelbundick/blob/master/README.md#browse)
+
 #### DIY
 
 Simply download the archive/package suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it. 
