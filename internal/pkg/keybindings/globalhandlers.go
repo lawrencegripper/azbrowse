@@ -144,3 +144,49 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 }
 
 ////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ConfirmDeleteHandler struct {
+	GlobalHandler
+}
+
+func NewConfirmDeleteHandler() *ConfirmDeleteHandler {
+	handler := &ConfirmDeleteHandler{}
+	handler.Index = 22
+	return handler
+}
+
+func (h *ConfirmDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		g.Update(func(*gocui.Gui) error {
+			views.ConfirmDelete()
+			return nil
+		})
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ClearPendingDeleteHandler struct {
+	GlobalHandler
+}
+
+func NewClearPendingDeleteHandler() *ClearPendingDeleteHandler {
+	handler := &ClearPendingDeleteHandler{}
+	handler.Index = 23
+	return handler
+}
+
+func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		g.Update(func(*gocui.Gui) error {
+			views.ClearPendingDeletes()
+			return nil
+		})
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////

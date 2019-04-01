@@ -133,8 +133,9 @@ func main() {
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing)
+	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
 
-	g.SetManager(status, content, list)
+	g.SetManager(status, content, list, notifications)
 	g.SetCurrentView("listWidget")
 
 	var editModeEnabled bool
@@ -150,6 +151,8 @@ func main() {
 	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
+	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler())
+	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler())
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -185,6 +188,8 @@ func main() {
 	status.HelpKeyBinding = keyBindings["help"]
 	list.ActionKeyBinding = keyBindings["listactions"]
 	list.FullscreenKeyBinding = keyBindings["fullscreen"]
+	notifications.ConfirmDeleteKeyBinding = keyBindings["confirmdelete"]
+	notifications.ClearPendingDeletesKeyBinding = keyBindings["clearpendingdeletes"]
 
 	go func() {
 		time.Sleep(time.Second * 1)

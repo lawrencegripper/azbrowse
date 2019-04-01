@@ -4,28 +4,30 @@ import "github.com/jroimartin/gocui"
 
 // HandlerIds A list of available handlers and their associated array index
 var HandlerIds = []string{
-	"quit",           // 0
-	"copy",           // 1
-	"listdelete",     // 2
-	"fullscreen",     // 3
-	"help",           // 4
-	"itemback",       // 5
-	"itemleft",       // 6
-	"listactions",    // 7
-	"listback",       // 8
-	"listbacklegacy", // 9
-	"listdown",       // 10
-	"listup",         // 11
-	"listright",      // 12
-	"listedit",       // 13
-	"listexpand",     // 14
-	"listopen",       // 15
-	"listrefresh",    // 16
-	"listupdate",     // 17
-	"listpagedown",   // 18
-	"listpageup",     // 19
-	"listend",        // 20
-	"listhome",       // 21
+	"quit",                // 0
+	"copy",                // 1
+	"listdelete",          // 2
+	"fullscreen",          // 3
+	"help",                // 4
+	"itemback",            // 5
+	"itemleft",            // 6
+	"listactions",         // 7
+	"listback",            // 8
+	"listbacklegacy",      // 9
+	"listdown",            // 10
+	"listup",              // 11
+	"listright",           // 12
+	"listedit",            // 13
+	"listexpand",          // 14
+	"listopen",            // 15
+	"listrefresh",         // 16
+	"listupdate",          // 17
+	"listpagedown",        // 18
+	"listpageup",          // 19
+	"listend",             // 20
+	"listhome",            // 21
+	"confirmdelete",       // 22
+	"clearpendingdeletes", //23
 }
 
 // KeyHandler is an interface that all key handlers must implement
