@@ -60,3 +60,13 @@ func Completed(s string) string {
 func Header(s string) string {
 	return color.New(color.BgBlue, color.FgWhite).Sprint(s)
 }
+
+// Warning make the background red and text white
+func Warning(s string) string {
+	return color.New(color.BgRed, color.FgWhite).Sprint(s)
+}
+
+// Highlight make the background green and text white
+func Highlight(s string) string {
+	return color.New(color.BgBlue, color.FgWhite).Sprint(s)
+}

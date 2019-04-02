@@ -378,27 +378,12 @@ func (h ListRefreshHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 ////////////////////////////////////////////////////////////////////
 type ListDeleteHandler struct {
 	ListHandler
-	DeleteConfirmItemID string
-	DeleteConfirmCount  int
-	StatusBar           *views.StatusbarWidget
-	Content             *views.ItemWidget
-	List                *views.ListWidget
-	Context             context.Context
+	List *views.ListWidget
 }
 
-func NewListDeleteHandler(content *views.ItemWidget,
-	statusbar *views.StatusbarWidget,
-	list *views.ListWidget,
-	deleteConfirmItemId string,
-	deleteConfirmCount int,
-	context context.Context) *ListDeleteHandler {
+func NewListDeleteHandler(list *views.ListWidget) *ListDeleteHandler {
 	handler := &ListDeleteHandler{
-		Content:             content,
-		StatusBar:           statusbar,
-		List:                list,
-		DeleteConfirmCount:  deleteConfirmCount,
-		DeleteConfirmItemID: deleteConfirmItemId,
-		Context:             context,
+		List: list,
 	}
 	handler.Index = 2
 	return handler

@@ -141,8 +141,6 @@ func main() {
 	var editModeEnabled bool
 	var isFullscreen bool
 	var showHelp bool
-	var deleteConfirmItemID string
-	var deleteConfirmCount int
 
 	// Global handlers
 	// NOTE> Global handlers must be registered first to
@@ -165,7 +163,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
-	keybindings.AddHandler(keybindings.NewListDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
+	keybindings.AddHandler(keybindings.NewListDeleteHandler(list))
 	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))

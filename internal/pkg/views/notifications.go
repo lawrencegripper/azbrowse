@@ -33,6 +33,17 @@ func AddPendingDelete(display, url string) {
 		deleteMutex.Lock()
 		defer deleteMutex.Unlock()
 
+		for _, i := range pendingDeletes {
+			if i.url == url {
+				eventing.SendStatusEvent(eventing.StatusEvent{
+					Failure: true,
+					Message: "Item already `" + display + "` in pending delete list",
+					Timeout: time.Second * 5,
+				})
+				return nil
+			}
+		}
+
 		pendingDeletes = append(pendingDeletes, pendingDelete{
 			url:     url,
 			display: display,
@@ -141,8 +152,8 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 	}
 	fmt.Fprintln(v, "")
 	fmt.Fprintln(v, "Do you want to delete these items?")
-	fmt.Fprintln(v, style.Header("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE"))
-	fmt.Fprintln(v, style.Header("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CANCEL"))
+	fmt.Fprintln(v, style.Warning("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE"))
+	fmt.Fprintln(v, style.Highlight("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CANCEL"))
 
 	return nil
 }
