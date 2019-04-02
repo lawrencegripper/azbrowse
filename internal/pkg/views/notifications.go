@@ -122,7 +122,7 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 		return nil
 	}
 
-	height := len(pendingDeletes)*1 + 6
+	height := len(pendingDeletes)*1 + 7
 
 	v, err := g.SetView(w.name, w.x, w.y, w.x+w.w, height)
 	if err != nil && err != gocui.ErrUnknownView {
@@ -140,8 +140,9 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 		fmt.Fprintln(v, " - "+i.display)
 	}
 	fmt.Fprintln(v, "")
-	fmt.Fprintln(v, style.Header("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE all pending items"))
-	fmt.Fprintln(v, style.Header("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CLEAR items"))
+	fmt.Fprintln(v, "Do you want to delete these items?")
+	fmt.Fprintln(v, style.Header("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE"))
+	fmt.Fprintln(v, style.Header("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CANCEL"))
 
 	return nil
 }

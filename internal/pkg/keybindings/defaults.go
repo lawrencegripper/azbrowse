@@ -27,5 +27,5 @@ var DefaultKeys = map[string]gocui.Key{
 	"listend":             gocui.KeyEnd,
 	"listhome":            gocui.KeyHome,
 	"confirmdelete":       gocui.KeyCtrlY,
-	"clearpendingdeletes": gocui.KeyCtrlT,
+	"clearpendingdeletes": gocui.KeyCtrlN,
 }
