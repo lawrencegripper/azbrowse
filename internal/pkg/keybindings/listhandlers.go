@@ -392,7 +392,7 @@ func NewListDeleteHandler(list *views.ListWidget) *ListDeleteHandler {
 func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		item := h.List.CurrentItem()
-		views.AddPendingDelete(item.Display, item.DeleteURL)
+		views.AddPendingDelete(item.Name, item.DeleteURL)
 		return nil
 	}
 }

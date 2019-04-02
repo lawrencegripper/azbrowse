@@ -29,6 +29,14 @@ var gui *gocui.Gui
 // AddPendingDelete queues deletes for
 // delete once confirmed
 func AddPendingDelete(display, url string) {
+	if url == "" {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			Failure: true,
+			Message: "Item `" + display + "` doesn't support delete",
+			Timeout: time.Second * 5,
+		})
+		return
+	}
 	gui.Update(func(g *gocui.Gui) error {
 		deleteMutex.Lock()
 		defer deleteMutex.Unlock()
@@ -55,10 +63,11 @@ func AddPendingDelete(display, url string) {
 
 // ConfirmDelete delete all queued/pending deletes
 func ConfirmDelete() {
-	deleteMutex.Lock()
-	pending := pendingDeletes
 	gui.Update(func(g *gocui.Gui) error {
+		deleteMutex.Lock()
+		defer deleteMutex.Unlock()
 
+		pending := pendingDeletes
 		event, _ := eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Starting to delete items",
@@ -68,7 +77,15 @@ func ConfirmDelete() {
 		for _, i := range pending {
 			_, err := armclient.DoRequest(context.Background(), "DELETE", i.url)
 			if err != nil {
-				panic(err)
+				event.Failure = true
+				event.Message = "Failed to delete `" + i.display + "` with error:" + err.Error()
+				event.Update()
+
+				// In the event that a delete fails in the
+				// batch of pending deletes lets give up on the rest
+				// as something might have gone wrong and best
+				// to be cautious
+				return nil
 			}
 
 			event.Message = "Deleted: " + i.display
@@ -80,7 +97,6 @@ func ConfirmDelete() {
 		event.Update()
 
 		pendingDeletes = []pendingDelete{}
-		deleteMutex.Unlock()
 
 		return nil
 	})
@@ -142,7 +158,7 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 
 	v.Clear()
 	v.Title = "Notifications [ESC to clear]"
-	v.Wrap = true
+	v.Wrap = false
 
 	pending := pendingDeletes
 
