@@ -1,11 +1,8 @@
-.PHONY: dep checks test build
-all: dep checks test build
+.PHONY: checks test build
+all: checks test build
 
 setup:
 	./scripts/install_dev_tools.sh
-
-dep:
-	dep ensure -v --vendor-only
 
 test:
 	go test -v -short ./...
@@ -13,7 +10,7 @@ test:
 integration:
 	go test ./...
 
-build: dep swagger-codegen test checks 
+build: swagger-codegen test checks 
 	go build ./cmd/azbrowse
 
 install:
