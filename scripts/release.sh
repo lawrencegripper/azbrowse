@@ -9,6 +9,7 @@ fi
 
 git tag -f v1.1.$BUILD_NUMBER
 export GOVERSION=$(go version)
+export GO111MODULE=on
 
 echo "->Installing dev tools"
 bash -f ./install_dev_tools.sh
