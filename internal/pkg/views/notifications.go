@@ -3,11 +3,12 @@ package views
 import (
 	"context"
 	"fmt"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
-	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -37,6 +38,19 @@ func AddPendingDelete(display, url string) {
 		})
 		return
 	}
+
+	// Don't add more items than we can draw on the
+	// current terminal size
+	_, yMax := gui.Size()
+	if len(pendingDeletes) > (yMax - 12) {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			Failure: true,
+			Message: "Can't add `" + display + "` run out of space to draw the `Pending delete` list!",
+			Timeout: time.Second * 5,
+		})
+		return
+	}
+
 	gui.Update(func(g *gocui.Gui) error {
 		deleteMutex.Lock()
 		defer deleteMutex.Unlock()
@@ -63,7 +77,7 @@ func AddPendingDelete(display, url string) {
 
 // ConfirmDelete delete all queued/pending deletes
 func ConfirmDelete() {
-	gui.Update(func(g *gocui.Gui) error {
+	go func() {
 		deleteMutex.Lock()
 		defer deleteMutex.Unlock()
 
@@ -85,7 +99,7 @@ func ConfirmDelete() {
 				// batch of pending deletes lets give up on the rest
 				// as something might have gone wrong and best
 				// to be cautious
-				return nil
+				return
 			}
 
 			event.Message = "Deleted: " + i.display
@@ -97,9 +111,7 @@ func ConfirmDelete() {
 		event.Update()
 
 		pendingDeletes = []pendingDelete{}
-
-		return nil
-	})
+	}()
 }
 
 // ClearPendingDeletes removes all pending deletes
