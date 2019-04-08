@@ -20,7 +20,7 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 	}
 	defer g.Close()
 
-	notView := NewNotificationWidget(0, 0, 45, false, g)
+	notView := NewNotificationWidget(0, 0, 47, false, g)
 	g.SetManager(notView)
 
 	notView.AddPendingDelete("s1", "http://delete/s1")

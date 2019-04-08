@@ -8,6 +8,7 @@ dep:
 	dep ensure -v --vendor-only
 
 test:
+	# ensure running in a terminal a required for gocui testing
 	go test -v -short ./...
 
 integration:
