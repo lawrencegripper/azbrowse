@@ -148,20 +148,20 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 ////////////////////////////////////////////////////////////////////
 type ConfirmDeleteHandler struct {
 	GlobalHandler
+	notificationWidget *views.NotificationWidget
 }
 
-func NewConfirmDeleteHandler() *ConfirmDeleteHandler {
-	handler := &ConfirmDeleteHandler{}
+func NewConfirmDeleteHandler(notificationWidget *views.NotificationWidget) *ConfirmDeleteHandler {
+	handler := &ConfirmDeleteHandler{
+		notificationWidget: notificationWidget,
+	}
 	handler.Index = 22
 	return handler
 }
 
 func (h *ConfirmDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		g.Update(func(*gocui.Gui) error {
-			views.ConfirmDelete()
-			return nil
-		})
+		h.notificationWidget.ConfirmDelete()
 		return nil
 	}
 }
@@ -171,20 +171,20 @@ func (h *ConfirmDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 ////////////////////////////////////////////////////////////////////
 type ClearPendingDeleteHandler struct {
 	GlobalHandler
+	notificationWidget *views.NotificationWidget
 }
 
-func NewClearPendingDeleteHandler() *ClearPendingDeleteHandler {
-	handler := &ClearPendingDeleteHandler{}
+func NewClearPendingDeleteHandler(notificationWidget *views.NotificationWidget) *ClearPendingDeleteHandler {
+	handler := &ClearPendingDeleteHandler{
+		notificationWidget: notificationWidget,
+	}
 	handler.Index = 23
 	return handler
 }
 
 func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		g.Update(func(*gocui.Gui) error {
-			views.ClearPendingDeletes()
-			return nil
-		})
+		h.notificationWidget.ClearPendingDeletes()
 		return nil
 	}
 }

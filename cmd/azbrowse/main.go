@@ -149,8 +149,8 @@ func main() {
 	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
-	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler())
-	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler())
+	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
+	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -163,7 +163,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
-	keybindings.AddHandler(keybindings.NewListDeleteHandler(list))
+	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
 	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))

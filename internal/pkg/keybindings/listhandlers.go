@@ -378,12 +378,14 @@ func (h ListRefreshHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 ////////////////////////////////////////////////////////////////////
 type ListDeleteHandler struct {
 	ListHandler
-	List *views.ListWidget
+	List               *views.ListWidget
+	NotificationWidget *views.NotificationWidget
 }
 
-func NewListDeleteHandler(list *views.ListWidget) *ListDeleteHandler {
+func NewListDeleteHandler(list *views.ListWidget, notificationWidget *views.NotificationWidget) *ListDeleteHandler {
 	handler := &ListDeleteHandler{
-		List: list,
+		List:               list,
+		NotificationWidget: notificationWidget,
 	}
 	handler.Index = 2
 	return handler
@@ -392,7 +394,7 @@ func NewListDeleteHandler(list *views.ListWidget) *ListDeleteHandler {
 func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		item := h.List.CurrentItem()
-		views.AddPendingDelete(item.Name, item.DeleteURL)
+		h.NotificationWidget.AddPendingDelete(item.Name, item.DeleteURL)
 		return nil
 	}
 }

@@ -3,6 +3,7 @@ package views
 import (
 	"context"
 	"fmt"
+	"io"
 	"strings"
 	"sync"
 	"time"
@@ -14,22 +15,36 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 )
 
-func init() {
-	pendingDeletes = []pendingDelete{}
-}
-
 type pendingDelete struct {
 	display string
 	url     string
 }
 
-var pendingDeletes []pendingDelete
-var deleteMutex sync.Mutex // ensure delete occurs only once
-var gui *gocui.Gui
+// NotificationWidget controls the notifications windows in the top right
+type NotificationWidget struct {
+	ConfirmDeleteKeyBinding       string
+	ClearPendingDeletesKeyBinding string
+	name                          string
+	x, y                          int
+	w                             int
+	pendingDeletes                []pendingDelete
+	deleteMutex                   sync.Mutex // ensure delete occurs only once
+	deleteInProgress              bool
+	gui                           *gocui.Gui
+}
 
 // AddPendingDelete queues deletes for
 // delete once confirmed
-func AddPendingDelete(display, url string) {
+func (w *NotificationWidget) AddPendingDelete(display, url string) {
+	if w.deleteInProgress {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			Failure: true,
+			Message: "Delete already in progress. Please wait for completion.",
+			Timeout: time.Second * 5,
+		})
+		return
+	}
+
 	if url == "" {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
@@ -41,8 +56,8 @@ func AddPendingDelete(display, url string) {
 
 	// Don't add more items than we can draw on the
 	// current terminal size
-	_, yMax := gui.Size()
-	if len(pendingDeletes) > (yMax - 12) {
+	_, yMax := w.gui.Size()
+	if len(w.pendingDeletes) > (yMax - 12) {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
 			Message: "Can't add `" + display + "` run out of space to draw the `Pending delete` list!",
@@ -51,37 +66,48 @@ func AddPendingDelete(display, url string) {
 		return
 	}
 
-	gui.Update(func(g *gocui.Gui) error {
-		deleteMutex.Lock()
-		defer deleteMutex.Unlock()
+	w.deleteMutex.Lock()
+	defer w.deleteMutex.Unlock()
 
-		for _, i := range pendingDeletes {
-			if i.url == url {
-				eventing.SendStatusEvent(eventing.StatusEvent{
-					Failure: true,
-					Message: "Item already `" + display + "` in pending delete list",
-					Timeout: time.Second * 5,
-				})
-				return nil
-			}
+	for _, i := range w.pendingDeletes {
+		if i.url == url {
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				Failure: true,
+				Message: "Item already `" + display + "` in pending delete list",
+				Timeout: time.Second * 5,
+			})
+			return
 		}
+	}
 
-		pendingDeletes = append(pendingDeletes, pendingDelete{
-			url:     url,
-			display: display,
-		})
-
-		return nil
+	w.pendingDeletes = append(w.pendingDeletes, pendingDelete{
+		url:     url,
+		display: display,
 	})
 }
 
 // ConfirmDelete delete all queued/pending deletes
-func ConfirmDelete() {
-	go func() {
-		deleteMutex.Lock()
-		defer deleteMutex.Unlock()
+func (w *NotificationWidget) ConfirmDelete() {
+	if w.deleteInProgress {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			Failure: true,
+			Message: "Delete already in progress. Please wait for completion.",
+			Timeout: time.Second * 5,
+		})
+		return
+	}
 
-		pending := pendingDeletes
+	w.deleteMutex.Lock()
+	w.deleteInProgress = true
+
+	go func() {
+		// unlock and mark delete as not in progress
+		defer w.deleteMutex.Unlock()
+		defer func() {
+			w.deleteInProgress = false
+		}()
+
+		pending := w.pendingDeletes
 		event, _ := eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Starting to delete items",
@@ -92,6 +118,7 @@ func ConfirmDelete() {
 			_, err := armclient.DoRequest(context.Background(), "DELETE", i.url)
 			if err != nil {
 				event.Failure = true
+				event.InProgress = false
 				event.Message = "Failed to delete `" + i.display + "` with error:" + err.Error()
 				event.Update()
 
@@ -110,14 +137,14 @@ func ConfirmDelete() {
 		event.InProgress = false
 		event.Update()
 
-		pendingDeletes = []pendingDelete{}
+		w.pendingDeletes = []pendingDelete{}
 	}()
 }
 
 // ClearPendingDeletes removes all pending deletes
-func ClearPendingDeletes() {
-	deleteMutex.Lock()
-	gui.Update(func(g *gocui.Gui) error {
+func (w *NotificationWidget) ClearPendingDeletes() {
+	w.deleteMutex.Lock()
+	w.gui.Update(func(g *gocui.Gui) error {
 
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: true,
@@ -125,43 +152,35 @@ func ClearPendingDeletes() {
 			Timeout:    time.Second * 2,
 		})
 
-		pendingDeletes = []pendingDelete{}
-		deleteMutex.Unlock()
+		w.pendingDeletes = []pendingDelete{}
+		w.deleteMutex.Unlock()
 
 		return nil
 	})
 }
 
-// NotificationWidget controls the statusbar
-type NotificationWidget struct {
-	ConfirmDeleteKeyBinding       string
-	ClearPendingDeletesKeyBinding string
-	name                          string
-	x, y                          int
-	w                             int
-}
-
 // NewNotificationWidget create new instance and start go routine for spinner
 func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *NotificationWidget {
 	widget := &NotificationWidget{
-		name: "notificationWidget",
-		x:    x,
-		y:    y,
-		w:    w,
+		name:           "notificationWidget",
+		x:              x,
+		y:              y,
+		w:              w,
+		gui:            g,
+		pendingDeletes: []pendingDelete{},
 	}
-	gui = g
 	return widget
 }
 
 // Layout draws the widget in the gocui view
 func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 	// Don't draw anything if no pending deletes
-	if len(pendingDeletes) < 1 {
+	if len(w.pendingDeletes) < 1 {
 		g.DeleteView(w.name)
 		return nil
 	}
 
-	height := len(pendingDeletes)*1 + 7
+	height := len(w.pendingDeletes)*1 + 7
 
 	v, err := g.SetView(w.name, w.x, w.y, w.x+w.w, height)
 	if err != nil && err != gocui.ErrUnknownView {
@@ -172,7 +191,11 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 	v.Title = "Notifications [ESC to clear]"
 	v.Wrap = false
 
-	pending := pendingDeletes
+	return w.layoutInternal(v)
+}
+
+func (w *NotificationWidget) layoutInternal(v io.Writer) error {
+	pending := w.pendingDeletes
 
 	fmt.Fprintln(v, style.Title("Pending Deletes:"))
 	for _, i := range pending {

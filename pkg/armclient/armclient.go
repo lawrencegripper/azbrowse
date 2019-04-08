@@ -19,12 +19,26 @@ const (
 	providerCacheKey = "providerCache"
 )
 
-// func isWriteVerb(verb string) bool {
-// 	v := strings.ToUpper(verb)
-// 	return v == "PUT" || v == "POST" || v == "PATCH"
-// }
+func init() {
+	client = &http.Client{}
+	aquireToken = aquireTokenFromAzCLI
+}
 
 var tenantID string
+var client *http.Client
+var aquireToken func() (AzCLIToken, error)
+
+// SetClient is used to override the HTTP Client used.
+// This is useful when testing
+func SetClient(newClient *http.Client) {
+	client = newClient
+}
+
+// SetAquireToken lets you override the token func for testing
+// or other purposes
+func SetAquireToken(aquireFunc func() (AzCLIToken, error)) {
+	aquireToken = aquireFunc
+}
 
 // GetTenantID gets the current tenandid from AzCli
 func GetTenantID() string {
@@ -65,8 +79,10 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		return "", err
 	}
 
-	client := &http.Client{}
-	req, _ := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
+	req, err := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
+	if err != nil {
+		return "", errors.New("Failed to create request for body: " + err.Error())
+	}
 
 	cliToken, err := aquireTokenFromAzCLI()
 	if err != nil {
@@ -88,7 +104,7 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 	// Check response error but also return body as it may contain useful information
 	// about the error
 	var responseErr error
-	if response.StatusCode < 200 && response.StatusCode > 299 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		span.SetTag("isError", true)
 		span.SetTag("errorCode", response.StatusCode)
 		span.SetTag("error", response.Status)

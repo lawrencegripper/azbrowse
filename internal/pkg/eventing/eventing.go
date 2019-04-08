@@ -67,3 +67,8 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 func SubscribeToStatusEvents() chan interface{} {
 	return pubSub.Sub("statusEvent")
 }
+
+// Unsubscribe from events
+func Unsubscribe(ch chan interface{}) {
+	pubSub.Unsub(ch)
+}

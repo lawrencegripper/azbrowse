@@ -34,7 +34,8 @@ func getRequestURL(path string) (string, error) {
 		return "", errors.New("Scheme must be https")
 	}
 
-	if !strings.HasSuffix(u.Hostname(), armEndpointSuffix) {
+	// 127.0.0.1 is to allow integration testing with locally mocked server
+	if !strings.HasSuffix(u.Hostname(), armEndpointSuffix) && u.Hostname() != "127.0.0.1" {
 		return "", fmt.Errorf("'%s' is not an ARM endpoint", u.Hostname())
 	}
 
