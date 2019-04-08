@@ -17,6 +17,7 @@ echo "->Move to root directory"
 cd ../
 
 echo "->Use make build to codegen, lint and check"
+export TERM=xterm
 make build
 if [[ $(git diff --stat) != '' ]]; then
   echo "Ditry GIT: Failing as swagger-generated caused changes, please run `make swagger-update` and `make swagger-generate` and commit changes for build to pass"
