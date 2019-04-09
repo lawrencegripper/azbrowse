@@ -8,11 +8,14 @@ dep:
 	dep ensure -v --vendor-only
 
 test:
-	# ensure running in a terminal a required for gocui testing
 	go test -v -short ./...
 
 integration:
-	bash -f ./scripts/integration_tests.sh
+	go test -count=1 ./...
+
+ci-integration:
+	docker build -f ci.Dockerfile -t azint . && docker run --privileged azint ./scripts/ci_integration_tests.sh
+	#docker run -it --privileged -v $PWD:/go/src/github.com/lawrencegripper/azbrowse -w /go/src/github.com/lawrencegripper/azbrowse golang:1.12 bash -c "make integration"
 
 build: dep swagger-codegen test checks 
 	go build ./cmd/azbrowse

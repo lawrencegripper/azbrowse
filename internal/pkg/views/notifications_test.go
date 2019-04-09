@@ -24,8 +24,6 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 	}
 	defer g.Close()
 
-	t.Error("Simulate failure")
-
 	notView := NewNotificationWidget(0, 0, 47, false, g)
 	g.SetManager(notView)
 

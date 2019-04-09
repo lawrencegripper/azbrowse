@@ -1,9 +1,16 @@
 #!/bin/bash
 set -e
 
+# start x server
+X -config ./scripts/assets/dummydisplay.conf &
+#set display to use
+export DISPLAY=:0
+
 statusfile=$(mktemp)
 logfile=$(mktemp)
-xterm -e sh -c 'make test > '$logfile'; echo $? > '$statusfile
+echo "Starting texts in Xterm"
+xterm -e sh -c 'go test -v ./... > '$logfile'; echo $? > '$statusfile
+echo "Tests finished"
 status=$(cat $statusfile)
 rm $statusfile
 
@@ -15,5 +22,6 @@ if [[ $status == "0" ]]; then
 else
   cat $logfile
   echo "Tests FAILED"
+  go version
   exit 1
 fi 
