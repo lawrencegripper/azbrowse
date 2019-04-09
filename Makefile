@@ -12,7 +12,7 @@ test:
 	go test -v -short ./...
 
 integration:
-	go test ./...
+	bash -f ./scripts/integration_tests.sh
 
 build: dep swagger-codegen test checks 
 	go build ./cmd/azbrowse

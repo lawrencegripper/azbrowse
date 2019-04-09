@@ -13,12 +13,18 @@ import (
 )
 
 func Test_Delete_AddPendingDelete(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
 	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
 	defer g.Close()
+
+	t.Error("Simulate failure")
 
 	notView := NewNotificationWidget(0, 0, 47, false, g)
 	g.SetManager(notView)
@@ -50,6 +56,10 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 }
 
 func Test_Delete_MessageSent(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -89,6 +99,10 @@ func Test_Delete_MessageSent(t *testing.T) {
 }
 
 func Test_Delete_StopAfterFailure(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -126,6 +140,10 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 }
 
 func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -163,6 +181,10 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 }
 
 func Test_Delete_RefusedAddPendingWhileInprogress(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
