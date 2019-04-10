@@ -84,7 +84,7 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		return "", errors.New("Failed to create request for body: " + err.Error())
 	}
 
-	cliToken, err := aquireTokenFromAzCLI()
+	cliToken, err := aquireToken()
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
