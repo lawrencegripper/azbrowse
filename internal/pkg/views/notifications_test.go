@@ -71,6 +71,8 @@ func Test_Delete_MessageSent(t *testing.T) {
 	}))
 	defer ts.Close()
 
+	time.Sleep(time.Second * 5)
+
 	// Set the ARM client to use out test server
 	armclient.SetClient(ts.Client())
 	armclient.SetAquireToken(dummyTokenFunc())
