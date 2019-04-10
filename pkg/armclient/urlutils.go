@@ -30,7 +30,8 @@ func getRequestURL(path string) (string, error) {
 		return armEndpoint + path, nil
 	}
 
-	if u.Scheme != "https" {
+	// 127.0.0.1 is to allow integration testing with locally mocked server
+	if u.Scheme != "https" && u.Hostname() != "127.0.0.1" {
 		return "", errors.New("Scheme must be https")
 	}
 

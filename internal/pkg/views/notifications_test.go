@@ -62,7 +62,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 	defer eventing.Unsubscribe(statusEvents)
 
 	count := 0
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Logf("SEVER MESSAGE: received: %s method: %s", r.URL.String(), r.Method)
 		count = count + 1
 		if r.Method != "DELETE" {

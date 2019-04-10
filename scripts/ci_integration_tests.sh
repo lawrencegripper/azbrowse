@@ -9,7 +9,7 @@ export DISPLAY=:0
 statusfile=$(mktemp)
 logfile=$(mktemp)
 echo "Starting texts in Xterm"
-xterm -e sh -c 'go test -v ./... > '$logfile'; echo $? > '$statusfile
+xterm -e sh -c 'go test -v -count=1 ./... > '$logfile'; echo $? > '$statusfile
 echo "Tests finished"
 status=$(cat $statusfile)
 rm $statusfile
