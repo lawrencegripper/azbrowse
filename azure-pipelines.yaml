@@ -26,6 +26,10 @@ steps:
     echo '##vso[task.prependpath]$(GOROOT)/bin'
   displayName: 'Set up the Go workspace'
 
+- script: go build ./cmd/azbrowse
+  workingDirectory: '$(modulePath)'
+  displayName: 'Build'
+
 - script: sudo -E scripts/install_ci_integration_tools.sh && sudo -E ./scripts/ci_integration_tests.sh
   workingDirectory: '$(modulePath)'
   displayName: 'Run integration tests'
