@@ -2,7 +2,7 @@
 all: dep checks test build
 
 setup:
-	./scripts/install_dev_tools.sh
+	./scripts/install_ci_tools.sh
 
 dep:
 	dep ensure -v --vendor-only
@@ -12,10 +12,6 @@ test:
 
 integration:
 	go test -count=1 ./...
-
-ci-integration:
-	docker build -f ci.Dockerfile -t azint . && docker run --privileged azint ./scripts/ci_integration_tests.sh
-	#docker run -it --privileged -v $PWD:/go/src/github.com/lawrencegripper/azbrowse -w /go/src/github.com/lawrencegripper/azbrowse golang:1.12 bash -c "make integration"
 
 build: dep swagger-codegen test checks 
 	go build ./cmd/azbrowse
