@@ -8,11 +8,11 @@ variables:
   modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
 
 steps:
-# - task: GoTool@0
-#   inputs:
-#     version: '1.12' 
-#     #goPath: # Optional
-#     #goBin: # Optional
+- task: GoTool@0
+  inputs:
+    version: '1.12' 
+    #goPath: # Optional
+    #goBin: # Optional
 - script: |
     mkdir -p '$(GOBIN)'
     mkdir -p '$(GOPATH)/pkg'
@@ -26,6 +26,6 @@ steps:
     echo '##vso[task.prependpath]$(GOROOT)/bin'
   displayName: 'Set up the Go workspace'
 
-- script: sudo make ci-integration
+- script: sudo -E scripts/install_ci_integration_tools.sh && sudo -E ./scripts/ci_integration_tests.sh
   workingDirectory: '$(modulePath)'
   displayName: 'Run integration tests'
