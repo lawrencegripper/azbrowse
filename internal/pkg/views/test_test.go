@@ -18,4 +18,8 @@ func Test_tests(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
+	if count != 1 {
+		t.Error("Expected 1 call to server")
+	}
 }
