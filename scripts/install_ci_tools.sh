@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 set -e
 
 # Download and install dep (https://github.com/golang/dep)

@@ -133,15 +133,14 @@ func main() {
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing)
+	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
 
-	g.SetManager(status, content, list)
+	g.SetManager(status, content, list, notifications)
 	g.SetCurrentView("listWidget")
 
 	var editModeEnabled bool
 	var isFullscreen bool
 	var showHelp bool
-	var deleteConfirmItemID string
-	var deleteConfirmCount int
 
 	// Global handlers
 	// NOTE> Global handlers must be registered first to
@@ -150,6 +149,8 @@ func main() {
 	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
+	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
+	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -162,7 +163,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
-	keybindings.AddHandler(keybindings.NewListDeleteHandler(content, status, list, deleteConfirmItemID, deleteConfirmCount, ctx))
+	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
 	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
@@ -185,6 +186,8 @@ func main() {
 	status.HelpKeyBinding = keyBindings["help"]
 	list.ActionKeyBinding = keyBindings["listactions"]
 	list.FullscreenKeyBinding = keyBindings["fullscreen"]
+	notifications.ConfirmDeleteKeyBinding = keyBindings["confirmdelete"]
+	notifications.ClearPendingDeletesKeyBinding = keyBindings["clearpendingdeletes"]
 
 	go func() {
 		time.Sleep(time.Second * 1)

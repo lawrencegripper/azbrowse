@@ -2,7 +2,7 @@
 all: dep checks test build
 
 setup:
-	./scripts/install_dev_tools.sh
+	./scripts/install_ci_tools.sh
 
 dep:
 	dep ensure -v --vendor-only
@@ -11,7 +11,7 @@ test:
 	go test -v -short ./...
 
 integration:
-	go test ./...
+	go test -count=1 ./...
 
 build: dep swagger-codegen test checks 
 	go build ./cmd/azbrowse

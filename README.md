@@ -110,29 +110,39 @@ You can install these yourself following the instructions on their github pages,
 
  This runs the script `scripts/install_dev_tools.sh`, which will install these tools for you.
 
-### Building
+## Building
 
 With your Go development environment set up, use `make` to build `azbrowse`.
 
 Take a look at the `Makefile` yourself, but the main rules are:
 
-#### Run Tests and Build
+### Run Tests and Build
 
 ``` bash
 make build
 ```
 
-#### Install Local Development Build
+Running integration tests (requires a full terminal)
+``` bash
+make integration
+```
+
+### Install Local Development Build
 
 
 ``` bash
 make install
 ```
 
-#### Run Travis-CI build locally
+## Automated builds
+
+The `CircleCI` build runs the `golang` build, unit tests and linting. 
+The `AzureDevOps` build run the integration tests under `XTerm`.
+
+### Running locally
 
 ``` bash
-make ci-docker
+make integration && make ci-docker 
 ```
 
 To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` environment variable defined, so running it as follows may be easier:

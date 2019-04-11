@@ -378,27 +378,14 @@ func (h ListRefreshHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 ////////////////////////////////////////////////////////////////////
 type ListDeleteHandler struct {
 	ListHandler
-	DeleteConfirmItemID string
-	DeleteConfirmCount  int
-	StatusBar           *views.StatusbarWidget
-	Content             *views.ItemWidget
-	List                *views.ListWidget
-	Context             context.Context
+	List               *views.ListWidget
+	NotificationWidget *views.NotificationWidget
 }
 
-func NewListDeleteHandler(content *views.ItemWidget,
-	statusbar *views.StatusbarWidget,
-	list *views.ListWidget,
-	deleteConfirmItemId string,
-	deleteConfirmCount int,
-	context context.Context) *ListDeleteHandler {
+func NewListDeleteHandler(list *views.ListWidget, notificationWidget *views.NotificationWidget) *ListDeleteHandler {
 	handler := &ListDeleteHandler{
-		Content:             content,
-		StatusBar:           statusbar,
-		List:                list,
-		DeleteConfirmCount:  deleteConfirmCount,
-		DeleteConfirmItemID: deleteConfirmItemId,
-		Context:             context,
+		List:               list,
+		NotificationWidget: notificationWidget,
 	}
 	handler.Index = 2
 	return handler
@@ -407,30 +394,7 @@ func NewListDeleteHandler(content *views.ItemWidget,
 func (h ListDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		item := h.List.CurrentItem()
-		if h.DeleteConfirmItemID != item.ID {
-			h.DeleteConfirmItemID = item.ID
-			h.DeleteConfirmCount = 0
-		}
-		keyBindings := GetKeyBindingsAsStrings()
-		done := h.StatusBar.Status(fmt.Sprintf("Delete item? Really? PRESS %s TO CONFIRM: %s", strings.ToUpper(keyBindings["listdelete"]), item.DeleteURL), true)
-		h.DeleteConfirmCount++
-
-		if h.DeleteConfirmCount > 1 {
-			done()
-			doneDelete := h.StatusBar.Status("Deleting item: "+item.DeleteURL, true)
-			defer doneDelete()
-			h.DeleteConfirmItemID = ""
-
-			// Run in the background
-			go func() {
-				res, err := armclient.DoRequest(h.Context, "DELETE", item.DeleteURL)
-				if err != nil {
-					panic(err)
-				}
-				// list.Refresh()
-				h.Content.SetContent(res, "Delete response>"+item.Name)
-			}()
-		}
+		h.NotificationWidget.AddPendingDelete(item.Name, item.DeleteURL)
 		return nil
 	}
 }

@@ -10,8 +10,9 @@ fi
 git tag -f v1.1.$BUILD_NUMBER
 export GOVERSION=$(go version)
 
-echo "->Installing dev tools"
-bash -f ./install_dev_tools.sh
+echo "->Installing tools"
+bash -f ./install_ci_tools.sh
+bash -f ./install_release_tools.sh
 
 echo "->Move to root directory"
 cd ../
