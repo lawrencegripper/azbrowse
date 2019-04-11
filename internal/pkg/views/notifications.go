@@ -122,6 +122,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 				event.Message = "Failed to delete `" + i.display + "` with error:" + err.Error()
 				event.Update()
 
+				w.pendingDeletes = []pendingDelete{}
 				// In the event that a delete fails in the
 				// batch of pending deletes lets give up on the rest
 				// as something might have gone wrong and best
@@ -146,7 +147,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 	w.deleteMutex.Lock()
 	w.gui.Update(func(g *gocui.Gui) error {
 
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Clearing pending deletes",
 			Timeout:    time.Second * 2,
@@ -154,6 +155,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 
 		w.pendingDeletes = []pendingDelete{}
 		w.deleteMutex.Unlock()
+		done()
 
 		return nil
 	})
