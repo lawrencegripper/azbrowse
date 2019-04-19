@@ -8,8 +8,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-func dummyTokenFunc() func() (armclient.AzCLIToken, error) {
-	return func() (armclient.AzCLIToken, error) {
+func dummyTokenFunc() func(clearCache bool) (armclient.AzCLIToken, error) {
+	return func(clearCache bool) (armclient.AzCLIToken, error) {
 		return armclient.AzCLIToken{
 			AccessToken:  "bob",
 			Subscription: "bill",
