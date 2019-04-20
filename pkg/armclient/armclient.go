@@ -106,6 +106,7 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		}
 		tenantID = cliToken.Tenant
 
+		// Retry the request now we have a valid token
 		response, err = client.Do(req) //nolint:staticcheck
 	}
 	if err != nil {
