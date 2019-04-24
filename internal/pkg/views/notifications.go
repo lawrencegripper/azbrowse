@@ -36,15 +36,6 @@ type NotificationWidget struct {
 // AddPendingDelete queues deletes for
 // delete once confirmed
 func (w *NotificationWidget) AddPendingDelete(display, url string) {
-	if w.deleteInProgress {
-		eventing.SendStatusEvent(eventing.StatusEvent{
-			Failure: true,
-			Message: "Delete already in progress. Please wait for completion.",
-			Timeout: time.Second * 5,
-		})
-		return
-	}
-
 	if url == "" {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
@@ -61,6 +52,15 @@ func (w *NotificationWidget) AddPendingDelete(display, url string) {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
 			Message: "Can't add `" + display + "` run out of space to draw the `Pending delete` list!",
+			Timeout: time.Second * 5,
+		})
+		return
+	}
+
+	if w.deleteInProgress {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			Failure: true,
+			Message: "Delete already in progress. Please wait for completion.",
 			Timeout: time.Second * 5,
 		})
 		return
