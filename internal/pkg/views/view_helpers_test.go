@@ -51,5 +51,4 @@ func WaitForStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec 
 
 	t.Error("Waited for event which never occurred")
 	return eventing.StatusEvent{}
-
 }

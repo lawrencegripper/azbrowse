@@ -188,10 +188,8 @@ func Test_Delete_RefusedAddPendingWhileInprogress(t *testing.T) {
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
-	count := 0
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Logf("SEVER MESSAGE: received: %s method: %s", r.URL.String(), r.Method)
-		count = count + 1
 		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
 	}))
 	defer ts.Close()
@@ -210,6 +208,9 @@ func Test_Delete_RefusedAddPendingWhileInprogress(t *testing.T) {
 
 	notView.AddPendingDelete("rg1", ts.URL+"/subscriptions/1/resourceGroups/rg1")
 	notView.ConfirmDelete()
+
+	// Wait for delete to be submitted
+	time.Sleep(time.Second * 1)
 
 	// Simulate double tap of delet key
 	notView.AddPendingDelete("rg2", ts.URL+"/subscriptions/1/resourceGroups/rg2")
