@@ -139,11 +139,51 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	}
 }
 
+func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
+	statusEvents := eventing.SubscribeToStatusEvents()
+	defer eventing.Unsubscribe(statusEvents)
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Logf("SEVER MESSAGE: received: %s method: %s", r.URL.String(), r.Method)
+		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
+	}))
+	defer ts.Close()
+	// Set the ARM client to use out test server
+	armclient.SetClient(ts.Client())
+	armclient.SetAquireToken(dummyTokenFunc())
+
+	g, err := gocui.NewGui(gocui.Output256)
+	if err != nil {
+		t.Error(err)
+		t.FailNow()
+	}
+	defer g.Close()
+	notView := NewNotificationWidget(0, 0, 45, false, g)
+
+	notView.AddPendingDelete("rg1", ts.URL+"/subscriptions/1/resourceGroups/rg1")
+	notView.ConfirmDelete()
+
+	notView.AddPendingDelete("rg2", ts.URL+"/subscriptions/1/resourceGroups/rg2")
+
+	// ConfirmDelete returns before it's finished
+	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)
+	if failureStatus.Message != "Delete already in progress. Please wait for completion." {
+		t.Errorf("Expected message 'Delete already in progress. Please wait for completion.' Got: %s", failureStatus.Message)
+	}
+}
+
 func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	if testing.Short() {
 		t.Log("Skipping integration test")
 		return
 	}
+
+	time.Sleep(time.Second * 5)
+
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -172,48 +212,6 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 
 	// Simulate double tap of delet key
 	notView.ConfirmDelete()
-
-	// ConfirmDelete returns before it's finished
-	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)
-	if failureStatus.Message != "Delete already in progress. Please wait for completion." {
-		t.Errorf("Expected message 'Delete already in progress. Please wait for completion.' Got: %s", failureStatus.Message)
-	}
-}
-
-func Test_Delete_RefusedAddPendingWhileInprogress(t *testing.T) {
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
-	statusEvents := eventing.SubscribeToStatusEvents()
-	defer eventing.Unsubscribe(statusEvents)
-
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		t.Logf("SEVER MESSAGE: received: %s method: %s", r.URL.String(), r.Method)
-		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
-	}))
-	defer ts.Close()
-
-	// Set the ARM client to use out test server
-	armclient.SetClient(ts.Client())
-	armclient.SetAquireToken(dummyTokenFunc())
-
-	g, err := gocui.NewGui(gocui.Output256)
-	if err != nil {
-		t.Error(err)
-		t.FailNow()
-	}
-	defer g.Close()
-	notView := NewNotificationWidget(0, 0, 45, false, g)
-
-	notView.AddPendingDelete("rg1", ts.URL+"/subscriptions/1/resourceGroups/rg1")
-	notView.ConfirmDelete()
-
-	// Wait for delete to be submitted
-	time.Sleep(time.Second * 1)
-
-	// Simulate double tap of delet key
-	notView.AddPendingDelete("rg2", ts.URL+"/subscriptions/1/resourceGroups/rg2")
 
 	// ConfirmDelete returns before it's finished
 	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)

@@ -36,6 +36,15 @@ type NotificationWidget struct {
 // AddPendingDelete queues deletes for
 // delete once confirmed
 func (w *NotificationWidget) AddPendingDelete(display, url string) {
+	if w.deleteInProgress {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			Failure: true,
+			Message: "Delete already in progress. Please wait for completion.",
+			Timeout: time.Second * 5,
+		})
+		return
+	}
+
 	if url == "" {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
@@ -52,15 +61,6 @@ func (w *NotificationWidget) AddPendingDelete(display, url string) {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
 			Message: "Can't add `" + display + "` run out of space to draw the `Pending delete` list!",
-			Timeout: time.Second * 5,
-		})
-		return
-	}
-
-	if w.deleteInProgress {
-		eventing.SendStatusEvent(eventing.StatusEvent{
-			Failure: true,
-			Message: "Delete already in progress. Please wait for completion.",
 			Timeout: time.Second * 5,
 		})
 		return
@@ -100,14 +100,18 @@ func (w *NotificationWidget) ConfirmDelete() {
 	w.deleteMutex.Lock()
 	w.deleteInProgress = true
 
+	// Take a copy of the current pending deletes
+	pending := make([]pendingDelete, len(w.pendingDeletes))
+	copy(pending, w.pendingDeletes)
+
+	w.deleteMutex.Unlock()
+
 	go func() {
 		// unlock and mark delete as not in progress
-		defer w.deleteMutex.Unlock()
 		defer func() {
 			w.deleteInProgress = false
 		}()
 
-		pending := w.pendingDeletes
 		event, _ := eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Starting to delete items",

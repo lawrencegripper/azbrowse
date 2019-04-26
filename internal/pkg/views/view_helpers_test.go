@@ -30,6 +30,8 @@ func WaitForFailureStatusEvent(t *testing.T, statusEvents chan interface{}, wait
 func WaitForStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec int, expectError bool) eventing.StatusEvent {
 	for index := 0; index < waitForSec; index++ {
 		select {
+		case <-time.After(time.Second):
+			t.Log("Waited 1 sec...")
 		case statusRaw := <-statusEvents:
 			statusEvent := statusRaw.(eventing.StatusEvent)
 			t.Logf("EVENT STATUS MESSAGE: %s Failure: %v InProgress: %v", statusEvent.Message, statusEvent.Failure, statusEvent.InProgress)
@@ -44,8 +46,6 @@ func WaitForStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec 
 			if statusEvent.InProgress == false {
 				return statusEvent
 			}
-		case <-time.After(1 * time.Second):
-			t.Log("Waited 1 sec...")
 		}
 	}
 
