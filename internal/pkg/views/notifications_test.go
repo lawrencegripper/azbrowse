@@ -182,6 +182,9 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 		return
 	}
 
+	// Wait for the last test to clear down
+	// Todo: This needs to be fixed. The ARMClient should be moved to a
+	// struct and not package level methods.
 	time.Sleep(time.Second * 5)
 
 	statusEvents := eventing.SubscribeToStatusEvents()
