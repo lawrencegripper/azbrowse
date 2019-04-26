@@ -2,7 +2,16 @@
 
 An interactive CLI for browsing azure resources, inspired by [resources.azure.com](https://resources.azure.com)
 
-[![CircleCI](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master.svg?style=svg)](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lawrencegripper/azbrowse?style=flat-square)](https://goreportcard.com/report/github.com/lawrencegripper/azbrowse)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/lawrencegripper/azbrowse)
+[![Release](https://img.shields.io/github/release/lawrencegripper/azbrowse.svg?style=flat-square)](https://github.com/lawrencegripper/azbrowse/releases/latest)
+
+| Test Type | Status
+| ------------- |:-------------:| -----:|
+| Unit Tests | [![CircleCI](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master.svg?style=svg)](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master)
+| Integration Tests | [![Build Status](https://dev.azure.com/lawrencegripper/githubbuilds/_apis/build/status/lawrencegripper.azbrowse?branchName=master)](https://dev.azure.com/lawrencegripper/githubbuilds/_build/latest?definitionId=5&branchName=master)
+
+
 
 ### Status
 

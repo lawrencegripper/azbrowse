@@ -26,7 +26,7 @@ func init() {
 
 var tenantID string
 var client *http.Client
-var aquireToken func() (AzCLIToken, error)
+var aquireToken func(clearCache bool) (AzCLIToken, error)
 
 // SetClient is used to override the HTTP Client used.
 // This is useful when testing
@@ -36,7 +36,7 @@ func SetClient(newClient *http.Client) {
 
 // SetAquireToken lets you override the token func for testing
 // or other purposes
-func SetAquireToken(aquireFunc func() (AzCLIToken, error)) {
+func SetAquireToken(aquireFunc func(clearCache bool) (AzCLIToken, error)) {
 	aquireToken = aquireFunc
 }
 
@@ -84,7 +84,7 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		return "", errors.New("Failed to create request for body: " + err.Error())
 	}
 
-	cliToken, err := aquireToken()
+	cliToken, err := aquireToken(false)
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
@@ -97,6 +97,18 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 	req.Header.Set("Content-Type", "application/json")
 
 	response, err := client.Do(req)
+	if response != nil && response.StatusCode == 401 {
+		// This might be because the token we've cached has expired.
+		// Get a new token forcing it to clear cache
+		cliToken, err := aquireToken(true)
+		if err != nil {
+			return "", errors.New("Failed to acquire auth token: " + err.Error())
+		}
+		tenantID = cliToken.Tenant
+
+		// Retry the request now we have a valid token
+		response, err = client.Do(req) //nolint:staticcheck
+	}
 	if err != nil {
 		return "", errors.New("Request failed: " + err.Error())
 	}

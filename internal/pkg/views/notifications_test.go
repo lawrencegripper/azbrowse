@@ -139,7 +139,7 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	}
 }
 
-func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
+func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	if testing.Short() {
 		t.Log("Skipping integration test")
 		return
@@ -147,14 +147,11 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
-	count := 0
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Logf("SEVER MESSAGE: received: %s method: %s", r.URL.String(), r.Method)
-		count = count + 1
 		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
 	}))
 	defer ts.Close()
-
 	// Set the ARM client to use out test server
 	armclient.SetClient(ts.Client())
 	armclient.SetAquireToken(dummyTokenFunc())
@@ -170,8 +167,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	notView.AddPendingDelete("rg1", ts.URL+"/subscriptions/1/resourceGroups/rg1")
 	notView.ConfirmDelete()
 
-	// Simulate double tap of delet key
-	notView.ConfirmDelete()
+	notView.AddPendingDelete("rg2", ts.URL+"/subscriptions/1/resourceGroups/rg2")
 
 	// ConfirmDelete returns before it's finished
 	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)
@@ -180,11 +176,17 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	}
 }
 
-func Test_Delete_RefusedAddPendingWhileInprogress(t *testing.T) {
+func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	if testing.Short() {
 		t.Log("Skipping integration test")
 		return
 	}
+
+	// Wait for the last test to clear down
+	// Todo: This needs to be fixed. The ARMClient should be moved to a
+	// struct and not package level methods.
+	time.Sleep(time.Second * 5)
+
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -212,7 +214,7 @@ func Test_Delete_RefusedAddPendingWhileInprogress(t *testing.T) {
 	notView.ConfirmDelete()
 
 	// Simulate double tap of delet key
-	notView.AddPendingDelete("rg2", ts.URL+"/subscriptions/1/resourceGroups/rg2")
+	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
 	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)

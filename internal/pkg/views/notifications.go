@@ -100,14 +100,18 @@ func (w *NotificationWidget) ConfirmDelete() {
 	w.deleteMutex.Lock()
 	w.deleteInProgress = true
 
+	// Take a copy of the current pending deletes
+	pending := make([]pendingDelete, len(w.pendingDeletes))
+	copy(pending, w.pendingDeletes)
+
+	w.deleteMutex.Unlock()
+
 	go func() {
 		// unlock and mark delete as not in progress
-		defer w.deleteMutex.Unlock()
 		defer func() {
 			w.deleteInProgress = false
 		}()
 
-		pending := w.pendingDeletes
 		event, _ := eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Starting to delete items",
