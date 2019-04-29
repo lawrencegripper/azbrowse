@@ -14,7 +14,7 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 
 ### Status
 
-It's an MVP to prove out the use case. Basic navigation and operations with a boltdb based cache for expensive (slow) API calls.
+This is a pet project which has matured thanks to support from awesome contributions. 
 
 Currently I'm using it every day **but it is experimental so use with caution on a production environment!!**
 
