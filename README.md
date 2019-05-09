@@ -43,7 +43,8 @@ scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
 
-### Install via `azure-cli` extention (Experimental:  Non-functional on Windows. Only tested on Unix based systems)
+### Install via `azure-cli` extention 
+> Warning: This is experimental and Non-functional on Windows. Only tested on Unix based systems
 
 Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
 
