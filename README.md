@@ -43,6 +43,14 @@ scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
 
+### Linux (via Releases tar.gz)
+
+Grab the url to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
+
+Download the release (either via the browser or `wget https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`).
+
+Extract the binary from the archive to a suitable location (here we're using `/usr/bin` for convenience): `tar -C /usr/bin -zxvf azbrowse_linux_amd64.tar.gz azbrowse`
+
 ### Install via `azure-cli` extention 
 > Warning: This is experimental and Non-functional on Windows. Only tested on Unix based systems
 
