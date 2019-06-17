@@ -51,6 +51,8 @@ Download the release (either via the browser or `wget https://github.com/lawrenc
 
 Extract the binary from the archive to a suitable location (here we're using `/usr/bin` for convenience): `tar -C /usr/bin -zxvf azbrowse_linux_amd64.tar.gz azbrowse`
 
+Make the binary executable: `chmod +x /usr/bin/azbrowse`
+
 ### Install via `azure-cli` extention 
 > Warning: This is experimental and Non-functional on Windows. Only tested on Unix based systems
 
