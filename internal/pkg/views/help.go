@@ -34,6 +34,7 @@ func DrawHelp(keyBindings map[string]string, v *gocui.View) {
 | Expand/View resource     | %s
 | Refresh                  | %s
 | Show this help page      | %s
+| Quit                     | %s
  
 # Operations
  
@@ -66,6 +67,7 @@ Creating\Preparing:  🏗   Scaling:  ⚖   Suspended/Suspending:  ⛔   Succeed
 		keyBindings["listexpand"],
 		keyBindings["listrefresh"],
 		keyBindings["help"],
+		keyBindings["quit"],
 		keyBindings["listedit"],
 		keyBindings["fullscreen"],
 		keyBindings["listopen"],
