@@ -27,16 +27,18 @@ func Bind(g *gocui.Gui) error {
 		configLocation = user.HomeDir + "/.azbrowse-bindings.json"
 	}
 	defaultFilePath := configLocation
-	return bindWithFileOverrides(g, defaultFilePath)
+	keyOverrideSettings, err := loadBindingsFromFile(defaultFilePath)
+	if err != nil {
+		return err
+	}
+	return bindWithConfigOverrides(g, keyOverrideSettings)
 }
 
-func bindWithFileOverrides(g *gocui.Gui, filePath string) error {
-	if _, err := os.Stat(filePath); err == nil {
-		err = initializeOverrides(filePath)
-		if err != nil {
-			return err
-		}
-	} // ignore file overrides if error
+func bindWithConfigOverrides(g *gocui.Gui, keyOverrideSettings map[string]string) error {
+	err := initializeOverrides(keyOverrideSettings)
+	if err != nil {
+		return err
+	}
 	return bindHandlersToKeys(g)
 }
 
@@ -113,13 +115,9 @@ func checkKeyNotAlreadyInUse(widget, id string, key gocui.Key) error {
 	return nil
 }
 
-func initializeOverrides(filePath string) error {
-	rawKeyMap, err := loadBindingsFromFile(filePath)
-	if err != nil {
-		return err
-	}
-
-	overrides, err = parseKeyValues(rawKeyMap)
+func initializeOverrides(keyOverrideSettings map[string]string) error {
+	var err error
+	overrides, err = parseKeyValues(keyOverrideSettings)
 	if err != nil {
 		return err
 	}
@@ -134,17 +132,17 @@ func loadBindingsFromFile(filePath string) (map[string]string, error) {
 	}
 	defer jsonf.Close() //nolint: errcheck
 	bytes, _ := ioutil.ReadAll(jsonf)
-	var rawKeyMap map[string]string
-	if err := json.Unmarshal(bytes, &rawKeyMap); err != nil {
+	var keyOverrideSettings map[string]string
+	if err := json.Unmarshal(bytes, &keyOverrideSettings); err != nil {
 		return nil, err
 	}
-	return rawKeyMap, nil
+	return keyOverrideSettings, nil
 }
 
-func parseKeyValues(rawKeyMap map[string]string) (KeyMap, error) {
+func parseKeyValues(keyOverrideSettings map[string]string) (KeyMap, error) {
 	keyMap := KeyMap{}
 
-	for k, v := range rawKeyMap {
+	for k, v := range keyOverrideSettings {
 		parsedKey, err := parseKey(k)
 		if err != nil {
 			continue // ignore invalid keys
