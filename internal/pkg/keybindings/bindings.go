@@ -1,15 +1,12 @@
 package keybindings
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"os/user"
 	"strings"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 )
 
 // KeyMap reprsents the current mappings from Handler -> Key
@@ -21,17 +18,11 @@ var usedKeys map[string]string
 
 // Bind sets up key bindings for AzBrowse
 func Bind(g *gocui.Gui) error {
-	configLocation := "/root/.azbrowse-bindings.json"
-	user, err := user.Current()
-	if err == nil {
-		configLocation = user.HomeDir + "/.azbrowse-bindings.json"
-	}
-	defaultFilePath := configLocation
-	keyOverrideSettings, err := loadBindingsFromFile(defaultFilePath)
+	config, err := config.Load()
 	if err != nil {
 		return err
 	}
-	return bindWithConfigOverrides(g, keyOverrideSettings)
+	return bindWithConfigOverrides(g, config.KeyBindings)
 }
 
 func bindWithConfigOverrides(g *gocui.Gui, keyOverrideSettings map[string]string) error {
@@ -123,20 +114,6 @@ func initializeOverrides(keyOverrideSettings map[string]string) error {
 	}
 
 	return nil
-}
-
-func loadBindingsFromFile(filePath string) (map[string]string, error) {
-	jsonf, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonf.Close() //nolint: errcheck
-	bytes, _ := ioutil.ReadAll(jsonf)
-	var keyOverrideSettings map[string]string
-	if err := json.Unmarshal(bytes, &keyOverrideSettings); err != nil {
-		return nil, err
-	}
-	return keyOverrideSettings, nil
 }
 
 func parseKeyValues(keyOverrideSettings map[string]string) (KeyMap, error) {
