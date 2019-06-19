@@ -12,6 +12,7 @@ type Config struct {
 	KeyBindings map[string]string `json:"keyBindings,omitempty"`
 }
 
+// Load the user configuration settings
 func Load() (Config, error) {
 	var config Config
 	configLocation := "/root/.azbrowse-settings.json"
