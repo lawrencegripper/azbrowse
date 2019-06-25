@@ -1,23 +1,20 @@
-.PHONY: dep checks test build
-all: dep checks test build
+.PHONY: checks test build
+all: checks test build
 
 setup:
 	./scripts/install_ci_tools.sh
 
-dep:
-	dep ensure -v --vendor-only
-
 test:
-	go test -v -short ./...
+	GO111MODULE=on go test -v -short ./...
 
 integration:
-	go test -v -count=1 ./...
+	GO111MODULE=on go test -v -count=1 ./...
 
-build: dep swagger-codegen test checks 
-	go build ./cmd/azbrowse
+build: swagger-codegen test checks 
+	GO111MODULE=on go build ./cmd/azbrowse
 
 install:
-	go install ./cmd/azbrowse
+	GO111MODULE=on go install ./cmd/azbrowse
 
 checks:
 	golangci-lint run
@@ -29,6 +26,7 @@ swagger-update:
 	./scripts/update-swagger.sh
 	
 swagger-codegen:
+	export GO111MODULE=on
 	go run ./cmd/swagger-codegen/ --output-file ./internal/pkg/handlers/swagger.generated.go 
 	# Format the generated code
 	gofmt -s -w internal/pkg/handlers/swagger.generated.go
@@ -38,7 +36,7 @@ swagger-codegen:
 	go test -v internal/pkg/handlers/swagger_test.go internal/pkg/handlers/swagger.generated.go internal/pkg/handlers/swagger.go internal/pkg/handlers/types.go
 
 debug:
-	go build ./cmd/azbrowse &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
+	GO111MODULE=on go build ./cmd/azbrowse &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
 
 run: checks install
 	azbrowse

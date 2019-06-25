@@ -5,6 +5,7 @@ set -e
 X -config ./scripts/assets/dummydisplay.conf &
 #set display to use
 export DISPLAY=:0
+export GO111MODULE=on
 
 statusfile=$(mktemp)
 logfile=$(mktemp)

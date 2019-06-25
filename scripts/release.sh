@@ -9,6 +9,7 @@ fi
 
 git tag -f v1.1.$BUILD_NUMBER
 export GOVERSION=$(go version)
+export GO111MODULE=on
 
 echo "->Move to root directory"
 cd ../
