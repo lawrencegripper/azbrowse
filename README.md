@@ -161,7 +161,7 @@ The `AzureDevOps` build run the integration tests under `XTerm`.
 ### Running locally
 
 ``` bash
-make integration && make ci-docker 
+make integration && make ci-docker
 ```
 
 To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` environment variable defined, so running it as follows may be easier:
@@ -172,15 +172,18 @@ TRAVIS_BUILD_NUMBER=0.1 make ci-docker
 
 ## Custom Key Bindings
 
-If you wish to override the default key bindings, create a `~/.azbrowse-bindings.json` file (where `~` is your users home directory).
+If you wish to override the default key bindings, create a `~/.azbrowse-settings.json` file (where `~` is your users home directory).
 
 The file should be formated like so:
+
 ```json
 {
-    ...
-    "Copy": "F8",
-    "Help": "Ctrl+H",
-    ...
+    "keyBindings": {
+        ...
+        "Copy": "F8",
+        "Help": "Ctrl+H",
+        ...
+    }
 }
 ```
 

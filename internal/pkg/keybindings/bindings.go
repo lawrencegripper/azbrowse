@@ -1,15 +1,12 @@
 package keybindings
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"os/user"
 	"strings"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 )
 
 // KeyMap reprsents the current mappings from Handler -> Key
@@ -21,22 +18,18 @@ var usedKeys map[string]string
 
 // Bind sets up key bindings for AzBrowse
 func Bind(g *gocui.Gui) error {
-	configLocation := "/root/.azbrowse-bindings.json"
-	user, err := user.Current()
-	if err == nil {
-		configLocation = user.HomeDir + "/.azbrowse-bindings.json"
+	config, err := config.Load()
+	if err != nil {
+		return err
 	}
-	defaultFilePath := configLocation
-	return bindWithFileOverrides(g, defaultFilePath)
+	return bindWithConfigOverrides(g, config.KeyBindings)
 }
 
-func bindWithFileOverrides(g *gocui.Gui, filePath string) error {
-	if _, err := os.Stat(filePath); err == nil {
-		err = initializeOverrides(filePath)
-		if err != nil {
-			return err
-		}
-	} // ignore file overrides if error
+func bindWithConfigOverrides(g *gocui.Gui, keyOverrideSettings map[string]string) error {
+	err := initializeOverrides(keyOverrideSettings)
+	if err != nil {
+		return err
+	}
 	return bindHandlersToKeys(g)
 }
 
@@ -113,13 +106,9 @@ func checkKeyNotAlreadyInUse(widget, id string, key gocui.Key) error {
 	return nil
 }
 
-func initializeOverrides(filePath string) error {
-	rawKeyMap, err := loadBindingsFromFile(filePath)
-	if err != nil {
-		return err
-	}
-
-	overrides, err = parseKeyValues(rawKeyMap)
+func initializeOverrides(keyOverrideSettings map[string]string) error {
+	var err error
+	overrides, err = parseKeyValues(keyOverrideSettings)
 	if err != nil {
 		return err
 	}
@@ -127,24 +116,10 @@ func initializeOverrides(filePath string) error {
 	return nil
 }
 
-func loadBindingsFromFile(filePath string) (map[string]string, error) {
-	jsonf, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer jsonf.Close() //nolint: errcheck
-	bytes, _ := ioutil.ReadAll(jsonf)
-	var rawKeyMap map[string]string
-	if err := json.Unmarshal(bytes, &rawKeyMap); err != nil {
-		return nil, err
-	}
-	return rawKeyMap, nil
-}
-
-func parseKeyValues(rawKeyMap map[string]string) (KeyMap, error) {
+func parseKeyValues(keyOverrideSettings map[string]string) (KeyMap, error) {
 	keyMap := KeyMap{}
 
-	for k, v := range rawKeyMap {
+	for k, v := range keyOverrideSettings {
 		parsedKey, err := parseKey(k)
 		if err != nil {
 			continue // ignore invalid keys
