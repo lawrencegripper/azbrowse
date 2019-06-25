@@ -19,12 +19,26 @@ const (
 	providerCacheKey = "providerCache"
 )
 
-// func isWriteVerb(verb string) bool {
-// 	v := strings.ToUpper(verb)
-// 	return v == "PUT" || v == "POST" || v == "PATCH"
-// }
+func init() {
+	client = &http.Client{}
+	aquireToken = aquireTokenFromAzCLI
+}
 
 var tenantID string
+var client *http.Client
+var aquireToken func(clearCache bool) (AzCLIToken, error)
+
+// SetClient is used to override the HTTP Client used.
+// This is useful when testing
+func SetClient(newClient *http.Client) {
+	client = newClient
+}
+
+// SetAquireToken lets you override the token func for testing
+// or other purposes
+func SetAquireToken(aquireFunc func(clearCache bool) (AzCLIToken, error)) {
+	aquireToken = aquireFunc
+}
 
 // GetTenantID gets the current tenandid from AzCli
 func GetTenantID() string {
@@ -65,10 +79,12 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		return "", err
 	}
 
-	client := &http.Client{}
-	req, _ := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
+	req, err := http.NewRequest(method, url, bytes.NewReader([]byte(body)))
+	if err != nil {
+		return "", errors.New("Failed to create request for body: " + err.Error())
+	}
 
-	cliToken, err := aquireTokenFromAzCLI()
+	cliToken, err := aquireToken(false)
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
@@ -81,6 +97,18 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 	req.Header.Set("Content-Type", "application/json")
 
 	response, err := client.Do(req)
+	if response != nil && response.StatusCode == 401 {
+		// This might be because the token we've cached has expired.
+		// Get a new token forcing it to clear cache
+		cliToken, err := aquireToken(true)
+		if err != nil {
+			return "", errors.New("Failed to acquire auth token: " + err.Error())
+		}
+		tenantID = cliToken.Tenant
+
+		// Retry the request now we have a valid token
+		response, err = client.Do(req) //nolint:staticcheck
+	}
 	if err != nil {
 		return "", errors.New("Request failed: " + err.Error())
 	}
@@ -88,7 +116,7 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 	// Check response error but also return body as it may contain useful information
 	// about the error
 	var responseErr error
-	if response.StatusCode < 200 && response.StatusCode > 299 {
+	if response.StatusCode < 200 || response.StatusCode > 299 {
 		span.SetTag("isError", true)
 		span.SetTag("errorCode", response.StatusCode)
 		span.SetTag("error", response.Status)

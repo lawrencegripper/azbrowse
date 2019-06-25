@@ -2,13 +2,13 @@
 all: checks test build
 
 setup:
-	./scripts/install_dev_tools.sh
+	./scripts/install_ci_tools.sh
 
 test:
 	go test -v -short ./...
 
 integration:
-	go test ./...
+	go test -v -count=1 ./...
 
 build: swagger-codegen test checks 
 	go build ./cmd/azbrowse

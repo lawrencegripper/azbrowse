@@ -2,11 +2,19 @@
 
 An interactive CLI for browsing azure resources, inspired by [resources.azure.com](https://resources.azure.com)
 
-[![CircleCI](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master.svg?style=svg)](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lawrencegripper/azbrowse?style=flat-square)](https://goreportcard.com/report/github.com/lawrencegripper/azbrowse)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/lawrencegripper/azbrowse)
+[![Release](https://img.shields.io/github/release/lawrencegripper/azbrowse.svg?style=flat-square)](https://github.com/lawrencegripper/azbrowse/releases/latest)
+
+| Test Type | Status |
+| ------------- |:-------------:|
+| Unit Tests | [![CircleCI](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master.svg?style=svg)](https://circleci.com/gh/lawrencegripper/azbrowse/tree/master) |
+| Integration Tests | [![Build Status](https://dev.azure.com/lawrencegripper/githubbuilds/_apis/build/status/lawrencegripper.azbrowse?branchName=master)](https://dev.azure.com/lawrencegripper/githubbuilds/_build/latest?definitionId=5&branchName=master) |
+
 
 ### Status
 
-It's an MVP to prove out the use case. Basic navigation and operations with a boltdb based cache for expensive (slow) API calls.
+This is a pet project which has matured thanks to support from awesome contributions. 
 
 Currently I'm using it every day **but it is experimental so use with caution on a production environment!!**
 
@@ -35,7 +43,18 @@ scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
 
-### Install via `azure-cli` extention
+### Linux (via Releases tar.gz)
+
+Grab the url to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
+
+Download the release (either via the browser or `wget https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`).
+
+Extract the binary from the archive to a suitable location (here we're using `/usr/bin` for convenience): `tar -C /usr/bin -zxvf azbrowse_linux_amd64.tar.gz azbrowse`
+
+Make the binary executable: `chmod +x /usr/bin/azbrowse`
+
+### Install via `azure-cli` extention 
+> Warning: This is experimental and Non-functional on Windows. Only tested on Unix based systems
 
 Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
 
@@ -110,29 +129,39 @@ You can install these yourself following the instructions on their github pages,
 
  This runs the script `scripts/install_dev_tools.sh`, which will install these tools for you.
 
-### Building
+## Building
 
 With your Go development environment set up, use `make` to build `azbrowse`.
 
 Take a look at the `Makefile` yourself, but the main rules are:
 
-#### Run Tests and Build
+### Run Tests and Build
 
 ``` bash
 make build
 ```
 
-#### Install Local Development Build
+Running integration tests (requires a full terminal)
+``` bash
+make integration
+```
+
+### Install Local Development Build
 
 
 ``` bash
 make install
 ```
 
-#### Run Travis-CI build locally
+## Automated builds
+
+The `CircleCI` build runs the `golang` build, unit tests and linting. 
+The `AzureDevOps` build run the integration tests under `XTerm`.
+
+### Running locally
 
 ``` bash
-make ci-docker
+make integration && make ci-docker
 ```
 
 To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` environment variable defined, so running it as follows may be easier:
@@ -143,15 +172,18 @@ TRAVIS_BUILD_NUMBER=0.1 make ci-docker
 
 ## Custom Key Bindings
 
-If you wish to override the default key bindings, create a `~/.azbrowse-bindings.json` file (where `~` is your users home directory).
+If you wish to override the default key bindings, create a `~/.azbrowse-settings.json` file (where `~` is your users home directory).
 
 The file should be formated like so:
+
 ```json
 {
-    ...
-    "Copy": "F8",
-    "Help": "Ctrl+H",
-    ...
+    "keyBindings": {
+        ...
+        "Copy": "F8",
+        "Help": "Ctrl+H",
+        ...
+    }
 }
 ```
 

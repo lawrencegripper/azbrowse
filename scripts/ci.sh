@@ -2,6 +2,8 @@
 set -e
 cd `dirname $0`
 
+echo "->Installing tools"
+bash -f ./install_ci_tools.sh
 bash -f ./install_release_tools.sh
 
 if [ -z ${CIRCLECI} ]; then

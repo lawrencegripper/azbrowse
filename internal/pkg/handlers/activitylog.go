@@ -83,7 +83,7 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 func GetActivityLogExpandURL(subscriptionID, resourceName string) string {
 	queryString := `eventTimestamp ge '` + time.Now().AddDate(0, 0, -30).Format("2006-01-02T15:04:05Z07:00") + `' and eventTimestamp le '` +
 		time.Now().Format("2006-01-02T15:04:05Z07:00") + `' and eventChannels eq 'Admin, Operation' and resourceGroupName eq '` +
-		resourceName + `' and levels eq 'Critical,Error,Warning,Informational'`
+		resourceName + `' and levels eq 'Critical,Error,Warning,Informational' | orderby eventTimestamp desc`
 	return `/subscriptions/` + subscriptionID + `/providers/microsoft.insights/eventtypes/management/values?api-version=2017-03-01-preview&$filter=` +
 		url.QueryEscape(queryString)
 }

@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: golang:1.11.5
+      - image: golang:1.12-stretch
     working_directory: /go/src/github.com/lawrencegripper/azbrowse
     steps:
       - checkout 
