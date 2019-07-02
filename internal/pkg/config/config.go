@@ -19,9 +19,11 @@ type EditorConfig struct {
 	TranslateFilePathForWSL bool          `json:"translateFilePathForWSL,omitEmpty"` // WSL use only. True to translate the path to a Windows path (e.g. when running under WSL but using a Windows editor)
 	TempDir                 string        `json:"tempDir,omitempty"`                 // Specify the directory to use for temporary files for editing (defaults to OS temp dir)
 }
+
+// CommandConfig respresents the options for launching a command
 type CommandConfig struct {
 	Executable string   `json:"executable,omitempty"` // The program to run
-	Arguments  []string `json:"args,omitempty"`      // The arguments to pass to the executable (filename will automatically be appended)
+	Arguments  []string `json:"args,omitempty"`       // The arguments to pass to the executable (filename will automatically be appended)
 }
 
 // Load the user configuration settings
