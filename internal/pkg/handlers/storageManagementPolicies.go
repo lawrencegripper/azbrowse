@@ -21,7 +21,7 @@ func (e *StorageManagementPoliciesExpander) Name() string {
 // DoesExpand checks if this is a storage account
 func (e *StorageManagementPoliciesExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	swaggerResourceType := currentItem.SwaggerResourceType
-	if currentItem.ItemType == "resource"  && swaggerResourceType != nil {
+	if currentItem.ItemType == "resource" && swaggerResourceType != nil {
 		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}" {
 			return true, nil
 		}
@@ -40,13 +40,13 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 
 		matchResult := swaggerResourceType.Endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
 		templateValues := matchResult.Values
-	
+
 		if swaggerResourceType.SubResources != nil {
 			for _, resourceType := range swaggerResourceType.SubResources {
 				if resourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/managementPolicies/{managementPolicyName}" {
 					// got the management policies endpoint
 					// now create the expand URL etc etc
-					
+
 					defaultPolicyTemplateValues := make(map[string]string)
 					for k, v := range templateValues {
 						defaultPolicyTemplateValues[k] = v
@@ -55,7 +55,7 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 
 					url, err := resourceType.Endpoint.BuildURL(defaultPolicyTemplateValues)
 					if err != nil {
-						return ExpanderResult {
+						return ExpanderResult{
 							Err: err,
 						}
 					}
@@ -67,8 +67,8 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 						ItemType:            SubResourceType,
 						ExpandURL:           url,
 						SwaggerResourceType: &resourceType,
-					})			
-			
+					})
+
 					break
 				}
 			}
