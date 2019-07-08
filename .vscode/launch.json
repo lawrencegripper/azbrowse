@@ -7,7 +7,7 @@
         {
             "name": "Connect to server",
             "type": "go",
-            "request": "launch",
+            "request": "attach",
             "mode": "remote",
             "remotePath": "${workspaceFolder}",
             "port": 2345,
