@@ -1,6 +1,7 @@
 package keybindings
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"time"
 
 	"github.com/jroimartin/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
@@ -421,6 +423,25 @@ func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidg
 	return handler
 }
 
+func (h ListUpdateHandler) getEditorConfig() (config.EditorConfig, error) {
+	userConfig, err := config.Load()
+	if err != nil {
+		return config.EditorConfig{}, err
+	}
+	if userConfig.Editor.Command.Executable != "" {
+		return userConfig.Editor, nil
+	}
+	// generate default config
+	translateFilePathForWSL := os.Getenv("WSL_DISTRO_NAME") != "" // If WSL_DISTRO_NAME env var is set then translate path so that it is valid when loaded by VS code in Windows
+	return config.EditorConfig{
+		Command: config.CommandConfig{
+			Executable: "code",
+			Arguments:  []string{"--wait"},
+		},
+		TranslateFilePathForWSL: translateFilePathForWSL,
+	}, nil
+}
+
 func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		item := h.List.CurrentExpandedItem()
@@ -430,7 +451,16 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			return nil
 		}
 
-		tmpFile, err := ioutil.TempFile(os.TempDir(), "azbrowse-*.json")
+		editorConfig, err := h.getEditorConfig()
+		if err != nil {
+			return err
+		}
+
+		tempDir := editorConfig.TempDir
+		if tempDir == "" {
+			tempDir = os.TempDir() // fall back to Temp dir as default
+		}
+		tmpFile, err := ioutil.TempFile(tempDir, "azbrowse-*.json")
 		if err != nil {
 			h.status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
 			return err
@@ -463,7 +493,21 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		h.status.Status("Opening JSON in editor...", false)
-		err = openEditor(tmpFile.Name())
+		editorTmpFile := tmpFile.Name()
+		// check if we should perform path translation for WSL (Windows Subsytem for Linux)
+		if editorConfig.TranslateFilePathForWSL {
+			cmd := exec.Command("wslpath", "-w", editorTmpFile)
+			var out bytes.Buffer
+			var stderr bytes.Buffer
+			cmd.Stdout = &out
+			cmd.Stderr = &stderr
+			err = cmd.Run()
+			if err != nil {
+				return fmt.Errorf("Error running wslpath: %s", stderr.String())
+			}
+			editorTmpFile = strings.TrimSuffix(out.String(), "\n")
+		}
+		err = openEditor(editorConfig.Command, editorTmpFile)
 		if err != nil {
 			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
 			return nil
@@ -518,8 +562,14 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	}
 }
 
-func openEditor(filename string) error {
-	cmd := exec.Command("code", "--wait", filename) // TODO - make this configurable!
+func openEditor(command config.CommandConfig, filename string) error {
+	// TODO - handle no Executable configured
+	args := command.Arguments
+	args = append(args, filename)
+	cmd := exec.Command(command.Executable, args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 func getAPIErrorMessage(responseString string) (string, error) {

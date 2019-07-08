@@ -16,7 +16,7 @@
             "env": {},
             "args": [],
             // run azbrowse in a terminal with the following command before starting the debugger
-            // go build &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
+            // go build ./cmd/azbrowse &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
         }
     ]
 }
