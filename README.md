@@ -191,25 +191,26 @@ In the file you can override the keys for actions using keys from the lists belo
 
 ### Actions
 
-| Actions:       | Does                                  |
-| ------------------------ | --------------------------------------|
-| Quit                     | Terminates the program                |
-| Copy                     | Copies the resource JSON to clipboard |
-| ListDelete               | Deletes a resources                   |
-| Fullscreen               | Toggles fullscreen                    |
-| Help                     | Toggles help view                     |
-| ItemBack                 | Go back from an item to a list        |
-| ItemLeft                 | Switch from the item json to the menu |
-| ListActions              | List available actions on a resource  |
-| ListBack                 | Go back on a list                     |
-| ListBackLegacy           | Go back on a list (legacy terminals)  |
-| ListDown                 | Navigate down a list                  |
-| ListUp                   | Navigate up a list                    |
-| ListRight                | Switch from the list to an item view  |
-| ListEdit                 | Toggle edit mode on a resource        |
-| ListExpand               | Expand a selected resource            |
-| ListOpen                 | Open a resource in the Azure portal   |
-| ListRefresh              | Refresh a list                        |
+| Actions:                 | Does                                          |
+| ------------------------ | ----------------------------------------------|
+| Quit                     | Terminates the program                        |
+| Copy                     | Copies the resource JSON to clipboard         |
+| ListDelete               | Deletes a resources                           |
+| Fullscreen               | Toggles fullscreen                            |
+| Help                     | Toggles help view                             |
+| ItemBack                 | Go back from an item to a list                |
+| ItemLeft                 | Switch from the item json to the menu         |
+| ListActions              | List available actions on a resource          |
+| ListBack                 | Go back on a list                             |
+| ListBackLegacy           | Go back on a list (legacy terminals)          |
+| ListDown                 | Navigate down a list                          |
+| ListUp                   | Navigate up a list                            |
+| ListRight                | Switch from the list to an item view          |
+| ListEdit                 | Toggle edit mode on a resource                |
+| ListExpand               | Expand a selected resource                    |
+| ListOpen                 | Open a resource in the Azure portal           |
+| ListRefresh              | Refresh a list                                |
+| ListUpdate               | Open JSON editor to allow updating a resource |
 
 ### Keys
 
@@ -281,6 +282,35 @@ In the file you can override the keys for actions using keys from the lists belo
 - F12
 
 > For compatibility reasons you may notice some keys will have multiple mappings.
+
+## Editing JSON
+
+For items in the tree that are editable (i.e. have a `PUT` endpoint), the `ListUpdate` action will open an editor for you to make changes and then issue the `PUT` request to update the item once you have closed the file. By default this is configured to use [Visual Studio Code](https://code.visualstudio.com).
+
+If you wish to override the default editor, create a `~/.azbrowse-settings.json` file (where `~` is your users home directory).
+
+The file should be formated like so:
+
+```json
+{
+    "editor": {
+        "command": {
+            "executable": "code",
+            "args" : [ "--wait" ]
+        },
+        "translateFilePathForWSL" : "true",
+        "tempDir" : "~/tmp"
+    }
+}
+```
+
+The `command` has two parts, `executable` and `args`. The filename to edit is automatically appended to the `args`. In the example above you can see the `--wait` argument specified which instructs the VS Code executable to not exit until the file is closed. This is important as it is how azbrowse determines that you have finished editing the file and it should perform the `PUT` request.
+
+The `translateFilePathForWSL` property controls whether the path should be converted from a Linux path to a Windows path using the `wslpath` command. This is useful when running azbrwose under [WSL](https://docs.microsoft.com/en-us/windows/wsl/about) and a Windows editor as it converts the temp file path to one that the Windows application can understand.
+
+The `tempDir` property lets you control where the temporary JSON files are written should you have a requirement to not put them in the OS temp location.
+
+The default configuration uses VS Code as the editor as shown above, and dynamically determines whether to perform the WSL file path translation.
 
 ## Plans
 
