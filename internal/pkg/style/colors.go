@@ -2,6 +2,7 @@ package style
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/TylerBrock/colorjson"
@@ -11,8 +12,10 @@ import (
 
 // ColorJSON formats the json with colors for the terminal
 func ColorJSON(content string) string {
-	var obj map[string]interface{}
-	err := json.Unmarshal([]byte(content), &obj)
+	d := json.NewDecoder(strings.NewReader(content))
+	d.UseNumber()
+	var obj interface{}
+	err := d.Decode(&obj)
 	if err != nil {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: false,
