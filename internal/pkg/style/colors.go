@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TylerBrock/colorjson"
 	"github.com/fatih/color"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/stuartleeks/colorjson"
 )
 
 // ColorJSON formats the json with colors for the terminal

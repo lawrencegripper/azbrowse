@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
-	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296
+	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296 // indirect
 	github.com/atotto/clipboard v0.1.1
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/boltdb/bolt v1.3.1
@@ -35,6 +35,7 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
+	github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6
 	github.com/valyala/fastjson v1.4.0
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/tools v0.0.0-20190405180640-052fc3cfdbc2 // indirect

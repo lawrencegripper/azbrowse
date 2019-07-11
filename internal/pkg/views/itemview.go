@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/TylerBrock/colorjson"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/stuartleeks/colorjson"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests

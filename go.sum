@@ -112,6 +112,10 @@ github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c h1:fyKiXKO1
 github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c/go.mod h1:sUM3LWHvSMaG192sy56D9F7CNvL7jUJVXoqM1QKLnog=
 github.com/stretchr/testify v1.2.2 h1:bSDNvY7ZPG5RlJ8otE/7V6gMiyenm9RtJ7IUVIAoJ1w=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
+github.com/stuartleeks/colorjson v0.0.0-20190711213712-a3a3544b049a h1:edIYWKjwDN0BEZXL0Eg0ESWGGCYkH+8Kv/G94vMzdLA=
+github.com/stuartleeks/colorjson v0.0.0-20190711213712-a3a3544b049a/go.mod h1:GUDgeGBnYpG3I6GnAsz8sVXNdVPgRxIyy7hyaERcKwE=
+github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6 h1:5swVPekURYRSZL+OjwuXwZ3si+bZALQ57D1sJqq6OgM=
+github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6/go.mod h1:GUDgeGBnYpG3I6GnAsz8sVXNdVPgRxIyy7hyaERcKwE=
 github.com/tcnksm/go-gitconfig v0.1.2 h1:iiDhRitByXAEyjgBqsKi9QU4o2TNtv9kPP3RgPgXBPw=
 github.com/tcnksm/go-gitconfig v0.1.2/go.mod h1:/8EhP4H7oJZdIPyT+/UIsG87kTzrzM4UsLGSItWYCpE=
 github.com/ulikunitz/xz v0.5.5 h1:pFrO0lVpTBXLpYw+pnLj6TbvHuyjXMfjGeCwSqCVwok=
