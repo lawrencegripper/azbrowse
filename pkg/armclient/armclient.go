@@ -45,6 +45,11 @@ func GetTenantID() string {
 	return tenantID
 }
 
+// GetToken gets the cached cli token
+func GetToken() (AzCLIToken, error) {
+	return aquireToken(false)
+}
+
 // RequestResult used with async channel
 type RequestResult struct {
 	Result string

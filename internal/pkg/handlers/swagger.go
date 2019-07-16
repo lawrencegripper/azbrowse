@@ -12,9 +12,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+func NewSwaggerResourceExpander(resources []SwaggerResourceType) *SwaggerResourceExpander {
+	return &SwaggerResourceExpander{
+		ResourceTypes: resources,
+	}
+}
+
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
-	initialized   bool
 	ResourceTypes []SwaggerResourceType
 }
 
@@ -63,16 +68,9 @@ func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType)
 	}
 	return nil
 }
-func (e *SwaggerResourceExpander) ensureInitialized() {
-	if !e.initialized {
-		e.ResourceTypes = e.getResourceTypes()
-		e.initialized = true
-	}
-}
 
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	e.ensureInitialized()
 	if currentItem.ItemType == ResourceType || currentItem.ItemType == SubResourceType {
 		if currentItem.SwaggerResourceType != nil {
 			return true, nil

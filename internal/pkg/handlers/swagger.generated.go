@@ -1,6 +1,6 @@
 package handlers
 
-func (e *SwaggerResourceExpander) getResourceTypes() []SwaggerResourceType {
+func getManagementPlaneResourceTypes() []SwaggerResourceType {
 	return []SwaggerResourceType{
 		{
 			Display:  "addsservices",
