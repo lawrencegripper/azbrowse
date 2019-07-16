@@ -1,0 +1,135 @@
+# github.com/PuerkitoBio/purell v1.1.1
+github.com/PuerkitoBio/purell
+# github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578
+github.com/PuerkitoBio/urlesc
+# github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296
+github.com/TylerBrock/colorjson
+# github.com/asaskevich/govalidator v0.0.0-20180720115003-f9ffefc3facf
+github.com/asaskevich/govalidator
+# github.com/atotto/clipboard v0.1.1
+github.com/atotto/clipboard
+# github.com/blang/semver v3.5.1+incompatible
+github.com/blang/semver
+# github.com/boltdb/bolt v1.3.1
+github.com/boltdb/bolt
+# github.com/cskr/pubsub v1.0.1
+github.com/cskr/pubsub
+# github.com/fatih/color v1.7.0
+github.com/fatih/color
+# github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
+github.com/globalsign/mgo/bson
+github.com/globalsign/mgo/internal/json
+# github.com/go-openapi/analysis v0.18.0
+github.com/go-openapi/analysis
+github.com/go-openapi/analysis/internal
+# github.com/go-openapi/errors v0.18.0
+github.com/go-openapi/errors
+# github.com/go-openapi/jsonpointer v0.17.0
+github.com/go-openapi/jsonpointer
+# github.com/go-openapi/jsonreference v0.17.0
+github.com/go-openapi/jsonreference
+# github.com/go-openapi/loads v0.18.0
+github.com/go-openapi/loads
+# github.com/go-openapi/spec v0.18.0
+github.com/go-openapi/spec
+# github.com/go-openapi/strfmt v0.18.0
+github.com/go-openapi/strfmt
+# github.com/go-openapi/swag v0.18.0
+github.com/go-openapi/swag
+# github.com/gogo/protobuf v1.2.0
+github.com/gogo/protobuf/io
+github.com/gogo/protobuf/proto
+# github.com/golang/protobuf v1.2.0
+github.com/golang/protobuf/proto
+# github.com/google/go-github v17.0.0+incompatible
+github.com/google/go-github/github
+# github.com/google/go-querystring v1.0.0
+github.com/google/go-querystring/query
+# github.com/gorilla/context v1.1.1
+github.com/gorilla/context
+# github.com/gorilla/mux v1.6.2
+github.com/gorilla/mux
+# github.com/inconshreveable/go-update v0.0.0-20160112193335-8152e7eb6ccf
+github.com/inconshreveable/go-update
+github.com/inconshreveable/go-update/internal/binarydist
+github.com/inconshreveable/go-update/internal/osext
+# github.com/jroimartin/gocui v0.4.0
+github.com/jroimartin/gocui
+# github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f
+github.com/mailru/easyjson/jlexer
+github.com/mailru/easyjson/jwriter
+github.com/mailru/easyjson/buffer
+# github.com/mattn/go-colorable v0.0.9
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.4
+github.com/mattn/go-isatty
+# github.com/mattn/go-runewidth v0.0.3
+github.com/mattn/go-runewidth
+# github.com/mitchellh/mapstructure v1.1.2
+github.com/mitchellh/mapstructure
+# github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed
+github.com/nsf/termbox-go
+# github.com/opentracing/basictracer-go v1.0.0
+github.com/opentracing/basictracer-go
+github.com/opentracing/basictracer-go/wire
+# github.com/opentracing/opentracing-go v1.0.2
+github.com/opentracing/opentracing-go
+github.com/opentracing/opentracing-go/log
+github.com/opentracing/opentracing-go/ext
+# github.com/rhysd/go-github-selfupdate v1.1.0
+github.com/rhysd/go-github-selfupdate/selfupdate
+# github.com/satori/go.uuid v1.2.0
+github.com/satori/go.uuid
+# github.com/schollz/closestmatch v2.1.0+incompatible
+github.com/schollz/closestmatch
+# github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414
+github.com/shurcooL/httpfs/vfsutil
+# github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd
+github.com/shurcooL/vfsgen
+# github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
+github.com/skratchdot/open-golang/open
+# github.com/tcnksm/go-gitconfig v0.1.2
+github.com/tcnksm/go-gitconfig
+# github.com/ulikunitz/xz v0.5.5
+github.com/ulikunitz/xz
+github.com/ulikunitz/xz/internal/xlog
+github.com/ulikunitz/xz/lzma
+github.com/ulikunitz/xz/internal/hash
+# github.com/valyala/fastjson v1.4.0
+github.com/valyala/fastjson
+github.com/valyala/fastjson/fastfloat
+# golang.org/x/net v0.0.0-20190311183353-d8887717615a
+golang.org/x/net/context
+golang.org/x/net/context/ctxhttp
+golang.org/x/net/idna
+# golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890
+golang.org/x/oauth2
+golang.org/x/oauth2/internal
+# golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a
+golang.org/x/sys/unix
+# golang.org/x/text v0.3.0
+golang.org/x/text/unicode/norm
+golang.org/x/text/width
+golang.org/x/text/secure/bidirule
+golang.org/x/text/unicode/bidi
+golang.org/x/text/transform
+# google.golang.org/appengine v1.3.0
+google.golang.org/appengine/urlfetch
+google.golang.org/appengine/internal
+google.golang.org/appengine/internal/urlfetch
+google.golang.org/appengine/internal/base
+google.golang.org/appengine/internal/datastore
+google.golang.org/appengine/internal/log
+google.golang.org/appengine/internal/remote_api
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
+# sourcegraph.com/sourcegraph/appdash v0.0.0-20180531100431-4c381bd170b4
+sourcegraph.com/sourcegraph/appdash
+sourcegraph.com/sourcegraph/appdash/opentracing
+sourcegraph.com/sourcegraph/appdash/traceapp
+sourcegraph.com/sourcegraph/appdash/internal/wire
+sourcegraph.com/sourcegraph/appdash/httptrace
+sourcegraph.com/sourcegraph/appdash/sqltrace
+sourcegraph.com/sourcegraph/appdash/traceapp/tmpl
+# sourcegraph.com/sourcegraph/appdash-data v0.0.0-20151005221446-73f23eafcf67
+sourcegraph.com/sourcegraph/appdash-data
