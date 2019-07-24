@@ -48,8 +48,11 @@ func main() {
 
 		if strings.Contains(arg, "search") {
 			fmt.Print("Getting resources \n")
-			subRequest, _ := getSubscriptions(context.Background())
-			err := search.CrawlResources(context.Background(), subRequest)
+			subRequest, _, err := getSubscriptions(context.Background())
+			if err != nil {
+				panic(err)
+			}
+			err = search.CrawlResources(context.Background(), subRequest)
 			if err != nil {
 				panic(err)
 			}
@@ -193,7 +196,11 @@ func main() {
 		time.Sleep(time.Second * 1)
 
 		status.Status("Fetching Subscriptions", true)
-		subRequest, data := getSubscriptions(ctx)
+		subRequest, data, err := getSubscriptions(ctx)
+		if err != nil {
+			g.Close()
+			log.Panicln(err)
+		}
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
@@ -225,20 +232,20 @@ func main() {
 
 }
 
-func getSubscriptions(ctx context.Context) (armclient.SubResponse, string) {
+func getSubscriptions(ctx context.Context) (armclient.SubResponse, string, error) {
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:subs")
 	defer span.Finish()
 
 	// Get Subscriptions
 	data, err := armclient.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
 	if err != nil {
-		panic(err)
+		return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
 	}
 
 	var subRequest armclient.SubResponse
 	err = json.Unmarshal([]byte(data), &subRequest)
 	if err != nil {
-		panic(err)
+		return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
 	}
-	return subRequest, data
+	return subRequest, data, nil
 }
