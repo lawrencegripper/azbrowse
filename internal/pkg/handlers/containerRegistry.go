@@ -49,68 +49,12 @@ func (e *ContainerRegistryExpander) DoesExpand(ctx context.Context, currentItem 
 
 // Expand returns ManagementPolicies in the StorageAccount
 func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
-	isPrimaryResponse := false
-	response := "TODO"
-	newItems := []*TreeNode{}
-
-	if currentItem.Namespace == "containerRegistry" {
-		isPrimaryResponse = true
-		registryID := currentItem.Metadata["RegistryID"]
-		// TODO - factor this out to a separate function!
-
-		loginServer, err := e.GetLoginServer(ctx, registryID)
-		if err != nil {
-			return ExpanderResult{
-				Err: err,
-				SourceDescription: "ContainerRegistryExpander request",
-			}
-		}
-
-		token, err := e.GetRegistryToken(loginServer)
-		if err != nil {
-			return ExpanderResult{
-				Err: err,
-				SourceDescription: "ContainerRegistryExpander request",
-			}
-		}
-
-		responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/_catalog", loginServer), token)
-		if err != nil {
-			return ExpanderResult{
-				Err: err,
-				SourceDescription: "ContainerRegistryExpander request",
-			}
-		}
-		response = string(responseBuf)
-
-		var jsonResponse map[string]interface{}
-		err = json.Unmarshal(responseBuf, &jsonResponse)
-		if err != nil {
-			err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
-			return ExpanderResult{
-				Err: err,
-				SourceDescription: "ContainerRegistryExpander request",
-			}
-		}
-
-		repositories := jsonResponse["repositories"].([]interface{})
-
-		for _, repositoryTemp := range repositories {
-			repository := repositoryTemp.(string)
-			newItems = append(newItems, &TreeNode{
-				Parentid:  currentItem.ID,
-				Namespace: "containerRegistry",
-				Name:      repository,
-				Display:   repository,
-				ItemType:  "containerRegistry.repository",
-				ExpandURL: ExpandURLNotSupported,
-			})
-		}
-	}
 
 	swaggerResourceType := currentItem.SwaggerResourceType
-	if swaggerResourceType != nil && swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}" {
-
+	if currentItem.Namespace != "ContainerRegistry" &&
+		swaggerResourceType != nil &&
+		swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}" {
+		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "containerRegistry",
@@ -118,23 +62,32 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 			Display:   "Repositories",
 			ItemType:  SubResourceType,
 			ExpandURL: ExpandURLNotSupported,
-			// SwaggerResourceType: &resourceType,
 			Metadata: map[string]string{
-				"RegistryID": currentItem.ExpandURL, // save full URL to registry
+				"RegistryID":            currentItem.ExpandURL, // save full URL to registry
 				"SuppressSwaggerExpand": "true",
 			},
 		})
 
+		return ExpanderResult{
+			Err:               nil,
+			Response:          "TODO",
+			SourceDescription: "ContainerRegistryExpander request",
+			Nodes:             newItems,
+			IsPrimaryResponse: false,
+		}
+	}
+
+	if currentItem.Namespace == "containerRegistry" && currentItem.ItemType == SubResourceType {
+		return e.ExpandRepositories(ctx, currentItem)
 	}
 
 	return ExpanderResult{
-		Err:               nil,
-		Response:          response,
+		Err:               fmt.Errorf("Error - unhandled Expand"),
+		Response:          "Error!",
 		SourceDescription: "ContainerRegistryExpander request",
-		Nodes:             newItems,
-		IsPrimaryResponse: isPrimaryResponse,
 	}
 }
+
 func (e *ContainerRegistryExpander) GetLoginServer(ctx context.Context, registryID string) (string, error) {
 	data, err := armclient.DoRequest(ctx, "GET", registryID)
 	if err != nil {
@@ -150,6 +103,66 @@ func (e *ContainerRegistryExpander) GetLoginServer(ctx context.Context, registry
 	// TODO also capture SKU to ensure it is a managed SKU
 	loginServer := containerRegistryResponse.Properties.LoginServer
 	return loginServer, nil
+}
+func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	registryID := currentItem.Metadata["RegistryID"]
+
+	loginServer, err := e.GetLoginServer(ctx, registryID)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+
+	token, err := e.GetRegistryToken(loginServer)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/_catalog", loginServer), token)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+	response := string(responseBuf)
+
+	var jsonResponse map[string]interface{}
+	err = json.Unmarshal(responseBuf, &jsonResponse)
+	if err != nil {
+		err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+
+	repositories := jsonResponse["repositories"].([]interface{})
+	newItems := []*TreeNode{}
+
+	for _, repositoryTemp := range repositories {
+		repository := repositoryTemp.(string)
+		newItems = append(newItems, &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      repository,
+			Display:   repository,
+			ItemType:  "containerRegistry.repository",
+			ExpandURL: ExpandURLNotSupported,
+		})
+	}
+	return ExpanderResult{
+		Err:               nil,
+		Response:          response,
+		SourceDescription: "ContainerRegistryExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
 }
 
 func (e *ContainerRegistryExpander) DoRequest(url string, accessToken string) ([]byte, error) {
