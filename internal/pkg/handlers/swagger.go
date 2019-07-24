@@ -71,6 +71,9 @@ func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType)
 
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	if currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
+		return false, nil
+	}
 	if currentItem.ItemType == ResourceType || currentItem.ItemType == SubResourceType {
 		if currentItem.SwaggerResourceType != nil {
 			return true, nil
@@ -100,9 +103,10 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
-			Nodes:    nil,
-			Response: string(data),
-			Err:      fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+			Nodes:             nil,
+			Response:          string(data),
+			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+			SourceDescription: "SwaggerResourceExpander",
 		}
 	}
 

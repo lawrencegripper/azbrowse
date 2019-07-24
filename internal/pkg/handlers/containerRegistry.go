@@ -109,7 +109,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 	}
 
 	swaggerResourceType := currentItem.SwaggerResourceType
-	if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}" {
+	if swaggerResourceType != nil && swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}" {
 
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
@@ -121,6 +121,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 			// SwaggerResourceType: &resourceType,
 			Metadata: map[string]string{
 				"RegistryID": currentItem.ExpandURL, // save full URL to registry
+				"SuppressSwaggerExpand": "true",
 			},
 		})
 
