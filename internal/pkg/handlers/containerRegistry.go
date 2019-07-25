@@ -100,109 +100,55 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 	}
 }
 
-func (e *ContainerRegistryExpander) GetLoginServer(ctx context.Context, registryID string) (string, error) {
-	data, err := armclient.DoRequest(ctx, "GET", registryID)
-	if err != nil {
-		return "", fmt.Errorf("Failed to get registry: " + err.Error() + registryID)
-	}
-	var containerRegistryResponse ContainerRegistryResponse
-	err = json.Unmarshal([]byte(data), &containerRegistryResponse)
-	if err != nil {
-		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, registryID)
-		return "", err
-	}
-
-	// TODO also capture SKU to ensure it is a managed SKU
-	loginServer := containerRegistryResponse.Properties.LoginServer
-	return loginServer, nil
-}
 func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	registryID := currentItem.Metadata["RegistryID"]
-	lastRepository := currentItem.Metadata["lastRepository"]
 
-	loginServer, err := e.GetLoginServer(ctx, registryID)
+	loginServer, err := e.getLoginServer(ctx, registryID)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
 			SourceDescription: "ContainerRegistryExpander request",
 		}
 	}
+	currentItem.Metadata["loginServer"] = loginServer // expandNode requires this is in the Metadata!
 
-	token, err := e.GetRegistryToken(loginServer, "registry:catalog:*")
-	if err != nil {
-		return ExpanderResult{
-			Err:               err,
-			SourceDescription: "ContainerRegistryExpander request",
-		}
-	}
-
-	continuation := ""
-	if lastRepository != "" {
-		continuation = fmt.Sprintf("?last=%s", lastRepository)
-	}
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/v2/_catalog%s", loginServer, continuation), token)
-	if err != nil {
-		return ExpanderResult{
-			Err:               err,
-			SourceDescription: "ContainerRegistryExpander request",
-		}
-	}
-	response := string(responseBuf)
-
-	var jsonResponse map[string]interface{}
-	err = json.Unmarshal(responseBuf, &jsonResponse)
-	if err != nil {
-		err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
-		return ExpanderResult{
-			Err:               err,
-			SourceDescription: "ContainerRegistryExpander request",
-		}
-	}
-
-	newItems := []*TreeNode{}
-	repositoriesTemp := jsonResponse["repositories"]
-	if repositoriesTemp != nil {
-		repositories := repositoriesTemp.([]interface{})
-		lastRepository = ""
-
-		for _, repositoryTemp := range repositories {
-			repository := repositoryTemp.(string)
-			lastRepository = repository
-			newItems = append(newItems, &TreeNode{
+	return e.expandNode(
+		ctx,
+		currentItem,
+		fmt.Sprintf("https://%s/v2/_catalog", loginServer),
+		"registry:catalog:*",
+		"repositories",
+		"",
+		func(currentItem *TreeNode, item string) *TreeNode {
+			return &TreeNode{
 				Parentid:  currentItem.ID,
 				Namespace: "containerRegistry",
-				Name:      repository,
-				Display:   repository,
+				Name:      item,
+				Display:   item,
 				ItemType:  "containerRegistry.repository",
 				ExpandURL: ExpandURLNotSupported,
 				Metadata: map[string]string{
 					"loginServer": loginServer,
-					"repository":  repository,
+					"repository":  item,
 				},
-			})
-		}
-		newItems = append(newItems, &TreeNode{
-			Parentid:  currentItem.ID,
-			Namespace: "containerRegistry",
-			Name:      "more...",
-			Display:   "more...",
-			ItemType:  SubResourceType,
-			ExpandURL: ExpandURLNotSupported,
-			Metadata: map[string]string{
-				"RegistryID":            registryID,
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
-				"lastRepository":        lastRepository,
-			},
+			}
+		},
+		func(currentItem *TreeNode, lastItem string) *TreeNode {
+			return &TreeNode{
+				Parentid:  currentItem.ID,
+				Namespace: "containerRegistry",
+				Name:      "more...",
+				Display:   "more...",
+				ItemType:  SubResourceType,
+				ExpandURL: ExpandURLNotSupported,
+				Metadata: map[string]string{
+					"RegistryID":            registryID,
+					"SuppressSwaggerExpand": "true",
+					"SuppressGenericExpand": "true",
+					"lastItem":              lastItem,
+				},
+			}
 		})
-	}
-	return ExpanderResult{
-		Err:               nil,
-		Response:          response,
-		SourceDescription: "ContainerRegistryExpander request",
-		Nodes:             newItems,
-		IsPrimaryResponse: true,
-	}
 }
 
 func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, currentItem *TreeNode) ExpanderResult {
@@ -227,32 +173,8 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 	response := string(responseBuf)
 
 	newItems := []*TreeNode{
-		&TreeNode{
-			Parentid:  currentItem.ID,
-			Namespace: "containerRegistry",
-			Name:      "Tags",
-			Display:   "Tags",
-			ItemType:  "containerRegistry.repository.tags",
-			ExpandURL: ExpandURLNotSupported,
-			Metadata: map[string]string{
-				"loginServer": loginServer,
-				"accessToken": accessToken,
-				"repository":  repository,
-			},
-		},
-		&TreeNode{
-			Parentid:  currentItem.ID,
-			Namespace: "containerRegistry",
-			Name:      "Manifests",
-			Display:   "Manifests",
-			ItemType:  "containerRegistry.repository.manifests",
-			ExpandURL: ExpandURLNotSupported,
-			Metadata: map[string]string{
-				"loginServer": loginServer,
-				"accessToken": accessToken,
-				"repository":  repository,
-			},
-		},
+		e.getCreateTagsNodeFunc(loginServer, repository, "Tags")(currentItem, ""),
+		e.getCreateManifestsNodeFunc(loginServer, repository, "Manifests")(currentItem, ""),
 	}
 
 	return ExpanderResult{
@@ -276,21 +198,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTags(ctx context.Context, cu
 		"tags",
 		"name",
 		e.getCreateTagNodeFunc(loginServer, repository),
-		func(currentItem *TreeNode, lastItem string) *TreeNode {
-			return &TreeNode{
-				Parentid:  currentItem.ID,
-				Namespace: "containerRegistry",
-				Name:      "more...",
-				Display:   "more...",
-				ItemType:  "containerRegistry.repository.tags",
-				ExpandURL: ExpandURLNotSupported,
-				Metadata: map[string]string{
-					"loginServer": loginServer,
-					"repository":  repository,
-					"lastItem":    lastItem,
-				},
-			}
-		})
+		e.getCreateTagsNodeFunc(loginServer, repository, "more..."))
 }
 
 func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, currentItem *TreeNode) ExpanderResult {
@@ -327,7 +235,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 
 	tagElement := jsonResponse["tag"].(map[string]interface{})
 	digest := tagElement["digest"].(string)
-	newItems := []*TreeNode{ e.getCreateManifestNodeFunc(loginServer, repository)(currentItem, digest) }
+	newItems := []*TreeNode{e.getCreateManifestNodeFunc(loginServer, repository)(currentItem, digest)}
 
 	return ExpanderResult{
 		Err:               nil,
@@ -337,7 +245,6 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 		IsPrimaryResponse: true,
 	}
 }
-
 
 func (e *ContainerRegistryExpander) expandRepositoryManifests(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	loginServer := currentItem.Metadata["loginServer"]
@@ -351,21 +258,7 @@ func (e *ContainerRegistryExpander) expandRepositoryManifests(ctx context.Contex
 		"manifests",
 		"digest",
 		e.getCreateManifestNodeFunc(loginServer, repository),
-		func(currentItem *TreeNode, lastItem string) *TreeNode {
-			return &TreeNode{
-				Parentid:  currentItem.ID,
-				Namespace: "containerRegistry",
-				Name:      "more...",
-				Display:   "more...",
-				ItemType:  "containerRegistry.repository.manifests",
-				ExpandURL: ExpandURLNotSupported,
-				Metadata: map[string]string{
-					"loginServer": loginServer,
-					"repository":  repository,
-					"lastItem":    lastItem,
-				},
-			}
-		})
+		e.getCreateManifestsNodeFunc(loginServer, repository, "more..."))
 }
 
 func (e *ContainerRegistryExpander) expandRepositoryManifest(ctx context.Context, currentItem *TreeNode) ExpanderResult {
@@ -380,14 +273,13 @@ func (e *ContainerRegistryExpander) expandRepositoryManifest(ctx context.Context
 		fmt.Sprintf("repository:%s:metadata_read", repository),
 		"manifest.tags",
 		"",
-		e.getCreateManifestNodeFunc(loginServer, repository),
+		e.getCreateTagNodeFunc(loginServer, repository),
 		nil)
 }
 
-
 type createItemNode func(currentItem *TreeNode, item string) *TreeNode
 
-func (e *ContainerRegistryExpander) getCreateManifestNodeFunc(loginServer string, repository string) createItemNode{
+func (e *ContainerRegistryExpander) getCreateManifestNodeFunc(loginServer string, repository string) createItemNode {
 	return func(currentItem *TreeNode, item string) *TreeNode {
 		return &TreeNode{
 			Parentid:  currentItem.ID,
@@ -405,7 +297,7 @@ func (e *ContainerRegistryExpander) getCreateManifestNodeFunc(loginServer string
 	}
 }
 
-func (e *ContainerRegistryExpander) getCreateTagNodeFunc(loginServer string, repository string) createItemNode{
+func (e *ContainerRegistryExpander) getCreateTagNodeFunc(loginServer string, repository string) createItemNode {
 	return func(currentItem *TreeNode, item string) *TreeNode {
 		return &TreeNode{
 			Parentid:  currentItem.ID,
@@ -418,6 +310,42 @@ func (e *ContainerRegistryExpander) getCreateTagNodeFunc(loginServer string, rep
 				"loginServer": loginServer,
 				"repository":  repository,
 				"tag":         item,
+			},
+		}
+	}
+}
+
+func (e *ContainerRegistryExpander) getCreateManifestsNodeFunc(loginServer string, repository string, title string) createItemNode {
+	return func(currentItem *TreeNode, lastItem string) *TreeNode {
+		return &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      title,
+			Display:   title,
+			ItemType:  "containerRegistry.repository.manifests",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"repository":  repository,
+				"lastItem":    lastItem,
+			},
+		}
+	}
+}
+
+func (e *ContainerRegistryExpander) getCreateTagsNodeFunc(loginServer string, repository string, title string) createItemNode {
+	return func(currentItem *TreeNode, lastItem string) *TreeNode {
+		return &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      title,
+			Display:   title,
+			ItemType:  "containerRegistry.repository.tags",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"repository":  repository,
+				"lastItem":    lastItem,
 			},
 		}
 	}
@@ -524,6 +452,10 @@ func (e *ContainerRegistryExpander) DoRequest(url string, accessToken string) ([
 		return []byte{}, fmt.Errorf("Request failed: %s", err)
 	}
 
+	if response.StatusCode != 200 {
+		return []byte{}, fmt.Errorf("DoRequest failed %v for '%s'", response.StatusCode, url)
+	}
+
 	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -531,6 +463,23 @@ func (e *ContainerRegistryExpander) DoRequest(url string, accessToken string) ([
 	}
 
 	return buf, nil
+}
+
+func (e *ContainerRegistryExpander) getLoginServer(ctx context.Context, registryID string) (string, error) {
+	data, err := armclient.DoRequest(ctx, "GET", registryID)
+	if err != nil {
+		return "", fmt.Errorf("Failed to get registry: " + err.Error() + registryID)
+	}
+	var containerRegistryResponse ContainerRegistryResponse
+	err = json.Unmarshal([]byte(data), &containerRegistryResponse)
+	if err != nil {
+		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, registryID)
+		return "", err
+	}
+
+	// TODO also capture SKU to ensure it is a managed SKU
+	loginServer := containerRegistryResponse.Properties.LoginServer
+	return loginServer, nil
 }
 
 func (e *ContainerRegistryExpander) GetRegistryToken(loginServer string, scope string) (string, error) {
