@@ -80,6 +80,9 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 	if currentItem.Namespace == "containerRegistry" && currentItem.ItemType == SubResourceType {
 		return e.ExpandRepositories(ctx, currentItem)
 	}
+	if currentItem.ItemType == "containerRegistry.repository" {
+		return e.ExpandRepository(ctx, currentItem)
+	}
 
 	return ExpanderResult{
 		Err:               fmt.Errorf("Error - unhandled Expand"),
@@ -115,7 +118,7 @@ func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, curr
 		}
 	}
 
-	token, err := e.GetRegistryToken(loginServer)
+	token, err := e.GetRegistryToken(loginServer, "registry:catalog:*")
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -154,8 +157,60 @@ func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, curr
 			Display:   repository,
 			ItemType:  "containerRegistry.repository",
 			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"repository":  repository,
+			},
 		})
 	}
+	return ExpanderResult{
+		Err:               nil,
+		Response:          response,
+		SourceDescription: "ContainerRegistryExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *ContainerRegistryExpander) ExpandRepository(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+
+	accessToken, err := e.GetRegistryToken(loginServer, fmt.Sprintf("repository:%s:pull", repository))
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+
+
+
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+	response := string(responseBuf)
+
+	newItems := []*TreeNode{
+		&TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      "Tags",
+			Display:   "Tags",
+			ItemType:  "containerRegistry.repository.tags",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"accessToken": accessToken,
+				"repository":  repository,
+			},
+		},
+	}
+
 	return ExpanderResult{
 		Err:               nil,
 		Response:          response,
@@ -186,7 +241,7 @@ func (e *ContainerRegistryExpander) DoRequest(url string, accessToken string) ([
 	return buf, nil
 }
 
-func (e *ContainerRegistryExpander) GetRegistryToken(loginServer string) (string, error) {
+func (e *ContainerRegistryExpander) GetRegistryToken(loginServer string, scope string) (string, error) {
 	// This logic is based around https://github.com/Azure/azure-cli/blob/c83710e4176cf598fccd57180263a4c5b0fc561e/src/azure-cli/azure/cli/command_modules/acr/_docker_utils.py#L110
 
 	// TODO - add support for admin credentials if enabled and the AAD approach fails
@@ -240,7 +295,7 @@ func (e *ContainerRegistryExpander) GetRegistryToken(loginServer string) (string
 	refreshToken := jsonResponse["refresh_token"].(string)
 
 	// Make a refreshtoken request
-	body = fmt.Sprintf("grant_type=refresh_token&service=%s&scope=registry:catalog:*&refresh_token=%s", loginServer, refreshToken)
+	body = fmt.Sprintf("grant_type=refresh_token&service=%s&scope=%s&refresh_token=%s", loginServer, scope, refreshToken)
 	req, err = http.NewRequest("POST", fmt.Sprintf("https://%s/oauth2/token", loginServer), bytes.NewReader([]byte(body)))
 	if err != nil {
 		return "", fmt.Errorf("Failed to create refreshtoken request: %s", err)
