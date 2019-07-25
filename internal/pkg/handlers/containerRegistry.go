@@ -65,6 +65,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 			Metadata: map[string]string{
 				"RegistryID":            currentItem.ExpandURL, // save full URL to registry
 				"SuppressSwaggerExpand": "true",
+				"SuppressGenericExpand": "true",
 			},
 		})
 
@@ -116,6 +117,7 @@ func (e *ContainerRegistryExpander) GetLoginServer(ctx context.Context, registry
 }
 func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	registryID := currentItem.Metadata["RegistryID"]
+	lastRepository := currentItem.Metadata["lastRepository"]
 
 	loginServer, err := e.GetLoginServer(ctx, registryID)
 	if err != nil {
@@ -133,8 +135,11 @@ func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, curr
 		}
 	}
 
-	// TODO - need to handle continuation calls for long lists
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/v2/_catalog", loginServer), token)
+	continuation := ""
+	if lastRepository != "" {
+		continuation = fmt.Sprintf("&last=%s", lastRepository)
+	}
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/v2/_catalog?n=3%s", loginServer, continuation), token)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -153,21 +158,40 @@ func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, curr
 		}
 	}
 
-	repositories := jsonResponse["repositories"].([]interface{})
 	newItems := []*TreeNode{}
+	repositoriesTemp := jsonResponse["repositories"]
+	if repositoriesTemp != nil {
+		repositories := repositoriesTemp.([]interface{})
+		lastRepository = ""
 
-	for _, repositoryTemp := range repositories {
-		repository := repositoryTemp.(string)
+		for _, repositoryTemp := range repositories {
+			repository := repositoryTemp.(string)
+			lastRepository = repository
+			newItems = append(newItems, &TreeNode{
+				Parentid:  currentItem.ID,
+				Namespace: "containerRegistry",
+				Name:      repository,
+				Display:   repository,
+				ItemType:  "containerRegistry.repository",
+				ExpandURL: ExpandURLNotSupported,
+				Metadata: map[string]string{
+					"loginServer": loginServer,
+					"repository":  repository,
+				},
+			})
+		}
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "containerRegistry",
-			Name:      repository,
-			Display:   repository,
-			ItemType:  "containerRegistry.repository",
+			Name:      "more...",
+			Display:   "more...",
+			ItemType:  SubResourceType,
 			ExpandURL: ExpandURLNotSupported,
 			Metadata: map[string]string{
-				"loginServer": loginServer,
-				"repository":  repository,
+				"RegistryID":            registryID,
+				"SuppressSwaggerExpand": "true",
+				"SuppressGenericExpand": "true",
+				"lastRepository":        lastRepository,
 			},
 		})
 	}
