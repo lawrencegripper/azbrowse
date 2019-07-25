@@ -136,7 +136,7 @@ func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, curr
 	}
 
 	// TODO - need to handle continuation calls for long lists
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/_catalog", loginServer), token)
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/v2/_catalog", loginServer), token)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -300,7 +300,15 @@ func (e *ContainerRegistryExpander) ExpandRepositoryTag(ctx context.Context, cur
 	loginServer := currentItem.Metadata["loginServer"]
 	repository := currentItem.Metadata["repository"]
 	tag := currentItem.Metadata["tag"]
-	accessToken := currentItem.Metadata["accessToken"]
+
+
+	accessToken, err := e.GetRegistryToken(loginServer, fmt.Sprintf("repository:%s:metadata_read", repository))
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
 
 	// TODO - need to handle continuation calls for long lists
 	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
