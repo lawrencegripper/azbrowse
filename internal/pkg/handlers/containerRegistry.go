@@ -243,9 +243,13 @@ func (e *ContainerRegistryExpander) ExpandRepositoryTags(ctx context.Context, cu
 	loginServer := currentItem.Metadata["loginServer"]
 	repository := currentItem.Metadata["repository"]
 	accessToken := currentItem.Metadata["accessToken"]
+	lastTag := currentItem.Metadata["lastTag"]
 
-	// TODO - need to handle continuation calls for long lists
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_tags", loginServer, repository), accessToken)
+	continuation := ""
+	if lastTag != "" {
+		continuation = fmt.Sprintf("?last=%s", lastTag)
+	}
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_tags%s", loginServer, repository, continuation), accessToken)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -268,10 +272,12 @@ func (e *ContainerRegistryExpander) ExpandRepositoryTags(ctx context.Context, cu
 	tagsTemp := jsonResponse["tags"]
 	if tagsTemp != nil {
 		tags := tagsTemp.([]interface{})
+		lastTag := ""
 
 		for _, tagTemp := range tags {
 			tag := tagTemp.(map[string]interface{})
 			tagName := tag["name"].(string)
+			lastTag = tagName
 			newItems = append(newItems, &TreeNode{
 				Parentid:  currentItem.ID,
 				Namespace: "containerRegistry",
@@ -286,6 +292,20 @@ func (e *ContainerRegistryExpander) ExpandRepositoryTags(ctx context.Context, cu
 				},
 			})
 		}
+		newItems = append(newItems, &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      "more...",
+			Display:   "more...",
+			ItemType:  "containerRegistry.repository.tags",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"accessToken": accessToken,
+				"repository":  repository,
+				"lastTag":     lastTag,
+			},
+		})
 	}
 
 	return ExpanderResult{
@@ -330,7 +350,7 @@ func (e *ContainerRegistryExpander) ExpandRepositoryTag(ctx context.Context, cur
 		}
 	}
 
-	tagElement := jsonResponse["tag"].(map[string]interface{}) 
+	tagElement := jsonResponse["tag"].(map[string]interface{})
 	digest := tagElement["digest"].(string)
 	newItems := []*TreeNode{
 		&TreeNode{
@@ -427,7 +447,7 @@ func (e *ContainerRegistryExpander) ExpandRepositoryManifest(ctx context.Context
 			SourceDescription: "ContainerRegistryExpander request",
 		}
 	}
-	
+
 	// TODO - need to handle continuation calls for long lists
 	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_manifests/%s", loginServer, repository, digest), accessToken)
 	if err != nil {
