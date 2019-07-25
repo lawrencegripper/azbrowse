@@ -83,6 +83,15 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 	if currentItem.ItemType == "containerRegistry.repository" {
 		return e.ExpandRepository(ctx, currentItem)
 	}
+	if currentItem.ItemType == "containerRegistry.repository.tags" {
+		return e.ExpandRepositoryTags(ctx, currentItem)
+	}
+	if currentItem.ItemType == "containerRegistry.repository.tag" {
+		return e.ExpandRepositoryTag(ctx, currentItem)
+	}
+	if currentItem.ItemType == "containerRegistry.repository.manifests" {
+		return e.ExpandRepositoryManifests(ctx, currentItem)
+	}
 
 	return ExpanderResult{
 		Err:               fmt.Errorf("Error - unhandled Expand"),
@@ -126,6 +135,7 @@ func (e *ContainerRegistryExpander) ExpandRepositories(ctx context.Context, curr
 		}
 	}
 
+	// TODO - need to handle continuation calls for long lists
 	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/_catalog", loginServer), token)
 	if err != nil {
 		return ExpanderResult{
@@ -184,8 +194,6 @@ func (e *ContainerRegistryExpander) ExpandRepository(ctx context.Context, curren
 		}
 	}
 
-
-
 	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
 	if err != nil {
 		return ExpanderResult{
@@ -209,6 +217,186 @@ func (e *ContainerRegistryExpander) ExpandRepository(ctx context.Context, curren
 				"repository":  repository,
 			},
 		},
+		&TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      "Manifests",
+			Display:   "Manifests",
+			ItemType:  "containerRegistry.repository.manifests",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"accessToken": accessToken,
+				"repository":  repository,
+			},
+		},
+	}
+
+	return ExpanderResult{
+		Err:               nil,
+		Response:          response,
+		SourceDescription: "ContainerRegistryExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *ContainerRegistryExpander) ExpandRepositoryTags(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+	accessToken := currentItem.Metadata["accessToken"]
+
+	// TODO - need to handle continuation calls for long lists
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_tags", loginServer, repository), accessToken)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+	response := string(responseBuf)
+
+	var jsonResponse map[string]interface{}
+	err = json.Unmarshal(responseBuf, &jsonResponse)
+	if err != nil {
+		err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+
+	tags := jsonResponse["tags"].([]interface{})
+	newItems := []*TreeNode{}
+
+	for _, tagTemp := range tags {
+		tag := tagTemp.(map[string]interface{})
+		tagName := tag["name"].(string)
+		newItems = append(newItems, &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      tagName,
+			Display:   tagName,
+			ItemType:  "containerRegistry.repository.tag",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"repository":  repository,
+				"tag":         tagName,
+			},
+		})
+	}
+
+	return ExpanderResult{
+		Err:               nil,
+		Response:          response,
+		SourceDescription: "ContainerRegistryExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *ContainerRegistryExpander) ExpandRepositoryTag(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+	tag := currentItem.Metadata["tag"]
+	accessToken := currentItem.Metadata["accessToken"]
+
+	// TODO - need to handle continuation calls for long lists
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+	response := string(responseBuf)
+
+	newItems := []*TreeNode{}
+	// var jsonResponse map[string]interface{}
+	// err = json.Unmarshal(responseBuf, &jsonResponse)
+	// if err != nil {
+	// 	err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
+	// 	return ExpanderResult{
+	// 		Err:               err,
+	// 		SourceDescription: "ContainerRegistryExpander request",
+	// 	}
+	// }
+
+	// tags := jsonResponse["tags"].([]interface{})
+	// newItems := []*TreeNode{}
+
+	// for _, tagTemp := range tags {
+	// 	tag := tagTemp.(map[string]interface{})
+	// 	tagName := tag["name"].(string)
+	// 	newItems = append(newItems, &TreeNode{
+	// 		Parentid:  currentItem.ID,
+	// 		Namespace: "containerRegistry",
+	// 		Name:      tagName,
+	// 		Display:   tagName,
+	// 		ItemType:  "containerRegistry.repository.tag",
+	// 		ExpandURL: ExpandURLNotSupported,
+	// 		Metadata: map[string]string{
+	// 			"loginServer": loginServer,
+	// 			"repository":  repository,
+	// 			"tag":         tagName,
+	// 		},
+	// 	})
+	// }
+
+	return ExpanderResult{
+		Err:               nil,
+		Response:          response,
+		SourceDescription: "ContainerRegistryExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *ContainerRegistryExpander) ExpandRepositoryManifests(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+	accessToken := currentItem.Metadata["accessToken"]
+
+	// TODO - need to handle continuation calls for long lists
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_manifests", loginServer, repository), accessToken)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+	response := string(responseBuf)
+
+	var jsonResponse map[string]interface{}
+	err = json.Unmarshal(responseBuf, &jsonResponse)
+	if err != nil {
+		err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "ContainerRegistryExpander request",
+		}
+	}
+
+	manifests := jsonResponse["manifests"].([]interface{})
+	newItems := []*TreeNode{}
+
+	for _, manifestTemp := range manifests {
+		manifest := manifestTemp.(map[string]interface{})
+		digest := manifest["digest"].(string)
+		newItems = append(newItems, &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      digest,
+			Display:   digest,
+			ItemType:  "containerRegistry.repository.manifest",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer": loginServer,
+				"repository":  repository,
+				"digest":      digest,
+			},
+		})
 	}
 
 	return ExpanderResult{
