@@ -381,9 +381,13 @@ func (e *ContainerRegistryExpander) ExpandRepositoryManifests(ctx context.Contex
 	loginServer := currentItem.Metadata["loginServer"]
 	repository := currentItem.Metadata["repository"]
 	accessToken := currentItem.Metadata["accessToken"]
+	lastManifest := currentItem.Metadata["lastManifest"]
 
-	// TODO - need to handle continuation calls for long lists
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_manifests", loginServer, repository), accessToken)
+	continuation := ""
+	if lastManifest != "" {
+		continuation = fmt.Sprintf("?last=%s", lastManifest)
+	}
+	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_manifests%s", loginServer, repository, continuation), accessToken)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -406,10 +410,11 @@ func (e *ContainerRegistryExpander) ExpandRepositoryManifests(ctx context.Contex
 	manifestsTemp := jsonResponse["manifests"]
 	if manifestsTemp != nil {
 		manifests := manifestsTemp.([]interface{})
-
+		lastManifest := ""
 		for _, manifestTemp := range manifests {
 			manifest := manifestTemp.(map[string]interface{})
 			digest := manifest["digest"].(string)
+			lastManifest = digest
 			newItems = append(newItems, &TreeNode{
 				Parentid:  currentItem.ID,
 				Namespace: "containerRegistry",
@@ -424,6 +429,20 @@ func (e *ContainerRegistryExpander) ExpandRepositoryManifests(ctx context.Contex
 				},
 			})
 		}
+		newItems = append(newItems, &TreeNode{
+			Parentid:  currentItem.ID,
+			Namespace: "containerRegistry",
+			Name:      "more...",
+			Display:   "more...",
+			ItemType:  "containerRegistry.repository.manifests",
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"loginServer":  loginServer,
+				"accessToken":  accessToken,
+				"repository":   repository,
+				"lastManifest": lastManifest,
+			},
+		})
 	}
 
 	return ExpanderResult{
