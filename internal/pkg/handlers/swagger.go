@@ -20,6 +20,7 @@ func NewSwaggerResourceExpander(resources []SwaggerResourceType) *SwaggerResourc
 
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
+	initialized   bool
 	ResourceTypes []SwaggerResourceType
 }
 
@@ -69,8 +70,16 @@ func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType)
 	return nil
 }
 
+func (e *SwaggerResourceExpander) ensureInitialized() {
+ if !e.initialized {
+			e.ResourceTypes = e.getResourceTypes()
+			e.initialized = true
+		}
+	}
+
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	e.ensureInitialized()
 	if currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
 		return false, nil
 	}

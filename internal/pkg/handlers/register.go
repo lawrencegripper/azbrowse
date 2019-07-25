@@ -7,7 +7,7 @@ var Register = []Expander{
 	&ResourceGroupResourceExpander{},
 	&SubscriptionExpander{},
 	&ActionExpander{},
-	NewManagementPlaneSwaggerExpander(),
+	&SwaggerResourceExpander{},
 	&DeploymentsExpander{},
 	&ActivityLogExpander{},
 	&JSONExpander{},
