@@ -71,11 +71,11 @@ func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType)
 }
 
 func (e *SwaggerResourceExpander) ensureInitialized() {
- if !e.initialized {
-			e.ResourceTypes = e.getResourceTypes()
-			e.initialized = true
-		}
+	if !e.initialized {
+		e.ResourceTypes = e.getResourceTypes()
+		e.initialized = true
 	}
+}
 
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {

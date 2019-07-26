@@ -380,12 +380,46 @@ func (e *ContainerRegistryExpander) expandNode(
 	if lastItem != "" && createContinuationFunc != nil {
 		continuation = fmt.Sprintf("?last=%s", lastItem)
 	}
-	responseBuf, err := e.DoRequest(fmt.Sprintf("%s%s", url, continuation), accessToken)
+	urlTemp := fmt.Sprintf("%s%s", url, continuation)
+
+	response, items, err := e.getItemsForURL(urlTemp, accessToken, collectionPath, itemPath)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
 			SourceDescription: "ContainerRegistryExpander request",
 		}
+	}
+
+	newItems := []*TreeNode{}
+	for _, item := range items {
+		newItems = append(newItems, createItemNodeFunc(currentItem, item))
+	}
+
+	if len(newItems) > 0 {
+		if createContinuationFunc != nil {
+			newLastItem := items[len(items)-1]
+			continuation = fmt.Sprintf("?last=%s", newLastItem)
+			urlTemp = fmt.Sprintf("%s%s", url, continuation)
+			_, nextItems, _ := e.getItemsForURL(urlTemp, accessToken, collectionPath, itemPath)
+			if len(nextItems) > 0 {
+				newItems = append(newItems, createContinuationFunc(currentItem, newLastItem))
+			}
+		}
+	}
+
+	return ExpanderResult{
+		Err:               nil,
+		Response:          response,
+		SourceDescription: "ContainerRegistryExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
+}
+func (e *ContainerRegistryExpander) getItemsForURL(url string, accessToken string, collectionPath string, itemPath string) (string, []string, error) {
+
+	responseBuf, err := e.DoRequest(url, accessToken)
+	if err != nil {
+		return "", []string{}, err
 	}
 
 	// project nodes
@@ -395,13 +429,10 @@ func (e *ContainerRegistryExpander) expandNode(
 	err = json.Unmarshal(responseBuf, &jsonResponse)
 	if err != nil {
 		err = fmt.Errorf("Error unmarshalling repositories response: %s, %s", err, response)
-		return ExpanderResult{
-			Err:               err,
-			SourceDescription: "ContainerRegistryExpander request",
-		}
+		return "", []string{}, err
 	}
 
-	newItems := []*TreeNode{}
+	itemsResult := []string{}
 	var itemsTemp interface{}
 	itemsTemp = jsonResponse
 	pathSegments := strings.Split(collectionPath, ".")
@@ -413,7 +444,6 @@ func (e *ContainerRegistryExpander) expandNode(
 	}
 	if itemsTemp != nil {
 		items := itemsTemp.([]interface{})
-		lastItem := ""
 		for _, itemTemp := range items {
 			var itemName string
 			if itemPath == "" {
@@ -422,22 +452,11 @@ func (e *ContainerRegistryExpander) expandNode(
 				item := itemTemp.(map[string]interface{})
 				itemName = item[itemPath].(string)
 			}
-			lastItem = itemName
-			newItems = append(newItems, createItemNodeFunc(currentItem, itemName))
-		}
-		if createContinuationFunc != nil {
-			// TODO - test for more results before adding continuation node
-			newItems = append(newItems, createContinuationFunc(currentItem, lastItem))
+			itemsResult = append(itemsResult, itemName)
 		}
 	}
 
-	return ExpanderResult{
-		Err:               nil,
-		Response:          response,
-		SourceDescription: "ContainerRegistryExpander request",
-		Nodes:             newItems,
-		IsPrimaryResponse: true,
-	}
+	return response, itemsResult, nil
 }
 
 func (e *ContainerRegistryExpander) DoRequest(url string, accessToken string) ([]byte, error) {
