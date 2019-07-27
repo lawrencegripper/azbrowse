@@ -12,12 +12,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-func NewSwaggerResourceExpander(resources []SwaggerResourceType) *SwaggerResourceExpander {
-	return &SwaggerResourceExpander{
-		ResourceTypes: resources,
-	}
-}
-
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
 	initialized   bool
