@@ -9,15 +9,17 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-type ContainerRegistryResponse struct {
+type containerRegistryResponse struct {
 	Properties struct {
 		LoginServer string `json:"loginServer"`
-	} `json:"properties`
+	} `json:"properties"`
 }
 
+// NewContainerRegistryExpander creates a new instance of ContainerRegistryExpander
 func NewContainerRegistryExpander() *ContainerRegistryExpander {
 	return &ContainerRegistryExpander{
 		client: &http.Client{},
@@ -72,7 +74,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 
 		return ExpanderResult{
 			Err:               nil,
-			Response:          "", // Swagger expander will supply the reponse
+			Response:          "", // Swagger expander will supply the response
 			SourceDescription: "ContainerRegistryExpander request",
 			Nodes:             newItems,
 			IsPrimaryResponse: false,
@@ -155,7 +157,7 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 	loginServer := currentItem.Metadata["loginServer"]
 	repository := currentItem.Metadata["repository"]
 
-	accessToken, err := e.GetRegistryToken(loginServer, fmt.Sprintf("repository:%s:pull", repository))
+	accessToken, err := e.getRegistryToken(ctx, loginServer, fmt.Sprintf("repository:%s:pull", repository))
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -163,7 +165,7 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 		}
 	}
 
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
+	responseBuf, err := e.doRequest(ctx, fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -206,7 +208,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 	repository := currentItem.Metadata["repository"]
 	tag := currentItem.Metadata["tag"]
 
-	accessToken, err := e.GetRegistryToken(loginServer, fmt.Sprintf("repository:%s:metadata_read", repository))
+	accessToken, err := e.getRegistryToken(ctx, loginServer, fmt.Sprintf("repository:%s:metadata_read", repository))
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -214,7 +216,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 		}
 	}
 
-	responseBuf, err := e.DoRequest(fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
+	responseBuf, err := e.doRequest(ctx, fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -361,13 +363,16 @@ func (e *ContainerRegistryExpander) expandNode(
 	createItemNodeFunc createItemNode,
 	createContinuationFunc createItemNode) ExpanderResult {
 
+	span, ctx := tracing.StartSpanFromContext(ctx, "expand(containerregistry):"+currentItem.ItemType+":"+currentItem.Name+":"+currentItem.ID, tracing.SetTag("item", currentItem))
+	defer span.Finish()
+
 	// TODO - add context around errors
 
 	loginServer := currentItem.Metadata["loginServer"]
 	lastItem := currentItem.Metadata["lastItem"]
 
 	// get token
-	accessToken, err := e.GetRegistryToken(loginServer, accessTokenScope)
+	accessToken, err := e.getRegistryToken(ctx, loginServer, accessTokenScope)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -382,7 +387,7 @@ func (e *ContainerRegistryExpander) expandNode(
 	}
 	urlTemp := fmt.Sprintf("%s%s", url, continuation)
 
-	response, items, err := e.getItemsForURL(urlTemp, accessToken, collectionPath, itemPath)
+	response, items, err := e.getItemsForURL(ctx, urlTemp, accessToken, collectionPath, itemPath)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -400,7 +405,7 @@ func (e *ContainerRegistryExpander) expandNode(
 			newLastItem := items[len(items)-1]
 			continuation = fmt.Sprintf("?last=%s", newLastItem)
 			urlTemp = fmt.Sprintf("%s%s", url, continuation)
-			_, nextItems, _ := e.getItemsForURL(urlTemp, accessToken, collectionPath, itemPath)
+			_, nextItems, _ := e.getItemsForURL(ctx, urlTemp, accessToken, collectionPath, itemPath)
 			if len(nextItems) > 0 {
 				newItems = append(newItems, createContinuationFunc(currentItem, newLastItem))
 			}
@@ -415,9 +420,11 @@ func (e *ContainerRegistryExpander) expandNode(
 		IsPrimaryResponse: true,
 	}
 }
-func (e *ContainerRegistryExpander) getItemsForURL(url string, accessToken string, collectionPath string, itemPath string) (string, []string, error) {
+func (e *ContainerRegistryExpander) getItemsForURL(ctx context.Context, url string, accessToken string, collectionPath string, itemPath string) (string, []string, error) {
+	span, ctx := tracing.StartSpanFromContext(ctx, "getItemsForURL(containerregistry):"+url, tracing.SetTag("url", url))
+	defer span.Finish()
 
-	responseBuf, err := e.DoRequest(url, accessToken)
+	responseBuf, err := e.doRequest(ctx, url, accessToken)
 	if err != nil {
 		return "", []string{}, err
 	}
@@ -459,7 +466,10 @@ func (e *ContainerRegistryExpander) getItemsForURL(url string, accessToken strin
 	return response, itemsResult, nil
 }
 
-func (e *ContainerRegistryExpander) DoRequest(url string, accessToken string) ([]byte, error) {
+func (e *ContainerRegistryExpander) doRequest(ctx context.Context, url string, accessToken string) ([]byte, error) {
+	span, _ := tracing.StartSpanFromContext(ctx, "doRequest(containerregistry):"+url, tracing.SetTag("url", url))
+	defer span.Finish()
+
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return []byte{}, fmt.Errorf("Failed to create request: %s", err)
@@ -489,19 +499,21 @@ func (e *ContainerRegistryExpander) getLoginServer(ctx context.Context, registry
 	if err != nil {
 		return "", fmt.Errorf("Failed to get registry: " + err.Error() + registryID)
 	}
-	var containerRegistryResponse ContainerRegistryResponse
-	err = json.Unmarshal([]byte(data), &containerRegistryResponse)
+	var response containerRegistryResponse
+	err = json.Unmarshal([]byte(data), &response)
 	if err != nil {
 		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, registryID)
 		return "", err
 	}
 
 	// TODO also capture SKU to ensure it is a managed SKU
-	loginServer := containerRegistryResponse.Properties.LoginServer
+	loginServer := response.Properties.LoginServer
 	return loginServer, nil
 }
 
-func (e *ContainerRegistryExpander) GetRegistryToken(loginServer string, scope string) (string, error) {
+func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginServer string, scope string) (string, error) {
+	span, _ := tracing.StartSpanFromContext(ctx, "getRegistryToken(containerregistry):"+loginServer+":"+scope, tracing.SetTag("loginServer", loginServer))
+	defer span.Finish()
 	// This logic is based around https://github.com/Azure/azure-cli/blob/c83710e4176cf598fccd57180263a4c5b0fc561e/src/azure-cli/azure/cli/command_modules/acr/_docker_utils.py#L110
 
 	// TODO - add support for admin credentials if enabled and the AAD approach fails
