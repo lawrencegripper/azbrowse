@@ -440,7 +440,7 @@ func (e *ContainerRegistryExpander) getItemsForURL(ctx context.Context, url stri
 	}
 
 	itemsResult := []string{}
-	var itemsTemp interface{}
+	var itemsTemp interface{} //nolint:gosimple
 	itemsTemp = jsonResponse
 	pathSegments := strings.Split(collectionPath, ".")
 	for _, pathSegment := range pathSegments {
