@@ -30,11 +30,12 @@ type ListWidget struct {
 	enableTracing        bool
 	FullscreenKeyBinding string
 	ActionKeyBinding     string
+	lastTopIndex         int
 }
 
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing}
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0}
 }
 
 // Layout draws the widget in the gocui view
@@ -71,11 +72,27 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	linesPerItem := linesUsedCount / len(w.items)
 	maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
 
-	for i, item := range allItems {
-		// Skip items above the selection to allow scrolling
-		if w.selected > maxItemsCanShow && i < w.selected {
-			continue
-		}
+	topIndex := w.lastTopIndex
+	bottomIndex := w.lastTopIndex + maxItemsCanShow
+
+	if w.selected >= bottomIndex {
+		// need to adjust down
+		diff := w.selected - bottomIndex + 1
+		topIndex += diff
+		bottomIndex += diff
+	}
+	if w.selected < topIndex {
+		// need to adjust up
+		diff := topIndex - w.selected
+		topIndex -= diff
+		bottomIndex -= diff
+	}
+	w.lastTopIndex = topIndex
+	if bottomIndex > len(allItems) {
+		bottomIndex = len(allItems) - 1
+	}
+
+	for _, item := range allItems[topIndex : bottomIndex+1] {
 		fmt.Fprint(v, item)
 	}
 
@@ -336,8 +353,6 @@ func (w *ListWidget) MoveHome() {
 func (w *ListWidget) MoveEnd() {
 	w.ChangeSelection(len(w.items) - 1)
 }
-
-
 
 // MoveHome changes the selection to the top of the list
 func (w *ListWidget) MoveUp() {
