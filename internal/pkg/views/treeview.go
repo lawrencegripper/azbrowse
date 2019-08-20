@@ -355,12 +355,12 @@ func (w *ListWidget) MoveEnd() {
 	w.ChangeSelection(len(w.items) - 1)
 }
 
-// MoveHome changes the selection to the top of the list
+// MoveUp moves the selection up one item
 func (w *ListWidget) MoveUp() {
 	w.ChangeSelection(w.CurrentSelection() - 1)
 }
 
-// MoveEnd changes the selection to the bottom of the list
+// MoveDown moves the selection down one item
 func (w *ListWidget) MoveDown() {
 	w.ChangeSelection(w.CurrentSelection() + 1)
 }
