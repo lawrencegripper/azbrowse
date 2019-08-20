@@ -92,7 +92,8 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		bottomIndex = len(allItems) - 1
 	}
 
-	for _, item := range allItems[topIndex : bottomIndex+1] {
+	for index := topIndex; index < bottomIndex +1; index++ {
+		item := allItems[index]
 		fmt.Fprint(v, item)
 	}
 
