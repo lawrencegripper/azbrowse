@@ -106,7 +106,7 @@ func NewListDownHandler(list *views.ListWidget) *ListDownHandler {
 
 func (h ListDownHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.List.ChangeSelection(h.List.CurrentSelection() + 1)
+		h.List.MoveDown()
 		return nil
 	}
 }
@@ -129,7 +129,7 @@ func NewListUpHandler(list *views.ListWidget) *ListUpHandler {
 
 func (h ListUpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.List.ChangeSelection(h.List.CurrentSelection() - 1)
+		h.List.MoveUp()
 		return nil
 	}
 }
