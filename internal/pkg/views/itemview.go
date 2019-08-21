@@ -3,11 +3,12 @@ package views
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
-	"github.com/TylerBrock/colorjson"
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/stuartleeks/colorjson"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests
@@ -46,8 +47,10 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		w.content = stripSecretVals(w.content)
 	}
 
-	var obj map[string]interface{}
-	err = json.Unmarshal([]byte(w.content), &obj)
+	d := json.NewDecoder(strings.NewReader(w.content))
+	d.UseNumber()
+	var obj interface{}
+	err = d.Decode(&obj)
 	if err != nil {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: false,
