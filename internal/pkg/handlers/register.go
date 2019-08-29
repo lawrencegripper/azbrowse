@@ -13,4 +13,5 @@ var Register = []Expander{
 	&JSONExpander{},
 	&StorageManagementPoliciesExpander{}, // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 	NewContainerRegistryExpander(),       // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+	&ContainerInstanceExpander{},
 }
