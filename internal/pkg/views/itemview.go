@@ -47,28 +47,32 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		w.content = stripSecretVals(w.content)
 	}
 
-	d := json.NewDecoder(strings.NewReader(w.content))
-	d.UseNumber()
-	var obj interface{}
-	err = d.Decode(&obj)
-	if err != nil {
-		eventing.SendStatusEvent(eventing.StatusEvent{
-			InProgress: false,
-			Failure:    true,
-			Message:    "Failed to display as JSON: " + err.Error(),
-			Timeout:    time.Duration(time.Second * 4),
-		})
-		fmt.Fprint(v, w.content)
-		return nil
-	}
+	if string(w.content[0]) == "{" || string(w.content[0]) == "[" {
+		d := json.NewDecoder(strings.NewReader(w.content))
+		d.UseNumber()
+		var obj interface{}
+		err = d.Decode(&obj)
+		if err != nil {
+			eventing.SendStatusEvent(eventing.StatusEvent{
+				InProgress: false,
+				Failure:    true,
+				Message:    "Failed to display as JSON: " + err.Error(),
+				Timeout:    time.Duration(time.Second * 4),
+			})
+			fmt.Fprint(v, w.content)
+			return nil
+		}
 
-	f := colorjson.NewFormatter()
-	f.Indent = 2
-	s, err := f.Marshal(obj)
-	if err != nil {
-		fmt.Fprint(v, w.content)
+		f := colorjson.NewFormatter()
+		f.Indent = 2
+		s, err := f.Marshal(obj)
+		if err != nil {
+			fmt.Fprint(v, w.content)
+		} else {
+			fmt.Fprint(v, string(s))
+		}
 	} else {
-		fmt.Fprint(v, string(s))
+		fmt.Fprint(v, w.content)
 	}
 
 	return nil

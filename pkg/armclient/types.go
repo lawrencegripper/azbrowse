@@ -286,6 +286,11 @@ type ActivityLogResource struct {
 	} `json:"value"`
 }
 
+// ContainerLogResponse for container logs
+type ContainerLogResponse struct {
+	Content string `json:"content"`
+}
+
 // ContainerGroupResponse is the response to a get request on a container group
 type ContainerGroupResponse struct {
 	ID         string `json:"id"`

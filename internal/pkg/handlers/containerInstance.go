@@ -31,14 +31,18 @@ func (e *ContainerInstanceExpander) DoesExpand(ctx context.Context, currentItem 
 			return true, nil
 		}
 	}
-	// if currentItem.ItemType == "containerInstance.logs" {
-	// 	return true, nil
-	// }
+	if currentItem.ExpandReturnType == "containerInstance.logs" {
+		return true, nil
+	}
 	return false, nil
 }
 
 // Expand adds items for container instance items to the list
 func (e *ContainerInstanceExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	if currentItem.ExpandReturnType == "containerInstance.logs" {
+		return e.expandLogs(ctx, currentItem)
+	}
+
 	swaggerResourceType := currentItem.SwaggerResourceType
 	if currentItem.Namespace != containerInstanceNamespace &&
 		swaggerResourceType != nil &&
@@ -85,14 +89,14 @@ func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, curren
 
 	for _, container := range containerGroupResponse.Properties.Containers {
 		newItems = append(newItems, &TreeNode{
-			Name:            container.Name,
-			Display:         container.Name + "\n   " + style.Subtle("Status:  "+container.Properties.InstanceView.CurrentState.State) + "\n   " + style.Subtle("Restarts:  "+string(container.Properties.InstanceView.RestartCount)) + "\n   " + style.Subtle("Image: "+container.Properties.Image),
-			ID:              currentItem.ID + "/" + container.Name,
-			Parentid:        currentItem.ID,
-			ExpandURL:       currentItem.ID + "/containers/" + container.Name + "/logs" + "?api-version=" + resourceAPIVersion,
-			ItemType:        "containerInstance.logs",
-			SubscriptionID:  currentItem.SubscriptionID,
-			StatusIndicator: DrawStatus(container.Properties.InstanceView.CurrentState.State),
+			Name:             container.Name,
+			Display:          container.Name + "\n   " + style.Subtle("Status:  "+container.Properties.InstanceView.CurrentState.State) + "\n   " + style.Subtle("Restarts:  "+string(container.Properties.InstanceView.RestartCount)) + "\n   " + style.Subtle("Image: "+container.Properties.Image),
+			ID:               currentItem.ID + "/" + container.Name,
+			Parentid:         currentItem.ID,
+			ExpandURL:        currentItem.ID + "/containers/" + container.Name + "/logs" + "?api-version=" + resourceAPIVersion,
+			ExpandReturnType: "containerInstance.logs",
+			SubscriptionID:   currentItem.SubscriptionID,
+			StatusIndicator:  DrawStatus(container.Properties.InstanceView.CurrentState.State),
 			Metadata: map[string]string{
 				"ContainerName":         container.Name,
 				"SuppressSwaggerExpand": "true",
@@ -108,30 +112,28 @@ func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, curren
 	}
 }
 
-// func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem *TreeNode) ExpanderResult {
-// 	resourceAPIVersion, err := armclient.GetAPIVersion(currentItem.ArmType)
-// 	if err != nil {
-// 		eventing.SendStatusEvent(eventing.StatusEvent{
-// 			Failure: true,
-// 			Message: "Failed to get resouceVersion for the Type:" + currentItem.ArmType,
-// 			Timeout: time.Duration(time.Second * 5),
-// 		})
-// 	}
-// 	containersLogURL := currentItem.Parentid + "/containers/" + currentItem.Metadata["ContainerName"] + "/logs" + "?api-version=" + resourceAPIVersion
+func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	containersLogURL := currentItem.ExpandURL
 
-// 	data, err := armclient.DoRequest(ctx, "GET", containersLogURL)
-// 	if err != nil {
-// 		return ExpanderResult{
-// 			Err:               err,
-// 			Response:          "",
-// 			SourceDescription: "expandContainers logs",
-// 			IsPrimaryResponse: true,
-// 		}
-// 	}
+	data, err := armclient.DoRequest(ctx, "GET", containersLogURL)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			Response:          "",
+			SourceDescription: "expandContainers logs",
+			IsPrimaryResponse: true,
+		}
+	}
 
-// 	return ExpanderResult{
-// 		IsPrimaryResponse: true,
-// 		Response:          data,
-// 		SourceDescription: "ContainerInstanceExpander request",
-// 	}
-// }
+	var containerLogResponse armclient.ContainerLogResponse
+	err = json.Unmarshal([]byte(data), &containerLogResponse)
+	if err != nil {
+		panic(err)
+	}
+
+	return ExpanderResult{
+		IsPrimaryResponse: true,
+		Response:          containerLogResponse.Content,
+		SourceDescription: "ContainerInstanceExpander request",
+	}
+}
