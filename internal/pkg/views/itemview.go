@@ -43,11 +43,10 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		return nil
 	}
 
-	if w.hideGuids {
-		w.content = stripSecretVals(w.content)
-	}
-
-	if string(w.content[0]) == "{" || string(w.content[0]) == "[" {
+	if string(w.content[0]) == "{" {
+		if w.hideGuids {
+			w.content = stripSecretVals(w.content)
+		}
 		d := json.NewDecoder(strings.NewReader(w.content))
 		d.UseNumber()
 		var obj interface{}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -90,10 +91,10 @@ func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, curren
 	for _, container := range containerGroupResponse.Properties.Containers {
 		newItems = append(newItems, &TreeNode{
 			Name:             container.Name,
-			Display:          container.Name + "\n   " + style.Subtle("Status:  "+container.Properties.InstanceView.CurrentState.State) + "\n   " + style.Subtle("Restarts:  "+string(container.Properties.InstanceView.RestartCount)) + "\n   " + style.Subtle("Image: "+container.Properties.Image),
+			Display:          container.Name + "\n   " + style.Subtle("Status:  "+container.Properties.InstanceView.CurrentState.State) + "\n   " + style.Subtle("Restarts:  "+strconv.Itoa(container.Properties.InstanceView.RestartCount)) + "\n   " + style.Subtle("Image: "+container.Properties.Image),
 			ID:               currentItem.ID + "/" + container.Name,
 			Parentid:         currentItem.ID,
-			ExpandURL:        currentItem.ID + "/containers/" + container.Name + "/logs" + "?api-version=" + resourceAPIVersion,
+			ExpandURL:        currentItem.ID + "/containers/" + container.Name + "/logs?tail=400&api-version=" + resourceAPIVersion,
 			ExpandReturnType: "containerInstance.logs",
 			SubscriptionID:   currentItem.SubscriptionID,
 			StatusIndicator:  DrawStatus(container.Properties.InstanceView.CurrentState.State),
