@@ -13,6 +13,9 @@ integration:
 build: swagger-codegen test checks 
 	GO111MODULE=on go build ./cmd/azbrowse
 
+fmt:
+	find . -name '*.go' | grep -v vendor | xargs gofmt -s -w
+
 install:
 	GO111MODULE=on go install ./cmd/azbrowse
 
