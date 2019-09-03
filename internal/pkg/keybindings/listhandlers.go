@@ -1,7 +1,6 @@
 package keybindings
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -16,6 +15,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/skratchdot/open-golang/open"
 )
@@ -432,7 +432,7 @@ func (h ListUpdateHandler) getEditorConfig() (config.EditorConfig, error) {
 		return userConfig.Editor, nil
 	}
 	// generate default config
-	translateFilePathForWSL := os.Getenv("WSL_DISTRO_NAME") != "" // If WSL_DISTRO_NAME env var is set then translate path so that it is valid when loaded by VS code in Windows
+	translateFilePathForWSL := wsl.IsWSL() // If on WSL then translate path so that it is valid when loaded by VS code in Windows
 	return config.EditorConfig{
 		Command: config.CommandConfig{
 			Executable: "code",
@@ -496,16 +496,10 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		editorTmpFile := tmpFile.Name()
 		// check if we should perform path translation for WSL (Windows Subsytem for Linux)
 		if editorConfig.TranslateFilePathForWSL {
-			cmd := exec.Command("wslpath", "-w", editorTmpFile)
-			var out bytes.Buffer
-			var stderr bytes.Buffer
-			cmd.Stdout = &out
-			cmd.Stderr = &stderr
-			err = cmd.Run()
+			editorTmpFile, err = wsl.TranslateToWindowsPath(editorTmpFile)
 			if err != nil {
-				return fmt.Errorf("Error running wslpath: %s", stderr.String())
+				return err
 			}
-			editorTmpFile = strings.TrimSuffix(out.String(), "\n")
 		}
 		err = openEditor(editorConfig.Command, editorTmpFile)
 		if err != nil {

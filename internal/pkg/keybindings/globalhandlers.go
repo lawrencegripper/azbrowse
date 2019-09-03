@@ -8,6 +8,7 @@ import (
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 )
 
 ////////////////////////////////////////////////////////////////////
@@ -47,7 +48,12 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 
 func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		err := clipboard.WriteAll(h.Content.GetContent())
+		var err error;
+		if wsl.IsWSL() {
+			err = wsl.TrySetClipboard(h.Content.GetContent())
+		} else {
+			err = clipboard.WriteAll(h.Content.GetContent())
+		}
 		if err != nil {
 			h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 			return nil
