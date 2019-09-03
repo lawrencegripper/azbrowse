@@ -48,7 +48,7 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 
 func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		var err error;
+		var err error
 		if wsl.IsWSL() {
 			err = wsl.TrySetClipboard(h.Content.GetContent())
 		} else {
