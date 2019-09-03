@@ -15,6 +15,7 @@ func IsWSL() bool {
 	return os.Getenv("WSL_DISTRO_NAME") != ""
 }
 
+// TranslateToWindowsPath converts a Linux path under WSL to a Windows-accessible path
 func TranslateToWindowsPath(localPath string) (string, error) {
 	cmd := exec.Command("wslpath", "-w", localPath)
 	var out bytes.Buffer
