@@ -49,7 +49,7 @@ func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		err := clipboard.WriteAll(h.Content.GetContent())
 		if err != nil {
-			h.StatusBar.Status("Failed to copy to clipboard", false)
+			h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 			return nil
 		}
 		h.StatusBar.Status("Current resource's JSON copied to clipboard", false)
