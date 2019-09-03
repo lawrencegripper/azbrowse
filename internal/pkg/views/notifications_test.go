@@ -152,6 +152,10 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
 	}))
 	defer ts.Close()
+
+	// Wait for server start
+	time.Sleep(2 * time.Second)
+
 	// Set the ARM client to use out test server
 	armclient.SetClient(ts.Client())
 	armclient.SetAquireToken(dummyTokenFunc())
@@ -197,6 +201,9 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
 	}))
 	defer ts.Close()
+
+	// Wait for server start
+	time.Sleep(2 * time.Second)
 
 	// Set the ARM client to use out test server
 	armclient.SetClient(ts.Client())
