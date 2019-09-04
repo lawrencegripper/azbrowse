@@ -1,5 +1,6 @@
 package armclient
 
+// MetricNamespaceResponse https://docs.microsoft.com/en-us/rest/api/monitor/metricnamespaces/list
 type MetricNamespaceResponse struct {
 	Value []struct {
 		ID             string `json:"id"`
@@ -12,6 +13,7 @@ type MetricNamespaceResponse struct {
 	} `json:"value"`
 }
 
+// MetricsListResponse https://docs.microsoft.com/en-us/rest/api/monitor/metricdefinitions/list
 type MetricsListResponse struct {
 	Value []struct {
 		ID         string `json:"id"`

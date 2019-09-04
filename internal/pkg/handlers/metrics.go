@@ -29,18 +29,53 @@ func (e *MetricsExpander) DoesExpand(ctx context.Context, currentItem *TreeNode)
 		return true, nil
 	}
 
+	if currentItem.ItemType == "metrics.graph" {
+		return true, nil
+	}
+
 	return false, nil
 }
 
 // Expand adds items for metrics to the list
 func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	if currentItem.ItemType == "metrics.metricdefinition" {
-		availableMetrics, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+		data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
 		if err != nil {
 			return ExpanderResult{
 				Err:               err,
 				SourceDescription: "MetricsExpander request metricDefinitions",
 			}
+		}
+
+		var metricsListResponse armclient.MetricsListResponse
+		err = json.Unmarshal([]byte(data), &metricsListResponse)
+		if err != nil {
+			panic(err)
+		}
+
+		newItems := []*TreeNode{}
+
+		for _, metric := range metricsListResponse.Value {
+			newItems = append(newItems, &TreeNode{
+				Name:           metric.Name.Value,
+				Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
+				ID:             currentItem.ID,
+				Parentid:       currentItem.ID,
+				ExpandURL:      ExpandURLNotSupported,
+				ItemType:       "metrics.graph",
+				SubscriptionID: currentItem.SubscriptionID,
+				Metadata: map[string]string{
+					"SuppressSwaggerExpand": "true",
+					"SuppressGenericExpand": "true",
+				},
+			})
+		}
+
+		return ExpanderResult{
+			Response:          data,
+			IsPrimaryResponse: true,
+			Nodes:             newItems,
+			SourceDescription: "MetricsExpander build response metric namespaces",
 		}
 
 		// Todo then go and get the metrics and return a list of options to the uers.
@@ -98,7 +133,7 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 /////////////////////////
 // Calls
 
-// Docs https://docs.microsoft.com/en-us/rest/api/monitor/metricnamespaces/list
+//
 // Get metric namespaces relativeUrl: /subscriptions/SUBIDHERE/resourceGroups/lk-scratch/providers/Microsoft.Web/sites/lg-scratch/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview
 
 ////////////////////////////
