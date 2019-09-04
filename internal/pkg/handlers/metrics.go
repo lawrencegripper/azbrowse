@@ -63,7 +63,7 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 				Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
 				ID:             currentItem.ID,
 				Parentid:       currentItem.ID,
-				ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().Add(-3*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
+				ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().UTC().Add(-3*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().UTC().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
 				ItemType:       "metrics.graph",
 				SubscriptionID: currentItem.SubscriptionID,
 				Metadata: map[string]string{
