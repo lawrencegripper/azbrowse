@@ -144,6 +144,12 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 		t.Log("Skipping integration test")
 		return
 	}
+
+	// Wait for the last test to clear down
+	// Todo: This needs to be fixed. The ARMClient should be moved to a
+	// struct and not package level methods.
+	time.Sleep(time.Second * 5)
+
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -152,9 +158,6 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 		time.Sleep(time.Second * 5) // Make the ConfirmDelete take a while
 	}))
 	defer ts.Close()
-
-	// Wait for server start
-	time.Sleep(2 * time.Second)
 
 	// Set the ARM client to use out test server
 	armclient.SetClient(ts.Client())
