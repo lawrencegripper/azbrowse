@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 
@@ -61,7 +61,7 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 				Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
 				ID:             currentItem.ID,
 				Parentid:       currentItem.ID,
-				ExpandURL:      ExpandURLNotSupported,
+				ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().AddDate(0, 0, -30).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
 				ItemType:       "metrics.graph",
 				SubscriptionID: currentItem.SubscriptionID,
 				Metadata: map[string]string{
@@ -81,7 +81,19 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 		// Todo then go and get the metrics and return a list of options to the uers.
 
 	} else if currentItem.ItemType == "metrics.graph" {
-		// Todo draw the graph and return it.... :)
+		data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+		if err != nil {
+			return ExpanderResult{
+				Err:               err,
+				SourceDescription: "MetricsExpander request metricDefinitions",
+			}
+		}
+
+		return ExpanderResult{
+			Response:          data,
+			IsPrimaryResponse: true,
+			SourceDescription: "MetricsExpander build graph",
+		}
 	} else {
 
 		data, err := armclient.DoRequest(ctx, "GET", currentItem.ID+"/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview")
@@ -121,12 +133,6 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 			Nodes:             newItems,
 			SourceDescription: "MetricsExpander build response metric namespaces",
 		}
-	}
-
-	return ExpanderResult{
-		Err:               fmt.Errorf("Error - unhandled Expand"),
-		Response:          "Error!",
-		SourceDescription: "MetricsExpander request",
 	}
 }
 
