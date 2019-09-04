@@ -37,3 +37,31 @@ type MetricsListResponse struct {
 		} `json:"dimensions"`
 	} `json:"value"`
 }
+
+// MetricResponse https://docs.microsoft.com/en-us/rest/api/monitor/metrics/list
+type MetricResponse struct {
+	Cost           int    `json:"cost"`
+	Timespan       string `json:"timespan"`
+	Interval       string `json:"interval"`
+	Namespace      string `json:"namespace"`
+	Resourceregion string `json:"resourceregion"`
+	Value          []struct {
+		ID   string `json:"id"`
+		Type string `json:"type"`
+		Name struct {
+			Value          string `json:"value"`
+			LocalizedValue string `json:"localizedValue"`
+		} `json:"name"`
+		Unit       string `json:"unit"`
+		Timeseries []struct {
+			Metadatavalues []struct {
+				Name struct {
+					Value          string `json:"value"`
+					LocalizedValue string `json:"localizedValue"`
+				} `json:"name"`
+				Value string `json:"value"`
+			} `json:"metadatavalues"`
+			Data []map[string]interface{} `json:"data"`
+		} `json:"timeseries"`
+	} `json:"value"`
+}

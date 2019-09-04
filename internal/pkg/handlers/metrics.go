@@ -3,8 +3,10 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
 
+	"github.com/guptarohit/asciigraph"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -61,12 +63,13 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 				Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
 				ID:             currentItem.ID,
 				Parentid:       currentItem.ID,
-				ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().AddDate(0, 0, -30).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
+				ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().Add(-3*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
 				ItemType:       "metrics.graph",
 				SubscriptionID: currentItem.SubscriptionID,
 				Metadata: map[string]string{
 					"SuppressSwaggerExpand": "true",
 					"SuppressGenericExpand": "true",
+					"AggregationType":       strings.ToLower(metric.PrimaryAggregationType),
 				},
 			})
 		}
@@ -89,8 +92,22 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 			}
 		}
 
+		var metricResponse armclient.MetricResponse
+		err = json.Unmarshal([]byte(data), &metricResponse)
+		if err != nil {
+			panic(err)
+		}
+
+		graphData := []float64{}
+		for _, datapoint := range metricResponse.Value[0].Timeseries[0].Data {
+			value := datapoint[currentItem.Metadata["AggregationType"]].(float64)
+			graphData = append(graphData, value)
+		}
+
+		graph := asciigraph.Plot(graphData)
+
 		return ExpanderResult{
-			Response:          data,
+			Response:          graph,
 			IsPrimaryResponse: true,
 			SourceDescription: "MetricsExpander build graph",
 		}
