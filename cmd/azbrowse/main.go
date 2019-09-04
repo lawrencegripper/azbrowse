@@ -172,6 +172,8 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
+	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
+	keybindings.AddHandler(keybindings.NewItemViewPageUpHandler(content))
 
 	// Item handlers
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))

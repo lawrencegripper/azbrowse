@@ -28,4 +28,6 @@ var DefaultKeys = map[string]gocui.Key{
 	"listhome":            gocui.KeyHome,
 	"confirmdelete":       gocui.KeyCtrlY,
 	"clearpendingdeletes": gocui.KeyCtrlN,
+	"itempagedown":        gocui.KeyPgdn,
+	"itempageup":          gocui.KeyPgup,
 }

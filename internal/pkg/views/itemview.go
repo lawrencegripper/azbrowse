@@ -77,6 +77,51 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
+// PageDown move the view down a page
+func (w *ItemWidget) PageDown() {
+	_, maxHeight := w.view.Size()
+	x, y := w.view.Origin()
+	w.view.SetCursor(0, 0) //nolint: errcheck
+
+	maxY := strings.Count(w.content, "\n")
+	y = y + maxHeight
+	if y > maxY {
+		y = maxY
+	}
+
+	err := w.view.SetOrigin(x, y)
+	if err != nil {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Failed to execute pagedown: " + err.Error(),
+			Timeout:    time.Duration(time.Second * 4),
+		})
+	}
+}
+
+// PageUp move the view a page up
+func (w *ItemWidget) PageUp() {
+	_, maxHeight := w.view.Size()
+	x, y := w.view.Origin()
+	w.view.SetCursor(0, 0) //nolint: errcheck
+
+	y = y - maxHeight
+	// Check we haven't overshot
+	if y < 0 {
+		y = 0
+	}
+	err := w.view.SetOrigin(x, y)
+	if err != nil {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Failed to execute pagedown: " + err.Error(),
+			Timeout:    time.Duration(time.Second * 4),
+		})
+	}
+}
+
 // SetContent displays the string in the itemview
 func (w *ItemWidget) SetContent(content string, title string) {
 	w.g.Update(func(g *gocui.Gui) error {
