@@ -20,7 +20,7 @@ install:
 	GO111MODULE=on go install ./cmd/azbrowse
 
 checks:
-	golangci-lint run
+	GO111MODULE=on golangci-lint run
 
 ci-docker:
 	docker run -it -e BUILD_NUMBER=999-localci -v /var/run/docker.sock:/var/run/docker.sock -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.11.5 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/ci.sh

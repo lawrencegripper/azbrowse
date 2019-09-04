@@ -285,3 +285,78 @@ type ActivityLogResource struct {
 		} `json:"httpRequest,omitempty"`
 	} `json:"value"`
 }
+
+// ContainerLogResponse for container logs
+type ContainerLogResponse struct {
+	Content string `json:"content"`
+}
+
+// ContainerGroupResponse is the response to a get request on a container group
+type ContainerGroupResponse struct {
+	ID         string `json:"id"`
+	Location   string `json:"location"`
+	Name       string `json:"name"`
+	Properties struct {
+		Containers []struct {
+			Name       string `json:"name"`
+			Properties struct {
+				Command              []interface{} `json:"command"`
+				EnvironmentVariables []interface{} `json:"environmentVariables"`
+				Image                string        `json:"image"`
+				Ports                []struct {
+					Port int `json:"port"`
+				} `json:"ports"`
+				InstanceView struct {
+					RestartCount int `json:"restartCount"`
+					CurrentState struct {
+						State        string    `json:"state"`
+						StartTime    time.Time `json:"startTime"`
+						DetailStatus string    `json:"detailStatus"`
+					} `json:"currentState"`
+					Events []struct {
+						Count          int       `json:"count"`
+						FirstTimestamp time.Time `json:"firstTimestamp"`
+						LastTimestamp  time.Time `json:"lastTimestamp"`
+						Name           string    `json:"name"`
+						Message        string    `json:"message"`
+						Type           string    `json:"type"`
+					} `json:"events"`
+				} `json:"instanceView"`
+				Resources struct {
+					Requests struct {
+						CPU        float64 `json:"cpu"`
+						MemoryInGB float64 `json:"memoryInGB"`
+					} `json:"requests"`
+				} `json:"resources"`
+				VolumeMounts []struct {
+					MountPath string `json:"mountPath"`
+					Name      string `json:"name"`
+					ReadOnly  bool   `json:"readOnly"`
+				} `json:"volumeMounts"`
+			} `json:"properties"`
+		} `json:"containers"`
+		ImageRegistryCredentials []struct {
+			Server   string `json:"server"`
+			Username string `json:"username"`
+		} `json:"imageRegistryCredentials"`
+		IPAddress struct {
+			IP    string `json:"ip"`
+			Ports []struct {
+				Port     int    `json:"port"`
+				Protocol string `json:"protocol"`
+			} `json:"ports"`
+			Type string `json:"type"`
+		} `json:"ipAddress"`
+		OsType            string `json:"osType"`
+		ProvisioningState string `json:"provisioningState"`
+		Volumes           []struct {
+			AzureFile struct {
+				ReadOnly           bool   `json:"readOnly"`
+				ShareName          string `json:"shareName"`
+				StorageAccountName string `json:"storageAccountName"`
+			} `json:"azureFile"`
+			Name string `json:"name"`
+		} `json:"volumes"`
+	} `json:"properties"`
+	Type string `json:"type"`
+}

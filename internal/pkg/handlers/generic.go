@@ -3,8 +3,9 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"time"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -22,7 +23,7 @@ func (e *DefaultExpander) Name() string {
 
 // DoesExpand checks if this handler can expand this item
 func (e *DefaultExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ExpandURL == ExpandURLNotSupported || currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
+	if currentItem.ExpandURL == ExpandURLNotSupported || currentItem.Metadata["SuppressGenericExpand"] == "true" {
 		return false, nil
 	}
 	return true, nil

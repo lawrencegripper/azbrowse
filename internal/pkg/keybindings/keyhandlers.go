@@ -27,7 +27,9 @@ var HandlerIds = []string{
 	"listend",             // 20
 	"listhome",            // 21
 	"confirmdelete",       // 22
-	"clearpendingdeletes", //23
+	"clearpendingdeletes", // 23
+	"itempagedown",        // 24
+	"itempageup",          // 25
 }
 
 // KeyHandler is an interface that all key handlers must implement
