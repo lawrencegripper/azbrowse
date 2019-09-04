@@ -136,8 +136,8 @@ func parseKeyValues(keyOverrideSettings map[string]string) (KeyMap, error) {
 
 func parseKey(key string) (string, error) {
 	target := cleanKey(key)
-	for _, k := range HandlerIds {
-		if k == target {
+	for _, k := range handlers {
+		if k.ID() == target {
 			return target, nil
 		}
 	}

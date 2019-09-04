@@ -197,7 +197,7 @@ func NewListPageUpHandler(list *views.ListWidget) *ListPageUpHandler {
 	handler := &ListPageUpHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListUp
+	handler.tempID = HandlerID_ListPageUp
 	return handler
 }
 
