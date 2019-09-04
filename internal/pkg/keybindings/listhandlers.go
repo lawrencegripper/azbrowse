@@ -32,7 +32,7 @@ func NewListActionsHandler(list *views.ListWidget, context context.Context) *Lis
 		Context: context,
 		List:    list,
 	}
-	handler.tempID = HandlerID_ListActions
+	handler.id = HandlerID_ListActions
 	return handler
 }
 
@@ -54,7 +54,7 @@ func NewListBackHandler(list *views.ListWidget) *ListBackHandler {
 	handler := &ListBackHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListBack
+	handler.id = HandlerID_ListBack
 	return handler
 }
 
@@ -77,7 +77,7 @@ func NewListBackLegacyHandler(list *views.ListWidget) *ListBackLegacyHandler {
 	handler := &ListBackLegacyHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListBackLegacy
+	handler.id = HandlerID_ListBackLegacy
 	return handler
 }
 
@@ -100,7 +100,7 @@ func NewListDownHandler(list *views.ListWidget) *ListDownHandler {
 	handler := &ListDownHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListDown
+	handler.id = HandlerID_ListDown
 	return handler
 }
 
@@ -123,7 +123,7 @@ func NewListUpHandler(list *views.ListWidget) *ListUpHandler {
 	handler := &ListUpHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListUp
+	handler.id = HandlerID_ListUp
 	return handler
 }
 
@@ -148,7 +148,7 @@ func NewListRightHandler(list *views.ListWidget, editModeEnabled *bool) *ListRig
 		List:            list,
 		EditModeEnabled: editModeEnabled,
 	}
-	handler.tempID = HandlerID_ListRight
+	handler.id = HandlerID_ListRight
 	return handler
 }
 
@@ -174,7 +174,7 @@ func NewListPageDownHandler(list *views.ListWidget) *ListPageDownHandler {
 	handler := &ListPageDownHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListPageDown
+	handler.id = HandlerID_ListPageDown
 	return handler
 }
 
@@ -197,7 +197,7 @@ func NewListPageUpHandler(list *views.ListWidget) *ListPageUpHandler {
 	handler := &ListPageUpHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListPageUp
+	handler.id = HandlerID_ListPageUp
 	return handler
 }
 
@@ -220,7 +220,7 @@ func NewListEndHandler(list *views.ListWidget) *ListEndHandler {
 	handler := &ListEndHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListEnd
+	handler.id = HandlerID_ListEnd
 	return handler
 }
 
@@ -243,7 +243,7 @@ func NewListHomeHandler(list *views.ListWidget) *ListHomeHandler {
 	handler := &ListHomeHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListHome
+	handler.id = HandlerID_ListHome
 	return handler
 }
 
@@ -268,7 +268,7 @@ func NewListEditHandler(list *views.ListWidget, editModeEnabled *bool) *ListEdit
 		List:            list,
 		EditModeEnabled: editModeEnabled,
 	}
-	handler.tempID = HandlerID_ListEdit
+	handler.id = HandlerID_ListEdit
 	return handler
 }
 
@@ -299,7 +299,7 @@ func NewListExpandHandler(list *views.ListWidget) *ListExpandHandler {
 	handler := &ListExpandHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListExpand
+	handler.id = HandlerID_ListExpand
 	return handler
 }
 
@@ -324,7 +324,7 @@ func NewListOpenHandler(list *views.ListWidget, context context.Context) *ListOp
 		List:    list,
 		Context: context,
 	}
-	handler.tempID = HandlerID_ListOpen
+	handler.id = HandlerID_ListOpen
 	return handler
 }
 
@@ -364,7 +364,7 @@ func NewListRefreshHandler(list *views.ListWidget) *ListRefreshHandler {
 	handler := &ListRefreshHandler{
 		List: list,
 	}
-	handler.tempID = HandlerID_ListRefresh
+	handler.id = HandlerID_ListRefresh
 	return handler
 }
 
@@ -389,7 +389,7 @@ func NewListDeleteHandler(list *views.ListWidget, notificationWidget *views.Noti
 		List:               list,
 		NotificationWidget: notificationWidget,
 	}
-	handler.tempID = HandlerID_ListDelete
+	handler.id = HandlerID_ListDelete
 	return handler
 }
 
@@ -419,7 +419,7 @@ func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidg
 		Context: ctx,
 		Content: content,
 	}
-	handler.tempID = HandlerID_ListUpdate
+	handler.id = HandlerID_ListUpdate
 	return handler
 }
 

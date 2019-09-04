@@ -45,8 +45,7 @@ type KeyHandler interface {
 // KeyHandlerBase A base structure that will return the associated handler id from
 // the HandlersId array and a default key for the handler.
 type KeyHandlerBase struct {
-	tempID HandlerID
-	xIndex uint16
+	id HandlerID
 }
 
 // // ID returns the name of this item for example "listup"
@@ -55,7 +54,7 @@ type KeyHandlerBase struct {
 // }
 // ID returns the name of this item for example "listup"
 func (h KeyHandlerBase) ID() string {
-	return string(h.tempID)
+	return string(h.id)
 }
 
 // DefaultKey returns the default key mapped to the handler

@@ -86,7 +86,7 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 	return g.SetKeybinding(hnd.Widget(), key, gocui.ModNone, hnd.Fn())
 }
 
-const reuseKeyError = "Please update your `~/.azbrowse-bindings.json` file to a valid configuration and restart"
+const reuseKeyError = "Please update your `~/.azbrowse-settings.json` file to a valid configuration and restart"
 
 func checkKeyNotAlreadyInUse(widget, id string, key gocui.Key) error {
 	keyString := KeyToStr[key]
