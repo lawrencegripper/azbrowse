@@ -8,6 +8,7 @@ import (
 
 	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/stuartleeks/colorjson"
 )
 
@@ -29,14 +30,17 @@ func NewItemWidget(x, y, w, h int, hideGuids bool, content string) *ItemWidget {
 // Layout draws the widget in the gocui view
 func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	w.g = g
+
 	v, err := g.SetView("itemWidget", w.x, w.y, w.x+w.w, w.y+w.h)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 	v.Editable = true
 	v.Wrap = true
-
 	w.view = v
+	width, height := v.Size()
+	handlers.ItemWidgetHeight = height - 10
+	handlers.ItemWidgetWidth = width - 10
 	v.Clear()
 
 	if w.content == "" {

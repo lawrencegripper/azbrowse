@@ -12,6 +12,16 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// HACK: To draw the graph this handler has to know how big the display area is...
+//  to work around this the ItemWidget sets these properties when it's created
+//  I don't like it but it works. Will hopefully replace with better mechanism in future
+//
+// ItemWidgetHeight tracks height of item widget
+var ItemWidgetHeight int
+
+// ItemWidgetWidth track width of item widget
+var ItemWidgetWidth int
+
 // MetricsExpander expands the data-plane aspects of the Microsoft.Insights RP
 type MetricsExpander struct {
 }
@@ -23,15 +33,7 @@ func (e *MetricsExpander) Name() string {
 
 // DoesExpand checks if this is a storage account
 func (e *MetricsExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ItemType == ResourceType {
-		return true, nil
-	}
-
-	if currentItem.ItemType == "metrics.metricdefinition" {
-		return true, nil
-	}
-
-	if currentItem.ItemType == "metrics.graph" {
+	if currentItem.ItemType == ResourceType || strings.HasPrefix(currentItem.ItemType, "metrics.") {
 		return true, nil
 	}
 
@@ -40,131 +42,138 @@ func (e *MetricsExpander) DoesExpand(ctx context.Context, currentItem *TreeNode)
 
 // Expand adds items for metrics to the list
 func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+
+	// We have a metric namespace lets lookup the metric definitions
 	if currentItem.ItemType == "metrics.metricdefinition" {
-		data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
-		if err != nil {
-			return ExpanderResult{
-				Err:               err,
-				SourceDescription: "MetricsExpander request metricDefinitions",
-			}
-		}
+		return expandMetricDefinition(ctx, currentItem)
+	}
 
-		var metricsListResponse armclient.MetricsListResponse
-		err = json.Unmarshal([]byte(data), &metricsListResponse)
-		if err != nil {
-			panic(err)
-		}
+	// We have a metric definition lets draw the graph
+	if currentItem.ItemType == "metrics.graph" {
+		return expandGraph(ctx, currentItem)
+	}
 
-		newItems := []*TreeNode{}
+	// We're looking at a top level resource, lets see if it has a metric namespace
+	return expandMetricNamespace(ctx, currentItem)
+}
 
-		for _, metric := range metricsListResponse.Value {
-			newItems = append(newItems, &TreeNode{
-				Name:           metric.Name.Value,
-				Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
-				ID:             currentItem.ID,
-				Parentid:       currentItem.ID,
-				ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().UTC().Add(-3*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().UTC().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
-				ItemType:       "metrics.graph",
-				SubscriptionID: currentItem.SubscriptionID,
-				Metadata: map[string]string{
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
-					"AggregationType":       strings.ToLower(metric.PrimaryAggregationType),
-				},
-			})
-		}
-
+func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ID+"/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview")
+	if err != nil {
 		return ExpanderResult{
-			Response:          data,
-			IsPrimaryResponse: true,
-			Nodes:             newItems,
-			SourceDescription: "MetricsExpander build response metric namespaces",
+			Err:               err,
+			SourceDescription: "MetricsExpander request metricNamespaces",
 		}
+	}
 
-		// Todo then go and get the metrics and return a list of options to the uers.
+	newItems := []*TreeNode{}
 
-	} else if currentItem.ItemType == "metrics.graph" {
-		data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
-		if err != nil {
-			return ExpanderResult{
-				Err:               err,
-				SourceDescription: "MetricsExpander request metricDefinitions",
-			}
-		}
-
-		var metricResponse armclient.MetricResponse
-		err = json.Unmarshal([]byte(data), &metricResponse)
-		if err != nil {
-			panic(err)
-		}
-
-		graphData := []float64{}
-		for _, datapoint := range metricResponse.Value[0].Timeseries[0].Data {
-			value := datapoint[currentItem.Metadata["AggregationType"]].(float64)
-			graphData = append(graphData, value)
-		}
-
-		graph := asciigraph.Plot(graphData)
-
+	var metricNamespaceResponse armclient.MetricNamespaceResponse
+	err = json.Unmarshal([]byte(data), &metricNamespaceResponse)
+	if err != nil {
 		return ExpanderResult{
-			Response:          graph,
-			IsPrimaryResponse: true,
-			SourceDescription: "MetricsExpander build graph",
+			Err:               err,
+			SourceDescription: "MetricsExpander metricNamespace failed to deserialise",
 		}
-	} else {
+	}
 
-		data, err := armclient.DoRequest(ctx, "GET", currentItem.ID+"/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview")
-		if err != nil {
-			return ExpanderResult{
-				Err:               err,
-				SourceDescription: "MetricsExpander request metricNamespaces",
-			}
-		}
+	for _, metricNamespace := range metricNamespaceResponse.Value {
+		newItems = append(newItems, &TreeNode{
+			Name:           metricNamespace.Name,
+			Display:        style.Subtle("[Metrics]") + "\n  " + metricNamespace.Name,
+			ID:             currentItem.ID,
+			Parentid:       currentItem.ID,
+			ExpandURL:      currentItem.ID + "/providers/microsoft.insights/metricdefinitions?metricNamespace=" + metricNamespace.Properties.MetricNamespaceName + "&api-version=2018-01-01",
+			ItemType:       "metrics.metricdefinition",
+			SubscriptionID: currentItem.SubscriptionID,
+			Metadata: map[string]string{
+				"SuppressSwaggerExpand": "true",
+				"SuppressGenericExpand": "true",
+			},
+		})
+	}
 
-		newItems := []*TreeNode{}
-
-		var metricNamespaceResponse armclient.MetricNamespaceResponse
-		err = json.Unmarshal([]byte(data), &metricNamespaceResponse)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, metricNamespace := range metricNamespaceResponse.Value {
-			newItems = append(newItems, &TreeNode{
-				Name:           metricNamespace.Name,
-				Display:        style.Subtle("[Metrics]") + "\n  " + metricNamespace.Name,
-				ID:             currentItem.ID,
-				Parentid:       currentItem.ID,
-				ExpandURL:      currentItem.ID + "/providers/microsoft.insights/metricdefinitions?metricNamespace=" + metricNamespace.Properties.MetricNamespaceName + "&api-version=2018-01-01",
-				ItemType:       "metrics.metricdefinition",
-				SubscriptionID: currentItem.SubscriptionID,
-				Metadata: map[string]string{
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
-				},
-			})
-		}
-
-		return ExpanderResult{
-			IsPrimaryResponse: false,
-			Nodes:             newItems,
-			SourceDescription: "MetricsExpander build response metric namespaces",
-		}
+	return ExpanderResult{
+		IsPrimaryResponse: false,
+		Nodes:             newItems,
+		SourceDescription: "MetricsExpander build response metric namespaces",
 	}
 }
 
-/////////////////////////
-// Calls
+func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "MetricsExpander request metricDefinitions",
+		}
+	}
 
-//
-// Get metric namespaces relativeUrl: /subscriptions/SUBIDHERE/resourceGroups/lk-scratch/providers/Microsoft.Web/sites/lg-scratch/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview
+	var metricsListResponse armclient.MetricsListResponse
+	err = json.Unmarshal([]byte(data), &metricsListResponse)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "MetricsExpander metricDefinitions failed to deserialise",
+		}
+	}
 
-////////////////////////////
+	newItems := []*TreeNode{}
 
-// Docs https://docs.microsoft.com/en-us/rest/api/monitor/metricdefinitions/list
-// Get available metrics in namespace relativeUrl: /subscriptions/SUBIDHERE/resourceGroups/lk-scratch/providers/Microsoft.Web/serverFarms/ServicePlan7bdb8347-931a/providers/microsoft.insights/metricdefinitions?metricNamespace=microsoft.web/serverfarms&api-version=2018-01-01
+	for _, metric := range metricsListResponse.Value {
+		newItems = append(newItems, &TreeNode{
+			Name:           metric.Name.Value,
+			Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
+			ID:             currentItem.ID,
+			Parentid:       currentItem.ID,
+			ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().UTC().Add(-3*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().UTC().Format("2006-01-02T15:04:05.000Z") + "&interval=PT5M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
+			ItemType:       "metrics.graph",
+			SubscriptionID: currentItem.SubscriptionID,
+			Metadata: map[string]string{
+				"SuppressSwaggerExpand": "true",
+				"SuppressGenericExpand": "true",
+				"AggregationType":       strings.ToLower(metric.PrimaryAggregationType),
+			},
+		})
+	}
 
-/////////////////////////
+	return ExpanderResult{
+		Response:          data,
+		IsPrimaryResponse: true,
+		Nodes:             newItems,
+		SourceDescription: "MetricsExpander build response metric namespaces",
+	}
+}
 
-// Docs https://docs.microsoft.com/en-us/rest/api/monitor/metrics/list
-// Get a metric relativeUrl: /subscriptions/SUBIDHERE/resourceGroups/lk-scratch/providers/Microsoft.Web/sites/lg-scratch/providers/microsoft.Insights/metrics?timespan=2019-09-03T15:25:00.000Z/2019-09-04T15:30:00.000Z&interval=PT5M&metricnames=CpuTime&aggregation=total&metricNamespace=microsoft.web/sites&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01
+func expandGraph(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "MetricsExpander request metricDefinitions",
+		}
+	}
+
+	var metricResponse armclient.MetricResponse
+	err = json.Unmarshal([]byte(data), &metricResponse)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "MetricsExpander graphdata failed to deserialise",
+		}
+	}
+
+	graphData := []float64{}
+	for _, datapoint := range metricResponse.Value[0].Timeseries[0].Data {
+		value := datapoint[currentItem.Metadata["AggregationType"]].(float64)
+		graphData = append(graphData, value)
+	}
+
+	graph := asciigraph.Plot(graphData, asciigraph.Height(ItemWidgetHeight), asciigraph.Width(ItemWidgetWidth))
+
+	return ExpanderResult{
+		Response:          graph,
+		IsPrimaryResponse: true,
+		SourceDescription: "MetricsExpander build graph",
+	}
+}
