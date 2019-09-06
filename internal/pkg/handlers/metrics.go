@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"net/url"
 	"strings"
 	"time"
 
@@ -59,7 +60,8 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 }
 
 func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderResult {
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ID+"/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview")
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ID+
+		"/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview")
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -80,11 +82,13 @@ func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderR
 
 	for _, metricNamespace := range metricNamespaceResponse.Value {
 		newItems = append(newItems, &TreeNode{
-			Name:           metricNamespace.Name,
-			Display:        style.Subtle("[Metrics]") + "\n  " + metricNamespace.Name,
-			ID:             currentItem.ID,
-			Parentid:       currentItem.ID,
-			ExpandURL:      currentItem.ID + "/providers/microsoft.insights/metricdefinitions?metricNamespace=" + metricNamespace.Properties.MetricNamespaceName + "&api-version=2018-01-01",
+			Name:     metricNamespace.Name,
+			Display:  style.Subtle("[Metrics]") + "\n  " + metricNamespace.Name,
+			ID:       currentItem.ID,
+			Parentid: currentItem.ID,
+			ExpandURL: currentItem.ID + "/providers/microsoft.insights/metricdefinitions?" +
+				"metricNamespace=" + url.QueryEscape(metricNamespace.Properties.MetricNamespaceName) +
+				"&api-version=2018-01-01",
 			ItemType:       "metrics.metricdefinition",
 			SubscriptionID: currentItem.SubscriptionID,
 			Metadata: map[string]string{
@@ -123,11 +127,17 @@ func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) Expander
 
 	for _, metric := range metricsListResponse.Value {
 		newItems = append(newItems, &TreeNode{
-			Name:           metric.Name.Value,
-			Display:        metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
-			ID:             currentItem.ID,
-			Parentid:       currentItem.ID,
-			ExpandURL:      currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" + time.Now().UTC().Add(-4*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" + time.Now().UTC().Format("2006-01-02T15:04:05.000Z") + "&interval=PT1M&metricnames=" + metric.Name.Value + "&aggregation=" + metric.PrimaryAggregationType + "&metricNamespace=" + metric.Namespace + "&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
+			Name:     metric.Name.Value,
+			Display:  metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
+			ID:       currentItem.ID,
+			Parentid: currentItem.ID,
+			ExpandURL: currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" +
+				time.Now().UTC().Add(-4*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" +
+				time.Now().UTC().Format("2006-01-02T15:04:05.000Z") + "&interval=PT1M&metricnames=" +
+				url.QueryEscape(metric.Name.Value) + "&aggregation=" +
+				url.QueryEscape(metric.PrimaryAggregationType) +
+				"&metricNamespace=" + url.QueryEscape(metric.Namespace) +
+				"&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
 			ItemType:       "metrics.graph",
 			SubscriptionID: currentItem.SubscriptionID,
 			Metadata: map[string]string{
@@ -165,15 +175,24 @@ func expandGraph(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 		}
 	}
 
-	caption := style.Title(currentItem.Name) + style.Subtle(" (Aggregate: '"+currentItem.Metadata["AggregationType"]+"' Unit: '"+currentItem.Metadata["Units"]+"')")
+	caption := style.Title(currentItem.Name) +
+		style.Subtle(" (Aggregate: '"+currentItem.Metadata["AggregationType"]+"' Unit: '"+
+			currentItem.Metadata["Units"]+"')")
 
 	graphData := []float64{}
 	for _, datapoint := range metricResponse.Value[0].Timeseries[0].Data {
-		value := datapoint[currentItem.Metadata["AggregationType"]].(float64)
-		graphData = append(graphData, value)
+		value, success := datapoint[currentItem.Metadata["AggregationType"]].(float64)
+		if success {
+			graphData = append(graphData, value)
+		} else {
+			graphData = append(graphData, float64(0))
+		}
 	}
 
-	graph := asciigraph.Plot(graphData, asciigraph.Height(ItemWidgetHeight), asciigraph.Width(ItemWidgetWidth), asciigraph.Caption("time: 4hrs ago ----> now"))
+	graph := asciigraph.Plot(graphData,
+		asciigraph.Height(ItemWidgetHeight-6),
+		asciigraph.Width(ItemWidgetWidth-15),
+		asciigraph.Caption("time: 4hrs ago ----> now"))
 
 	return ExpanderResult{
 		Response:          "\n\n" + caption + "\n\n" + style.Graph(graph),

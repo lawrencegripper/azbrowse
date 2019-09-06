@@ -39,8 +39,8 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	v.Wrap = true
 	w.view = v
 	width, height := v.Size()
-	handlers.ItemWidgetHeight = height - 6
-	handlers.ItemWidgetWidth = width - 10
+	handlers.ItemWidgetHeight = height
+	handlers.ItemWidgetWidth = width
 	v.Clear()
 
 	if w.content == "" {
