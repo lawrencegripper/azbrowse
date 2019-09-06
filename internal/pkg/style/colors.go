@@ -73,3 +73,8 @@ func Warning(s string) string {
 func Highlight(s string) string {
 	return color.New(color.BgBlue, color.FgWhite).Sprint(s)
 }
+
+// Graph make the background green and text white
+func Graph(s string) string {
+	return color.New(color.FgBlue).Sprint(s)
+}

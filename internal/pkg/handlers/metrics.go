@@ -16,6 +16,7 @@ import (
 //  to work around this the ItemWidget sets these properties when it's created
 //  I don't like it but it works. Will hopefully replace with better mechanism in future
 //
+
 // ItemWidgetHeight tracks height of item widget
 var ItemWidgetHeight int
 
@@ -133,6 +134,7 @@ func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) Expander
 				"SuppressSwaggerExpand": "true",
 				"SuppressGenericExpand": "true",
 				"AggregationType":       strings.ToLower(metric.PrimaryAggregationType),
+				"Units":                 strings.ToLower(metric.Unit),
 			},
 		})
 	}
@@ -163,16 +165,18 @@ func expandGraph(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 		}
 	}
 
+	caption := style.Title(currentItem.Name+" over last 3hrs ") + style.Subtle("(Aggregate: '"+currentItem.Metadata["AggregationType"]+"' Unit: '"+currentItem.Metadata["Units"]+"')")
+
 	graphData := []float64{}
 	for _, datapoint := range metricResponse.Value[0].Timeseries[0].Data {
 		value := datapoint[currentItem.Metadata["AggregationType"]].(float64)
 		graphData = append(graphData, value)
 	}
 
-	graph := asciigraph.Plot(graphData, asciigraph.Height(ItemWidgetHeight), asciigraph.Width(ItemWidgetWidth))
+	graph := asciigraph.Plot(graphData, asciigraph.Height(ItemWidgetHeight), asciigraph.Width(ItemWidgetWidth), asciigraph.Caption("time: 3hrs ago ----> now"))
 
 	return ExpanderResult{
-		Response:          graph,
+		Response:          "\n\n" + caption + "\n\n" + style.Graph(graph),
 		IsPrimaryResponse: true,
 		SourceDescription: "MetricsExpander build graph",
 	}

@@ -39,7 +39,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	v.Wrap = true
 	w.view = v
 	width, height := v.Size()
-	handlers.ItemWidgetHeight = height - 10
+	handlers.ItemWidgetHeight = height - 6
 	handlers.ItemWidgetWidth = width - 10
 	v.Clear()
 
@@ -47,10 +47,8 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		return nil
 	}
 
-	if string(w.content[0]) == "{" {
-		if w.hideGuids {
-			w.content = stripSecretVals(w.content)
-		}
+	if string(w.content[0]) == "{" && !w.hideGuids {
+
 		d := json.NewDecoder(strings.NewReader(w.content))
 		d.UseNumber()
 		var obj interface{}
@@ -75,6 +73,9 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 			fmt.Fprint(v, string(s))
 		}
 	} else {
+		if w.hideGuids {
+			w.content = stripSecretVals(w.content)
+		}
 		fmt.Fprint(v, w.content)
 	}
 
