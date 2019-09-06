@@ -93,8 +93,10 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	}
 
 	for index := topIndex; index < bottomIndex+1; index++ {
-		item := allItems[index]
-		fmt.Fprint(v, item)
+		if index < len(allItems) {
+			item := allItems[index]
+			fmt.Fprint(v, item)
+		}
 	}
 
 	// If the title is getting too long trim things
