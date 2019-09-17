@@ -20,6 +20,7 @@ require (
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/mux v1.6.2 // indirect
+	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
 	github.com/jroimartin/gocui v0.4.0
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect

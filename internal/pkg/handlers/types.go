@@ -50,6 +50,8 @@ const (
 	resourceGroupType = "resourcegroup"
 	// ResourceType defines a top level resource such as a Storage Account or VM
 	ResourceType = "resource"
+	// MetricsType defines an item which returns a graph
+	MetricsType = "metrics"
 	// SubResourceType defines a resource under a resource such as a VM Extension under a VM
 	SubResourceType = "subResource"
 	// deploymentType represents a deployment node
