@@ -2,11 +2,24 @@ package handlers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
+
+type AnalyticsItem struct {
+	Content      string `json:"Content"`
+	Id           string `json:"Id"`
+	Name         string `json:"Name"`
+	Scope        string `json:"Scope"`
+	TimeCreated  string `json:"TimeCreated"`
+	TimeModified string `json:"TimeModified"`
+	Type         string `json:"Type"`
+	Version      string `json:"Version"`
+}
 
 // AppInsightsExpander expands aspects of App Insights that don't naturally flow from the api spec
 type AppInsightsExpander struct {
@@ -85,9 +98,8 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
-
 	newItems := []*TreeNode{}
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
 
 	if err != nil {
 		return ExpanderResult{
@@ -98,8 +110,27 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 		}
 	}
 
+	var items []AnalyticsItem
+	err = json.Unmarshal([]byte(data), &items)
+	if err != nil {
+		err = fmt.Errorf("Error unmarshalling analytics items response: %s, %s", err, data)
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "AppInsightsExpander request",
+		}
+	}
+
+	for _, item := range items {
+		newItem := TreeNode{
+			Name:    item.Name,
+			Display: style.Subtle("[" + item.Type + "]") + "\n " + item.Name,
+		}
+		newItems = append(newItems, &newItem)
+	}
+
 	return ExpanderResult{
 		IsPrimaryResponse: true,
+		Nodes:             newItems,
 		Response:          data,
 		SourceDescription: "AppInsightsExpander request",
 	}
