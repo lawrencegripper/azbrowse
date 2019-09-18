@@ -4,15 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-type AnalyticsItem struct {
+type analyticsItem struct {
 	Content      string `json:"Content"`
-	Id           string `json:"Id"`
+	ID           string `json:"Id"`
 	Name         string `json:"Name"`
 	Scope        string `json:"Scope"`
 	TimeCreated  string `json:"TimeCreated"`
@@ -23,7 +22,6 @@ type AnalyticsItem struct {
 
 // AppInsightsExpander expands aspects of App Insights that don't naturally flow from the api spec
 type AppInsightsExpander struct {
-	client *http.Client
 }
 
 // Name returns the name of the expander
@@ -117,7 +115,7 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 	resourceAPIVersion := currentItem.Metadata["ResourceAPIVersion"]
 	appInsightsID := currentItem.Metadata["AppInsightsID"]
 
-	var items []AnalyticsItem
+	var items []analyticsItem
 	err = json.Unmarshal([]byte(data), &items)
 	if err != nil {
 		err = fmt.Errorf("Error unmarshalling analytics items response: %s, %s", err, data)
@@ -139,8 +137,8 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 			Namespace: "AppInsights",
 			ItemType:  "AppInsights.AnalyticsItem",
 			Name:      item.Name,
-			ExpandURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.Id,
-			DeleteURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.Id,
+			ExpandURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.ID,
+			DeleteURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.ID,
 			Display:   style.Subtle("["+item.Type+" - "+item.Scope+"]") + "\n " + item.Name,
 		}
 		newItems = append(newItems, &newItem)
