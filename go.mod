@@ -27,7 +27,7 @@ require (
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
 	github.com/mattn/go-runewidth v0.0.3 // indirect
-	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed // indirect
+	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
 	github.com/rhysd/go-github-selfupdate v1.1.0

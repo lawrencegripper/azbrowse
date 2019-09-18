@@ -31,6 +31,7 @@ const (
 	HandlerID_ClearPendingDeletes HandlerID = "clearpendingdeletes"
 	HandlerID_ItemPageDown        HandlerID = "itempagedown"
 	HandlerID_ItemPageUp          HandlerID = "itempageup"
+	HandlerID_ListLetterS         HandlerID = "listletter-s"
 )
 
 // KeyHandler is an interface that all key handlers must implement

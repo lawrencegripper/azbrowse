@@ -590,3 +590,28 @@ func getAPIErrorMessage(responseString string) (string, error) {
 }
 
 ////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ListLetterSHandler struct {
+	ListHandler
+	List   *views.ListWidget
+	status *views.StatusbarWidget
+}
+
+func NewListLetterSHandler(list *views.ListWidget, status *views.StatusbarWidget) *ListLetterSHandler {
+	handler := &ListLetterSHandler{
+		List:   list,
+		status: status,
+	}
+	handler.id = HandlerID_ListLetterS
+	return handler
+}
+
+func (h ListLetterSHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.status.Status("S pressed", false)
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////

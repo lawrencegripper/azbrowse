@@ -1,6 +1,9 @@
 package keybindings
 
-import "github.com/jroimartin/gocui"
+import (
+	"github.com/jroimartin/gocui"
+	"github.com/nsf/termbox-go"
+)
 
 // DefaultKeys are the default key bindings for each handler.
 var DefaultKeys = map[string]gocui.Key{
@@ -30,4 +33,5 @@ var DefaultKeys = map[string]gocui.Key{
 	"clearpendingdeletes": gocui.KeyCtrlN,
 	"itempagedown":        gocui.KeyPgdn,
 	"itempageup":          gocui.KeyPgup,
+	"foo":                 gocui.Key(termbox.Key(0x11)),
 }
