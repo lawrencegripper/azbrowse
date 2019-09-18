@@ -73,6 +73,8 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 			Metadata: map[string]string{
 				"SuppressSwaggerExpand": "true",
 				"SuppressGenericExpand": "true",
+				"ResourceAPIVersion":    resourceAPIVersion,
+				"AppInsightsID":         currentItem.ID,
 			},
 		})
 
@@ -87,6 +89,8 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 	if currentItem.ItemType == "AppInsights.AnalyticsItems" {
 		return e.expandAnalyticsItems(ctx, currentItem)
+	} else if currentItem.ItemType == "AppInsights.AnalyticsItem" {
+		return e.expandAnalyticsItem(ctx, currentItem)
 	}
 
 	return ExpanderResult{
@@ -99,8 +103,8 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	newItems := []*TreeNode{}
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
 
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -109,6 +113,9 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 			IsPrimaryResponse: true,
 		}
 	}
+
+	resourceAPIVersion := currentItem.Metadata["ResourceAPIVersion"]
+	appInsightsID := currentItem.Metadata["AppInsightsID"]
 
 	var items []AnalyticsItem
 	err = json.Unmarshal([]byte(data), &items)
@@ -121,11 +128,44 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 	}
 
 	for _, item := range items {
+		var collectionName string
+		if (item.Scope == "user"){
+			collectionName = "myanalyticsItems"
+		} else{
+			collectionName = "analyticsItems"
+		}
 		newItem := TreeNode{
-			Name:    item.Name,
-			Display: style.Subtle("[" + item.Type + "]") + "\n " + item.Name,
+			Parentid:  currentItem.ID,
+			Namespace: "AppInsights",
+			ItemType:  "AppInsights.AnalyticsItem",
+			Name:      item.Name,
+			ExpandURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.Id,
+			DeleteURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.Id,
+			Display:   style.Subtle("["+item.Type+"]") + "\n " + item.Name,
 		}
 		newItems = append(newItems, &newItem)
+	}
+
+	return ExpanderResult{
+		IsPrimaryResponse: true,
+		Nodes:             newItems,
+		Response:          data,
+		SourceDescription: "AppInsightsExpander request",
+	}
+}
+
+func (e *AppInsightsExpander) expandAnalyticsItem(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+
+	newItems := []*TreeNode{}
+
+	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			Nodes:             newItems,
+			SourceDescription: "AppInsightsExpander Request",
+			IsPrimaryResponse: true,
+		}
 	}
 
 	return ExpanderResult{
