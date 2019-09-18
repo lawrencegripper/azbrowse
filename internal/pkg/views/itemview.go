@@ -47,7 +47,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		return nil
 	}
 
-	if string(w.content[0]) == "{" && !w.hideGuids {
+	if (string(w.content[0]) == "[" || string(w.content[0]) == "{") && !w.hideGuids {
 
 		d := json.NewDecoder(strings.NewReader(w.content))
 		d.UseNumber()
