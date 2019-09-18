@@ -129,9 +129,9 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 
 	for _, item := range items {
 		var collectionName string
-		if (item.Scope == "user"){
+		if item.Scope == "user" {
 			collectionName = "myanalyticsItems"
-		} else{
+		} else {
 			collectionName = "analyticsItems"
 		}
 		newItem := TreeNode{
@@ -141,7 +141,7 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 			Name:      item.Name,
 			ExpandURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.Id,
 			DeleteURL: appInsightsID + "/" + collectionName + "/item?api-version=" + resourceAPIVersion + "&id=" + item.Id,
-			Display:   style.Subtle("["+item.Type+"]") + "\n " + item.Name,
+			Display:   style.Subtle("["+item.Type+" - "+item.Scope+"]") + "\n " + item.Name,
 		}
 		newItems = append(newItems, &newItem)
 	}
