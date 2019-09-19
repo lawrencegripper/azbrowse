@@ -10,7 +10,7 @@ import (
 )
 
 // KeyMap reprsents the current mappings from Handler -> Key
-type KeyMap map[string]gocui.Key
+type KeyMap map[string]interface{}
 
 var handlers []KeyHandler
 var overrides KeyMap
@@ -55,7 +55,7 @@ func GetKeyBindingsAsStrings() map[string]string {
 	keyBindings := map[string]string{}
 	keys := getKeyBindings()
 	for k, v := range keys {
-		keyBindings[k] = KeyToStr[v]
+		keyBindings[k] = keyToString(v)
 	}
 	return keyBindings
 }
@@ -72,7 +72,7 @@ func bindHandlersToKeys(g *gocui.Gui) error {
 }
 
 func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
-	var key gocui.Key
+	var key interface{}
 	if k, ok := overrides[hnd.ID()]; ok {
 		key = k
 	} else {
@@ -88,10 +88,16 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 
 const reuseKeyError = "Please update your `~/.azbrowse-settings.json` file to a valid configuration and restart"
 
-func checkKeyNotAlreadyInUse(widget, id string, key gocui.Key) error {
-	keyString := KeyToStr[key]
+func checkKeyNotAlreadyInUse(widget, id string, key interface{}) error {
+	var keyString string
+	switch key.(type) {
+	case gocui.Key:
+		keyString = GocuiKeyToStr[key.(gocui.Key)]
+	default:
+		panic("Unhandled key type")
+	}
 	// Check key isn't already use globally
-	if usedBy, alreadyInUse := usedKeys[KeyToStr[key]]; alreadyInUse {
+	if usedBy, alreadyInUse := usedKeys[keyString]; alreadyInUse {
 		return errors.New("Failed when configurig `" + id + "`. The key `" + keyString + "` is already in use by `" + usedBy + "`(Global binding). " + reuseKeyError)
 	}
 	// Check key isn't already in use by a widget
@@ -147,7 +153,7 @@ func parseKey(key string) (string, error) {
 func parseValue(value string) (gocui.Key, error) {
 	// TODO Parse semantics properly
 	target := cleanValue(value)
-	if val, ok := StrToKey[target]; ok {
+	if val, ok := StrToGocuiKey[target]; ok {
 		return val, nil
 	}
 
@@ -160,4 +166,13 @@ func cleanKey(str string) string {
 
 func cleanValue(str string) string {
 	return strings.Replace(strings.ToLower(str), " ", "", -1)
+}
+
+func keyToString(key interface{}) string {
+	switch key.(type) {
+	case gocui.Key:
+		return GocuiKeyToStr[key.(gocui.Key)]
+	default:
+		panic("Unhandled key type")
+	}
 }
