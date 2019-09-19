@@ -89,13 +89,9 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 const reuseKeyError = "Please update your `~/.azbrowse-settings.json` file to a valid configuration and restart"
 
 func checkKeyNotAlreadyInUse(widget, id string, key interface{}) error {
-	var keyString string
-	switch key.(type) {
-	case gocui.Key:
-		keyString = GocuiKeyToStr[key.(gocui.Key)]
-	default:
-		panic("Unhandled key type")
-	}
+
+	keyString := keyToString(key)
+
 	// Check key isn't already use globally
 	if usedBy, alreadyInUse := usedKeys[keyString]; alreadyInUse {
 		return errors.New("Failed when configurig `" + id + "`. The key `" + keyString + "` is already in use by `" + usedBy + "`(Global binding). " + reuseKeyError)
@@ -150,11 +146,16 @@ func parseKey(key string) (string, error) {
 	return "", fmt.Errorf("%s is an unsupported key", key)
 }
 
-func parseValue(value string) (gocui.Key, error) {
+func parseValue(value string) (interface{}, error) {
 	// TODO Parse semantics properly
 	target := cleanValue(value)
 	if val, ok := StrToGocuiKey[target]; ok {
 		return val, nil
+	}
+
+	if len(target) == 1{
+		// attempt as rune
+		return rune(target[0]), nil
 	}
 
 	return 0, fmt.Errorf("%s is an unsupported value", value)
@@ -172,7 +173,9 @@ func keyToString(key interface{}) string {
 	switch key.(type) {
 	case gocui.Key:
 		return GocuiKeyToStr[key.(gocui.Key)]
+	case rune:
+		return string(key.(rune))
 	default:
-		panic("Unhandled key type")
+		panic("Unhandled key type\n")
 	}
 }
