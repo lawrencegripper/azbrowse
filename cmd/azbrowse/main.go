@@ -172,7 +172,6 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
-	keybindings.AddHandler(keybindings.NewListLetterSHandler(list, status))
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
 	keybindings.AddHandler(keybindings.NewItemViewPageUpHandler(content))
 
@@ -189,11 +188,11 @@ func main() {
 
 	// Update views with keybindings
 	keyBindings := keybindings.GetKeyBindingsAsStrings()
-	status.HelpKeyBinding = keyBindings["help"]
-	list.ActionKeyBinding = keyBindings["listactions"]
-	list.FullscreenKeyBinding = keyBindings["fullscreen"]
-	notifications.ConfirmDeleteKeyBinding = keyBindings["confirmdelete"]
-	notifications.ClearPendingDeletesKeyBinding = keyBindings["clearpendingdeletes"]
+	status.HelpKeyBinding = strings.Join(keyBindings["help"], ",")
+	list.ActionKeyBinding = strings.Join(keyBindings["listactions"], ",")
+	list.FullscreenKeyBinding = strings.Join(keyBindings["fullscreen"], ",")
+	notifications.ConfirmDeleteKeyBinding = strings.Join(keyBindings["confirmdelete"], ",")
+	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
 	go func() {
 		time.Sleep(time.Second * 1)

@@ -10,7 +10,7 @@ import (
 )
 
 // KeyMap reprsents the current mappings from Handler -> Key
-type KeyMap map[string]interface{}
+type KeyMap map[string][]interface{}
 
 var handlers []KeyHandler
 var overrides KeyMap
@@ -25,7 +25,7 @@ func Bind(g *gocui.Gui) error {
 	return bindWithConfigOverrides(g, config.KeyBindings)
 }
 
-func bindWithConfigOverrides(g *gocui.Gui, keyOverrideSettings map[string]string) error {
+func bindWithConfigOverrides(g *gocui.Gui, keyOverrideSettings map[string]interface{}) error {
 	err := initializeOverrides(keyOverrideSettings)
 	if err != nil {
 		return err
@@ -44,18 +44,22 @@ func getKeyBindings() KeyMap {
 		if override, ok := overrides[handler.ID()]; ok {
 			keyBindings[handler.ID()] = override
 		} else {
-			keyBindings[handler.ID()] = handler.DefaultKey()
+			keyBindings[handler.ID()] = []interface{}{handler.DefaultKey()}
 		}
 	}
 	return keyBindings
 }
 
 // GetKeyBindingsAsStrings provides a map of Handler->Key in string format
-func GetKeyBindingsAsStrings() map[string]string {
-	keyBindings := map[string]string{}
+func GetKeyBindingsAsStrings() map[string][]string {
+	keyBindings := map[string][]string{}
 	keys := getKeyBindings()
-	for k, v := range keys {
-		keyBindings[k] = keyToString(v)
+	for k, values := range keys {
+		stringValues := []string{}
+		for _, v := range values {
+			stringValues = append(stringValues, keyToString(v))
+		}
+		keyBindings[k] = stringValues
 	}
 	return keyBindings
 }
@@ -72,18 +76,24 @@ func bindHandlersToKeys(g *gocui.Gui) error {
 }
 
 func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
-	var key interface{}
+	var keys []interface{}
 	if k, ok := overrides[hnd.ID()]; ok {
-		key = k
+		keys = k
 	} else {
-		key = hnd.DefaultKey()
+		keys = []interface{}{hnd.DefaultKey()}
 	}
 
-	if err := checkKeyNotAlreadyInUse(hnd.Widget(), hnd.ID(), key); err != nil {
-		return err
-	}
+	for _, key := range keys {
+		if err := checkKeyNotAlreadyInUse(hnd.Widget(), hnd.ID(), key); err != nil {
+			return err
+		}
 
-	return g.SetKeybinding(hnd.Widget(), key, gocui.ModNone, hnd.Fn())
+		err := g.SetKeybinding(hnd.Widget(), key, gocui.ModNone, hnd.Fn())
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 const reuseKeyError = "Please update your `~/.azbrowse-settings.json` file to a valid configuration and restart"
@@ -108,7 +118,7 @@ func checkKeyNotAlreadyInUse(widget, id string, key interface{}) error {
 	return nil
 }
 
-func initializeOverrides(keyOverrideSettings map[string]string) error {
+func initializeOverrides(keyOverrideSettings map[string]interface{}) error {
 	var err error
 	overrides, err = parseKeyValues(keyOverrideSettings)
 	if err != nil {
@@ -118,7 +128,7 @@ func initializeOverrides(keyOverrideSettings map[string]string) error {
 	return nil
 }
 
-func parseKeyValues(keyOverrideSettings map[string]string) (KeyMap, error) {
+func parseKeyValues(keyOverrideSettings map[string]interface{}) (KeyMap, error) {
 	keyMap := KeyMap{}
 
 	for k, v := range keyOverrideSettings {
@@ -126,11 +136,27 @@ func parseKeyValues(keyOverrideSettings map[string]string) (KeyMap, error) {
 		if err != nil {
 			continue // ignore invalid keys
 		}
-		parsedValue, err := parseValue(v)
-		if err != nil {
-			continue // ignore invalid values
+
+		var values []string
+		switch v.(type) {
+		case string:
+			values = []string{v.(string)}
+		case []interface{}:
+			values = []string{}
+			for _, item := range v.([]interface{}) {
+				values = append(values, item.(string))
+			}
 		}
-		keyMap[parsedKey] = parsedValue
+
+		parsedValues := []interface{}{}
+		for _, value := range values {
+			parsedValue, err := parseValue(value)
+			if err != nil {
+				continue // ignore invalid values
+			}
+			parsedValues = append(parsedValues, parsedValue)
+		}
+		keyMap[parsedKey] = parsedValues
 	}
 
 	return keyMap, nil
@@ -153,7 +179,7 @@ func parseValue(value string) (interface{}, error) {
 		return val, nil
 	}
 
-	if len(target) == 1{
+	if len(target) == 1 {
 		// attempt as rune
 		return rune(target[0]), nil
 	}

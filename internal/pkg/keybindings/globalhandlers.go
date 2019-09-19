@@ -95,7 +95,7 @@ func (h FullscreenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			v.Frame = false
 			v.Wrap = true
 			keyBindings := GetKeyBindingsAsStrings()
-			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(keyBindings["fullscreen"]))
+			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(strings.Join(keyBindings["fullscreen"], ",")))
 
 			content := h.Content.GetContent()
 			fmt.Fprint(v, style.ColorJSON(content))

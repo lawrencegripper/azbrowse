@@ -40,7 +40,7 @@ type KeyHandler interface {
 	Fn() func(g *gocui.Gui, v *gocui.View) error
 	Widget() string
 
-	DefaultKey() gocui.Key
+	DefaultKey() interface{}
 }
 
 // KeyHandlerBase A base structure that will return the associated handler id from
@@ -59,7 +59,7 @@ func (h KeyHandlerBase) ID() string {
 }
 
 // DefaultKey returns the default key mapped to the handler
-func (h KeyHandlerBase) DefaultKey() gocui.Key {
+func (h KeyHandlerBase) DefaultKey() interface{} {
 	return DefaultKeys[h.ID()]
 }
 
