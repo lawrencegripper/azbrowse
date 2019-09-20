@@ -2,7 +2,6 @@ package keybindings
 
 import (
 	"github.com/jroimartin/gocui"
-	"github.com/nsf/termbox-go"
 )
 
 // DefaultKeys are the default key bindings for each handler.
