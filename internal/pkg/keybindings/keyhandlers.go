@@ -2,36 +2,36 @@ package keybindings
 
 import "github.com/jroimartin/gocui"
 
+// HandlerID is used as the ID for Key Handlers
 type HandlerID string
 
 const (
-	HandlerIDQuit                HandlerID = "quit"
-	HandlerIDCopy                HandlerID = "copy"
-	HandlerIDListDelete          HandlerID = "listdelete"
-	HandlerIDFullScreen          HandlerID = "fullscreen"
-	HandlerIDHelp                HandlerID = "help"
-	HandlerIDItemBack            HandlerID = "itemback"
-	HandlerIDItemLeft            HandlerID = "itemleft"
-	HandlerIDListActions         HandlerID = "listactions"
-	HandlerIDListBack            HandlerID = "listback"
-	HandlerIDListBackLegacy      HandlerID = "listbacklegacy"
-	HandlerIDListDown            HandlerID = "listdown"
-	HandlerIDListUp              HandlerID = "listup"
-	HandlerIDListRight           HandlerID = "listright"
-	HandlerIDListEdit            HandlerID = "listedit"
-	HandlerIDListExpand          HandlerID = "listexpand"
-	HandlerIDListOpen            HandlerID = "listopen"
-	HandlerIDListRefresh         HandlerID = "listrefresh"
-	HandlerIDListUpdate          HandlerID = "listupdate"
-	HandlerIDListPageDown        HandlerID = "listpagedown"
-	HandlerIDListPageUp          HandlerID = "listpageup"
-	HandlerIDListEnd             HandlerID = "listend"
-	HandlerIDListHome            HandlerID = "listhome"
-	HandlerIDConfirmDelete       HandlerID = "confirmdelete"
-	HandlerIDClearPendingDeletes HandlerID = "clearpendingdeletes"
-	HandlerIDItemPageDown        HandlerID = "itempagedown"
-	HandlerIDItemPageUp          HandlerID = "itempageup"
-	HandlerIDListLetterS         HandlerID = "listletter-s"
+	HandlerIDQuit                HandlerID = "quit"                //nolint:golint
+	HandlerIDCopy                HandlerID = "copy"                //nolint:golint
+	HandlerIDListDelete          HandlerID = "listdelete"          //nolint:golint
+	HandlerIDFullScreen          HandlerID = "fullscreen"          //nolint:golint
+	HandlerIDHelp                HandlerID = "help"                //nolint:golint
+	HandlerIDItemBack            HandlerID = "itemback"            //nolint:golint
+	HandlerIDItemLeft            HandlerID = "itemleft"            //nolint:golint
+	HandlerIDListActions         HandlerID = "listactions"         //nolint:golint
+	HandlerIDListBack            HandlerID = "listback"            //nolint:golint
+	HandlerIDListBackLegacy      HandlerID = "listbacklegacy"      //nolint:golint
+	HandlerIDListDown            HandlerID = "listdown"            //nolint:golint
+	HandlerIDListUp              HandlerID = "listup"              //nolint:golint
+	HandlerIDListRight           HandlerID = "listright"           //nolint:golint
+	HandlerIDListEdit            HandlerID = "listedit"            //nolint:golint
+	HandlerIDListExpand          HandlerID = "listexpand"          //nolint:golint
+	HandlerIDListOpen            HandlerID = "listopen"            //nolint:golint
+	HandlerIDListRefresh         HandlerID = "listrefresh"         //nolint:golint
+	HandlerIDListUpdate          HandlerID = "listupdate"          //nolint:golint
+	HandlerIDListPageDown        HandlerID = "listpagedown"        //nolint:golint
+	HandlerIDListPageUp          HandlerID = "listpageup"          //nolint:golint
+	HandlerIDListEnd             HandlerID = "listend"             //nolint:golint
+	HandlerIDListHome            HandlerID = "listhome"            //nolint:golint
+	HandlerIDConfirmDelete       HandlerID = "confirmdelete"       //nolint:golint
+	HandlerIDClearPendingDeletes HandlerID = "clearpendingdeletes" //nolint:golint
+	HandlerIDItemPageDown        HandlerID = "itempagedown"        //nolint:golint
+	HandlerIDItemPageUp          HandlerID = "itempageup"          //nolint:golint
 )
 
 // KeyHandler is an interface that all key handlers must implement
