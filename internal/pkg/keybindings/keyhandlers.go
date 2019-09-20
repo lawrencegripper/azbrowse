@@ -49,10 +49,6 @@ type KeyHandlerBase struct {
 	id HandlerID
 }
 
-// // ID returns the name of this item for example "listup"
-// func (h KeyHandlerBase) ID() string {
-// 	return HandlerIds[h.Index]
-// }
 // ID returns the name of this item for example "listup"
 func (h KeyHandlerBase) ID() string {
 	return string(h.id)
