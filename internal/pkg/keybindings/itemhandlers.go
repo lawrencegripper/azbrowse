@@ -15,7 +15,7 @@ func NewItemBackHandler(list *views.ListWidget) *ItemBackHandler {
 	handler := &ItemBackHandler{
 		List: list,
 	}
-	handler.id = HandlerID_ItemBack
+	handler.id = HandlerIDItemBack
 	return handler
 }
 
@@ -40,7 +40,7 @@ func NewItemLeftHandler(editModeEnabled *bool) *ItemLeftHandler {
 	handler := &ItemLeftHandler{
 		EditModeEnabled: editModeEnabled,
 	}
-	handler.id = HandlerID_ItemLeft
+	handler.id = HandlerIDItemLeft
 	return handler
 }
 
@@ -66,7 +66,7 @@ func NewItemViewPageDownHandler(itemView *views.ItemWidget) *ItemViewPageDownHan
 	handler := &ItemViewPageDownHandler{
 		ItemView: itemView,
 	}
-	handler.id = HandlerID_ItemPageDown
+	handler.id = HandlerIDItemPageDown
 	return handler
 }
 
@@ -89,7 +89,7 @@ func NewItemViewPageUpHandler(itemView *views.ItemWidget) *ItemViewPageUpHandler
 	handler := &ItemViewPageUpHandler{
 		ItemView: itemView,
 	}
-	handler.id = HandlerID_ItemPageUp
+	handler.id = HandlerIDItemPageUp
 	return handler
 }
 

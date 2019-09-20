@@ -18,7 +18,7 @@ type QuitHandler struct {
 
 func NewQuitHandler() *QuitHandler {
 	handler := &QuitHandler{}
-	handler.id = HandlerID_Quit
+	handler.id = HandlerIDQuit
 	return handler
 }
 
@@ -42,7 +42,7 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 		Content:   content,
 		StatusBar: statusbar,
 	}
-	handler.id = HandlerID_Copy
+	handler.id = HandlerIDCopy
 	return handler
 }
 
@@ -79,7 +79,7 @@ func NewFullscreenHandler(list *views.ListWidget, content *views.ItemWidget, isF
 		Content:      content,
 		IsFullscreen: isFullscreen,
 	}
-	handler.id = HandlerID_FullScreen
+	handler.id = HandlerIDFullScreen
 	return handler
 }
 
@@ -122,7 +122,7 @@ func NewHelpHandler(showHelp *bool) *HelpHandler {
 	handler := &HelpHandler{
 		ShowHelp: showHelp,
 	}
-	handler.id = HandlerID_Help
+	handler.id = HandlerIDHelp
 	return handler
 }
 
@@ -161,7 +161,7 @@ func NewConfirmDeleteHandler(notificationWidget *views.NotificationWidget) *Conf
 	handler := &ConfirmDeleteHandler{
 		notificationWidget: notificationWidget,
 	}
-	handler.id = HandlerID_ConfirmDelete
+	handler.id = HandlerIDConfirmDelete
 	return handler
 }
 
@@ -184,7 +184,7 @@ func NewClearPendingDeleteHandler(notificationWidget *views.NotificationWidget) 
 	handler := &ClearPendingDeleteHandler{
 		notificationWidget: notificationWidget,
 	}
-	handler.id = HandlerID_ClearPendingDeletes
+	handler.id = HandlerIDClearPendingDeletes
 	return handler
 }
 
