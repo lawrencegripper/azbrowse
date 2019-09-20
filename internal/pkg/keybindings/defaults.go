@@ -33,5 +33,4 @@ var DefaultKeys = map[string]gocui.Key{
 	"clearpendingdeletes": gocui.KeyCtrlN,
 	"itempagedown":        gocui.KeyPgdn,
 	"itempageup":          gocui.KeyPgup,
-	"foo":                 gocui.Key(termbox.Key(0x11)),
 }
