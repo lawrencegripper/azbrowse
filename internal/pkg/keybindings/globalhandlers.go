@@ -18,7 +18,7 @@ type QuitHandler struct {
 
 func NewQuitHandler() *QuitHandler {
 	handler := &QuitHandler{}
-	handler.Index = 0
+	handler.id = HandlerIDQuit
 	return handler
 }
 
@@ -42,7 +42,7 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 		Content:   content,
 		StatusBar: statusbar,
 	}
-	handler.Index = 1
+	handler.id = HandlerIDCopy
 	return handler
 }
 
@@ -79,7 +79,7 @@ func NewFullscreenHandler(list *views.ListWidget, content *views.ItemWidget, isF
 		Content:      content,
 		IsFullscreen: isFullscreen,
 	}
-	handler.Index = 3
+	handler.id = HandlerIDFullScreen
 	return handler
 }
 
@@ -95,7 +95,7 @@ func (h FullscreenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			v.Frame = false
 			v.Wrap = true
 			keyBindings := GetKeyBindingsAsStrings()
-			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(keyBindings["fullscreen"]))
+			v.Title = fmt.Sprintf("JSON Response - Fullscreen (%s to exit)", strings.ToUpper(strings.Join(keyBindings["fullscreen"], ",")))
 
 			content := h.Content.GetContent()
 			fmt.Fprint(v, style.ColorJSON(content))
@@ -122,7 +122,7 @@ func NewHelpHandler(showHelp *bool) *HelpHandler {
 	handler := &HelpHandler{
 		ShowHelp: showHelp,
 	}
-	handler.Index = 4
+	handler.id = HandlerIDHelp
 	return handler
 }
 
@@ -161,7 +161,7 @@ func NewConfirmDeleteHandler(notificationWidget *views.NotificationWidget) *Conf
 	handler := &ConfirmDeleteHandler{
 		notificationWidget: notificationWidget,
 	}
-	handler.Index = 22
+	handler.id = HandlerIDConfirmDelete
 	return handler
 }
 
@@ -184,7 +184,7 @@ func NewClearPendingDeleteHandler(notificationWidget *views.NotificationWidget) 
 	handler := &ClearPendingDeleteHandler{
 		notificationWidget: notificationWidget,
 	}
-	handler.Index = 23
+	handler.id = HandlerIDClearPendingDeletes
 	return handler
 }
 

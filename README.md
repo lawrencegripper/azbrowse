@@ -187,6 +187,21 @@ The file should be formated like so:
 }
 ```
 
+You can also specify multiple key bindings for a command:
+
+```json
+{
+    "keyBindings": {
+        ...
+        "Copy": "F8",
+        "Help": "Ctrl+H",
+        "ListUp": ["k", "Up"],
+        "ListDown": ["j", "Down"]
+        ...
+    }
+}
+```
+
 In the file you can override the keys for actions using keys from the lists below.
 
 ### Actions

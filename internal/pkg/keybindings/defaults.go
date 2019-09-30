@@ -1,6 +1,8 @@
 package keybindings
 
-import "github.com/jroimartin/gocui"
+import (
+	"github.com/jroimartin/gocui"
+)
 
 // DefaultKeys are the default key bindings for each handler.
 var DefaultKeys = map[string]gocui.Key{

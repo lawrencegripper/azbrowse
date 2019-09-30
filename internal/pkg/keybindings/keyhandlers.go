@@ -2,35 +2,37 @@ package keybindings
 
 import "github.com/jroimartin/gocui"
 
-// HandlerIds A list of available handlers and their associated array index
-var HandlerIds = []string{
-	"quit",                // 0
-	"copy",                // 1
-	"listdelete",          // 2
-	"fullscreen",          // 3
-	"help",                // 4
-	"itemback",            // 5
-	"itemleft",            // 6
-	"listactions",         // 7
-	"listback",            // 8
-	"listbacklegacy",      // 9
-	"listdown",            // 10
-	"listup",              // 11
-	"listright",           // 12
-	"listedit",            // 13
-	"listexpand",          // 14
-	"listopen",            // 15
-	"listrefresh",         // 16
-	"listupdate",          // 17
-	"listpagedown",        // 18
-	"listpageup",          // 19
-	"listend",             // 20
-	"listhome",            // 21
-	"confirmdelete",       // 22
-	"clearpendingdeletes", // 23
-	"itempagedown",        // 24
-	"itempageup",          // 25
-}
+// HandlerID is used as the ID for Key Handlers
+type HandlerID string
+
+const (
+	HandlerIDQuit                HandlerID = "quit"                //nolint:golint
+	HandlerIDCopy                HandlerID = "copy"                //nolint:golint
+	HandlerIDListDelete          HandlerID = "listdelete"          //nolint:golint
+	HandlerIDFullScreen          HandlerID = "fullscreen"          //nolint:golint
+	HandlerIDHelp                HandlerID = "help"                //nolint:golint
+	HandlerIDItemBack            HandlerID = "itemback"            //nolint:golint
+	HandlerIDItemLeft            HandlerID = "itemleft"            //nolint:golint
+	HandlerIDListActions         HandlerID = "listactions"         //nolint:golint
+	HandlerIDListBack            HandlerID = "listback"            //nolint:golint
+	HandlerIDListBackLegacy      HandlerID = "listbacklegacy"      //nolint:golint
+	HandlerIDListDown            HandlerID = "listdown"            //nolint:golint
+	HandlerIDListUp              HandlerID = "listup"              //nolint:golint
+	HandlerIDListRight           HandlerID = "listright"           //nolint:golint
+	HandlerIDListEdit            HandlerID = "listedit"            //nolint:golint
+	HandlerIDListExpand          HandlerID = "listexpand"          //nolint:golint
+	HandlerIDListOpen            HandlerID = "listopen"            //nolint:golint
+	HandlerIDListRefresh         HandlerID = "listrefresh"         //nolint:golint
+	HandlerIDListUpdate          HandlerID = "listupdate"          //nolint:golint
+	HandlerIDListPageDown        HandlerID = "listpagedown"        //nolint:golint
+	HandlerIDListPageUp          HandlerID = "listpageup"          //nolint:golint
+	HandlerIDListEnd             HandlerID = "listend"             //nolint:golint
+	HandlerIDListHome            HandlerID = "listhome"            //nolint:golint
+	HandlerIDConfirmDelete       HandlerID = "confirmdelete"       //nolint:golint
+	HandlerIDClearPendingDeletes HandlerID = "clearpendingdeletes" //nolint:golint
+	HandlerIDItemPageDown        HandlerID = "itempagedown"        //nolint:golint
+	HandlerIDItemPageUp          HandlerID = "itempageup"          //nolint:golint
+)
 
 // KeyHandler is an interface that all key handlers must implement
 type KeyHandler interface {
@@ -38,22 +40,22 @@ type KeyHandler interface {
 	Fn() func(g *gocui.Gui, v *gocui.View) error
 	Widget() string
 
-	DefaultKey() gocui.Key
+	DefaultKey() interface{}
 }
 
 // KeyHandlerBase A base structure that will return the associated handler id from
 // the HandlersId array and a default key for the handler.
 type KeyHandlerBase struct {
-	Index uint16
+	id HandlerID
 }
 
 // ID returns the name of this item for example "listup"
 func (h KeyHandlerBase) ID() string {
-	return HandlerIds[h.Index]
+	return string(h.id)
 }
 
 // DefaultKey returns the default key mapped to the handler
-func (h KeyHandlerBase) DefaultKey() gocui.Key {
+func (h KeyHandlerBase) DefaultKey() interface{} {
 	return DefaultKeys[h.ID()]
 }
 

@@ -9,8 +9,8 @@ import (
 
 // Config represents the user configuration options
 type Config struct {
-	KeyBindings map[string]string `json:"keyBindings,omitempty"`
-	Editor      EditorConfig      `json:"editor,omitempty"`
+	KeyBindings map[string]interface{} `json:"keyBindings,omitempty"`
+	Editor      EditorConfig           `json:"editor,omitempty"`
 }
 
 // EditorConfig represents the user options for external editor

@@ -10,10 +10,12 @@ import (
 )
 
 // DrawHelp renders the popup help view
-func DrawHelp(keyBindings map[string]string, v *gocui.View) {
+func DrawHelp(keyBindings map[string][]string, v *gocui.View) {
 
 	for k, v := range keyBindings {
-		keyBindings[k] = strings.ToUpper(v)
+		for i, v2 := range v {
+			keyBindings[k][i] = strings.ToUpper(v2)
+		}
 	}
 
 	view := fmt.Sprintf(`
