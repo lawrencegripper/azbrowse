@@ -96,7 +96,8 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	// Is this a new view?
 	if !viewExists {
 		// It is lets prepopulate it with content like `/` if it was launched from the filter handler
-		v.Write([]byte(w.prepopulate)) //nolint: errcheck
+		v.Write([]byte(w.prepopulate))     //nolint: errcheck
+		v.SetCursor(len(w.prepopulate), 0) //nolint: errcheck
 	} else if w.panelContent != v.Buffer() {
 		// Has something been typed?
 		w.panelContent = v.Buffer()
