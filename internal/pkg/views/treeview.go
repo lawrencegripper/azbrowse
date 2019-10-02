@@ -31,11 +31,20 @@ type ListWidget struct {
 	FullscreenKeyBinding string
 	ActionKeyBinding     string
 	lastTopIndex         int
+	filterString         string
 }
 
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0}
+	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0}
+	go func() {
+		filterChannel := eventing.SubscribeToTopic("filter")
+		for {
+			filterString := <-filterChannel
+			listWidget.filterString = filterString.(string)
+		}
+	}()
+	return listWidget
 }
 
 // Layout draws the widget in the gocui view

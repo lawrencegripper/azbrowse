@@ -143,9 +143,6 @@ func main() {
 	g.SetManager(status, content, list, notifications, commandPanel)
 	g.SetCurrentView("listWidget")
 
-	commandPanel.ToggleShowHide()
-	// commandPanel.ToggleShowHide()
-
 	var editModeEnabled bool
 	var isFullscreen bool
 	var showHelp bool
@@ -213,6 +210,9 @@ func main() {
 			g.SetCurrentView("listWidget")
 
 			status.Status("Getting provider data", true)
+
+			// Starting to work with panel
+			commandPanel.ShowWithText("/")
 
 			armclient.PopulateResourceAPILookup(ctx)
 			status.Status("Done getting provider data", false)
