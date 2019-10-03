@@ -43,8 +43,8 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 	go func() {
 		filterChannel := eventing.SubscribeToTopic("filter")
 		for {
-			filterString := <-filterChannel
-			listWidget.filterString = strings.ToLower(strings.TrimSpace(strings.Replace(filterString.(string), "/", "", 1)))
+			filterStringInterface := <-filterChannel
+			filterString := strings.ToLower(strings.TrimSpace(strings.Replace(filterStringInterface.(string), "/", "", 1)))
 
 			filteredItems := []*handlers.TreeNode{}
 			for _, item := range listWidget.items {
@@ -54,6 +54,8 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 			}
 
 			listWidget.filteredItems = filteredItems
+			listWidget.selected = 0
+			listWidget.filterString = filterString
 		}
 	}()
 	return listWidget
@@ -93,9 +95,9 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	}
 
 	linesUsedCount := 0
-	allItems := make([]string, 0, w.itemCount())
+	renderedItems := make([]string, 0, w.itemCount())
 
-	allItems = append(allItems, style.Separator("  ---\n"))
+	renderedItems = append(renderedItems, style.Separator("  ---\n"))
 
 	for i, s := range w.itemsToShow() {
 		var itemToShow string
@@ -107,7 +109,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		itemToShow = itemToShow + s.Display + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
-		allItems = append(allItems, itemToShow)
+		renderedItems = append(renderedItems, itemToShow)
 	}
 
 	linesPerItem := linesUsedCount / w.itemCount()
@@ -129,13 +131,13 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		bottomIndex -= diff
 	}
 	w.lastTopIndex = topIndex
-	if bottomIndex > len(allItems) {
-		bottomIndex = len(allItems) - 1
+	if bottomIndex > len(renderedItems) {
+		bottomIndex = len(renderedItems) - 1
 	}
 
 	for index := topIndex; index < bottomIndex+1; index++ {
-		if index < len(allItems) {
-			item := allItems[index]
+		if index < len(renderedItems) {
+			item := renderedItems[index]
 			fmt.Fprint(v, item)
 		}
 	}
@@ -218,13 +220,13 @@ func (w *ListWidget) GoBack() {
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
-	w.clearFilter()
 
 	if w.title == "Subscriptions" {
 		w.title = ""
 	}
 
 	currentItem := w.itemsToShow()[w.selected]
+	w.clearFilter()
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		InProgress: true,
