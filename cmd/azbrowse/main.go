@@ -156,6 +156,8 @@ func main() {
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
+	keybindings.AddHandler(keybindings.NewCommandPanelHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelFilterHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -210,9 +212,6 @@ func main() {
 			g.SetCurrentView("listWidget")
 
 			status.Status("Getting provider data", true)
-
-			// Starting to work with panel
-			commandPanel.ShowWithText("/")
 
 			armclient.PopulateResourceAPILookup(ctx)
 			status.Status("Done getting provider data", false)

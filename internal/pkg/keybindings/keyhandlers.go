@@ -32,6 +32,8 @@ const (
 	HandlerIDClearPendingDeletes HandlerID = "clearpendingdeletes" //nolint:golint
 	HandlerIDItemPageDown        HandlerID = "itempagedown"        //nolint:golint
 	HandlerIDItemPageUp          HandlerID = "itempageup"          //nolint:golint
+	HandlerIDToggleCommandPanel  HandlerID = "commandpanel"        //nolint:golint
+	HandlerIDFilter              HandlerID = "filter"              //nolint:golint
 )
 
 // KeyHandler is an interface that all key handlers must implement

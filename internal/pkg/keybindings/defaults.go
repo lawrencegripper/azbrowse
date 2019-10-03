@@ -9,7 +9,7 @@ var DefaultKeys = map[string]gocui.Key{
 	"quit":                gocui.KeyCtrlC,
 	"copy":                gocui.KeyCtrlS,
 	"listdelete":          gocui.KeyDelete,
-	"fullscreen":          gocui.KeyCtrlF,
+	"fullscreen":          gocui.KeyF11,
 	"help":                gocui.KeyCtrlI,
 	"itemback":            gocui.KeyBackspace2,
 	"itemleft":            gocui.KeyArrowLeft,
@@ -32,4 +32,6 @@ var DefaultKeys = map[string]gocui.Key{
 	"clearpendingdeletes": gocui.KeyCtrlN,
 	"itempagedown":        gocui.KeyPgdn,
 	"itempageup":          gocui.KeyPgup,
+	"commandpanel":        gocui.KeyCtrlP,
+	"filter":              gocui.KeyCtrlF,
 }

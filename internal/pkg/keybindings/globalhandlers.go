@@ -196,3 +196,49 @@ func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error
 }
 
 ////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type CommandPanelHandler struct {
+	GlobalHandler
+	commandPanelWidget *views.CommandPanelWidget
+}
+
+func NewCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelHandler {
+	handler := &CommandPanelHandler{
+		commandPanelWidget: commandPanelWidget,
+	}
+	handler.id = HandlerIDToggleCommandPanel
+	return handler
+}
+
+func (h *CommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.commandPanelWidget.ToggleShowHide()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type CommandPanelFilterHandler struct {
+	GlobalHandler
+	commandPanelWidget *views.CommandPanelWidget
+}
+
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
+	handler := &CommandPanelFilterHandler{
+		commandPanelWidget: commandPanelWidget,
+	}
+	handler.id = HandlerIDFilter
+	return handler
+}
+
+func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.commandPanelWidget.ShowWithText("/")
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
