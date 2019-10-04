@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
+	"github.com/stuartleeks/gocui"
 )
 
 // DrawHelp renders the popup help view

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/stuartleeks/colorjson"
+	"github.com/stuartleeks/gocui"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests

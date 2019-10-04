@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jroimartin/gocui"
+	"github.com/stuartleeks/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"

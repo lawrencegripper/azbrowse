@@ -22,7 +22,6 @@ require (
 	github.com/gorilla/mux v1.6.2 // indirect
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
-	github.com/jroimartin/gocui v0.4.0
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
@@ -37,6 +36,7 @@ require (
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
 	github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6
+	github.com/stuartleeks/gocui v0.4.1
 	github.com/valyala/fastjson v1.4.0
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/tools v0.0.0-20190405180640-052fc3cfdbc2 // indirect

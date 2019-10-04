@@ -5,10 +5,10 @@ import (
 	"strings"
 
 	"github.com/atotto/clipboard"
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
+	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////

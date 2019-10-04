@@ -20,8 +20,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
-	"github.com/jroimartin/gocui"
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/stuartleeks/gocui"
 )
 
 // Overridden via ldflags

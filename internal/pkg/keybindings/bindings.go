@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/stuartleeks/gocui"
 )
 
 // KeyMap reprsents the current mappings from Handler -> Key
