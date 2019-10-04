@@ -313,8 +313,9 @@ The file should be formated like so:
             "executable": "code",
             "args" : [ "--wait" ]
         },
-        "translateFilePathForWSL" : "true",
-        "tempDir" : "~/tmp"
+        "translateFilePathForWSL" : true,
+        "tempDir" : "~/tmp",
+        "revertToStandardBuffer" : false
     }
 }
 ```
@@ -325,7 +326,51 @@ The `translateFilePathForWSL` property controls whether the path should be conve
 
 The `tempDir` property lets you control where the temporary JSON files are written should you have a requirement to not put them in the OS temp location.
 
+The `revertToStandardBuffer` property controls whether the terminal is reverted to the standard buffer (azbrowse uses the alternate buffer for display) when editing files. Set this to `true` when configuring terminal-based editors.
+
 The default configuration uses VS Code as the editor as shown above, and dynamically determines whether to perform the WSL file path translation.
+
+Another example:
+
+### Examples
+
+#### vim
+
+```json
+{
+    "editor": {
+        "command": {
+            "executable": "vim"
+        },
+        "revertToStandardBuffer" : true
+    }
+}
+```
+
+#### notepad (on Windows)
+
+```json
+{
+    "editor": {
+        "command": {
+            "executable": "notepad.exe"
+        }
+    }
+}
+```
+
+#### notepad (under WSL)
+
+```json
+{
+    "editor": {
+        "command": {
+            "executable": "notepad.exe"
+        },
+        "translateFilePathForWSL" : true,
+    }
+}
+```
 
 ## Plans
 

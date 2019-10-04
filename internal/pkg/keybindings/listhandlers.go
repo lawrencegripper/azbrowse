@@ -505,18 +505,21 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			}
 		}
 
-		
+		if editorConfig.RevertToStandardBuffer {
 		// Close termbox to revert to normal buffer
 		termbox.Close()
+		}
 
 		err = openEditor(editorConfig.Command, editorTmpFile)
 		if err != nil {
 			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
 			return nil
 		}
+		if editorConfig.RevertToStandardBuffer {
 		// Init termbox to switch back to alternate buffer and Flush content
 		termbox.Init()
 		h.Gui.Flush()
+		}
 
 		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
 		if err != nil {
