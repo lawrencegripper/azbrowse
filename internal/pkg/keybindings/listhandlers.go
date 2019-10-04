@@ -516,8 +516,14 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 		if editorConfig.RevertToStandardBuffer {
 			// Init termbox to switch back to alternate buffer and Flush content
-			termbox.Init()
-			h.Gui.Flush()
+			err = termbox.Init()
+			if err != nil {
+				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+			}
+			err = h.Gui.Flush()
+			if err != nil {
+				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+			}
 		}
 
 		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
