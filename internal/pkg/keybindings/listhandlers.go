@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/stuartleeks/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -19,6 +18,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nsf/termbox-go"
 	"github.com/skratchdot/open-golang/open"
+	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////
@@ -420,7 +420,7 @@ func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidg
 		status:  statusbar,
 		Context: ctx,
 		Content: content,
-		Gui: gui,
+		Gui:     gui,
 	}
 	handler.id = HandlerIDListUpdate
 	return handler
@@ -435,13 +435,12 @@ func (h ListUpdateHandler) getEditorConfig() (config.EditorConfig, error) {
 		return userConfig.Editor, nil
 	}
 	// generate default config
-	translateFilePathForWSL := wsl.IsWSL() // If on WSL then translate path so that it is valid when loaded by VS code in Windows
 	return config.EditorConfig{
 		Command: config.CommandConfig{
 			Executable: "code",
 			Arguments:  []string{"--wait"},
 		},
-		TranslateFilePathForWSL: translateFilePathForWSL,
+		TranslateFilePathForWSL: false, // previously used wsl.IsWSL to determine whether to translate path, but VSCode  now performs translation from WSL (so we get a bad path if we have translated it)
 	}, nil
 }
 
@@ -506,8 +505,8 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		if editorConfig.RevertToStandardBuffer {
-		// Close termbox to revert to normal buffer
-		termbox.Close()
+			// Close termbox to revert to normal buffer
+			termbox.Close()
 		}
 
 		err = openEditor(editorConfig.Command, editorTmpFile)
@@ -516,9 +515,9 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			return nil
 		}
 		if editorConfig.RevertToStandardBuffer {
-		// Init termbox to switch back to alternate buffer and Flush content
-		termbox.Init()
-		h.Gui.Flush()
+			// Init termbox to switch back to alternate buffer and Flush content
+			termbox.Init()
+			h.Gui.Flush()
 		}
 
 		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
