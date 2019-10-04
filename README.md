@@ -78,6 +78,10 @@ docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrence
 
 ## Usage
 
+### Configuration
+
+By default azbrowse looks for configuration in `/root/.azbrowse-settings.json` or `~/.azbrowse-settings.json` (where `~` is your users home directory). You can also set the `AZBROWSE_SETTINGS_PATH` environment variable to point to another location where you want to store your config (e.g. `~/clouddrive/.azbrowse-settings.json`)
+
 Below is a table containing the default key bindings. If you'd like to customise the key bindings to be more suitable for your setup, please refer to the section on [custom key bindings](#custom-key-bindings).
 
 ### Navigation

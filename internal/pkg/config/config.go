@@ -30,12 +30,16 @@ type CommandConfig struct {
 // Load the user configuration settings
 func Load() (Config, error) {
 	var config Config
-	configLocation := "/root/.azbrowse-settings.json"
-	user, err := user.Current()
-	if err == nil {
-		configLocation = user.HomeDir + "/.azbrowse-settings.json"
+
+	configLocation := os.Getenv("AZBROWSE_SETTINGS_PATH")
+	if configLocation == "" {
+		configLocation = "/root/.azbrowse-settings.json"
+		user, err := user.Current()
+		if err == nil {
+			configLocation = user.HomeDir + "/.azbrowse-settings.json"
+		}
 	}
-	_, err = os.Stat(configLocation)
+	_, err := os.Stat(configLocation)
 	if err != nil {
 		// don't error on no config file
 		return config, nil
