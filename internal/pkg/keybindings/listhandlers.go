@@ -17,6 +17,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/nsf/termbox-go"
 	"github.com/skratchdot/open-golang/open"
 )
 
@@ -410,14 +411,16 @@ type ListUpdateHandler struct {
 	status  *views.StatusbarWidget
 	Context context.Context
 	Content *views.ItemWidget
+	Gui     *gocui.Gui
 }
 
-func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidget, ctx context.Context, content *views.ItemWidget) *ListUpdateHandler {
+func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidget, ctx context.Context, content *views.ItemWidget, gui *gocui.Gui) *ListUpdateHandler {
 	handler := &ListUpdateHandler{
 		List:    list,
 		status:  statusbar,
 		Context: ctx,
 		Content: content,
+		Gui: gui,
 	}
 	handler.id = HandlerIDListUpdate
 	return handler
@@ -501,11 +504,19 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 				return err
 			}
 		}
+
+		
+		// Close termbox to revert to normal buffer
+		termbox.Close()
+
 		err = openEditor(editorConfig.Command, editorTmpFile)
 		if err != nil {
 			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
 			return nil
 		}
+		// Init termbox to switch back to alternate buffer and Flush content
+		termbox.Init()
+		h.Gui.Flush()
 
 		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
 		if err != nil {

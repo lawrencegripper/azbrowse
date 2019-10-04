@@ -193,7 +193,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
-	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
+	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content, g))
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
