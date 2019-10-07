@@ -63,7 +63,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 					ExpandURL:        currentItem.ID + "/" + actionURL,
 					ExpandReturnType: handlers.ActionType,
 					ItemType:         "action",
-					ID:               currentItem.ID,
+					ID:               currentItem.ID + "/" + actionURL,
 				})
 			}
 		}
