@@ -110,23 +110,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
-// SetNodes allows others to set the list nodes
-func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
-	w.selected = 0
 
-	// Capture current view to navstack
-	if w.HasCurrentItem() {
-		w.navStack.Push(&Page{
-			Data:             w.contentView.GetContent(),
-			Value:            w.items,
-			Title:            w.title,
-			Selection:        w.selected,
-			ExpandedNodeItem: w.CurrentItem(),
-		})
-	}
-
-	w.items = nodes
-}
 
 // Refresh refreshes the current view
 func (w *ListWidget) Refresh() {
@@ -160,7 +144,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.title = ""
 	}
 
-	currentItem := w.items[w.selected]
+	currentItem := w.CurrentItem()
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		InProgress: true,
@@ -206,6 +190,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	} else {
 		timeout = time.After(time.Second * 45)
 	}
+	var newContent string
+	var newTitle string
 
 	observedError := false
 	for index := 0; index < handlerExpanding; index++ {
@@ -227,7 +213,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				w.contentView.SetContent(done.Response, fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
+				newContent = done.Response
+				newTitle = fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 			}
 			if done.Nodes == nil {
 				continue
@@ -245,20 +232,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-	if len(newItems) > 0 {
-		// Capture current view to navstack as we're viewing an item with children
-		w.navStack.Push(&Page{
-			Data:             w.contentView.GetContent(),
-			Value:            w.items,
-			Title:            w.title,
-			Selection:        w.selected,
-			ExpandedNodeItem: w.CurrentItem(),
-		})
-		// Show new items and move cursor to top
-		w.items = newItems
-		w.selected = 0
-	}
-	w.expandedNodeItem = currentItem
 
 	// Use the default handler to get the resource JSON for display
 	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
@@ -271,13 +244,46 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				Timeout:    time.Duration(time.Second * 3),
 			})
 		}
-		w.contentView.SetContent(result.Response, fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
+		newContent = result.Response
+		newTitle = fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 	}
 
-	w.title = w.title + ">" + currentItem.Name
+	w.Navigate(newItems, newContent, newTitle)
+
 	if !observedError {
 		done()
 	}
+}
+
+// Navigate updates the currently selected list nodes, title and details content
+func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title string){
+	currentItem := w.CurrentItem()
+	if len(nodes) > 0 {
+		w.SetNodes(nodes)
+	}
+	w.expandedNodeItem = currentItem
+	w.contentView.SetContent(content, title)
+	if currentItem != nil {
+		w.title = w.title + ">" + currentItem.Name
+	}
+}
+
+// SetNodes allows others to set the list nodes
+func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
+	w.selected = 0
+
+	// Capture current view to navstack
+	if w.HasCurrentItem() {
+		w.navStack.Push(&Page{
+			Data:             w.contentView.GetContent(),
+			Value:            w.items,
+			Title:            w.title,
+			Selection:        w.selected,
+			ExpandedNodeItem: w.CurrentItem(),
+		})
+	}
+
+	w.items = nodes
 }
 
 // ChangeSelection updates the selected item
@@ -302,7 +308,10 @@ func (w *ListWidget) HasCurrentItem() bool {
 
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
-	return w.items[w.selected]
+	if (w.HasCurrentItem()) {
+		return w.items[w.selected]
+	}
+	return nil
 }
 
 // CurrentExpandedItem returns the currently expanded item as a treenode

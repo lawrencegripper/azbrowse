@@ -224,14 +224,19 @@ func main() {
 					SubscriptionID: sub.SubscriptionID,
 				})
 			}
-		
-			list.SetNodes(newList)
 
+			var newContent string
+			var newTitle string
 			if err != nil {
-				content.SetContent(err.Error(), "Error")
-				return nil
+				newContent = err.Error()
+				newTitle = "Error"
+			} else {
+				newContent = data
+				newTitle = "Subscriptions response"
 			}
-			content.SetContent(data, "Subscriptions response")
+
+			list.Navigate(newList, newContent, newTitle)
+
 			return nil
 		})
 
