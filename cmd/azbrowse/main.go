@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
@@ -35,9 +36,14 @@ var enableTracing bool
 var hideGuids bool
 
 func main() {
+	var navigateToID string
 
-	if len(os.Args) >= 2 {
-		arg := os.Args[1]
+	args := os.Args[1:] // skip first arg
+	
+	for len(args) >= 1 {
+		arg := args[0]
+		handled := false
+
 		if strings.Contains(arg, "version") {
 			fmt.Println(version)
 			fmt.Println(commit)
@@ -62,7 +68,7 @@ func main() {
 			suggester, _ := search.NewSuggester()
 			fmt.Print("Get suggestions \n")
 
-			suggestions := suggester.Autocomplete(os.Args[2])
+			suggestions := suggester.Autocomplete(args[1])
 			fmt.Printf("%v \n", suggestions)
 			os.Exit(0)
 		}
@@ -70,11 +76,30 @@ func main() {
 		if strings.Contains(arg, "debug") {
 			enableTracing = true
 			tracing.EnableDebug()
+			handled = true
 		}
-
 		if strings.Contains(arg, "demo") {
 			hideGuids = true
+			handled = true
 		}
+
+		if strings.Contains(arg, "navigate") {
+			if len(args) >= 2{
+				navigateToID = args[1] // capture the next arg
+				args = args[1:] // move past the the captured arg
+				handled = true
+			}
+		}
+		
+		if !handled {
+			// unhandled arg
+			fmt.Println("Usage:")
+			fmt.Println("\tazbrowse [debug] [demo] [navigate <id to navigate to>]")
+			fmt.Println()
+			os.Exit(-1)
+		}
+
+		args = args[1:] // move to the next arg
 	}
 
 	confirmAndSelfUpdate()
@@ -243,6 +268,38 @@ func main() {
 		status.Status("Fetching Subscriptions: Completed", false)
 
 	}()
+
+	if navigateToID != "" {
+		go func() {
+			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+			var lastNavigatedNode *handlers.TreeNode
+
+			for {
+				nodeListInterface := <-navigatedChannel
+				nodeList := nodeListInterface.([]*handlers.TreeNode)
+
+				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem(){
+					break
+				}
+
+				gotNode := false
+				for nodeIndex, node := range nodeList {
+					if strings.HasPrefix(navigateToID, node.ID) {
+						list.ChangeSelection(nodeIndex)
+						lastNavigatedNode = node
+						list.ExpandCurrentSelection()
+						gotNode = true
+						break
+					}
+				}
+
+				if !gotNode {
+					// we got as far as we could - now stop!
+					break
+				}
+			}
+		}()
+	}
 
 	span.Finish()
 
