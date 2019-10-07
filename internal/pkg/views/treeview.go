@@ -266,6 +266,8 @@ func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title 
 	if currentItem != nil {
 		w.title = w.title + ">" + currentItem.Name
 	}
+
+	eventing.Publish("list.navigated", nodes)
 }
 
 // SetNodes allows others to set the list nodes
