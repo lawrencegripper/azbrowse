@@ -58,7 +58,7 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 				Name:            dep.Name,
 				Display:         dep.Name + "\n   " + style.Subtle("Started:  "+dep.Properties.Timestamp) + "\n   " + style.Subtle("Duration: "+dep.Properties.Duration) + "\n   " + style.Subtle("DeploymentStatus: "+dep.Properties.ProvisioningState+""),
 				ID:              dep.ID,
-				Parentid:        currentItem.ID,
+				Parentid:        currentItem.ID+ "/operations/",
 				ExpandURL:       dep.ID + "/operations/?api-version=2017-05-10",
 				ItemType:        deploymentType,
 				DeleteURL:       dep.ID + "?api-version=2017-05-10",

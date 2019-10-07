@@ -84,7 +84,7 @@ func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderR
 		newItems = append(newItems, &TreeNode{
 			Name:     metricNamespace.Name,
 			Display:  style.Subtle("[Metrics]") + "\n  " + metricNamespace.Name,
-			ID:       currentItem.ID,
+			ID:       currentItem.ID + "/providers/microsoft.insights/metricdefinitions",
 			Parentid: currentItem.ID,
 			ExpandURL: currentItem.ID + "/providers/microsoft.insights/metricdefinitions?" +
 				"metricNamespace=" + url.QueryEscape(metricNamespace.Properties.MetricNamespaceName) +
@@ -129,7 +129,7 @@ func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) Expander
 		newItems = append(newItems, &TreeNode{
 			Name:     metric.Name.Value,
 			Display:  metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
-			ID:       currentItem.ID,
+			ID:       currentItem.ID + "/providers/microsoft.Insights/metrics",
 			Parentid: currentItem.ID,
 			ExpandURL: currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" +
 				time.Now().UTC().Add(-4*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" +
