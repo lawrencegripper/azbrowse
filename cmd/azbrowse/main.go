@@ -274,31 +274,37 @@ func main() {
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 			var lastNavigatedNode *handlers.TreeNode
 
+			processNavigations := true
+
 			for {
 				nodeListInterface := <-navigatedChannel
-				nodeList := nodeListInterface.([]*handlers.TreeNode)
 
-				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
-					break
-				}
+				if processNavigations {
+					nodeList := nodeListInterface.([]*handlers.TreeNode)
 
-				gotNode := false
-				for nodeIndex, node := range nodeList {
-					// use prefix matching
-					// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
-					// additional check is that the lengths match, or the next char in target is a '/'
-					if strings.HasPrefix(navigateToID, node.ID) && (len(navigateToID) == len(node.ID) || navigateToID[len(node.ID)] == '/') {
-						list.ChangeSelection(nodeIndex)
-						lastNavigatedNode = node
-						list.ExpandCurrentSelection()
-						gotNode = true
-						break
+					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
+						processNavigations = false
+					} else {
+
+						gotNode := false
+						for nodeIndex, node := range nodeList {
+							// use prefix matching
+							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
+							// additional check is that the lengths match, or the next char in target is a '/'
+							if strings.HasPrefix(navigateToID, node.ID) && (len(navigateToID) == len(node.ID) || navigateToID[len(node.ID)] == '/') {
+								list.ChangeSelection(nodeIndex)
+								lastNavigatedNode = node
+								list.ExpandCurrentSelection()
+								gotNode = true
+								break
+							}
+						}
+
+						if !gotNode {
+							// we got as far as we could - now stop!
+							processNavigations = false
+						}
 					}
-				}
-
-				if !gotNode {
-					// we got as far as we could - now stop!
-					break
 				}
 			}
 		}()
