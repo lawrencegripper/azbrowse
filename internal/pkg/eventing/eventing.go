@@ -7,10 +7,13 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+const pubSubCapcityPerTopic = 30
+
 // pubSub is the eventbus for the app
 // it is then wrapped in methods for use
-// to allow future changes
-var pubSub = pubsub.New(1)
+// to allow future changes.
+// NOTE: When capacity is reached events are silently dropped
+var pubSub = pubsub.New(pubSubCapcityPerTopic)
 
 // StatusEvent is used to show status information
 // in the statusbar
@@ -58,7 +61,7 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 		s.Update()
 	}
 
-	pubSub.Pub(s, "statusEvent")
+	Publish("statusEvent", s)
 	return s, doneFunc
 }
 
@@ -75,7 +78,7 @@ func Unsubscribe(ch chan interface{}) {
 
 // Publish publishes any event
 func Publish(topic string, event interface{}) {
-	pubSub.Pub(event, topic)
+	pubSub.TryPub(event, topic)
 }
 
 // SubscribeToTopic creates a channel which will receive event in that topic

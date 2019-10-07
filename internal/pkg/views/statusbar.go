@@ -43,14 +43,19 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 			timeout := time.After(time.Second)
 			select {
 			case eventObj := <-newEvents:
-				// See if we have any new events
-				event := eventObj.(eventing.StatusEvent)
-				widget.messages[event.ID()] = event
-				// Favor the most recent message
-				widget.currentMessage = &event
+				widget.addStatusEvent(eventObj)
 			case <-timeout:
 				// Update the UI
 				continue
+			}
+
+			// Seeing as we're about to process and thats quite a bit of effort
+			// lets grab everything off the channel, if there is stuff
+			// stacked up waiting for us
+			itemsInChan := len(newEvents)
+			for index := 0; index < itemsInChan; index++ {
+				eventObj := <-newEvents
+				widget.addStatusEvent(eventObj)
 			}
 
 			for _, message := range widget.messages {
@@ -88,12 +93,17 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				}
 				return nil
 			})
-
-			time.Sleep(time.Second)
-
 		}
 	}()
 	return widget
+}
+
+func (w *StatusbarWidget) addStatusEvent(eventObj interface{}) {
+	// See if we have any new events
+	event := eventObj.(eventing.StatusEvent)
+	w.messages[event.ID()] = event
+	// Favor the most recent message
+	w.currentMessage = &event
 }
 
 // Layout draws the widget in the gocui view
