@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/cskr/pubsub"
-	"github.com/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 )
 
 // pubSub is the eventbus for the app
@@ -65,10 +65,20 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 // SubscribeToStatusEvents creates a channel which will receive
 // new `StatusEvent` types
 func SubscribeToStatusEvents() chan interface{} {
-	return pubSub.Sub("statusEvent")
+	return SubscribeToTopic("statusEvent")
 }
 
 // Unsubscribe from events
 func Unsubscribe(ch chan interface{}) {
 	pubSub.Unsub(ch)
+}
+
+// Publish publishes any event
+func Publish(topic string, event interface{}) {
+	pubSub.Pub(event, topic)
+}
+
+// SubscribeToTopic creates a channel which will receive event in that topic
+func SubscribeToTopic(topic string) chan interface{} {
+	return pubSub.Sub(topic)
 }
