@@ -110,8 +110,6 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
-
-
 // Refresh refreshes the current view
 func (w *ListWidget) Refresh() {
 	w.statusView.Status("Refreshing", true)
@@ -232,7 +230,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-
 	// Use the default handler to get the resource JSON for display
 	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
 	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
@@ -256,7 +253,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 }
 
 // Navigate updates the currently selected list nodes, title and details content
-func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title string){
+func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title string) {
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
 		w.SetNodes(nodes)
@@ -310,7 +307,7 @@ func (w *ListWidget) HasCurrentItem() bool {
 
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
-	if (w.HasCurrentItem()) {
+	if w.HasCurrentItem() {
 		return w.items[w.selected]
 	}
 	return nil

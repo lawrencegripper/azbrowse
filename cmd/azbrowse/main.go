@@ -39,7 +39,7 @@ func main() {
 	var navigateToID string
 
 	args := os.Args[1:] // skip first arg
-	
+
 	for len(args) >= 1 {
 		arg := args[0]
 		handled := false
@@ -84,13 +84,13 @@ func main() {
 		}
 
 		if strings.Contains(arg, "navigate") {
-			if len(args) >= 2{
+			if len(args) >= 2 {
 				navigateToID = args[1] // capture the next arg
-				args = args[1:] // move past the the captured arg
+				args = args[1:]        // move past the the captured arg
 				handled = true
 			}
 		}
-		
+
 		if !handled {
 			// unhandled arg
 			fmt.Println("Usage:")
@@ -278,7 +278,7 @@ func main() {
 				nodeListInterface := <-navigatedChannel
 				nodeList := nodeListInterface.([]*handlers.TreeNode)
 
-				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem(){
+				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
 					break
 				}
 

@@ -63,7 +63,7 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
-			ID: currentItem.ID + "/analyticsItems",
+			ID:        currentItem.ID + "/analyticsItems",
 			Namespace: "AppInsights",
 			Name:      "Analytics Items",
 			Display:   "Analytics Items",

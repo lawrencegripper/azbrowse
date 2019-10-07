@@ -101,7 +101,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		Namespace:      "None",
 		Display:        style.Subtle("[Microsoft.Insights]") + "\n  Activity Log",
 		Name:           "Activity Log",
-		ID:             currentItem.ID +"/<activitylog>",
+		ID:             currentItem.ID + "/<activitylog>",
 		ExpandURL:      GetActivityLogExpandURL(currentItem.SubscriptionID, currentItem.Name),
 		ItemType:       activityLogType,
 		DeleteURL:      "",
