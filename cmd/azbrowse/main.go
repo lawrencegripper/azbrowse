@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -34,9 +36,14 @@ var enableTracing bool
 var hideGuids bool
 
 func main() {
+	var navigateToID string
 
-	if len(os.Args) >= 2 {
-		arg := os.Args[1]
+	args := os.Args[1:] // skip first arg
+
+	for len(args) >= 1 {
+		arg := args[0]
+		handled := false
+
 		if strings.Contains(arg, "version") {
 			fmt.Println(version)
 			fmt.Println(commit)
@@ -61,7 +68,7 @@ func main() {
 			suggester, _ := search.NewSuggester()
 			fmt.Print("Get suggestions \n")
 
-			suggestions := suggester.Autocomplete(os.Args[2])
+			suggestions := suggester.Autocomplete(args[1])
 			fmt.Printf("%v \n", suggestions)
 			os.Exit(0)
 		}
@@ -69,11 +76,30 @@ func main() {
 		if strings.Contains(arg, "debug") {
 			enableTracing = true
 			tracing.EnableDebug()
+			handled = true
 		}
-
 		if strings.Contains(arg, "demo") {
 			hideGuids = true
+			handled = true
 		}
+
+		if strings.Contains(arg, "navigate") {
+			if len(args) >= 2 {
+				navigateToID = args[1] // capture the next arg
+				args = args[1:]        // move past the the captured arg
+				handled = true
+			}
+		}
+
+		if !handled {
+			// unhandled arg
+			fmt.Println("Usage:")
+			fmt.Println("\tazbrowse [debug] [demo] [navigate <id to navigate to>]")
+			fmt.Println()
+			os.Exit(-1)
+		}
+
+		args = args[1:] // move to the next arg
 	}
 
 	confirmAndSelfUpdate()
@@ -135,7 +161,7 @@ func main() {
 
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing)
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions")
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
 
 	g.SetManager(status, content, list, notifications)
@@ -212,19 +238,77 @@ func main() {
 			armclient.PopulateResourceAPILookup(ctx)
 			status.Status("Done getting provider data", false)
 
-			list.SetSubscriptions(subRequest)
-
-			if err != nil {
-				content.SetContent(err.Error(), "Error")
-				return nil
+			newList := []*handlers.TreeNode{}
+			for _, sub := range subRequest.Subs {
+				newList = append(newList, &handlers.TreeNode{
+					Display:        sub.DisplayName,
+					Name:           sub.DisplayName,
+					ID:             sub.ID,
+					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
+					ItemType:       handlers.SubscriptionType,
+					SubscriptionID: sub.SubscriptionID,
+				})
 			}
-			content.SetContent(data, "Subscriptions response")
+
+			var newContent string
+			var newTitle string
+			if err != nil {
+				newContent = err.Error()
+				newTitle = "Error"
+			} else {
+				newContent = data
+				newTitle = "Subscriptions response"
+			}
+
+			list.Navigate(newList, newContent, newTitle)
+
 			return nil
 		})
 
 		status.Status("Fetching Subscriptions: Completed", false)
 
 	}()
+
+	if navigateToID != "" {
+		go func() {
+			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+			var lastNavigatedNode *handlers.TreeNode
+
+			processNavigations := true
+
+			for {
+				nodeListInterface := <-navigatedChannel
+
+				if processNavigations {
+					nodeList := nodeListInterface.([]*handlers.TreeNode)
+
+					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
+						processNavigations = false
+					} else {
+
+						gotNode := false
+						for nodeIndex, node := range nodeList {
+							// use prefix matching
+							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
+							// additional check is that the lengths match, or the next char in target is a '/'
+							if strings.HasPrefix(navigateToID, node.ID) && (len(navigateToID) == len(node.ID) || navigateToID[len(node.ID)] == '/') {
+								list.ChangeSelection(nodeIndex)
+								lastNavigatedNode = node
+								list.ExpandCurrentSelection()
+								gotNode = true
+								break
+							}
+						}
+
+						if !gotNode {
+							// we got as far as we could - now stop!
+							processNavigations = false
+						}
+					}
+				}
+			}
+		}()
+	}
 
 	span.Finish()
 

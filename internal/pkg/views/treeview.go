@@ -11,7 +11,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
-	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // ListWidget hosts the left panel showing resources and controls the navigation
@@ -34,8 +33,8 @@ type ListWidget struct {
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string) *ListWidget {
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, title: title}
 }
 
 // Layout draws the widget in the gocui view
@@ -111,39 +110,6 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
-// SetNodes allows others to set the list nodes
-func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
-	w.selected = 0
-	// Capture current view to navstack
-	w.navStack.Push(&Page{
-		Data:             w.contentView.GetContent(),
-		Value:            w.items,
-		Title:            w.title,
-		Selection:        w.selected,
-		ExpandedNodeItem: w.CurrentItem(),
-	})
-	w.items = nodes
-}
-
-// SetSubscriptions starts vaidation with the subs found
-func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
-	//Todo: Evaluate moving this to a handler
-	newList := []*handlers.TreeNode{}
-	for _, sub := range subs.Subs {
-		newList = append(newList, &handlers.TreeNode{
-			Display:        sub.DisplayName,
-			Name:           sub.DisplayName,
-			ID:             sub.ID,
-			ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-			ItemType:       handlers.SubscriptionType,
-			SubscriptionID: sub.SubscriptionID,
-		})
-	}
-
-	w.title = "Subscriptions"
-	w.items = newList
-}
-
 // Refresh refreshes the current view
 func (w *ListWidget) Refresh() {
 	w.statusView.Status("Refreshing", true)
@@ -176,7 +142,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		w.title = ""
 	}
 
-	currentItem := w.items[w.selected]
+	currentItem := w.CurrentItem()
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		InProgress: true,
@@ -222,6 +188,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	} else {
 		timeout = time.After(time.Second * 45)
 	}
+	var newContent string
+	var newTitle string
 
 	observedError := false
 	for index := 0; index < handlerExpanding; index++ {
@@ -243,7 +211,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				w.contentView.SetContent(done.Response, fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
+				newContent = done.Response
+				newTitle = fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 			}
 			if done.Nodes == nil {
 				continue
@@ -261,21 +230,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		}
 	}
 
-	if len(newItems) > 0 {
-		// Capture current view to navstack as we're viewing an item with children
-		w.navStack.Push(&Page{
-			Data:             w.contentView.GetContent(),
-			Value:            w.items,
-			Title:            w.title,
-			Selection:        w.selected,
-			ExpandedNodeItem: w.CurrentItem(),
-		})
-		// Show new items and move cursor to top
-		w.items = newItems
-		w.selected = 0
-	}
-	w.expandedNodeItem = currentItem
-
 	// Use the default handler to get the resource JSON for display
 	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
 	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
@@ -287,13 +241,55 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				Timeout:    time.Duration(time.Second * 3),
 			})
 		}
-		w.contentView.SetContent(result.Response, fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name))
+		newContent = result.Response
+		newTitle = fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 	}
 
-	w.title = w.title + ">" + currentItem.Name
+	w.Navigate(newItems, newContent, newTitle)
+
 	if !observedError {
 		done()
 	}
+}
+
+// Navigate updates the currently selected list nodes, title and details content
+func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title string) {
+	currentItem := w.CurrentItem()
+	if len(nodes) > 0 {
+		w.SetNodes(nodes)
+	}
+	w.expandedNodeItem = currentItem
+	w.contentView.SetContent(content, title)
+	if currentItem != nil {
+		w.title = w.title + ">" + currentItem.Name
+	}
+
+	eventing.Publish("list.navigated", nodes)
+}
+
+// SetNodes allows others to set the list nodes
+func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
+	w.selected = 0
+
+	// Capture current view to navstack
+	if w.HasCurrentItem() {
+		w.navStack.Push(&Page{
+			Data:             w.contentView.GetContent(),
+			Value:            w.items,
+			Title:            w.title,
+			Selection:        w.selected,
+			ExpandedNodeItem: w.CurrentItem(),
+		})
+
+		currentID := w.CurrentItem().ID
+		for _, node := range nodes {
+			if node.ID == currentID {
+				panic(fmt.Errorf("ids must be unique or the navigate command breaks"))
+			}
+		}
+	}
+
+	w.items = nodes
 }
 
 // ChangeSelection updates the selected item
@@ -311,9 +307,17 @@ func (w *ListWidget) CurrentSelection() int {
 	return w.selected
 }
 
+// HasCurrentItem indicates whether there is a current item
+func (w *ListWidget) HasCurrentItem() bool {
+	return w.selected < len(w.items)
+}
+
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
-	return w.items[w.selected]
+	if w.HasCurrentItem() {
+		return w.items[w.selected]
+	}
+	return nil
 }
 
 // CurrentExpandedItem returns the currently expanded item as a treenode
