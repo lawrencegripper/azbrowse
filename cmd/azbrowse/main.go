@@ -156,8 +156,9 @@ func main() {
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
-	keybindings.AddHandler(keybindings.NewCommandPanelHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(commandPanel))
 	keybindings.AddHandler(keybindings.NewCommandPanelFilterHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))

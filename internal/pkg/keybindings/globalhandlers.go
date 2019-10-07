@@ -198,20 +198,20 @@ func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
-type CommandPanelHandler struct {
+type OpenCommandPanelHandler struct {
 	GlobalHandler
 	commandPanelWidget *views.CommandPanelWidget
 }
 
-func NewCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelHandler {
-	handler := &CommandPanelHandler{
+func NewOpenCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *OpenCommandPanelHandler {
+	handler := &OpenCommandPanelHandler{
 		commandPanelWidget: commandPanelWidget,
 	}
-	handler.id = HandlerIDToggleCommandPanel
+	handler.id = HandlerIDToggleOpenCommandPanel
 	return handler
 }
 
-func (h *CommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		h.commandPanelWidget.ToggleShowHide()
 		return nil

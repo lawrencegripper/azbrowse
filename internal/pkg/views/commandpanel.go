@@ -55,7 +55,9 @@ func (w *CommandPanelWidget) ShowWithText(s string) {
 }
 
 func (w *CommandPanelWidget) trackPreviousView() {
-	w.previousViewName = w.gui.CurrentView().Name()
+	if view := w.gui.CurrentView(); view != nil {
+		w.previousViewName = view.Name()
+	}
 }
 
 // Layout draws the widget in the gocui view

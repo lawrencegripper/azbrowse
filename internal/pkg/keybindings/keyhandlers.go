@@ -6,34 +6,35 @@ import "github.com/jroimartin/gocui"
 type HandlerID string
 
 const (
-	HandlerIDQuit                HandlerID = "quit"                //nolint:golint
-	HandlerIDCopy                HandlerID = "copy"                //nolint:golint
-	HandlerIDListDelete          HandlerID = "listdelete"          //nolint:golint
-	HandlerIDFullScreen          HandlerID = "fullscreen"          //nolint:golint
-	HandlerIDHelp                HandlerID = "help"                //nolint:golint
-	HandlerIDItemBack            HandlerID = "itemback"            //nolint:golint
-	HandlerIDItemLeft            HandlerID = "itemleft"            //nolint:golint
-	HandlerIDListActions         HandlerID = "listactions"         //nolint:golint
-	HandlerIDListBack            HandlerID = "listback"            //nolint:golint
-	HandlerIDListBackLegacy      HandlerID = "listbacklegacy"      //nolint:golint
-	HandlerIDListDown            HandlerID = "listdown"            //nolint:golint
-	HandlerIDListUp              HandlerID = "listup"              //nolint:golint
-	HandlerIDListRight           HandlerID = "listright"           //nolint:golint
-	HandlerIDListEdit            HandlerID = "listedit"            //nolint:golint
-	HandlerIDListExpand          HandlerID = "listexpand"          //nolint:golint
-	HandlerIDListOpen            HandlerID = "listopen"            //nolint:golint
-	HandlerIDListRefresh         HandlerID = "listrefresh"         //nolint:golint
-	HandlerIDListUpdate          HandlerID = "listupdate"          //nolint:golint
-	HandlerIDListPageDown        HandlerID = "listpagedown"        //nolint:golint
-	HandlerIDListPageUp          HandlerID = "listpageup"          //nolint:golint
-	HandlerIDListEnd             HandlerID = "listend"             //nolint:golint
-	HandlerIDListHome            HandlerID = "listhome"            //nolint:golint
-	HandlerIDConfirmDelete       HandlerID = "confirmdelete"       //nolint:golint
-	HandlerIDClearPendingDeletes HandlerID = "clearpendingdeletes" //nolint:golint
-	HandlerIDItemPageDown        HandlerID = "itempagedown"        //nolint:golint
-	HandlerIDItemPageUp          HandlerID = "itempageup"          //nolint:golint
-	HandlerIDToggleCommandPanel  HandlerID = "commandpanel"        //nolint:golint
-	HandlerIDFilter              HandlerID = "filter"              //nolint:golint
+	HandlerIDQuit                    HandlerID = "quit"                //nolint:golint
+	HandlerIDCopy                    HandlerID = "copy"                //nolint:golint
+	HandlerIDListDelete              HandlerID = "listdelete"          //nolint:golint
+	HandlerIDFullScreen              HandlerID = "fullscreen"          //nolint:golint
+	HandlerIDHelp                    HandlerID = "help"                //nolint:golint
+	HandlerIDItemBack                HandlerID = "itemback"            //nolint:golint
+	HandlerIDItemLeft                HandlerID = "itemleft"            //nolint:golint
+	HandlerIDListActions             HandlerID = "listactions"         //nolint:golint
+	HandlerIDListBack                HandlerID = "listback"            //nolint:golint
+	HandlerIDListBackLegacy          HandlerID = "listbacklegacy"      //nolint:golint
+	HandlerIDListDown                HandlerID = "listdown"            //nolint:golint
+	HandlerIDListUp                  HandlerID = "listup"              //nolint:golint
+	HandlerIDListRight               HandlerID = "listright"           //nolint:golint
+	HandlerIDListEdit                HandlerID = "listedit"            //nolint:golint
+	HandlerIDListExpand              HandlerID = "listexpand"          //nolint:golint
+	HandlerIDListOpen                HandlerID = "listopen"            //nolint:golint
+	HandlerIDListRefresh             HandlerID = "listrefresh"         //nolint:golint
+	HandlerIDListUpdate              HandlerID = "listupdate"          //nolint:golint
+	HandlerIDListPageDown            HandlerID = "listpagedown"        //nolint:golint
+	HandlerIDListPageUp              HandlerID = "listpageup"          //nolint:golint
+	HandlerIDListEnd                 HandlerID = "listend"             //nolint:golint
+	HandlerIDListHome                HandlerID = "listhome"            //nolint:golint
+	HandlerIDConfirmDelete           HandlerID = "confirmdelete"       //nolint:golint
+	HandlerIDClearPendingDeletes     HandlerID = "clearpendingdeletes" //nolint:golint
+	HandlerIDItemPageDown            HandlerID = "itempagedown"        //nolint:golint
+	HandlerIDItemPageUp              HandlerID = "itempageup"          //nolint:golint
+	HandlerIDToggleOpenCommandPanel  HandlerID = "opencommandpanel"    //nolint:golint
+	HandlerIDToggleCloseCommandPanel HandlerID = "closecommandpanel"   //nolint:golint
+	HandlerIDFilter                  HandlerID = "filter"              //nolint:golint
 )
 
 // KeyHandler is an interface that all key handlers must implement
@@ -92,4 +93,15 @@ type GlobalHandler struct {
 // Widget returns the name of the widget this handler binds to
 func (h GlobalHandler) Widget() string {
 	return ""
+}
+
+// CommandPanelHandler is a parent struct for all key handlers not tied to
+// a specific view.
+type CommandPanelHandler struct {
+	KeyHandlerBase
+}
+
+// Widget returns the name of the widget this handler binds to
+func (h CommandPanelHandler) Widget() string {
+	return "commandPanelWidget"
 }
