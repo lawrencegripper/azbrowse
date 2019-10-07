@@ -10,7 +10,9 @@ import (
 // pubSub is the eventbus for the app
 // it is then wrapped in methods for use
 // to allow future changes
-var pubSub = pubsub.New(1)
+// each `topic` on the bus can have 30 items waiting at
+// any time after which events are silently dropped
+var pubSub = pubsub.New(30)
 
 // StatusEvent is used to show status information
 // in the statusbar
@@ -58,7 +60,7 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 		s.Update()
 	}
 
-	pubSub.Pub(s, "statusEvent")
+	Publish("statusEvent", s)
 	return s, doneFunc
 }
 
@@ -75,7 +77,7 @@ func Unsubscribe(ch chan interface{}) {
 
 // Publish publishes any event
 func Publish(topic string, event interface{}) {
-	pubSub.Pub(event, topic)
+	pubSub.TryPub(event, topic)
 }
 
 // SubscribeToTopic creates a channel which will receive event in that topic
