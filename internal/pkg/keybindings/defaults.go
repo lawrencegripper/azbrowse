@@ -5,7 +5,7 @@ import (
 )
 
 // DefaultKeys are the default key bindings for each handler.
-var DefaultKeys = map[string]gocui.Key{
+var DefaultKeys = map[string]interface{}{
 	"quit":                gocui.KeyCtrlC,
 	"copy":                gocui.KeyCtrlS,
 	"listdelete":          gocui.KeyDelete,
@@ -32,7 +32,7 @@ var DefaultKeys = map[string]gocui.Key{
 	"clearpendingdeletes": gocui.KeyCtrlN,
 	"itempagedown":        gocui.KeyPgdn,
 	"itempageup":          gocui.KeyPgup,
-	"opencommandpanel":    gocui.KeyCtrlP,
+	"commandpanelopen":    gocui.KeyCtrlP,
 	"filter":              gocui.KeyCtrlF,
-	"closecommandpanel":   gocui.KeyCtrlT,
+	"commandpanelclose":   gocui.KeyEsc,
 }

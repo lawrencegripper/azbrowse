@@ -32,8 +32,8 @@ const (
 	HandlerIDClearPendingDeletes     HandlerID = "clearpendingdeletes" //nolint:golint
 	HandlerIDItemPageDown            HandlerID = "itempagedown"        //nolint:golint
 	HandlerIDItemPageUp              HandlerID = "itempageup"          //nolint:golint
-	HandlerIDToggleOpenCommandPanel  HandlerID = "opencommandpanel"    //nolint:golint
-	HandlerIDToggleCloseCommandPanel HandlerID = "closecommandpanel"   //nolint:golint
+	HandlerIDToggleOpenCommandPanel  HandlerID = "commandpanelopen"    //nolint:golint
+	HandlerIDToggleCloseCommandPanel HandlerID = "commandpanelclose"   //nolint:golint
 	HandlerIDFilter                  HandlerID = "filter"              //nolint:golint
 )
 

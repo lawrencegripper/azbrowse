@@ -92,7 +92,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	v.Editable = true
 	g.Cursor = true
-	v.Title = "Command Pallet"
+	v.Title = "Command Panel"
 	v.Wrap = false
 
 	// Is this a new view?

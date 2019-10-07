@@ -147,6 +147,7 @@ func main() {
 
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorCyan
+	g.InputEsc = true
 
 	maxX, maxY := g.Size()
 	// Padding
