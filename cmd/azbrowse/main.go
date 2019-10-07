@@ -284,7 +284,10 @@ func main() {
 
 				gotNode := false
 				for nodeIndex, node := range nodeList {
-					if strings.HasPrefix(navigateToID, node.ID) {
+					// use prefix matching
+					// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
+					// additional check is that the lengths match, or the next char in target is a '/'
+					if strings.HasPrefix(navigateToID, node.ID) && (len(navigateToID) == len(node.ID) || navigateToID[len(node.ID)] == '/') {
 						list.ChangeSelection(nodeIndex)
 						lastNavigatedNode = node
 						list.ExpandCurrentSelection()
