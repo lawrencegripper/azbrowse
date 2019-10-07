@@ -7,12 +7,13 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
+const pubSubCapcityPerTopic = 30
+
 // pubSub is the eventbus for the app
 // it is then wrapped in methods for use
-// to allow future changes
-// each `topic` on the bus can have 30 items waiting at
-// any time after which events are silently dropped
-var pubSub = pubsub.New(30)
+// to allow future changes.
+// NOTE: When capacity is reached events are silently dropped
+var pubSub = pubsub.New(pubSubCapcityPerTopic)
 
 // StatusEvent is used to show status information
 // in the statusbar
