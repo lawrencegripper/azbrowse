@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -135,7 +136,7 @@ func main() {
 
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing)
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions")
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
 
 	g.SetManager(status, content, list, notifications)
@@ -212,7 +213,19 @@ func main() {
 			armclient.PopulateResourceAPILookup(ctx)
 			status.Status("Done getting provider data", false)
 
-			list.SetSubscriptions(subRequest)
+			newList := []*handlers.TreeNode{}
+			for _, sub := range subRequest.Subs {
+				newList = append(newList, &handlers.TreeNode{
+					Display:        sub.DisplayName,
+					Name:           sub.DisplayName,
+					ID:             sub.ID,
+					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
+					ItemType:       handlers.SubscriptionType,
+					SubscriptionID: sub.SubscriptionID,
+				})
+			}
+		
+			list.SetNodes(newList)
 
 			if err != nil {
 				content.SetContent(err.Error(), "Error")

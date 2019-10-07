@@ -11,7 +11,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
-	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // ListWidget hosts the left panel showing resources and controls the navigation
@@ -34,8 +33,8 @@ type ListWidget struct {
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string) *ListWidget {
+	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, title: title}
 }
 
 // Layout draws the widget in the gocui view
@@ -114,34 +113,19 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 // SetNodes allows others to set the list nodes
 func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 	w.selected = 0
-	// Capture current view to navstack
-	w.navStack.Push(&Page{
-		Data:             w.contentView.GetContent(),
-		Value:            w.items,
-		Title:            w.title,
-		Selection:        w.selected,
-		ExpandedNodeItem: w.CurrentItem(),
-	})
-	w.items = nodes
-}
 
-// SetSubscriptions starts vaidation with the subs found
-func (w *ListWidget) SetSubscriptions(subs armclient.SubResponse) {
-	//Todo: Evaluate moving this to a handler
-	newList := []*handlers.TreeNode{}
-	for _, sub := range subs.Subs {
-		newList = append(newList, &handlers.TreeNode{
-			Display:        sub.DisplayName,
-			Name:           sub.DisplayName,
-			ID:             sub.ID,
-			ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-			ItemType:       handlers.SubscriptionType,
-			SubscriptionID: sub.SubscriptionID,
+	// Capture current view to navstack
+	if w.HasCurrentItem() {
+		w.navStack.Push(&Page{
+			Data:             w.contentView.GetContent(),
+			Value:            w.items,
+			Title:            w.title,
+			Selection:        w.selected,
+			ExpandedNodeItem: w.CurrentItem(),
 		})
 	}
 
-	w.title = "Subscriptions"
-	w.items = newList
+	w.items = nodes
 }
 
 // Refresh refreshes the current view
@@ -309,6 +293,11 @@ func (w *ListWidget) ChangeSelection(i int) {
 // CurrentSelection returns the current selection int
 func (w *ListWidget) CurrentSelection() int {
 	return w.selected
+}
+
+// HasCurrentItem indicates whether there is a current item
+func (w *ListWidget) HasCurrentItem() bool {
+	return w.selected < len(w.items)
 }
 
 // CurrentItem returns the selected item as a treenode
