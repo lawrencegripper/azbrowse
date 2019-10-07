@@ -280,6 +280,13 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 			Selection:        w.selected,
 			ExpandedNodeItem: w.CurrentItem(),
 		})
+
+		currentID := w.CurrentItem().ID
+		for _, node := range nodes {
+			if node.ID == currentID {
+				panic(fmt.Errorf("ids must be unique or the navigate command breaks"))
+			}
+		}
 	}
 
 	w.items = nodes
