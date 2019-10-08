@@ -73,7 +73,8 @@ func (w *ListWidget) itemCount() int {
 	return len(w.filteredItems)
 }
 
-func (w *ListWidget) clearFilter() {
+// ClearFilter clears a filter if applied
+func (w *ListWidget) ClearFilter() {
 	w.filterString = ""
 }
 
@@ -185,14 +186,14 @@ func (w *ListWidget) Refresh() {
 	w.ChangeSelection(currentSelection)
 	w.statusView.Status("Done refreshing", false)
 
-	w.clearFilter()
+	w.ClearFilter()
 }
 
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
 	if w.filterString != "" {
 		// initial Back action is to clear filter, subsequent Back actions are normal
-		w.clearFilter()
+		w.ClearFilter()
 		return
 	}
 	previousPage := w.navStack.Pop()
@@ -215,7 +216,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	currentItem := w.CurrentItem()
-	w.clearFilter()
+	w.ClearFilter()
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		InProgress: true,
@@ -363,7 +364,7 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 	}
 
 	w.items = nodes
-	w.clearFilter()
+	w.ClearFilter()
 }
 
 // ChangeSelection updates the selected item
