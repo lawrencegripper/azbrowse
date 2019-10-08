@@ -147,6 +147,7 @@ func main() {
 
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorCyan
+	g.InputEsc = true
 
 	maxX, maxY := g.Size()
 	// Padding
@@ -159,12 +160,14 @@ func main() {
 
 	leftColumnWidth := 45
 
+	// Create the views used
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions")
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions", g)
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
+	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
 
-	g.SetManager(status, content, list, notifications)
+	g.SetManager(status, content, list, notifications, commandPanel)
 	g.SetCurrentView("listWidget")
 
 	var editModeEnabled bool
@@ -180,6 +183,9 @@ func main() {
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
+	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelFilterHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -198,6 +204,9 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
+	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
+
+	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
 	keybindings.AddHandler(keybindings.NewItemViewPageUpHandler(content))
 

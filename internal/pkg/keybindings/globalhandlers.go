@@ -134,7 +134,7 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		// If we're up and running clear and redraw the view
 		// if w.g != nil {
 		if *h.ShowHelp {
-			v, err := g.SetView("helppopup", 1, 1, 145, 40)
+			v, err := g.SetView("helppopup", 1, 1, 145, 45)
 			g.SetCurrentView("helppopup")
 			if err != nil && err != gocui.ErrUnknownView {
 				panic(err)
@@ -191,6 +191,52 @@ func NewClearPendingDeleteHandler(notificationWidget *views.NotificationWidget) 
 func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		h.notificationWidget.ClearPendingDeletes()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type OpenCommandPanelHandler struct {
+	GlobalHandler
+	commandPanelWidget *views.CommandPanelWidget
+}
+
+func NewOpenCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *OpenCommandPanelHandler {
+	handler := &OpenCommandPanelHandler{
+		commandPanelWidget: commandPanelWidget,
+	}
+	handler.id = HandlerIDToggleOpenCommandPanel
+	return handler
+}
+
+func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.commandPanelWidget.ToggleShowHide()
+		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type CommandPanelFilterHandler struct {
+	GlobalHandler
+	commandPanelWidget *views.CommandPanelWidget
+}
+
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
+	handler := &CommandPanelFilterHandler{
+		commandPanelWidget: commandPanelWidget,
+	}
+	handler.id = HandlerIDFilter
+	return handler
+}
+
+func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.commandPanelWidget.ShowWithText("/")
 		return nil
 	}
 }

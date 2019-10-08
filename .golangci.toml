@@ -54,6 +54,9 @@
     path = "internal/pkg/keybindings/listhandlers.go"
     linters = ["golint"]
   [[issues.exclude-rules]]
+    path = "internal/pkg/keybindings/commandpanelhandlers.go"
+    linters = ["golint"]
+  [[issues.exclude-rules]]
     path = "internal/pkg/keybindings/itemhandlers.go"
     linters = ["golint"]
   [[issues.exclude-rules]]
