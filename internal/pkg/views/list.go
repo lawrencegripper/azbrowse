@@ -47,7 +47,7 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 
 			filteredItems := []*handlers.TreeNode{}
 			for _, item := range listWidget.items {
-				if strings.Contains(strings.ToLower(item.Name), listWidget.filterString) {
+				if strings.Contains(strings.ToLower(item.Display), listWidget.filterString) {
 					filteredItems = append(filteredItems, item)
 				}
 			}
@@ -105,6 +105,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		} else {
 			itemToShow = "  "
 		}
+
 		itemToShow = itemToShow + s.Display + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
