@@ -17,6 +17,7 @@ import (
 type ListWidget struct {
 	x, y  int
 	w, h  int
+	g     *gocui.Gui
 	items []*handlers.TreeNode
 
 	filteredItems []*handlers.TreeNode
@@ -37,8 +38,8 @@ type ListWidget struct {
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string) *ListWidget {
-	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, g *gocui.Gui) *ListWidget {
+	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, g: g}
 	go func() {
 		filterChannel := eventing.SubscribeToTopic("filter")
 		for {
@@ -55,6 +56,10 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 			listWidget.selected = 0
 			listWidget.filterString = filterString
 			listWidget.filteredItems = filteredItems
+
+			g.Update(func(gui *gocui.Gui) error {
+				return nil
+			})
 		}
 	}()
 	return listWidget

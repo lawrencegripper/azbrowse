@@ -163,7 +163,7 @@ func main() {
 	// Create the views used
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions")
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions", g)
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
 
