@@ -3,8 +3,8 @@ package views
 import (
 	"strings"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/stuartleeks/gocui"
 )
 
 // CommandPanelWidget controls the notifications windows in the top right
