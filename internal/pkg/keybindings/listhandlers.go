@@ -509,11 +509,7 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			termbox.Close()
 		}
 
-		err = openEditor(editorConfig.Command, editorTmpFile)
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
-			return nil
-		}
+		editorErr := openEditor(editorConfig.Command, editorTmpFile)
 		if editorConfig.RevertToStandardBuffer {
 			// Init termbox to switch back to alternate buffer and Flush content
 			err = termbox.Init()
@@ -524,6 +520,10 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			if err != nil {
 				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
 			}
+		}
+		if editorErr != nil {
+			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr), false)
+			return nil
 		}
 
 		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
