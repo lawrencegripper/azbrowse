@@ -21,10 +21,19 @@ type clusterCredentialsResponse struct {
 
 // kubeConfig is a minimal struct for parsing the parts of the response that we care about
 type kubeConfig struct {
+	Clusters []struct {
+		Name    string `yaml:"name"`
+		Cluster struct {
+			CertificateAuthorityData string `yaml:"certificate-authority-data"`
+			Server                   string `yaml:"server"`
+		} `yaml:"cluster"`
+	} `yaml: clusters`
 	Users []struct {
 		Name string `yaml:"name"`
 		User struct {
-			Token string `yaml:"token"`
+			ClientCertificateData string `yaml:"client-certificate-data"`
+			ClientKeyData         string `yaml:"client-key-data"`
+			Token                 string `yaml:"token"`
 		} `yaml:"user"`
 	} `yaml:"users"`
 }
@@ -100,7 +109,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 
 	clusterID := currentItem.Metadata["ClusterID"]
 
-	token, err := e.getClusterToken(ctx, clusterID)
+	kubeConfig, err := e.getClusterConfig(ctx, clusterID)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -109,33 +118,36 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 		}
 	}
 
+	// NOTE - at the time of writing the AKS API returns a single cluster/user
+	// so we're not fully parsing the config, just taking the first user and cluster
+
 	newItems := []*TreeNode{}
 	return ExpanderResult{
 		Err:               nil,
-		Response:          token,
+		Response:          kubeConfig.Clusters[0].Cluster.Server,
 		SourceDescription: "AzureKubernetesServiceExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
 	}
 }
 
-func (e *AzureKubernetesServiceExpander) getClusterToken(ctx context.Context, clusterID string) (string, error) {
+func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, clusterID string) (kubeConfig, error) {
 
-	data, err := armclient.DoRequest(ctx, "POST", clusterID+"/listClusterAdminCredential?api-version=2019-08-01")
+	data, err := armclient.DoRequest(ctx, "POST", clusterID+"/listClusterUserCredential?api-version=2019-08-01")
 	if err != nil {
-		return "", fmt.Errorf("Failed to get credentials: " + err.Error() + clusterID)
+		return kubeConfig{}, fmt.Errorf("Failed to get credentials: " + err.Error() + clusterID)
 	}
 
 	var response clusterCredentialsResponse
 	err = json.Unmarshal([]byte(data), &response)
 	if err != nil {
 		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, clusterID)
-		return "", err
+		return kubeConfig{}, err
 	}
 
 	if len(response.KubeConfigs) < 1 {
 		err = fmt.Errorf("Response has no KubeConfigs\nURL:%s", clusterID)
-		return "", err
+		return kubeConfig{}, err
 	}
 
 	configBase64 := response.KubeConfigs[0].Value
@@ -143,15 +155,15 @@ func (e *AzureKubernetesServiceExpander) getClusterToken(ctx context.Context, cl
 	config, err := base64.StdEncoding.DecodeString(configBase64)
 	if err != nil {
 		err = fmt.Errorf("Error decoding kubeconfig: %s\nURL:%s", err, clusterID)
-		return "", err
+		return kubeConfig{}, err
 	}
 
 	var kubeConfig kubeConfig
 	err = yaml.Unmarshal(config, &kubeConfig)
 	if err != nil {
 		err = fmt.Errorf("Error parsing kubeconfig: %s\nURL:%s", err, clusterID)
-		return "", err
+		return kubeConfig, err
 	}
 
-	return kubeConfig.Users[0].User.Token, nil
+	return kubeConfig, nil
 }
