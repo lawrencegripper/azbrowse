@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/stuartleeks/gocui"
 )
 
 func Test_Delete_AddPendingDelete(t *testing.T) {

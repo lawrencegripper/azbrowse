@@ -144,6 +144,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				Namespace:           "swagger",
 				Name:                name,
 				Display:             name,
+				ID:                  resource.ID,
 				ExpandURL:           resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
 				ItemType:            SubResourceType,
 				DeleteURL:           deleteURL,
@@ -169,6 +170,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		}
 		newItems = append(newItems, &TreeNode{
 			Parentid:            currentItem.ID,
+			ID:                  currentItem.ID + "/" + display,
 			Namespace:           "swagger",
 			Name:                display,
 			Display:             display,

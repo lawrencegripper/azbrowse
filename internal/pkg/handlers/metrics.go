@@ -94,6 +94,7 @@ func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderR
 			Metadata: map[string]string{
 				"SuppressSwaggerExpand": "true",
 				"SuppressGenericExpand": "true",
+				"ResourceID":            currentItem.ID,
 			},
 		})
 	}
@@ -129,9 +130,9 @@ func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) Expander
 		newItems = append(newItems, &TreeNode{
 			Name:     metric.Name.Value,
 			Display:  metric.Name.Value + "\n  " + style.Subtle("Unit: "+metric.Unit),
-			ID:       currentItem.ID + "/providers/microsoft.Insights/metrics",
+			ID:       currentItem.Metadata["ResourceID"] + "/providers/microsoft.Insights/metrics",
 			Parentid: currentItem.ID,
-			ExpandURL: currentItem.ID + "/providers/microsoft.Insights/metrics?timespan=" +
+			ExpandURL: currentItem.Metadata["ResourceID"] + "/providers/microsoft.Insights/metrics?timespan=" +
 				time.Now().UTC().Add(-4*time.Hour).Format("2006-01-02T15:04:05.000Z") + "/" +
 				time.Now().UTC().Format("2006-01-02T15:04:05.000Z") + "&interval=PT1M&metricnames=" +
 				url.QueryEscape(metric.Name.Value) + "&aggregation=" +
