@@ -180,6 +180,11 @@ func (w *ListWidget) Refresh() {
 
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
+	if (w.filterString != ""){
+		// initial Back action is to clear filter, subsequent Back actions are normal
+		w.clearFilter()
+		return
+	}
 	previousPage := w.navStack.Pop()
 	if previousPage == nil {
 		return
@@ -190,7 +195,6 @@ func (w *ListWidget) GoBack() {
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
-	w.clearFilter()
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
