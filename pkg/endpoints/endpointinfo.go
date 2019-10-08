@@ -58,6 +58,14 @@ func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo
 	}, nil
 }
 
+func MustGetEndpointInfoFromURL(url string, apiVersion string) *EndpointInfo {
+	endpoint, err := GetEndpointInfoFromURL(url, apiVersion)
+	if err != nil {
+		panic(err)
+	}
+	return &endpoint
+}
+
 // Match tests whether a URL matches the EndpointInfo (ignoring query string values)
 func (ei *EndpointInfo) Match(url string) MatchResult {
 

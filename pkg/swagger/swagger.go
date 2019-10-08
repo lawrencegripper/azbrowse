@@ -115,6 +115,38 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 	return paths
 }
 
+func ConvertToSwaggerResourceTypes(paths []*Path) []SwaggerResourceType {
+	resourceTypes := []SwaggerResourceType{}
+	for _, path := range paths {
+		resourceType := convertToSwaggerResourceType(path)
+		resourceTypes = append(resourceTypes, resourceType)
+	}
+	return resourceTypes
+}
+
+func convertToSwaggerResourceType(path *Path) SwaggerResourceType {
+	resourceType := SwaggerResourceType{
+		Display:      path.Name,
+		Endpoint:     endpoints.MustGetEndpointInfoFromURL(path.Operations.Get.Endpoint.TemplateURL, path.Operations.Get.Endpoint.APIVersion),
+		Children:     ConvertToSwaggerResourceTypes(path.Children),
+		SubResources: ConvertToSwaggerResourceTypes(path.SubPaths),
+	}
+	if path.Operations.Get.Verb != "" {
+		resourceType.Verb = path.Operations.Get.Verb
+	}
+	if path.Operations.Delete.Permitted {
+		resourceType.DeleteEndpoint = endpoints.MustGetEndpointInfoFromURL(path.Operations.Delete.Endpoint.TemplateURL, path.Operations.Delete.Endpoint.APIVersion)
+	}
+	if path.Operations.Patch.Permitted {
+		resourceType.PatchEndpoint = endpoints.MustGetEndpointInfoFromURL(path.Operations.Patch.Endpoint.TemplateURL, path.Operations.Patch.Endpoint.APIVersion)
+	}
+	if path.Operations.Put.Permitted {
+		resourceType.PutEndpoint = endpoints.MustGetEndpointInfoFromURL(path.Operations.Put.Endpoint.TemplateURL, path.Operations.Put.Endpoint.APIVersion)
+	}
+
+	return resourceType
+}
+
 func getSortedPaths(spec *analysis.Spec) []string {
 	paths := make([]string, len(spec.AllPaths()))
 	i := 0

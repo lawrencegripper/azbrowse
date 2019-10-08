@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
+	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -15,7 +15,7 @@ import (
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
 	initialized   bool
-	ResourceTypes []SwaggerResourceType
+	ResourceTypes []swagger.SwaggerResourceType
 }
 
 // Name returns the name of the expander
@@ -23,20 +23,12 @@ func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"
 }
 
-func mustGetEndpointInfoFromURL(url string, apiVersion string) *endpoints.EndpointInfo {
-	endpoint, err := endpoints.GetEndpointInfoFromURL(url, apiVersion)
-	if err != nil {
-		panic(err)
-	}
-	return &endpoint
-}
-
-func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []SwaggerResourceType) *SwaggerResourceType {
+func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []swagger.SwaggerResourceType) *swagger.SwaggerResourceType {
 	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
 	defer span.Finish()
 	return getResourceTypeForURLInner(url, resourceTypes)
 }
-func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType) *SwaggerResourceType {
+func getResourceTypeForURLInner(url string, resourceTypes []swagger.SwaggerResourceType) *swagger.SwaggerResourceType {
 	for _, resourceType := range resourceTypes {
 		matchResult := resourceType.Endpoint.Match(url)
 		if matchResult.IsMatch {
