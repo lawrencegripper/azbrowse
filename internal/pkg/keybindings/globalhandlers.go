@@ -134,7 +134,7 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		// If we're up and running clear and redraw the view
 		// if w.g != nil {
 		if *h.ShowHelp {
-			v, err := g.SetView("helppopup", 1, 1, 145, 40)
+			v, err := g.SetView("helppopup", 1, 1, 145, 45)
 			g.SetCurrentView("helppopup")
 			if err != nil && err != gocui.ErrUnknownView {
 				panic(err)

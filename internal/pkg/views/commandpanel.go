@@ -40,6 +40,7 @@ func (w *CommandPanelWidget) ToggleShowHide() {
 	}
 
 	// Show or hide
+	w.prepopulate = ""
 	w.visible = !w.visible
 }
 
