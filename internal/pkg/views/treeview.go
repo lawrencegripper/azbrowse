@@ -218,7 +218,11 @@ func (w *ListWidget) ExpandCurrentSelection() {
 				continue
 			}
 			// Add the items it found
-			newItems = append(newItems, done.Nodes...)
+			if done.IsPrimaryResponse {
+				newItems = append(done.Nodes, newItems...)
+			} else {
+				newItems = append(newItems, done.Nodes...)
+			}
 			span.Finish()
 		case <-timeout:
 			eventing.SendStatusEvent(eventing.StatusEvent{
