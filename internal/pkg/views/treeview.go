@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/stuartleeks/gocui"
 )
 
 // ListWidget hosts the left panel showing resources and controls the navigation

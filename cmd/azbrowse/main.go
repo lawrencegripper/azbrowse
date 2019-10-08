@@ -20,8 +20,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
-	"github.com/jroimartin/gocui"
 	opentracing "github.com/opentracing/opentracing-go"
+	"github.com/stuartleeks/gocui"
 )
 
 // Overridden via ldflags
@@ -193,7 +193,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
-	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content))
+	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content, g))
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))

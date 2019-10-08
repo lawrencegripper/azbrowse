@@ -10,14 +10,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/nsf/termbox-go"
 	"github.com/skratchdot/open-golang/open"
+	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////
@@ -410,14 +411,16 @@ type ListUpdateHandler struct {
 	status  *views.StatusbarWidget
 	Context context.Context
 	Content *views.ItemWidget
+	Gui     *gocui.Gui
 }
 
-func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidget, ctx context.Context, content *views.ItemWidget) *ListUpdateHandler {
+func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidget, ctx context.Context, content *views.ItemWidget, gui *gocui.Gui) *ListUpdateHandler {
 	handler := &ListUpdateHandler{
 		List:    list,
 		status:  statusbar,
 		Context: ctx,
 		Content: content,
+		Gui:     gui,
 	}
 	handler.id = HandlerIDListUpdate
 	return handler
@@ -432,13 +435,12 @@ func (h ListUpdateHandler) getEditorConfig() (config.EditorConfig, error) {
 		return userConfig.Editor, nil
 	}
 	// generate default config
-	translateFilePathForWSL := wsl.IsWSL() // If on WSL then translate path so that it is valid when loaded by VS code in Windows
 	return config.EditorConfig{
 		Command: config.CommandConfig{
 			Executable: "code",
 			Arguments:  []string{"--wait"},
 		},
-		TranslateFilePathForWSL: translateFilePathForWSL,
+		TranslateFilePathForWSL: false, // previously used wsl.IsWSL to determine whether to translate path, but VSCode  now performs translation from WSL (so we get a bad path if we have translated it)
 	}, nil
 }
 
@@ -501,9 +503,26 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 				return err
 			}
 		}
-		err = openEditor(editorConfig.Command, editorTmpFile)
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", err), false)
+
+		if editorConfig.RevertToStandardBuffer {
+			// Close termbox to revert to normal buffer
+			termbox.Close()
+		}
+
+		editorErr := openEditor(editorConfig.Command, editorTmpFile)
+		if editorConfig.RevertToStandardBuffer {
+			// Init termbox to switch back to alternate buffer and Flush content
+			err = termbox.Init()
+			if err != nil {
+				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+			}
+			err = h.Gui.Flush()
+			if err != nil {
+				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+			}
+		}
+		if editorErr != nil {
+			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr), false)
 			return nil
 		}
 

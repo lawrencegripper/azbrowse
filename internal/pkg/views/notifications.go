@@ -11,8 +11,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/stuartleeks/gocui"
 )
 
 type pendingDelete struct {

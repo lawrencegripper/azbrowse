@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jroimartin/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
+	"github.com/stuartleeks/gocui"
 )
 
 // StatusbarWidget controls the statusbar
