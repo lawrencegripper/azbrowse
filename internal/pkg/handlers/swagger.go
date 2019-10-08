@@ -18,18 +18,6 @@ type SwaggerResourceExpander struct {
 	ResourceTypes []SwaggerResourceType
 }
 
-// SwaggerResourceType holds information about resources that can be displayed
-type SwaggerResourceType struct {
-	Display        string
-	Endpoint       *endpoints.EndpointInfo
-	Verb           string
-	DeleteEndpoint *endpoints.EndpointInfo
-	PatchEndpoint  *endpoints.EndpointInfo
-	PutEndpoint    *endpoints.EndpointInfo
-	Children       []SwaggerResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
-	SubResources   []SwaggerResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
-}
-
 // Name returns the name of the expander
 func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"

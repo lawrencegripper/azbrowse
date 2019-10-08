@@ -12,6 +12,10 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	// "github.com/go-openapi/analysis"
+	"github.com/go-openapi/loads"
+	// "github.com/go-openapi/spec"
+
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
@@ -186,7 +190,8 @@ func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig ku
 		Transport: transport,
 	}
 
-	url := kubeConfig.Clusters[0].Cluster.Server + "/api/v1/nodes"
+	// url := kubeConfig.Clusters[0].Cluster.Server + "/api/v1/nodes"
+	url := kubeConfig.Clusters[0].Cluster.Server + "/openapi/v2"
 	response, err := httpClient.Get(url)
 	if err != nil {
 		return "", err
@@ -197,6 +202,13 @@ func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig ku
 	if err != nil {
 		return "", err
 	}
+
+	spec := json.RawMessage(buf)
+	doc, err := loads.Analyzed(spec, "")
+	if err != nil {
+		return "", err
+	}
+	_ = doc
 
 	return string(buf), nil
 }
