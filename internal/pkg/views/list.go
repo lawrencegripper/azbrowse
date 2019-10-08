@@ -48,7 +48,7 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 
 			filteredItems := []*handlers.TreeNode{}
 			for _, item := range listWidget.items {
-				if strings.Contains(strings.ToLower(item.Display), listWidget.filterString) {
+				if strings.Contains(strings.ToLower(item.Display), filterString) {
 					filteredItems = append(filteredItems, item)
 				}
 			}
