@@ -71,7 +71,7 @@ func DrawHelp(keyBindings map[string][]string, v *gocui.View) {
 	buf := new(bytes.Buffer)
 	err = tmpl.Execute(buf, keyBindings)
 	if err != nil {
-		panic("Failed to parse help template. This is a Bug please raise an issue on GH. " + err.Error())
+		panic("Failed to execute help template. This is a Bug please raise an issue on GH. " + err.Error())
 	}
 
 	view := buf.String()
