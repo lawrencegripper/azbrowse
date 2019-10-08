@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"context"
+	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"gopkg.in/yaml.v2"
@@ -121,14 +123,82 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 	// NOTE - at the time of writing the AKS API returns a single cluster/user
 	// so we're not fully parsing the config, just taking the first user and cluster
 
+	result, err := e.test(ctx, kubeConfig)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			Response:          "Error!",
+			SourceDescription: "AzureKubernetesServiceExpander request",
+		}
+	}
+
 	newItems := []*TreeNode{}
 	return ExpanderResult{
 		Err:               nil,
-		Response:          kubeConfig.Clusters[0].Cluster.Server,
+		Response:          result,
 		SourceDescription: "AzureKubernetesServiceExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
 	}
+}
+
+func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig kubeConfig) (string, error) {
+
+	clientCertificate, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientCertificateData)
+	if err != nil {
+		err = fmt.Errorf("Error decoding client certificate data: %s", err)
+		return "", err
+	}
+	clientKey, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientKeyData)
+	if err != nil {
+		err = fmt.Errorf("Error decoding client key data: %s", err)
+		return "", err
+	}
+
+	cert, err := tls.X509KeyPair(clientCertificate, clientKey)
+	if err != nil {
+		return "", err
+	}
+
+	// TODO - try below (see https://github.com/golang/go/issues/34258)
+	// cfg := &tls.Config{
+	// 	Certificates:       []tls.Certificate{cert},
+	// 	InsecureSkipVerify: true,
+	// }
+
+	// certPool, err := x509.SystemCertPool()
+	//   if err != nil {
+	//       panic(err)
+	//   }
+	//   certPool.AppendCertsFromPEM(caBytes)
+
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			GetClientCertificate: func(req *tls.CertificateRequestInfo) (*tls.Certificate, error) {
+				return &cert, nil
+			},
+			InsecureSkipVerify: true, // TODO - try adding RootCAs to see if we can avoid this
+			// RootCAs: caCerts,
+		},
+	}
+
+	httpClient := http.Client{
+		Transport: transport,
+	}
+
+	url := kubeConfig.Clusters[0].Cluster.Server + "/api/v1/nodes"
+	response, err := httpClient.Get(url)
+	if err != nil {
+		return "", err
+	}
+
+	defer response.Body.Close() //nolint: errcheck
+	buf, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(buf), nil
 }
 
 func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, clusterID string) (kubeConfig, error) {
