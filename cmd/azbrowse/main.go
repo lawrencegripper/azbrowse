@@ -15,7 +15,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/search"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -50,26 +49,6 @@ func main() {
 			fmt.Println(date)
 			fmt.Println(goversion)
 			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
-			os.Exit(0)
-		}
-
-		if strings.Contains(arg, "search") {
-			fmt.Print("Getting resources \n")
-			subRequest, _, err := getSubscriptions(context.Background())
-			if err != nil {
-				panic(err)
-			}
-			err = search.CrawlResources(context.Background(), subRequest)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Print("Build suggester \n")
-
-			suggester, _ := search.NewSuggester()
-			fmt.Print("Get suggestions \n")
-
-			suggestions := suggester.Autocomplete(args[1])
-			fmt.Printf("%v \n", suggestions)
 			os.Exit(0)
 		}
 
