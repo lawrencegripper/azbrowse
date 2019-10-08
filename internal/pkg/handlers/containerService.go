@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -154,31 +155,30 @@ func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig ku
 		err = fmt.Errorf("Error decoding client key data: %s", err)
 		return "", err
 	}
+	certificateAuthority, err := base64.StdEncoding.DecodeString(kubeConfig.Clusters[0].Cluster.CertificateAuthorityData)
+	if err != nil {
+		err = fmt.Errorf("Error decoding certificate authority data: %s", err)
+		return "", err
+	}
+	_ = certificateAuthority
 
 	cert, err := tls.X509KeyPair(clientCertificate, clientKey)
 	if err != nil {
 		return "", err
 	}
 
-	// TODO - try below (see https://github.com/golang/go/issues/34258)
-	// cfg := &tls.Config{
-	// 	Certificates:       []tls.Certificate{cert},
-	// 	InsecureSkipVerify: true,
-	// }
+	caCerts, err := x509.SystemCertPool()
+	if err != nil {
+		err = fmt.Errorf("Error creating certpool: %s", err)
+		return "", err
 
-	// certPool, err := x509.SystemCertPool()
-	//   if err != nil {
-	//       panic(err)
-	//   }
-	//   certPool.AppendCertsFromPEM(caBytes)
+	}
+	caCerts.AppendCertsFromPEM(certificateAuthority)
 
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{
-			GetClientCertificate: func(req *tls.CertificateRequestInfo) (*tls.Certificate, error) {
-				return &cert, nil
-			},
-			InsecureSkipVerify: true, // TODO - try adding RootCAs to see if we can avoid this
-			// RootCAs: caCerts,
+			Certificates: []tls.Certificate{cert},
+			RootCAs:      caCerts,
 		},
 	}
 
