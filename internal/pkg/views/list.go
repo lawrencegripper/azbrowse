@@ -52,9 +52,9 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 				}
 			}
 
-			listWidget.filteredItems = filteredItems
 			listWidget.selected = 0
 			listWidget.filterString = filterString
+			listWidget.filteredItems = filteredItems
 		}
 	}()
 	return listWidget
@@ -80,6 +80,16 @@ func (w *ListWidget) itemsToShow() []*handlers.TreeNode {
 	return w.filteredItems
 }
 
+func highlightText(displayText string, highlight string) string {
+	if highlight==""{
+		return displayText
+	}
+	index := strings.Index(strings.ToLower(displayText), highlight)
+	if index < 0 {
+		return displayText
+	}
+	return displayText[:index] +  style.Highlight(displayText[index:index+len(highlight)]) + displayText[index+len(highlight):]
+}
 // Layout draws the widget in the gocui view
 func (w *ListWidget) Layout(g *gocui.Gui) error {
 	v, err := g.SetView("listWidget", w.x, w.y, w.x+w.w, w.y+w.h)
@@ -106,7 +116,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 			itemToShow = "  "
 		}
 
-		itemToShow = itemToShow + s.Display + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
+		itemToShow = itemToShow + highlightText(s.Display, w.filterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
 		renderedItems = append(renderedItems, itemToShow)
