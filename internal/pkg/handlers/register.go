@@ -16,4 +16,5 @@ var Register = []Expander{
 	NewContainerRegistryExpander(),       // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 	&ContainerInstanceExpander{},
 	&AppInsightsExpander{},
+	&AzureKubernetesServiceExpander{},
 }
