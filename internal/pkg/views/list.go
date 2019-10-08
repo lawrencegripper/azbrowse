@@ -155,12 +155,16 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 
 	// If the title is getting too long trim things
 	// down from the front
-	if len(w.title) > w.w {
-		trimLength := len(w.title) - w.w + 5 // Add five for spacing and elipsis
-		w.title = ".." + w.title[trimLength:]
+	title := w.title
+	if w.filterString != "" {
+		title += "[filter=" + w.filterString + "]"
+	}
+	if len(title) > w.w {
+		trimLength := len(title) - w.w + 5 // Add five for spacing and elipsis
+		title = ".." + title[trimLength:]
 	}
 
-	w.view.Title = w.title
+	w.view.Title = title
 
 	return nil
 }
