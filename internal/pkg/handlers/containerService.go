@@ -153,48 +153,52 @@ func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig ku
 		return "", err
 	}
 
-	url := kubeConfig.Clusters[0].Cluster.Server + "/openapi/v2"
-	response, err := httpClient.Get(url)
+	serverUrl := kubeConfig.Clusters[0].Cluster.Server
+
+	swaggerResourceTypes, err := e.getSwaggerResourceTypes(*httpClient, serverUrl)
 	if err != nil {
 		return "", err
 	}
-
-	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return "", err
-	}
-
-	spec := json.RawMessage(buf)
-	doc, err := loads.Analyzed(spec, "")
-	if err != nil {
-		return "", err
-	}
-
-	_ = doc
-
-	config := swagger.Config{}
-	var paths []*swagger.Path
-	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc)
-	if err != nil {
-		return "", err
-	}
-
-	swaggerResourceTypes := swagger.ConvertToSwaggerResourceTypes(paths)
 
 	result := ""
 	for _, resourceType := range swaggerResourceTypes {
 		result += fmt.Sprintf("\nResource: %s, %s", resourceType.Display, resourceType.Endpoint.TemplateURL)
 	}
 	return result, nil
+}
 
-	// result := ""
-	// for _, path := range paths {
-	// 	result += fmt.Sprintf("\nPath: %s, %s", path.Name, path.Endpoint)
-	// }
-	// return result, nil
+func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http.Client, serverUrl string) ([]swagger.SwaggerResourceType, error) {
 
-	// return string(buf), nil
+	var swaggerResourceTypes []swagger.SwaggerResourceType
+
+	url := serverUrl + "/openapi/v2"
+
+	response, err := httpClient.Get(url)
+	if err != nil {
+		return swaggerResourceTypes, err
+	}
+
+	defer response.Body.Close() //nolint: errcheck
+	buf, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return swaggerResourceTypes, err
+	}
+
+	spec := json.RawMessage(buf)
+	doc, err := loads.Analyzed(spec, "")
+	if err != nil {
+		return swaggerResourceTypes, err
+	}
+
+	config := swagger.Config{}
+	var paths []*swagger.Path
+	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc)
+	if err != nil {
+		return swaggerResourceTypes, err
+	}
+
+	swaggerResourceTypes = swagger.ConvertToSwaggerResourceTypes(paths)
+	return swaggerResourceTypes, nil
 }
 
 func (e *AzureKubernetesServiceExpander) getHttpClientFromConfig(kubeConfig kubeConfig) (*http.Client, error) {
