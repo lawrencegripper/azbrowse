@@ -12,11 +12,10 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	// "github.com/go-openapi/analysis"
 	"github.com/go-openapi/loads"
-	// "github.com/go-openapi/spec"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
 type clusterCredentialsResponse struct {
@@ -171,9 +170,31 @@ func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig ku
 	if err != nil {
 		return "", err
 	}
+
 	_ = doc
 
-	return string(buf), nil
+	config := swagger.Config{}
+	var paths []*swagger.Path
+	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc)
+	if err != nil {
+		return "", err
+	}
+
+	swaggerResourceTypes := swagger.ConvertToSwaggerResourceTypes(paths)
+
+	result := ""
+	for _, resourceType := range swaggerResourceTypes {
+		result += fmt.Sprintf("\nResource: %s, %s", resourceType.Display, resourceType.Endpoint.TemplateURL)
+	}
+	return result, nil
+
+	// result := ""
+	// for _, path := range paths {
+	// 	result += fmt.Sprintf("\nPath: %s, %s", path.Name, path.Endpoint)
+	// }
+	// return result, nil
+
+	// return string(buf), nil
 }
 
 func (e *AzureKubernetesServiceExpander) getHttpClientFromConfig(kubeConfig kubeConfig) (*http.Client, error) {

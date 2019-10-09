@@ -11,7 +11,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
-func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path {
+func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) ([]*Path, error) {
 	swaggerVersion := doc.Spec().Info.Version
 	spec := doc.Analyzer
 	allPaths := spec.AllPaths()
@@ -25,7 +25,8 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 		}
 		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, swaggerVersion) // logical path
 		if err != nil {
-			panic(err) // TODO - return error
+			empty := []*Path{}
+			return empty, err
 		}
 		lastSegment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
 		name := lastSegment.Match
@@ -42,7 +43,11 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 			getVerb = "get"
 		}
 		pathItem := allPaths[swaggerPath]
-		getOperation := getOperationByVerb(&pathItem, getVerb)
+		getOperation, err := getOperationByVerb(&pathItem, getVerb)
+		if err != nil {
+			empty := []*Path{}
+			return empty, err
+		}
 		if getOperation != nil {
 			path.Operations.Get.Permitted = true
 			if getVerb != "get" {
@@ -53,7 +58,8 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 			} else {
 				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
 				if err != nil {
-					panic(err)
+					empty := []*Path{}
+					return empty, err
 				}
 				path.Operations.Get.Endpoint = &overriddenEndpoint
 			}
@@ -112,14 +118,16 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) []*Path
 			}
 		}
 	}
-	return paths
+	return paths, nil
 }
 
 func ConvertToSwaggerResourceTypes(paths []*Path) []SwaggerResourceType {
 	resourceTypes := []SwaggerResourceType{}
 	for _, path := range paths {
-		resourceType := convertToSwaggerResourceType(path)
-		resourceTypes = append(resourceTypes, resourceType)
+		if path.Operations.Get.Endpoint != nil { // ignore endpoints without a GET
+			resourceType := convertToSwaggerResourceType(path)
+			resourceTypes = append(resourceTypes, resourceType)
+		}
 	}
 	return resourceTypes
 }
@@ -158,24 +166,24 @@ func getSortedPaths(spec *analysis.Spec) []string {
 	return paths
 }
 
-func getOperationByVerb(pathItem *spec.PathItem, verb string) *spec.Operation {
+func getOperationByVerb(pathItem *spec.PathItem, verb string) (*spec.Operation, error) {
 	switch strings.ToLower(verb) {
 	case "get":
-		return pathItem.Get
+		return pathItem.Get, nil
 	case "delete":
-		return pathItem.Delete
+		return pathItem.Delete, nil
 	case "head":
-		return pathItem.Head
+		return pathItem.Head, nil
 	case "options":
-		return pathItem.Options
+		return pathItem.Options, nil
 	case "patch":
-		return pathItem.Patch
+		return pathItem.Patch, nil
 	case "post":
-		return pathItem.Post
+		return pathItem.Post, nil
 	case "put":
-		return pathItem.Put
+		return pathItem.Put, nil
 	default:
-		panic(fmt.Errorf("Unhandled verb: %s", verb))
+		return nil, fmt.Errorf("Unhandled verb: %s", verb)
 	}
 }
 
