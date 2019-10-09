@@ -149,48 +149,11 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 
 func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig kubeConfig) (string, error) {
 
-	clientCertificate, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientCertificateData)
-	if err != nil {
-		err = fmt.Errorf("Error decoding client certificate data: %s", err)
-		return "", err
-	}
-	clientKey, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientKeyData)
-	if err != nil {
-		err = fmt.Errorf("Error decoding client key data: %s", err)
-		return "", err
-	}
-	certificateAuthority, err := base64.StdEncoding.DecodeString(kubeConfig.Clusters[0].Cluster.CertificateAuthorityData)
-	if err != nil {
-		err = fmt.Errorf("Error decoding certificate authority data: %s", err)
-		return "", err
-	}
-	_ = certificateAuthority
-
-	cert, err := tls.X509KeyPair(clientCertificate, clientKey)
+	httpClient, err := e.getHttpClientFromConfig(kubeConfig)
 	if err != nil {
 		return "", err
 	}
 
-	caCerts, err := x509.SystemCertPool()
-	if err != nil {
-		err = fmt.Errorf("Error creating certpool: %s", err)
-		return "", err
-
-	}
-	caCerts.AppendCertsFromPEM(certificateAuthority)
-
-	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			Certificates: []tls.Certificate{cert},
-			RootCAs:      caCerts,
-		},
-	}
-
-	httpClient := http.Client{
-		Transport: transport,
-	}
-
-	// url := kubeConfig.Clusters[0].Cluster.Server + "/api/v1/nodes"
 	url := kubeConfig.Clusters[0].Cluster.Server + "/openapi/v2"
 	response, err := httpClient.Get(url)
 	if err != nil {
@@ -211,6 +174,53 @@ func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig ku
 	_ = doc
 
 	return string(buf), nil
+}
+
+func (e *AzureKubernetesServiceExpander) getHttpClientFromConfig(kubeConfig kubeConfig) (*http.Client, error) {
+
+	clientCertificate, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientCertificateData)
+	if err != nil {
+		err = fmt.Errorf("Error decoding client certificate data: %s", err)
+		return nil, err
+	}
+	clientKey, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientKeyData)
+	if err != nil {
+		err = fmt.Errorf("Error decoding client key data: %s", err)
+		return nil, err
+	}
+	certificateAuthority, err := base64.StdEncoding.DecodeString(kubeConfig.Clusters[0].Cluster.CertificateAuthorityData)
+	if err != nil {
+		err = fmt.Errorf("Error decoding certificate authority data: %s", err)
+		return nil, err
+	}
+	_ = certificateAuthority
+
+	cert, err := tls.X509KeyPair(clientCertificate, clientKey)
+	if err != nil {
+		return nil, err
+	}
+
+	caCerts, err := x509.SystemCertPool()
+	if err != nil {
+		err = fmt.Errorf("Error creating certpool: %s", err)
+		return nil, err
+
+	}
+	caCerts.AppendCertsFromPEM(certificateAuthority)
+
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			RootCAs:      caCerts,
+		},
+	}
+
+	httpClient := http.Client{
+		Transport: transport,
+	}
+
+	return &httpClient, nil
+
 }
 
 func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, clusterID string) (kubeConfig, error) {
