@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io/ioutil"
@@ -39,7 +40,12 @@ func (c SwaggerConfigContainerService) GetResourceTypes() []swagger.SwaggerResou
 
 func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.SwaggerResourceType) (ConfigExpandResponse, error) {
 
-	response, err := c.httpClient.Get(c.serverUrl + currentItem.ExpandURL)
+	url := c.serverUrl + currentItem.ExpandURL
+	request, err := http.NewRequest("GET", url, bytes.NewReader([]byte("")))
+
+	request.Header.Set("Accept", "application/yaml")
+
+	response, err := c.httpClient.Do(request)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
 		return ConfigExpandResponse{}, err
