@@ -100,7 +100,7 @@ func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, curre
 				}
 			}
 			subResource := SubResource{
-				ID:           item.Metadata.SelfLink,
+				ID:           c.clusterID + item.Metadata.SelfLink,
 				Name:         name,
 				ResourceType: *subResourceType,
 				ExpandURL:    item.Metadata.SelfLink,
