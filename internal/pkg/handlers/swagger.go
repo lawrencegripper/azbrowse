@@ -12,10 +12,29 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// SwaggerConfig represents the configuration for a set of swagger resources that the SwaggerResourceExpander can handle
+type SwaggerConfig interface {
+	ID() string
+	GetResourceTypes() []swagger.SwaggerResourceType
+	AppliesToNode(node *TreeNode) bool
+}
+
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
-	initialized   bool
-	ResourceTypes []swagger.SwaggerResourceType
+	configs map[string]*SwaggerConfig
+}
+
+func NewSwaggerResourcesExpander() *SwaggerResourceExpander {
+	return &SwaggerResourceExpander{
+		configs: map[string]*SwaggerConfig{},
+	}
+}
+
+func (e *SwaggerResourceExpander) AddConfig(config SwaggerConfig) {
+	e.configs[config.ID()] = &config
+}
+func (e *SwaggerResourceExpander) getConfig(id string) *SwaggerConfig {
+	return e.configs[id]
 }
 
 // Name returns the name of the expander
@@ -44,28 +63,42 @@ func getResourceTypeForURLInner(url string, resourceTypes []swagger.SwaggerResou
 	return nil
 }
 
-func (e *SwaggerResourceExpander) ensureInitialized() {
-	if !e.initialized {
-		e.ResourceTypes = e.getResourceTypes()
-		e.initialized = true
+func (e *SwaggerResourceExpander) getConfigForItem(currentItem *TreeNode) *SwaggerConfig {
+
+	if currentItem.Metadata == nil {
+		currentItem.Metadata = make(map[string]string)
 	}
+	if configID := currentItem.Metadata["SwaggerConfigID"]; configID != "" {
+		return e.getConfig(configID)
+	}
+	for _, configPtr := range e.configs {
+		config := *configPtr
+		if config.AppliesToNode(currentItem) {
+			currentItem.Metadata["SwaggerConfigID"] = config.ID()
+			return configPtr
+		}
+	}
+	return nil
 }
 
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	e.ensureInitialized()
 	if currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
 		return false, nil
 	}
-	if currentItem.ItemType == ResourceType || currentItem.ItemType == SubResourceType {
-		if currentItem.SwaggerResourceType != nil {
-			return true, nil
-		}
-		resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, e.ResourceTypes)
-		if resourceType != nil {
-			currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
-			return true, nil
-		}
+	configPtr := e.getConfigForItem(currentItem)
+	if configPtr == nil {
+		return false, nil
+	}
+	config := *configPtr
+
+	if currentItem.SwaggerResourceType != nil {
+		return true, nil
+	}
+	resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, config.GetResourceTypes())
+	if resourceType != nil {
+		currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
+		return true, nil
 	}
 
 	return false, nil
@@ -168,7 +201,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	}
 }
 
-// substituteValues applys a value map to strings such as "Name: {name}"
+// substituteValues applies a value map to strings such as "Name: {name}"
 func substituteValues(fmtString string, values map[string]string) string {
 	for name, value := range values {
 		fmtString = strings.Replace(fmtString, "{"+name+"}", value, -1)

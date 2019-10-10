@@ -26,7 +26,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"	
 )
 
-func (e *swagger.SwaggerResourceExpander) getResourceTypes() []swagger.SwaggerResourceType {
+func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourceType {
 	return  {{template "PathList" .Paths }}
 
 }

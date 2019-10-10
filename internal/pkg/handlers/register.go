@@ -1,5 +1,15 @@
 package handlers
 
+var swaggerResourceExpander *SwaggerResourceExpander
+
+func GetSwaggerResourceExpander() *SwaggerResourceExpander {
+	if swaggerResourceExpander == nil {
+		swaggerResourceExpander = NewSwaggerResourcesExpander()
+		swaggerResourceExpander.AddConfig(NewSwaggerConfigARMResources())
+	}
+	return swaggerResourceExpander
+}
+
 // Register tracks all the current handlers
 // add new handlers to the array to augment the
 // processing of items in the
@@ -8,7 +18,7 @@ var Register = []Expander{
 	&SubscriptionExpander{},
 	&ActionExpander{},
 	&MetricsExpander{},
-	&SwaggerResourceExpander{},
+	GetSwaggerResourceExpander(),
 	&DeploymentsExpander{},
 	&ActivityLogExpander{},
 	&JSONExpander{},

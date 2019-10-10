@@ -5,7 +5,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
-func (e *SwaggerResourceExpander) getResourceTypes() []swagger.SwaggerResourceType {
+func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourceType {
 	return []swagger.SwaggerResourceType{
 		{
 			Display:  "addsservices",
