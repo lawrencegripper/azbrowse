@@ -2,6 +2,7 @@ package swagger
 
 import (
 	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -155,14 +156,38 @@ func convertToSwaggerResourceType(path *Path) SwaggerResourceType {
 	return resourceType
 }
 
+type PathAndCondensedPath struct {
+	Path          string
+	CondensedPath string
+}
+type PathAndCondensedPathList []PathAndCondensedPath
+
+func (a PathAndCondensedPathList) Len() int { return len(a) }
+func (a PathAndCondensedPathList) Less(i, j int) bool {
+	return strings.Compare(a[i].CondensedPath, a[j].CondensedPath) < 0
+}
+func (a PathAndCondensedPathList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
 func getSortedPaths(spec *analysis.Spec) []string {
-	paths := make([]string, len(spec.AllPaths()))
+	// Sort ignoring names of captured sections (e.g. wibble in `/foo/{wibble}/bar`)
+
+	r, _ := regexp.Compile("\\{[^}]*}") // TODO - handle error
+
+	pathPairs := make([]PathAndCondensedPath, len(spec.AllPaths()))
 	i := 0
 	for key := range spec.AllPaths() {
-		paths[i] = key
+		pathPairs[i] = PathAndCondensedPath{
+			Path:          key,
+			CondensedPath: r.ReplaceAllString(key, "{}"),
+		}
 		i++
 	}
-	sort.Strings(paths)
+	sort.Sort(PathAndCondensedPathList(pathPairs))
+
+	paths := make([]string, len(pathPairs))
+	for i, pair := range pathPairs {
+		paths[i] = pair.Path
+	}
 	return paths
 }
 
