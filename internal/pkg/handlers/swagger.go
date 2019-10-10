@@ -158,7 +158,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				Name:                subResource.Name,
 				Display:             subResource.Name,
 				ID:                  subResource.ID,
-				ExpandURL:           subResource.ID + "?api-version=" + subResource.ResourceType.Endpoint.APIVersion,
+				ExpandURL:           subResource.ExpandURL,
 				ItemType:            SubResourceType,
 				DeleteURL:           subResource.DeleteURL,
 				SwaggerResourceType: &subResource.ResourceType,
@@ -177,14 +177,25 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		url, err := child.Endpoint.BuildURL(templateValues)
 		if err != nil {
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
-			panic(err)
+			return ExpanderResult{
+				Nodes:             nil,
+				Response:          expandResult.Response,
+				Err:               err,
+				SourceDescription: "SwaggerResourceExpander",
+			}
 		}
 		display := substituteValues(child.Display, templateValues)
 		deleteURL := ""
 		if child.DeleteEndpoint != nil {
 			deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
 			if err != nil {
-				panic(fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err))
+				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
+				return ExpanderResult{
+					Nodes:             nil,
+					Response:          expandResult.Response,
+					Err:               err,
+					SourceDescription: "SwaggerResourceExpander",
+				}
 			}
 		}
 		newItems = append(newItems, &TreeNode{
