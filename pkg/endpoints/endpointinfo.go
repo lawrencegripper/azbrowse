@@ -33,6 +33,7 @@ func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo
 	// This is currently generating at runtime, but would be a build-time task that generated code :-)
 	originalTemplateURL := templateURL
 	templateURL = strings.TrimPrefix(templateURL, "/")
+	templateURL = strings.TrimSuffix(templateURL, "/")
 	templateURLSegments := strings.Split(templateURL, "/")
 	urlSegments := make([]EndpointSegment, len(templateURLSegments))
 	for i, s := range templateURLSegments {
