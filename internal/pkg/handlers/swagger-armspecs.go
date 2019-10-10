@@ -22,6 +22,9 @@ func NewSwaggerConfigARMResources() SwaggerConfigARMResources {
 func (c SwaggerConfigARMResources) ID() string {
 	return "ARM_RESOURCES_FROM_SPECS"
 }
+func (c SwaggerConfigARMResources) MatchChildNodesByName() bool {
+	return true
+}
 func (c SwaggerConfigARMResources) AppliesToNode(node *TreeNode) bool {
 	// this function is only called for nodes that don't have the SwaggerConfigID set
 

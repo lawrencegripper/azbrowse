@@ -54,7 +54,7 @@ func main() {
 						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
 							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
 							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
-							paths, err = swagger.MergeSwaggerDoc(paths, &config, doc)
+							paths, err = swagger.MergeSwaggerDoc(paths, &config, doc, true)
 							if err != nil {
 								panic(err)
 							}

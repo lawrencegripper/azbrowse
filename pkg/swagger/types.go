@@ -21,11 +21,12 @@ type SwaggerResourceType struct {
 
 // Path represents a path that we want to consider emitting in code-gen. It is derived from
 type Path struct {
-	Name       string
-	Endpoint   *endpoints.EndpointInfo // The logical endpoint. May be overridden for an operation
-	Operations PathOperations
-	Children   []*Path
-	SubPaths   []*Path
+	Name                  string
+	CondensedEndpointPath string
+	Endpoint              *endpoints.EndpointInfo // The logical endpoint. May be overridden for an operation
+	Operations            PathOperations
+	Children              []*Path
+	SubPaths              []*Path
 }
 
 // PathOperations gives details on the operations for a resource

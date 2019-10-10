@@ -126,3 +126,38 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 	}
 	return url, nil
 }
+
+func (ei *EndpointInfo) GenerateValueArrayFromMap(templateValues map[string]string) []string {
+	valueArray := make([]string, len(templateValues))
+	valueArrayIndex := 0
+	for _, segment := range ei.URLSegments {
+		if segment.Name != "" {
+			valueArray[valueArrayIndex] = templateValues[segment.Name]
+			valueArrayIndex++
+		}
+	}
+	return valueArray
+}
+
+// BuildURLFromArray generates a URL based on the templateURL filling in placeholders with the values array by index
+func (ei *EndpointInfo) BuildURLFromArray(values []string) (string, error) {
+
+	url := ""
+	valueIndex := 0
+	for _, segment := range ei.URLSegments {
+		if segment.Match == "" {
+			if valueIndex >= len(values) {
+				return "", fmt.Errorf("Too few values")
+			}
+			value := values[valueIndex] // TODO - check array bounds!
+			url += "/" + value
+			valueIndex++
+		} else {
+			url += "/" + segment.Match
+		}
+	}
+	if ei.APIVersion != "" {
+		url += "?api-version=" + ei.APIVersion
+	}
+	return url, nil
+}

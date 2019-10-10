@@ -208,10 +208,19 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 
 	config := swagger.Config{}
 	var paths []*swagger.Path
-	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc)
+	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc, false)
 	if err != nil {
 		return swaggerResourceTypes, err
 	}
+
+	// tempBuf, err := json.Marshal(paths)
+	// ioutil.WriteFile("/tmp/k8s-paths.json", tempBuf, 0644)
+	tempBuf, err := yaml.Marshal(paths)
+	ioutil.WriteFile("/tmp/k8s-paths.yml", tempBuf, 0644)
+	if err != nil {
+		return swaggerResourceTypes, err
+	}
+	_ = err
 
 	swaggerResourceTypes = swagger.ConvertToSwaggerResourceTypes(paths)
 	return swaggerResourceTypes, nil

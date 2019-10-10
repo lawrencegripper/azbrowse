@@ -42,6 +42,9 @@ func NewSwaggerConfigContainerService(resourceTypes []swagger.SwaggerResourceTyp
 func (c SwaggerConfigContainerService) ID() string {
 	return c.clusterID
 }
+func (c SwaggerConfigContainerService) MatchChildNodesByName() bool {
+	return false
+}
 func (c SwaggerConfigContainerService) AppliesToNode(node *TreeNode) bool {
 	// this function is only called for nodes that don't have the SwaggerConfigID set
 	// this should never happen for containerService nodes

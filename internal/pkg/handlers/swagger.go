@@ -16,6 +16,7 @@ type SwaggerConfig interface {
 	GetResourceTypes() []swagger.SwaggerResourceType
 	AppliesToNode(node *TreeNode) bool
 	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.SwaggerResourceType) (ConfigExpandResponse, error)
+	MatchChildNodesByName() bool
 }
 
 // SubResource is used to pass sub resource information from SwaggerConfig to the expander
@@ -174,7 +175,14 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	templateValues := matchResult.Values
 	for _, child := range resourceType.Children {
 		loopChild := child
-		url, err := child.Endpoint.BuildURL(templateValues)
+
+		var url string
+		if config.MatchChildNodesByName() {
+			url, err = child.Endpoint.BuildURL(templateValues)
+		} else {
+			valueArray := resourceType.Endpoint.GenerateValueArrayFromMap(templateValues)
+			url, err = child.Endpoint.BuildURLFromArray(valueArray)
+		}
 		if err != nil {
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
 			return ExpanderResult{
@@ -184,10 +192,16 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				SourceDescription: "SwaggerResourceExpander",
 			}
 		}
+
 		display := substituteValues(child.Display, templateValues)
 		deleteURL := ""
 		if child.DeleteEndpoint != nil {
-			deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+			if config.MatchChildNodesByName() {
+				deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+			} else {
+				valueArray := child.DeleteEndpoint.GenerateValueArrayFromMap(templateValues)
+				deleteURL, err = child.DeleteEndpoint.BuildURLFromArray(valueArray)
+			}
 			if err != nil {
 				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
 				return ExpanderResult{

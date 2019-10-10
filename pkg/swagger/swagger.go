@@ -12,19 +12,28 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
-func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) ([]*Path, error) {
+func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
 	swaggerVersion := doc.Spec().Info.Version
 	spec := doc.Analyzer
 	allPaths := spec.AllPaths()
 	swaggerPaths := getSortedPaths(spec)
 	for _, swaggerPath := range swaggerPaths {
-		override := config.Overrides[swaggerPath]
+		override := config.Overrides[swaggerPath.Path]
 
-		searchPath := override.Path
-		if searchPath == "" {
-			searchPath = swaggerPath
+		searchPathTemp := override.Path
+		var searchPath PathAndCondensedPath
+		if searchPathTemp == "" {
+			searchPath = PathAndCondensedPath{
+				Path:          swaggerPath.Path,
+				CondensedPath: swaggerPath.CondensedPath,
+			}
+		} else {
+			searchPath = PathAndCondensedPath{
+				Path:          searchPathTemp,
+				CondensedPath: condensePath(searchPathTemp), // condense overridden path,
+			}
 		}
-		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, swaggerVersion) // logical path
+		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath.Path, swaggerVersion) // logical path
 		if err != nil {
 			empty := []*Path{}
 			return empty, err
@@ -35,15 +44,16 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) ([]*Pat
 			name = "{" + lastSegment.Name + "}"
 		}
 		path := Path{
-			Endpoint: &endpoint,
-			Name:     name,
+			Endpoint:              &endpoint,
+			Name:                  name,
+			CondensedEndpointPath: searchPath.CondensedPath,
 		}
 
 		getVerb := override.GetVerb
 		if getVerb == "" {
 			getVerb = "get"
 		}
-		pathItem := allPaths[swaggerPath]
+		pathItem := allPaths[swaggerPath.Path]
 		getOperation, err := getOperationByVerb(&pathItem, getVerb)
 		if err != nil {
 			empty := []*Path{}
@@ -57,7 +67,7 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) ([]*Pat
 			if override.Path == "" {
 				path.Operations.Get.Endpoint = path.Endpoint
 			} else {
-				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
+				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath.Path, swaggerVersion)
 				if err != nil {
 					empty := []*Path{}
 					return empty, err
@@ -65,25 +75,25 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document) ([]*Pat
 				path.Operations.Get.Endpoint = &overriddenEndpoint
 			}
 		}
-		if allPaths[swaggerPath].Delete != nil && getVerb != "delete" {
+		if allPaths[swaggerPath.Path].Delete != nil && getVerb != "delete" {
 			path.Operations.Delete.Permitted = true
 			path.Operations.Delete.Endpoint = path.Endpoint
 		}
-		if allPaths[swaggerPath].Patch != nil && getVerb != "patch" {
+		if allPaths[swaggerPath.Path].Patch != nil && getVerb != "patch" {
 			path.Operations.Patch.Permitted = true
 			path.Operations.Patch.Endpoint = path.Endpoint
 		}
-		if allPaths[swaggerPath].Post != nil && getVerb != "post" {
+		if allPaths[swaggerPath.Path].Post != nil && getVerb != "post" {
 			path.Operations.Post.Permitted = true
 			path.Operations.Post.Endpoint = path.Endpoint
 		}
-		if allPaths[swaggerPath].Put != nil && getVerb != "put" {
+		if allPaths[swaggerPath.Path].Put != nil && getVerb != "put" {
 			path.Operations.Put.Permitted = true
 			path.Operations.Put.Endpoint = path.Endpoint
 		}
 
 		// Add endpoint to paths
-		parent := findDeepestPath(paths, searchPath)
+		parent := findDeepestPath(paths, searchPath, !validateCapturedSegments)
 		if parent == nil {
 			paths = append(paths, &path)
 		} else {
@@ -168,27 +178,31 @@ func (a PathAndCondensedPathList) Less(i, j int) bool {
 }
 func (a PathAndCondensedPathList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func getSortedPaths(spec *analysis.Spec) []string {
+func getSortedPaths(spec *analysis.Spec) []PathAndCondensedPath {
 	// Sort ignoring names of captured sections (e.g. wibble in `/foo/{wibble}/bar`)
-
-	r, _ := regexp.Compile("\\{[^}]*}") // TODO - handle error
 
 	pathPairs := make([]PathAndCondensedPath, len(spec.AllPaths()))
 	i := 0
 	for key := range spec.AllPaths() {
 		pathPairs[i] = PathAndCondensedPath{
 			Path:          key,
-			CondensedPath: r.ReplaceAllString(key, "{}"),
+			CondensedPath: condensePath(key),
 		}
 		i++
 	}
 	sort.Sort(PathAndCondensedPathList(pathPairs))
 
-	paths := make([]string, len(pathPairs))
-	for i, pair := range pathPairs {
-		paths[i] = pair.Path
+	return pathPairs
+}
+
+var regexpCondense *regexp.Regexp
+
+func condensePath(path string) string {
+	if regexpCondense == nil {
+		regexpCondense, _ = regexp.Compile("\\{[^}]*}") // TODO - handle error
 	}
-	return paths
+	return regexpCondense.ReplaceAllString(path, "{}")
+
 }
 
 func getOperationByVerb(pathItem *spec.PathItem, verb string) (*spec.Operation, error) {
@@ -228,13 +242,27 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 }
 
 // findDeepestPath searches the endpoints tree to find the deepest point that the specified path can be nested at (used to build up the endpoint hierarchy)
-func findDeepestPath(paths []*Path, pathString string) *Path {
+func findDeepestPath(paths []*Path, pathToFind PathAndCondensedPath, useCondensedPath bool) *Path {
 	for _, path := range paths {
-		if strings.HasPrefix(pathString, path.Endpoint.TemplateURL) {
+		var matchString string
+		if useCondensedPath {
+			matchString = path.CondensedEndpointPath
+		} else {
+			matchString = path.Endpoint.TemplateURL
+		}
+
+		var pathString string
+		if useCondensedPath {
+			pathString = pathToFind.CondensedPath
+		} else {
+			pathString = pathToFind.Path
+		}
+
+		if strings.HasPrefix(pathString, matchString) {
 			// matches endpoint. Check children
-			match := findDeepestPath(path.Children, pathString)
+			match := findDeepestPath(path.Children, pathToFind, useCondensedPath)
 			if match == nil {
-				match = findDeepestPath(path.SubPaths, pathString)
+				match = findDeepestPath(path.SubPaths, pathToFind, useCondensedPath)
 				if match == nil {
 					return path
 				}
