@@ -7,8 +7,21 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"gopkg.in/yaml.v2"
+
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
+
+// ResourceResponse Resources list rest type
+type KubernetesListResponse struct {
+	Items []KubernetesItem `json:"items"`
+}
+type KubernetesItem struct {
+	Metadata struct {
+		Name     string `yaml:"name"`
+		SelfLink string `yaml:"selfLink"`
+	} `yaml:"metadata`
+}
 
 type SwaggerConfigContainerService struct {
 	resourceTypes []swagger.SwaggerResourceType
@@ -60,44 +73,42 @@ func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, curre
 
 	subResources := []SubResource{}
 
-	// if len(resourceType.SubResources) > 0 {
-	// 	// We have defined subResources - Unmarshal the ARM response and add these to newItems
+	if len(resourceType.SubResources) > 0 {
+		// We have defined subResources - Unmarshal the response and add these to newItems
 
-	// 	var resourceResponse armclient.ResourceResponse
-	// 	err = json.Unmarshal([]byte(data), &resourceResponse)
-	// 	if err != nil {
-	// 		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-	// 		return ConfigExpandResponse{Response: data}, err
-	// 	}
+		var listResponse KubernetesListResponse
+		err = yaml.Unmarshal([]byte(data), &listResponse)
+		if err != nil {
+			err = fmt.Errorf("Error parsing YAML response: %s", err)
+			return ConfigExpandResponse{Response: data}, err
+		}
 
-	// 	for _, resource := range resourceResponse.Resources {
-	// 		subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
-	// 		if subResourceType == nil {
-	// 			err = fmt.Errorf("SubResource type not found! %s", resource.ID)
-	// 			return ConfigExpandResponse{Response: data}, err
-	// 		}
-	// 		subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
-	// 		name := substituteValues(subResourceType.Display, subResourceTemplateValues)
-
-	// 		deleteURL := ""
-	// 		if subResourceType.DeleteEndpoint != nil {
-	// 			deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
-	// 			if err != nil {
-	// 				err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
-	// 				return ConfigExpandResponse{Response: data}, err
-	// 			}
-	// 		}
-
-	// 		subResource := SubResource{
-	// 			ID:           resource.ID,
-	// 			Name:         name,
-	// 			ResourceType: *subResourceType,
-	// 			ExpandURL:    resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
-	// 			DeleteURL:    deleteURL,
-	// 		}
-	// 		subResources = append(subResources, subResource)
-	// 	}
-	// }
+		for _, item := range listResponse.Items {
+			subResourceType := getResourceTypeForURL(ctx, item.Metadata.SelfLink, resourceType.SubResources)
+			if subResourceType == nil {
+				err = fmt.Errorf("SubResource type not found! %s", item.Metadata.SelfLink)
+				return ConfigExpandResponse{Response: data}, err
+			}
+			name := item.Metadata.Name
+			deleteURL := ""
+			if subResourceType.DeleteEndpoint != nil {
+				subResourceTemplateValues := subResourceType.Endpoint.Match(item.Metadata.SelfLink).Values
+				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
+				if err != nil {
+					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
+					return ConfigExpandResponse{Response: data}, err
+				}
+			}
+			subResource := SubResource{
+				ID:           item.Metadata.SelfLink,
+				Name:         name,
+				ResourceType: *subResourceType,
+				ExpandURL:    item.Metadata.SelfLink,
+				DeleteURL:    deleteURL,
+			}
+			subResources = append(subResources, subResource)
+		}
+	}
 
 	return ConfigExpandResponse{
 		Response:     data,
