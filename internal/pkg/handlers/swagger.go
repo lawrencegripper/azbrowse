@@ -2,14 +2,12 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
-	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // SwaggerConfig represents the configuration for a set of swagger resources that the SwaggerResourceExpander can handle
@@ -17,6 +15,22 @@ type SwaggerConfig interface {
 	ID() string
 	GetResourceTypes() []swagger.SwaggerResourceType
 	AppliesToNode(node *TreeNode) bool
+	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.SwaggerResourceType) (ConfigExpandResponse, error)
+}
+
+// SubResource is used to pass sub resource information from SwaggerConfig to the expander
+type SubResource struct {
+	ID           string
+	Name         string
+	ResourceType swagger.SwaggerResourceType
+	ExpandURL    string
+	DeleteURL    string
+}
+
+// ConfigExpandResource returns the result of expanding a Resource
+type ConfigExpandResponse struct {
+	Response     string
+	SubResources []SubResource
 }
 
 // SwaggerResourceExpander expands resource under an AppService
@@ -33,7 +47,7 @@ func NewSwaggerResourcesExpander() *SwaggerResourceExpander {
 func (e *SwaggerResourceExpander) AddConfig(config SwaggerConfig) {
 	e.configs[config.ID()] = &config
 }
-func (e *SwaggerResourceExpander) getConfig(id string) *SwaggerConfig {
+func (e *SwaggerResourceExpander) GetConfig(id string) *SwaggerConfig {
 	return e.configs[id]
 }
 
@@ -69,7 +83,7 @@ func (e *SwaggerResourceExpander) getConfigForItem(currentItem *TreeNode) *Swagg
 		currentItem.Metadata = make(map[string]string)
 	}
 	if configID := currentItem.Metadata["SwaggerConfigID"]; configID != "" {
-		return e.getConfig(configID)
+		return e.GetConfig(configID)
 	}
 	for _, configPtr := range e.configs {
 		config := *configPtr
@@ -115,57 +129,49 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		panic(fmt.Errorf("SwaggerResourceType not set"))
 	}
 
-	method := resourceType.Verb
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	configPtr := e.getConfigForItem(currentItem)
+	if configPtr == nil {
+		panic(fmt.Errorf("SwaggerConfig not set"))
+	}
+	config := *configPtr
+
+	data := ""
+
+	// Get sub resources from config
+	expandResult, err := config.ExpandResource(ctx, currentItem, *resourceType)
 	if err != nil {
 		return ExpanderResult{
 			Nodes:             nil,
-			Response:          string(data),
-			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+			Response:          expandResult.Response,
+			Err:               err,
 			SourceDescription: "SwaggerResourceExpander",
 		}
 	}
+	data = expandResult.Response
 
 	newItems := []*TreeNode{}
-	matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
-	templateValues := matchResult.Values
-
-	if len(resourceType.SubResources) > 0 {
-		// We have defined subResources - Unmarshal the ARM response and add these to newItems
-		var resourceResponse armclient.ResourceResponse
-		err = json.Unmarshal([]byte(data), &resourceResponse)
-		if err != nil {
-			err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-			panic(err)
-		}
-		for _, resource := range resourceResponse.Resources {
-			subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
-			if subResourceType == nil {
-				panic(fmt.Errorf("SubResource type not found! %s", resource.ID))
-			}
-			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
-			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
-			deleteURL := ""
-			if subResourceType.DeleteEndpoint != nil {
-				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
-				if err != nil {
-					panic(fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err))
-				}
-			}
+	if len(expandResult.SubResources) > 0 {
+		for _, subResource := range expandResult.SubResources {
 			newItems = append(newItems, &TreeNode{
 				Parentid:            currentItem.ID,
 				Namespace:           "swagger",
-				Name:                name,
-				Display:             name,
-				ID:                  resource.ID,
-				ExpandURL:           resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
+				Name:                subResource.Name,
+				Display:             subResource.Name,
+				ID:                  subResource.ID,
+				ExpandURL:           subResource.ID + "?api-version=" + subResource.ResourceType.Endpoint.APIVersion,
 				ItemType:            SubResourceType,
-				DeleteURL:           deleteURL,
-				SwaggerResourceType: subResourceType,
+				DeleteURL:           subResource.DeleteURL,
+				SwaggerResourceType: &subResource.ResourceType,
+				Metadata: map[string]string{
+					"SwaggerConfigID": config.ID(),
+				},
 			})
 		}
 	}
+
 	// Add any children to newItems
+	matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL)
+	templateValues := matchResult.Values
 	for _, child := range resourceType.Children {
 		loopChild := child
 		url, err := child.Endpoint.BuildURL(templateValues)
@@ -191,12 +197,15 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			ItemType:            SubResourceType,
 			DeleteURL:           deleteURL,
 			SwaggerResourceType: &loopChild,
+			Metadata: map[string]string{
+				"SwaggerConfigID": config.ID(),
+			},
 		})
 	}
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          string(data),
+		Response:          data,
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
 }

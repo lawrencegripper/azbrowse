@@ -127,7 +127,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 	// NOTE - at the time of writing the AKS API returns a single cluster/user
 	// so we're not fully parsing the config, just taking the first user and cluster
 
-	result, err := e.test(ctx, kubeConfig)
+	httpClient, err := e.getHttpClientFromConfig(kubeConfig)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -136,35 +136,51 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 		}
 	}
 
-	newItems := []*TreeNode{}
-	return ExpanderResult{
-		Err:               nil,
-		Response:          result,
-		SourceDescription: "AzureKubernetesServiceExpander request",
-		Nodes:             newItems,
-		IsPrimaryResponse: true,
-	}
-}
-
-func (e *AzureKubernetesServiceExpander) test(ctx context.Context, kubeConfig kubeConfig) (string, error) {
-
-	httpClient, err := e.getHttpClientFromConfig(kubeConfig)
-	if err != nil {
-		return "", err
-	}
-
 	serverUrl := kubeConfig.Clusters[0].Cluster.Server
 
 	swaggerResourceTypes, err := e.getSwaggerResourceTypes(*httpClient, serverUrl)
 	if err != nil {
-		return "", err
+		return ExpanderResult{
+			Err:               err,
+			Response:          "Error!",
+			SourceDescription: "AzureKubernetesServiceExpander request",
+		}
 	}
 
-	result := ""
-	for _, resourceType := range swaggerResourceTypes {
-		result += fmt.Sprintf("\nResource: %s, %s", resourceType.Display, resourceType.Endpoint.TemplateURL)
+	// Register the swagger config so that the swagger expander can take over
+	config := NewSwaggerConfigContainerService(swaggerResourceTypes, *httpClient, currentItem.ID, serverUrl)
+	GetSwaggerResourceExpander().AddConfig(config)
+
+	// TODO think about how to avoid re-registering - add something to the current node's metadata?
+	newItems := []*TreeNode{}
+	for _, child := range swaggerResourceTypes {
+		resourceType := child
+		display := resourceType.Display
+		if display == "{}" {
+			display = resourceType.Endpoint.TemplateURL
+		}
+		newItems = append(newItems, &TreeNode{
+			Parentid:            currentItem.ID,
+			ID:                  currentItem.ID + "/" + display,
+			Namespace:           "swagger",
+			Name:                display,
+			Display:             display,
+			ExpandURL:           resourceType.Endpoint.TemplateURL, // all fixed template URLs
+			ItemType:            SubResourceType,
+			SwaggerResourceType: &resourceType,
+			Metadata: map[string]string{
+				"SwaggerConfigID": currentItem.ID,
+			},
+		})
 	}
-	return result, nil
+
+	return ExpanderResult{
+		Err:               nil,
+		Response:          "TODO - what should go here?",
+		SourceDescription: "AzureKubernetesServiceExpander request",
+		Nodes:             newItems,
+		IsPrimaryResponse: true,
+	}
 }
 
 func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http.Client, serverUrl string) ([]swagger.SwaggerResourceType, error) {
