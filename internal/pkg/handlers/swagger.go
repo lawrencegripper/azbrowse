@@ -10,46 +10,50 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
-// SwaggerConfig represents the configuration for a set of swagger resources that the SwaggerResourceExpander can handle
-type SwaggerConfig interface {
+// SwaggerAPISet represents the configuration for a set of swagger API endpoints that the SwaggerResourceExpander can handle
+type SwaggerAPISet interface {
 	ID() string
-	GetResourceTypes() []swagger.SwaggerResourceType
+	GetResourceTypes() []swagger.ResourceType
 	AppliesToNode(node *TreeNode) bool
-	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.SwaggerResourceType) (ConfigExpandResponse, error)
+	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error)
 	MatchChildNodesByName() bool
 }
 
-// SubResource is used to pass sub resource information from SwaggerConfig to the expander
+// SubResource is used to pass sub resource information from SwaggerAPISet to the expander
 type SubResource struct {
 	ID           string
 	Name         string
-	ResourceType swagger.SwaggerResourceType
+	ResourceType swagger.ResourceType
 	ExpandURL    string
 	DeleteURL    string
 }
 
-// ConfigExpandResource returns the result of expanding a Resource
-type ConfigExpandResponse struct {
+// APISetExpandResponse returns the result of expanding a Resource
+type APISetExpandResponse struct {
 	Response     string
 	SubResources []SubResource
 }
 
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
-	configs map[string]*SwaggerConfig
+	apiSets map[string]*SwaggerAPISet
 }
 
+// NewSwaggerResourcesExpander creates a new SwaggerResourceExpander
 func NewSwaggerResourcesExpander() *SwaggerResourceExpander {
 	return &SwaggerResourceExpander{
-		configs: map[string]*SwaggerConfig{},
+		apiSets: map[string]*SwaggerAPISet{},
 	}
 }
 
-func (e *SwaggerResourceExpander) AddConfig(config SwaggerConfig) {
-	e.configs[config.ID()] = &config
+// AddAPISet adds a SwaggerAPISet to the APIs that the expander will handle
+func (e *SwaggerResourceExpander) AddAPISet(apiSet SwaggerAPISet) {
+	e.apiSets[apiSet.ID()] = &apiSet
 }
-func (e *SwaggerResourceExpander) GetConfig(id string) *SwaggerConfig {
-	return e.configs[id]
+
+// GetAPISet returns a SwaggerAPISet by id
+func (e *SwaggerResourceExpander) GetAPISet(id string) *SwaggerAPISet {
+	return e.apiSets[id]
 }
 
 // Name returns the name of the expander
@@ -57,12 +61,12 @@ func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"
 }
 
-func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []swagger.SwaggerResourceType) *swagger.SwaggerResourceType {
+func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
 	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
 	defer span.Finish()
 	return getResourceTypeForURLInner(url, resourceTypes)
 }
-func getResourceTypeForURLInner(url string, resourceTypes []swagger.SwaggerResourceType) *swagger.SwaggerResourceType {
+func getResourceTypeForURLInner(url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
 	for _, resourceType := range resourceTypes {
 		matchResult := resourceType.Endpoint.Match(url)
 		if matchResult.IsMatch {
@@ -78,19 +82,19 @@ func getResourceTypeForURLInner(url string, resourceTypes []swagger.SwaggerResou
 	return nil
 }
 
-func (e *SwaggerResourceExpander) getConfigForItem(currentItem *TreeNode) *SwaggerConfig {
+func (e *SwaggerResourceExpander) getAPISetForItem(currentItem *TreeNode) *SwaggerAPISet {
 
 	if currentItem.Metadata == nil {
 		currentItem.Metadata = make(map[string]string)
 	}
-	if configID := currentItem.Metadata["SwaggerConfigID"]; configID != "" {
-		return e.GetConfig(configID)
+	if apiSetID := currentItem.Metadata["SwaggerAPISetID"]; apiSetID != "" {
+		return e.GetAPISet(apiSetID)
 	}
-	for _, configPtr := range e.configs {
-		config := *configPtr
-		if config.AppliesToNode(currentItem) {
-			currentItem.Metadata["SwaggerConfigID"] = config.ID()
-			return configPtr
+	for _, apiSetPtr := range e.apiSets {
+		apiSet := *apiSetPtr
+		if apiSet.AppliesToNode(currentItem) {
+			currentItem.Metadata["SwaggerAPISetID"] = apiSet.ID()
+			return apiSetPtr
 		}
 	}
 	return nil
@@ -101,16 +105,16 @@ func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *T
 	if currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
 		return false, nil
 	}
-	configPtr := e.getConfigForItem(currentItem)
-	if configPtr == nil {
+	apiSetPtr := e.getAPISetForItem(currentItem)
+	if apiSetPtr == nil {
 		return false, nil
 	}
-	config := *configPtr
+	apiSet := *apiSetPtr
 
 	if currentItem.SwaggerResourceType != nil {
 		return true, nil
 	}
-	resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, config.GetResourceTypes())
+	resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, apiSet.GetResourceTypes())
 	if resourceType != nil {
 		currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
 		return true, nil
@@ -130,16 +134,16 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		panic(fmt.Errorf("SwaggerResourceType not set"))
 	}
 
-	configPtr := e.getConfigForItem(currentItem)
-	if configPtr == nil {
-		panic(fmt.Errorf("SwaggerConfig not set"))
+	apiSetPtr := e.getAPISetForItem(currentItem)
+	if apiSetPtr == nil {
+		panic(fmt.Errorf("SwaggerAPISet not set"))
 	}
-	config := *configPtr
+	apiSet := *apiSetPtr
 
 	data := ""
 
 	// Get sub resources from config
-	expandResult, err := config.ExpandResource(ctx, currentItem, *resourceType)
+	expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
 	if err != nil {
 		return ExpanderResult{
 			Nodes:             nil,
@@ -164,7 +168,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				DeleteURL:           subResource.DeleteURL,
 				SwaggerResourceType: &subResource.ResourceType,
 				Metadata: map[string]string{
-					"SwaggerConfigID": config.ID(),
+					"SwaggerAPISetID": apiSet.ID(),
 				},
 			})
 		}
@@ -177,7 +181,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		loopChild := child
 
 		var url string
-		if config.MatchChildNodesByName() {
+		if apiSet.MatchChildNodesByName() {
 			url, err = child.Endpoint.BuildURL(templateValues)
 		} else {
 			valueArray := resourceType.Endpoint.GenerateValueArrayFromMap(templateValues)
@@ -196,7 +200,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		display := substituteValues(child.Display, templateValues)
 		deleteURL := ""
 		if child.DeleteEndpoint != nil {
-			if config.MatchChildNodesByName() {
+			if apiSet.MatchChildNodesByName() {
 				deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
 			} else {
 				valueArray := child.DeleteEndpoint.GenerateValueArrayFromMap(templateValues)
@@ -223,7 +227,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			DeleteURL:           deleteURL,
 			SwaggerResourceType: &loopChild,
 			Metadata: map[string]string{
-				"SwaggerConfigID": config.ID(),
+				"SwaggerAPISetID": apiSet.ID(),
 			},
 		})
 	}

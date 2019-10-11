@@ -5,23 +5,23 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
-func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourceType {
-	return []swagger.SwaggerResourceType{
+func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
+	return []swagger.ResourceType{
 		{
 			Display:  "addsservices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices", "2014-01-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "premiumCheck",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/premiumCheck", "2014-01-01"),
 				}},
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serviceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}", "2014-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}", "2014-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}", "2014-01-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "addomainservicemembers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/addomainservicemembers", "2014-01-01"),
@@ -45,11 +45,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "metricmetadata",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/metricmetadata", "2014-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{metricName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/metricmetadata/{metricName}", "2014-01-01"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{groupName}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/metricmetadata/{metricName}/groups/{groupName}", "2014-01-01"),
@@ -71,12 +71,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "servicemembers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/servicemembers", "2014-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{serviceMemberId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/servicemembers/{serviceMemberId}", "2014-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/servicemembers/{serviceMemberId}", "2014-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "alerts",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/servicemembers/{serviceMemberId}/alerts", "2014-01-01"),
@@ -87,7 +87,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										}},
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{dimension}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/dimensions/{dimension}", "2014-01-01"),
@@ -100,7 +100,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "{groupName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/metrics/{metricName}/groups/{groupName}", "2014-01-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "average",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/addsservices/{serviceName}/metrics/{metricName}/groups/{groupName}/average", "2014-01-01"),
@@ -132,18 +132,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "services",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services", "2014-01-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "premiumCheck",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/premiumCheck", "2014-01-01"),
 				}},
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serviceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}", "2014-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}", "2014-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}", "2014-01-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "alerts",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/alerts", "2014-01-01"),
@@ -163,11 +163,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "metricmetadata",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/metricmetadata", "2014-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{metricName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/metricmetadata/{metricName}", "2014-01-01"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{groupName}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/metricmetadata/{metricName}/groups/{groupName}", "2014-01-01"),
@@ -185,12 +185,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "servicemembers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers", "2014-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{serviceMemberId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers/{serviceMemberId}", "2014-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers/{serviceMemberId}", "2014-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "alerts",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers/{serviceMemberId}/alerts", "2014-01-01"),
@@ -211,11 +211,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 											Display:  "serviceconfiguration",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers/{serviceMemberId}/serviceconfiguration", "2014-01-01"),
 										}},
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{metricName}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers/{serviceMemberId}/metrics/{metricName}", "2014-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{groupName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/servicemembers/{serviceMemberId}/metrics/{metricName}/groups/{groupName}", "2014-01-01"),
@@ -223,7 +223,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										}},
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{featureName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/TenantWhitelisting/{featureName}", "2014-01-01"),
@@ -239,7 +239,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "{groupName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/metrics/{metricName}/groups/{groupName}", "2014-01-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "average",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ADHybridHealthService/services/{serviceName}/metrics/{metricName}/groups/{groupName}/average", "2014-01-01"),
@@ -254,7 +254,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "metadata",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Advisor/metadata", "2017-04-19"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{name}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Advisor/metadata/{name}", "2017-04-19"),
@@ -285,7 +285,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "{recommendationId}",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceUri}/providers/Microsoft.Advisor/recommendations/{recommendationId}", "2017-04-19"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{name}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{resourceUri}/providers/Microsoft.Advisor/recommendations/{recommendationId}/suppressions/{name}", "2017-04-19"),
@@ -300,7 +300,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "smartDetectorAlertRules",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.alertsManagement/smartDetectorAlertRules", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{alertRuleName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.alertsManagement/smartDetectorAlertRules/{alertRuleName}", "2019-06-01"),
@@ -332,14 +332,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "servers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AnalysisServices/servers", "2017-08-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serverName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AnalysisServices/servers/{serverName}", "2017-08-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AnalysisServices/servers/{serverName}", "2017-08-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AnalysisServices/servers/{serverName}", "2017-08-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AnalysisServices/servers/{serverName}", "2017-08-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "skus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AnalysisServices/servers/{serverName}/skus", "2017-08-01"),
@@ -349,23 +349,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "apis",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis", "2019-01-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "apisByTags",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apisByTags", "2019-01-01"),
 				}},
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{apiId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}", "2019-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}", "2019-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}", "2019-01-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}", "2019-01-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "diagnostics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/diagnostics", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{diagnosticId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/diagnostics/{diagnosticId}", "2019-01-01"),
@@ -377,18 +377,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "issues",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{issueId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}", "2019-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}", "2019-01-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}", "2019-01-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "attachments",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}/attachments", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{attachmentId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}/attachments/{attachmentId}", "2019-01-01"),
@@ -399,7 +399,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "comments",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}/comments", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{commentId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/issues/{issueId}/comments/{commentId}", "2019-01-01"),
@@ -412,23 +412,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "operations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations", "2019-01-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "operationsByTags",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operationsByTags", "2019-01-01"),
 								}},
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{operationId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}", "2019-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}", "2019-01-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}", "2019-01-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "policies",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}/policies", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{policyId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}/policies/{policyId}", "2019-01-01"),
@@ -439,7 +439,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "tags",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}/tags", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{tagId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/operations/{operationId}/tags/{tagId}", "2019-01-01"),
@@ -452,7 +452,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "policies",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/policies", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{policyId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/policies/{policyId}", "2019-01-01"),
@@ -467,7 +467,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "releases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/releases", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{releaseId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/releases/{releaseId}", "2019-01-01"),
@@ -483,7 +483,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "schemas",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/schemas", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{schemaId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/schemas/{schemaId}", "2019-01-01"),
@@ -494,7 +494,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "tagDescriptions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/tagDescriptions", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{tagId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/tagDescriptions/{tagId}", "2019-01-01"),
@@ -505,7 +505,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "tags",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/tags", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{tagId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apis/{apiId}/tags/{tagId}", "2019-01-01"),
@@ -518,7 +518,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "apiVersionSets",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apiVersionSets", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{versionSetId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/apiVersionSets/{versionSetId}", "2019-01-01"),
@@ -530,7 +530,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "authorizationServers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/authorizationServers", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{authsid}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/authorizationServers/{authsid}", "2019-01-01"),
@@ -542,20 +542,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "backends",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/backends", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{backendId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/backends/{backendId}", "2019-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/backends/{backendId}", "2019-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/backends/{backendId}", "2019-01-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/backends/{backendId}", "2019-01-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "caches",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/caches", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{cacheId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/caches/{cacheId}", "2019-01-01"),
@@ -567,7 +567,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "certificates",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/certificates", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{certificateId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/certificates/{certificateId}", "2019-01-01"),
@@ -586,14 +586,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "service",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serviceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}", "2019-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}", "2019-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}", "2019-01-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}", "2019-01-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "skus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/skus", "2019-01-01"),
@@ -601,7 +601,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "diagnostics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/diagnostics", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{diagnosticId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/diagnostics/{diagnosticId}", "2019-01-01"),
@@ -613,7 +613,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "templates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/templates", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{templateName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/templates/{templateName}", "2019-01-01"),
@@ -625,25 +625,25 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "groups",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{groupId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}", "2019-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}", "2019-01-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}", "2019-01-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:      "users",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}/users", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										}},
 								}},
 						},
 						{
 							Display:  "identityProviders",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identityProviders", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{identityProviderName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identityProviders/{identityProviderName}", "2019-01-01"),
@@ -655,7 +655,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "issues",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/issues", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{issueId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/issues/{issueId}", "2019-01-01"),
@@ -664,7 +664,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "loggers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/loggers", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{loggerId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/loggers/{loggerId}", "2019-01-01"),
@@ -680,28 +680,28 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "notifications",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/notifications", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{notificationName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/notifications/{notificationName}", "2019-01-01"),
 									PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/notifications/{notificationName}", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:      "recipientEmails",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/notifications/{notificationName}/recipientEmails", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										},
 										{
 											Display:      "recipientUsers",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/notifications/{notificationName}/recipientUsers", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										}},
 								}},
 						},
 						{
 							Display:  "openidConnectProviders",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/openidConnectProviders", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{opid}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/openidConnectProviders/{opid}", "2019-01-01"),
@@ -713,7 +713,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "policies",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/policies", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{policyId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/policies/{policyId}", "2019-01-01"),
@@ -746,33 +746,33 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "products",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products", "2019-01-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "productsByTags",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/productsByTags", "2019-01-01"),
 								}},
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{productId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}", "2019-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}", "2019-01-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}", "2019-01-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:      "apis",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/apis", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										},
 										{
 											Display:      "groups",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/groups", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										},
 										{
 											Display:  "policies",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/policies", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{policyId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/policies/{policyId}", "2019-01-01"),
@@ -787,7 +787,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "tags",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/tags", "2019-01-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{tagId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/products/{productId}/tags/{tagId}", "2019-01-01"),
@@ -800,7 +800,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "properties",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/properties", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{propId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/properties/{propId}", "2019-01-01"),
@@ -848,14 +848,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "subscriptions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{sid}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}", "2019-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}", "2019-01-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}", "2019-01-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}", "2019-01-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
@@ -865,7 +865,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "tags",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/tags", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{tagId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/tags/{tagId}", "2019-01-01"),
@@ -877,14 +877,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "users",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/users", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{userId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/users/{userId}", "2019-01-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/users/{userId}", "2019-01-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/users/{userId}", "2019-01-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/users/{userId}", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "groups",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/users/{userId}/groups", "2019-01-01"),
@@ -899,7 +899,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										}},
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "networkstatus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/locations/{locationName}/networkstatus", "2019-01-01"),
@@ -908,7 +908,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:       "{quotaCounterKey}",
 							Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/quotas/{quotaCounterKey}", "2019-01-01"),
 							PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/quotas/{quotaCounterKey}", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:       "{quotaPeriodKey}",
 									Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/quotas/{quotaCounterKey}/periods/{quotaPeriodKey}", "2019-01-01"),
@@ -919,11 +919,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:       "{accessName}",
 							Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/tenant/{accessName}", "2019-01-01"),
 							PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/tenant/{accessName}", "2019-01-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "git",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/tenant/{accessName}/git", "2019-01-01"),
-									Children: []swagger.SwaggerResourceType{},
+									Children: []swagger.ResourceType{},
 								}},
 						},
 						{
@@ -939,7 +939,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "{scopePath}",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}", "2015-05-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:        "item",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/components/{resourceName}/{scopePath}/item", "2015-05-01"),
@@ -951,7 +951,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 			Display:     "Annotations",
 			Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/Annotations", "2015-05-01"),
 			PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/Annotations", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{annotationId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/Annotations/{annotationId}", "2015-05-01"),
@@ -970,7 +970,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "exportconfiguration",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/exportconfiguration", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{exportId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/exportconfiguration/{exportId}", "2015-05-01"),
@@ -998,7 +998,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "ProactiveDetectionConfigs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/ProactiveDetectionConfigs", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:     "{ConfigurationId}",
 					Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/ProactiveDetectionConfigs/{ConfigurationId}", "2015-05-01"),
@@ -1012,7 +1012,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "WorkItemConfigs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/WorkItemConfigs", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{workItemConfigId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/WorkItemConfigs/{workItemConfigId}", "2015-05-01"),
@@ -1027,18 +1027,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "components",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}", "2015-05-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}", "2015-05-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}", "2015-05-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}", "2015-05-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "favorites",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/favorites", "2015-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{favoriteId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/favorites/{favoriteId}", "2015-05-01"),
@@ -1051,7 +1051,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "syntheticmonitorlocations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/syntheticmonitorlocations", "2015-05-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{purgeId}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/components/{resourceName}/operations/{purgeId}", "2015-05-01"),
@@ -1069,7 +1069,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "webtests",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/webtests", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{webTestName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Insights/webtests/{webTestName}", "2015-05-01"),
@@ -1081,7 +1081,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "workbooks",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroup/{resourceGroupName}/providers/microsoft.insights/workbooks", "2015-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroup/{resourceGroupName}/providers/microsoft.insights/workbooks/{resourceName}", "2015-05-01"),
@@ -1097,7 +1097,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "providerOperations",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Authorization/providerOperations", "2015-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{resourceProviderNamespace}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Authorization/providerOperations/{resourceProviderNamespace}", "2015-07-01"),
@@ -1124,7 +1124,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "roleAssignments",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Authorization/roleAssignments", "2015-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{roleAssignmentName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Authorization/roleAssignments/{roleAssignmentName}", "2015-07-01"),
@@ -1147,7 +1147,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "roleDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Authorization/roleDefinitions", "2015-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{roleDefinitionId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Authorization/roleDefinitions/{roleDefinitionId}", "2015-07-01"),
@@ -1158,7 +1158,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "python2Packages",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/python2Packages", "2018-06-30"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{packageName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/python2Packages/{packageName}", "2018-06-30"),
@@ -1170,14 +1170,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "runbooks",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks", "2018-06-30"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{runbookName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}", "2018-06-30"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}", "2018-06-30"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}", "2018-06-30"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}", "2018-06-30"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "content",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/content", "2018-06-30"),
@@ -1185,7 +1185,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "draft",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft", "2018-06-30"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:     "content",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/content", "2018-06-30"),
@@ -1195,11 +1195,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									Display:     "testJob",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob", "2018-06-30"),
 									PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob", "2018-06-30"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "streams",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob/streams", "2018-06-30"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{jobStreamId}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Automation/automationAccounts/{automationAccountName}/runbooks/{runbookName}/draft/testJob/streams/{jobStreamId}", "2018-06-30"),
@@ -1224,29 +1224,29 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "clusters",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters", "2019-01-21"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{clusterName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}", "2019-01-21"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}", "2019-01-21"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}", "2019-01-21"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}", "2019-01-21"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases", "2019-01-21"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}", "2019-01-21"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}", "2019-01-21"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}", "2019-01-21"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}", "2019-01-21"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "dataConnections",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections", "2019-01-21"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{dataConnectionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Kusto/clusters/{clusterName}/databases/{databaseName}/dataConnections/{dataConnectionName}", "2019-01-21"),
@@ -1266,12 +1266,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "diagnosticSettings",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/microsoft.aadiam/diagnosticSettings", "2017-04-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "diagnosticSettingsCategories",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/microsoft.aadiam/diagnosticSettingsCategories", "2017-04-01"),
 				}},
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{name}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/microsoft.aadiam/diagnosticSettings/{name}", "2017-04-01"),
@@ -1290,7 +1290,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "customerSubscriptions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}/customerSubscriptions", "2017-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{customerSubscriptionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}/customerSubscriptions/{customerSubscriptionName}", "2017-06-01"),
@@ -1301,24 +1301,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "products",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}/products", "2017-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{productName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}/products/{productName}", "2017-06-01"),
-					Children: []swagger.SwaggerResourceType{},
+					Children: []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "registrations",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations", "2017-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{registrationName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}", "2017-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}", "2017-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}", "2017-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.AzureStack/registrations/{registrationName}", "2017-06-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -1336,35 +1336,35 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "batchAccounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "applications",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{applicationName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}", "2019-04-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}", "2019-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "versions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}/versions", "2019-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{versionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}/versions/{versionName}", "2019-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}/versions/{versionName}", "2019-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}/versions/{versionName}", "2019-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -1372,27 +1372,27 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "certificates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/certificates", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{certificateName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/certificates/{certificateName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/certificates/{certificateName}", "2019-04-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/certificates/{certificateName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/certificates/{certificateName}", "2019-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "pools",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{poolName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools/{poolName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools/{poolName}", "2019-04-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools/{poolName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/pools/{poolName}", "2019-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -1412,47 +1412,47 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "workspaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces", "2018-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{workspaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}", "2018-05-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}", "2018-05-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}", "2018-05-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}", "2018-05-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "clusters",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/clusters", "2018-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{clusterName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/clusters/{clusterName}", "2018-05-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/clusters/{clusterName}", "2018-05-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/clusters/{clusterName}", "2018-05-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/clusters/{clusterName}", "2018-05-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "experiments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments", "2018-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{experimentName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}", "2018-05-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}", "2018-05-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}", "2018-05-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "jobs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}/jobs", "2018-05-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{jobName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}/jobs/{jobName}", "2018-05-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}/jobs/{jobName}", "2018-05-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/experiments/{experimentName}/jobs/{jobName}", "2018-05-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -1460,7 +1460,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "fileServers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/fileServers", "2018-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{fileServerName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.BatchAI/workspaces/{workspaceName}/fileServers/{fileServerName}", "2018-05-01"),
@@ -1485,41 +1485,41 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "profiles",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles", "2019-04-15"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{profileName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}", "2019-04-15"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}", "2019-04-15"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}", "2019-04-15"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}", "2019-04-15"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "endpoints",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints", "2019-04-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{endpointName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}", "2019-04-15"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}", "2019-04-15"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}", "2019-04-15"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}", "2019-04-15"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "customDomains",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}/customDomains", "2019-04-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{customDomainName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}/customDomains/{customDomainName}", "2019-04-15"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}/customDomains/{customDomainName}", "2019-04-15"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}/customDomains/{customDomainName}", "2019-04-15"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "origins",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}/origins", "2019-04-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:       "{originName}",
 													Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/endpoints/{endpointName}/origins/{originName}", "2019-04-15"),
@@ -1545,14 +1545,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "accounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts", "2017-04-18"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}", "2017-04-18"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}", "2017-04-18"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}", "2017-04-18"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}", "2017-04-18"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "skus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/skus", "2017-04-18"),
@@ -1574,7 +1574,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "containerServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/containerServices", "2017-01-31"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{containerServiceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/containerServices/{containerServiceName}", "2017-01-31"),
@@ -1637,7 +1637,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "budgets",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Consumption/budgets", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{budgetName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Consumption/budgets/{budgetName}", "2019-01-01"),
@@ -1684,15 +1684,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "containerGroups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups", "2018-10-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{containerGroupName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}", "2018-10-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}", "2018-10-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}", "2018-10-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}", "2018-10-01"),
-					Children:       []swagger.SwaggerResourceType{},
-					SubResources: []swagger.SwaggerResourceType{
+					Children:       []swagger.ResourceType{},
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "logs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}/containers/{containerName}/logs", "2018-10-01"),
@@ -1710,14 +1710,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "registries",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries", "2019-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{registryName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}", "2019-05-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}", "2019-05-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}", "2019-05-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}", "2019-05-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "listUsages",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/listUsages", "2019-05-01"),
@@ -1725,7 +1725,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "replications",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications", "2019-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{replicationName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/replications/{replicationName}", "2019-05-01"),
@@ -1737,14 +1737,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "webhooks",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks", "2019-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{webhookName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}", "2019-05-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}", "2019-05-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}", "2019-05-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}/webhooks/{webhookName}", "2019-05-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -1764,24 +1764,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "managedClusters",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}", "2019-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "agentPools",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/agentPools", "2019-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{agentPoolName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/agentPools/{agentPoolName}", "2019-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/agentPools/{agentPoolName}", "2019-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/agentPools/{agentPoolName}", "2019-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "availableAgentPoolVersions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/agentPools/{agentPoolName}/availableAgentPoolVersions", "2019-06-01"),
@@ -1796,7 +1796,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "default",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/upgradeProfiles/default", "2019-06-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{},
+					SubResources: []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -1810,24 +1810,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "databaseAccounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts", "2015-04-08"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}", "2015-04-08"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}", "2015-04-08"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}", "2015-04-08"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}", "2015-04-08"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "keyspaces",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces", "2015-04-08"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{keyspaceName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}", "2015-04-08"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}", "2015-04-08"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}", "2015-04-08"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:     "throughput",
 											Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}/settings/throughput", "2015-04-08"),
@@ -1836,13 +1836,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "tables",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}/tables", "2015-04-08"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{tableName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}/tables/{tableName}", "2015-04-08"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}/tables/{tableName}", "2015-04-08"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}/tables/{tableName}", "2015-04-08"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:     "throughput",
 															Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/cassandra/keyspaces/{keyspaceName}/tables/{tableName}/settings/throughput", "2015-04-08"),
@@ -1855,23 +1855,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases", "2015-04-08"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}", "2015-04-08"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}", "2015-04-08"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}", "2015-04-08"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "graphs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}/graphs", "2015-04-08"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{graphName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}/graphs/{graphName}", "2015-04-08"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}/graphs/{graphName}", "2015-04-08"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}/graphs/{graphName}", "2015-04-08"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:     "throughput",
 															Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/gremlin/databases/{databaseName}/graphs/{graphName}/settings/throughput", "2015-04-08"),
@@ -1889,23 +1889,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases", "2015-04-08"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}", "2015-04-08"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}", "2015-04-08"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}", "2015-04-08"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "collections",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}/collections", "2015-04-08"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{collectionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}/collections/{collectionName}", "2015-04-08"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}/collections/{collectionName}", "2015-04-08"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}/collections/{collectionName}", "2015-04-08"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:     "throughput",
 															Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/mongodb/databases/{databaseName}/collections/{collectionName}/settings/throughput", "2015-04-08"),
@@ -1923,23 +1923,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases", "2015-04-08"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}", "2015-04-08"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}", "2015-04-08"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}", "2015-04-08"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "containers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}/containers", "2015-04-08"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{containerName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}/containers/{containerName}", "2015-04-08"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}/containers/{containerName}", "2015-04-08"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}/containers/{containerName}", "2015-04-08"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:     "throughput",
 															Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/sql/databases/{databaseName}/containers/{containerName}/settings/throughput", "2015-04-08"),
@@ -1957,13 +1957,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "tables",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/table/tables", "2015-04-08"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{tableName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/table/tables/{tableName}", "2015-04-08"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/table/tables/{tableName}", "2015-04-08"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/table/tables/{tableName}", "2015-04-08"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:     "throughput",
 											Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/apis/table/tables/{tableName}/settings/throughput", "2015-04-08"),
@@ -1991,7 +1991,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "usages",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/usages", "2015-04-08"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "metricDefinitions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/databases/{databaseRid}/collections/{collectionRid}/metricDefinitions", "2015-04-08"),
@@ -2065,13 +2065,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "exports",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.CostManagement/exports", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{exportName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.CostManagement/exports/{exportName}", "2019-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.CostManagement/exports/{exportName}", "2019-01-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.CostManagement/exports/{exportName}", "2019-01-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -2085,39 +2085,39 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "hubs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs", "2017-04-26"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{hubName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}", "2017-04-26"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}", "2017-04-26"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}", "2017-04-26"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}", "2017-04-26"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "authorizationPolicies",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/authorizationPolicies", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{authorizationPolicyName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/authorizationPolicies/{authorizationPolicyName}", "2017-04-26"),
 									PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/authorizationPolicies/{authorizationPolicyName}", "2017-04-26"),
-									Children:    []swagger.SwaggerResourceType{},
+									Children:    []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "connectors",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/connectors", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{connectorName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/connectors/{connectorName}", "2017-04-26"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/connectors/{connectorName}", "2017-04-26"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/connectors/{connectorName}", "2017-04-26"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "mappings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/connectors/{connectorName}/mappings", "2017-04-26"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{mappingName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/connectors/{connectorName}/mappings/{mappingName}", "2017-04-26"),
@@ -2130,30 +2130,30 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "interactions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/interactions", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{interactionName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/interactions/{interactionName}", "2017-04-26"),
 									PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/interactions/{interactionName}", "2017-04-26"),
-									Children:    []swagger.SwaggerResourceType{},
+									Children:    []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "kpi",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/kpi", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{kpiName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/kpi/{kpiName}", "2017-04-26"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/kpi/{kpiName}", "2017-04-26"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/kpi/{kpiName}", "2017-04-26"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "links",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/links", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{linkName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/links/{linkName}", "2017-04-26"),
@@ -2164,31 +2164,31 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "predictions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/predictions", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{predictionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/predictions/{predictionName}", "2017-04-26"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/predictions/{predictionName}", "2017-04-26"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/predictions/{predictionName}", "2017-04-26"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "profiles",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/profiles", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{profileName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/profiles/{profileName}", "2017-04-26"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/profiles/{profileName}", "2017-04-26"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/profiles/{profileName}", "2017-04-26"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "relationshipLinks",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/relationshipLinks", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{relationshipLinkName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/relationshipLinks/{relationshipLinkName}", "2017-04-26"),
@@ -2199,7 +2199,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "relationships",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/relationships", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{relationshipName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/relationships/{relationshipName}", "2017-04-26"),
@@ -2210,7 +2210,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "roleAssignments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/roleAssignments", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{assignmentName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/roleAssignments/{assignmentName}", "2017-04-26"),
@@ -2225,7 +2225,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "views",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/views", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{viewName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/views/{viewName}", "2017-04-26"),
@@ -2236,7 +2236,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "widgetTypes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/widgetTypes", "2017-04-26"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{widgetTypeName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomerInsights/hubs/{hubName}/widgetTypes/{widgetTypeName}", "2017-04-26"),
@@ -2255,14 +2255,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "jobs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs", "2018-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{jobName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}", "2018-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}", "2018-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}", "2018-01-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBox/jobs/{jobName}", "2018-01-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -2276,7 +2276,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "workspaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces", "2018-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{workspaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Databricks/workspaces/{workspaceName}", "2018-04-01"),
@@ -2292,7 +2292,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "catalogs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataCatalog/catalogs", "2016-03-30"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{catalogName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataCatalog/catalogs/{catalogName}", "2016-03-30"),
@@ -2312,18 +2312,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "factories",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories", "2018-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{factoryName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}", "2018-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}", "2018-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}", "2018-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}", "2018-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "datasets",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/datasets", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{datasetName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/datasets/{datasetName}", "2018-06-01"),
@@ -2334,28 +2334,28 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "integrationRuntimes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{integrationRuntimeName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}", "2018-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}", "2018-06-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}", "2018-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}", "2018-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
-									SubResources: []swagger.SwaggerResourceType{
+									Children:       []swagger.ResourceType{},
+									SubResources: []swagger.ResourceType{
 										{
 											Display:        "{nodeName}",
 											Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}/nodes/{nodeName}", "2018-06-01"),
 											DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}/nodes/{nodeName}", "2018-06-01"),
 											PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/integrationRuntimes/{integrationRuntimeName}/nodes/{nodeName}", "2018-06-01"),
-											Children:       []swagger.SwaggerResourceType{},
+											Children:       []swagger.ResourceType{},
 										}},
 								}},
 						},
 						{
 							Display:  "linkedservices",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/linkedservices", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{linkedServiceName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/linkedservices/{linkedServiceName}", "2018-06-01"),
@@ -2366,37 +2366,37 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "pipelines",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{pipelineName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines/{pipelineName}", "2018-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines/{pipelineName}", "2018-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelines/{pipelineName}", "2018-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "triggers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{triggerName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers/{triggerName}", "2018-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers/{triggerName}", "2018-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers/{triggerName}", "2018-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:      "rerunTriggers",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/triggers/{triggerName}/rerunTriggers", "2018-06-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										}},
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{runId}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataFactory/factories/{factoryName}/pipelineruns/{runId}", "2018-06-01"),
-							Children: []swagger.SwaggerResourceType{},
+							Children: []swagger.ResourceType{},
 						}},
 				}},
 		},
@@ -2415,18 +2415,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "accounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts", "2016-11-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}", "2016-11-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}", "2016-11-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}", "2016-11-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}", "2016-11-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "computePolicies",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/computePolicies", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{computePolicyName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/computePolicies/{computePolicyName}", "2016-11-01"),
@@ -2438,7 +2438,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "dataLakeStoreAccounts",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/dataLakeStoreAccounts", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{dataLakeStoreAccountName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/dataLakeStoreAccounts/{dataLakeStoreAccountName}", "2016-11-01"),
@@ -2449,7 +2449,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "firewallRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/firewallRules", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{firewallRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/firewallRules/{firewallRuleName}", "2016-11-01"),
@@ -2461,22 +2461,22 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "storageAccounts",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{storageAccountName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts/{storageAccountName}", "2016-11-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts/{storageAccountName}", "2016-11-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts/{storageAccountName}", "2016-11-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts/{storageAccountName}", "2016-11-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "containers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts/{storageAccountName}/containers", "2016-11-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{containerName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeAnalytics/accounts/{accountName}/storageAccounts/{storageAccountName}/containers/{containerName}", "2016-11-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -2502,18 +2502,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "accounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts", "2016-11-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}", "2016-11-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}", "2016-11-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}", "2016-11-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}", "2016-11-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "firewallRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}/firewallRules", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{firewallRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}/firewallRules/{firewallRuleName}", "2016-11-01"),
@@ -2525,7 +2525,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "trustedIdProviders",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}/trustedIdProviders", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{trustedIdProviderName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}/trustedIdProviders/{trustedIdProviderName}", "2016-11-01"),
@@ -2537,7 +2537,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualNetworkRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}/virtualNetworkRules", "2016-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualNetworkRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataLakeStore/accounts/{accountName}/virtualNetworkRules/{virtualNetworkRuleName}", "2016-11-01"),
@@ -2567,36 +2567,36 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "services",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services", "2018-04-19"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serviceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}", "2018-04-19"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}", "2018-04-19"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}", "2018-04-19"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}", "2018-04-19"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "projects",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects", "2018-04-19"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{projectName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}", "2018-04-19"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}", "2018-04-19"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}", "2018-04-19"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}", "2018-04-19"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "tasks",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks", "2018-04-19"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{taskName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks/{taskName}", "2018-04-19"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks/{taskName}", "2018-04-19"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks/{taskName}", "2018-04-19"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.DataMigration/services/{serviceName}/projects/{projectName}/tasks/{taskName}", "2018-04-19"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -2618,31 +2618,31 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "provisioningServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices", "2018-01-22"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{provisioningServiceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}", "2018-01-22"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}", "2018-01-22"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}", "2018-01-22"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}", "2018-01-22"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "certificates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/certificates", "2018-01-22"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{certificateName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/certificates/{certificateName}", "2018-01-22"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/certificates/{certificateName}", "2018-01-22"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/certificates/{certificateName}", "2018-01-22"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "skus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/skus", "2018-01-22"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{operationId}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/provisioningServices/{provisioningServiceName}/operationresults/{operationId}", "2018-01-22"),
@@ -2660,14 +2660,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "controllers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevSpaces/controllers", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{name}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevSpaces/controllers/{name}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevSpaces/controllers/{name}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevSpaces/controllers/{name}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevSpaces/controllers/{name}", "2019-04-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -2689,19 +2689,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "labs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs", "2018-09-15"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{name}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{name}", "2018-09-15"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{name}", "2018-09-15"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{name}", "2018-09-15"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{name}", "2018-09-15"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				},
 				{
 					Display:  "artifactsources",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/artifactsources", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/artifactsources/{name}", "2018-09-15"),
@@ -2712,7 +2712,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "armtemplates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/artifactsources/{artifactSourceName}/armtemplates", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{name}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/artifactsources/{artifactSourceName}/armtemplates/{name}", "2018-09-15"),
@@ -2721,11 +2721,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "artifacts",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/artifactsources/{artifactSourceName}/artifacts", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{name}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/artifactsources/{artifactSourceName}/artifacts/{name}", "2018-09-15"),
-									Children: []swagger.SwaggerResourceType{},
+									Children: []swagger.ResourceType{},
 								}},
 						}},
 				},
@@ -2737,7 +2737,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "customimages",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/customimages", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/customimages/{name}", "2018-09-15"),
@@ -2749,7 +2749,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "formulas",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/formulas", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/formulas/{name}", "2018-09-15"),
@@ -2765,20 +2765,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "notificationchannels",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/notificationchannels", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/notificationchannels/{name}", "2018-09-15"),
 							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/notificationchannels/{name}", "2018-09-15"),
 							PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/notificationchannels/{name}", "2018-09-15"),
 							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/notificationchannels/{name}", "2018-09-15"),
-							Children:       []swagger.SwaggerResourceType{},
+							Children:       []swagger.ResourceType{},
 						}},
 				},
 				{
 					Display:  "policies",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/policysets/{policySetName}/policies", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/policysets/{policySetName}/policies/{name}", "2018-09-15"),
@@ -2790,20 +2790,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "schedules",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/schedules", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/schedules/{name}", "2018-09-15"),
 							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/schedules/{name}", "2018-09-15"),
 							PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/schedules/{name}", "2018-09-15"),
 							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/schedules/{name}", "2018-09-15"),
-							Children:       []swagger.SwaggerResourceType{},
+							Children:       []swagger.ResourceType{},
 						}},
 				},
 				{
 					Display:  "servicerunners",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/servicerunners", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/servicerunners/{name}", "2018-09-15"),
@@ -2814,7 +2814,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "users",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{name}", "2018-09-15"),
@@ -2825,20 +2825,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "disks",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/disks", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/disks/{name}", "2018-09-15"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/disks/{name}", "2018-09-15"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/disks/{name}", "2018-09-15"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/disks/{name}", "2018-09-15"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "environments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/environments", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/environments/{name}", "2018-09-15"),
@@ -2850,7 +2850,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "secrets",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/secrets", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/secrets/{name}", "2018-09-15"),
@@ -2862,26 +2862,26 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "servicefabrics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{name}", "2018-09-15"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{name}", "2018-09-15"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{name}", "2018-09-15"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{name}", "2018-09-15"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								},
 								{
 									Display:  "schedules",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{serviceFabricName}/schedules", "2018-09-15"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:        "{name}",
 											Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{serviceFabricName}/schedules/{name}", "2018-09-15"),
 											DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{serviceFabricName}/schedules/{name}", "2018-09-15"),
 											PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{serviceFabricName}/schedules/{name}", "2018-09-15"),
 											PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/users/{userName}/servicefabrics/{serviceFabricName}/schedules/{name}", "2018-09-15"),
-											Children:       []swagger.SwaggerResourceType{},
+											Children:       []swagger.ResourceType{},
 										}},
 								}},
 						}},
@@ -2889,33 +2889,33 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "virtualmachines",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{name}", "2018-09-15"),
 							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{name}", "2018-09-15"),
 							PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{name}", "2018-09-15"),
 							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{name}", "2018-09-15"),
-							Children:       []swagger.SwaggerResourceType{},
+							Children:       []swagger.ResourceType{},
 						},
 						{
 							Display:  "schedules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{virtualMachineName}/schedules", "2018-09-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{virtualMachineName}/schedules/{name}", "2018-09-15"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{virtualMachineName}/schedules/{name}", "2018-09-15"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{virtualMachineName}/schedules/{name}", "2018-09-15"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualmachines/{virtualMachineName}/schedules/{name}", "2018-09-15"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				},
 				{
 					Display:  "virtualnetworks",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualnetworks", "2018-09-15"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{name}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/labs/{labName}/virtualnetworks/{name}", "2018-09-15"),
@@ -2928,14 +2928,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "schedules",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/schedules", "2018-09-15"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{name}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/schedules/{name}", "2018-09-15"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/schedules/{name}", "2018-09-15"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/schedules/{name}", "2018-09-15"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DevTestLab/schedules/{name}", "2018-09-15"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -2945,14 +2945,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "dnsZones",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones", "2018-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{zoneName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}", "2018-05-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}", "2018-05-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}", "2018-05-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}", "2018-05-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "all",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/all", "2018-05-01"),
@@ -2961,11 +2961,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "recordsets",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/recordsets", "2018-05-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{recordType}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}", "2018-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{relativeRecordSetName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnsZones/{zoneName}/{recordType}/{relativeRecordSetName}", "2018-05-01"),
@@ -2987,18 +2987,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "domainServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices", "2017-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{domainServiceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices/{domainServiceName}", "2017-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices/{domainServiceName}", "2017-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices/{domainServiceName}", "2017-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices/{domainServiceName}", "2017-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "replicaSets",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices/{domainServiceName}/replicaSets", "2017-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{replicaSetName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AAD/domainServices/{domainServiceName}/replicaSets/{replicaSetName}", "2017-06-01"),
@@ -3020,18 +3020,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "dataBoxEdgeDevices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices", "2019-03-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{deviceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}", "2019-03-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}", "2019-03-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}", "2019-03-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}", "2019-03-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "alerts",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/alerts", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{name}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/alerts/{name}", "2019-03-01"),
@@ -3040,7 +3040,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "bandwidthSchedules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/bandwidthSchedules", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/bandwidthSchedules/{name}", "2019-03-01"),
@@ -3055,7 +3055,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "orders",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/orders", "2019-03-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:        "default",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/orders/default", "2019-03-01"),
@@ -3066,7 +3066,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "roles",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/roles", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/roles/{name}", "2019-03-01"),
@@ -3077,19 +3077,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "shares",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/shares", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/shares/{name}", "2019-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/shares/{name}", "2019-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/shares/{name}", "2019-03-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "storageAccountCredentials",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/storageAccountCredentials", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/storageAccountCredentials/{name}", "2019-03-01"),
@@ -3100,7 +3100,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "triggers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/triggers", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/triggers/{name}", "2019-03-01"),
@@ -3115,7 +3115,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "users",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/users", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/users/{name}", "2019-03-01"),
@@ -3123,7 +3123,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/users/{name}", "2019-03-01"),
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{name}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DataBoxEdge/dataBoxEdgeDevices/{deviceName}/jobs/{name}", "2019-03-01"),
@@ -3141,11 +3141,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "topicTypes",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.EventGrid/topicTypes", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{topicTypeName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.EventGrid/topicTypes/{topicTypeName}", "2019-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "eventTypes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.EventGrid/topicTypes/{topicTypeName}/eventTypes", "2019-06-01"),
@@ -3179,18 +3179,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "domains",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{domainName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}", "2019-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}", "2019-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}", "2019-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}", "2019-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "topics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}/topics", "2019-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{domainTopicName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/domains/{domainName}/topics/{domainTopicName}", "2019-06-01"),
@@ -3223,14 +3223,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "topics",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{topicName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}", "2019-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}", "2019-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}", "2019-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventGrid/topics/{topicName}", "2019-06-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -3247,7 +3247,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.EventGrid/eventSubscriptions/{eventSubscriptionName}", "2019-06-01"),
 			PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.EventGrid/eventSubscriptions/{eventSubscriptionName}", "2019-06-01"),
 			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.EventGrid/eventSubscriptions/{eventSubscriptionName}", "2019-06-01"),
-			Children:       []swagger.SwaggerResourceType{},
+			Children:       []swagger.ResourceType{},
 		},
 		{
 			Display:  "operations",
@@ -3264,45 +3264,45 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "namespaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces", "2017-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{namespaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}", "2017-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}", "2017-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}", "2017-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}", "2017-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "AuthorizationRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/AuthorizationRules", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{authorizationRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "disasterRecoveryConfigs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs", "2017-04-01"),
-							Children: []swagger.SwaggerResourceType{},
-							SubResources: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{},
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{alias}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "AuthorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}/AuthorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{authorizationRuleName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -3310,29 +3310,29 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "eventhubs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{eventHubName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "authorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/authorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{authorizationRuleName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "consumergroups",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/consumergroups", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{consumerGroupName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}/consumergroups/{consumerGroupName}", "2017-04-01"),
@@ -3360,17 +3360,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "frontDoors",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{frontDoorName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "backendPools",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/backendPools", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{backendPoolName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/backendPools/{backendPoolName}", "2019-04-01"),
@@ -3381,19 +3381,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "frontendEndpoints",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/frontendEndpoints", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{frontendEndpointName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/frontendEndpoints/{frontendEndpointName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/frontendEndpoints/{frontendEndpointName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/frontendEndpoints/{frontendEndpointName}", "2019-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "healthProbeSettings",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/healthProbeSettings", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{healthProbeSettingsName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/healthProbeSettings/{healthProbeSettingsName}", "2019-04-01"),
@@ -3404,7 +3404,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "loadBalancingSettings",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/loadBalancingSettings", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{loadBalancingSettingsName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/loadBalancingSettings/{loadBalancingSettingsName}", "2019-04-01"),
@@ -3415,7 +3415,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "routingRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/routingRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{routingRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/frontDoors/{frontDoorName}/routingRules/{routingRuleName}", "2019-04-01"),
@@ -3432,17 +3432,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "guestConfigurationAssignments",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments", "2018-11-20"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{guestConfigurationAssignmentName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}", "2018-11-20"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}", "2018-11-20"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}", "2018-11-20"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "reports",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}/reports", "2018-11-20"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{reportId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/providers/Microsoft.GuestConfiguration/guestConfigurationAssignments/{guestConfigurationAssignmentName}/reports/{reportId}", "2018-11-20"),
@@ -3453,7 +3453,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "applications",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/applications", "2018-06-01-preview"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{applicationName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/applications/{applicationName}", "2018-06-01-preview"),
@@ -3468,14 +3468,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "clusters",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters", "2018-06-01-preview"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{clusterName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}", "2018-06-01-preview"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}", "2018-06-01-preview"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}", "2018-06-01-preview"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}", "2018-06-01-preview"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:        "clustermonitoring",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/clustermonitoring", "2018-06-01-preview"),
@@ -3485,19 +3485,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:      "scriptActions",
 							Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/scriptActions", "2018-06-01-preview"),
-							SubResources: []swagger.SwaggerResourceType{},
+							SubResources: []swagger.ResourceType{},
 						},
 						{
 							Display:  "scriptExecutionHistory",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/scriptExecutionHistory", "2018-06-01-preview"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{scriptExecutionId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/scriptExecutionHistory/{scriptExecutionId}", "2018-06-01-preview"),
-									Children: []swagger.SwaggerResourceType{},
+									Children: []swagger.ResourceType{},
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{extensionName}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HDInsight/clusters/{clusterName}/extensions/{extensionName}", "2018-06-01-preview"),
@@ -3529,40 +3529,40 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "dataManagers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers", "2016-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{dataManagerName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}", "2016-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}", "2016-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}", "2016-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}", "2016-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "dataServices",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{dataServiceName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}", "2016-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "jobDefinitions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}/jobDefinitions", "2016-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{jobDefinitionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}/jobDefinitions/{jobDefinitionName}", "2016-06-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}/jobDefinitions/{jobDefinitionName}", "2016-06-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}/jobDefinitions/{jobDefinitionName}", "2016-06-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "jobs",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}/jobDefinitions/{jobDefinitionName}/jobs", "2016-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{jobId}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataServices/{dataServiceName}/jobDefinitions/{jobDefinitionName}/jobs/{jobId}", "2016-06-01"),
-																	Children: []swagger.SwaggerResourceType{},
+																	Children: []swagger.ResourceType{},
 																}},
 														}},
 												}},
@@ -3576,7 +3576,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "dataStoreTypes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataStoreTypes", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{dataStoreTypeName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataStoreTypes/{dataStoreTypeName}", "2016-06-01"),
@@ -3585,7 +3585,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "dataStores",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataStores", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{dataStoreName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/dataStores/{dataStoreName}", "2016-06-01"),
@@ -3604,7 +3604,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "publicKeys",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/publicKeys", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{publicKeyName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.HybridData/dataManagers/{dataManagerName}/publicKeys/{publicKeyName}", "2016-06-01"),
@@ -3623,7 +3623,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "IoTApps",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.IoTCentral/IoTApps", "2018-09-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.IoTCentral/IoTApps/{resourceName}", "2018-09-01"),
@@ -3643,14 +3643,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "IotHubs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs", "2018-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}", "2018-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}", "2018-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}", "2018-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}", "2018-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "IotHubStats",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/IotHubStats", "2018-04-01"),
@@ -3658,19 +3658,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "certificates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/certificates", "2018-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{certificateName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/certificates/{certificateName}", "2018-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/certificates/{certificateName}", "2018-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/certificates/{certificateName}", "2018-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "jobs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/jobs", "2018-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{jobId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/jobs/{jobId}", "2018-04-01"),
@@ -3684,11 +3684,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "skus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/skus", "2018-04-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "ConsumerGroups",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/eventHubEndpoints/{eventHubEndpointName}/ConsumerGroups", "2018-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Devices/IotHubs/{resourceName}/eventHubEndpoints/{eventHubEndpointName}/ConsumerGroups/{name}", "2018-04-01"),
@@ -3709,7 +3709,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "{vaultName}",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.KeyVault/locations/{location}/deletedVaults/{vaultName}", "2018-02-14"),
-			Children: []swagger.SwaggerResourceType{},
+			Children: []swagger.ResourceType{},
 		},
 		{
 			Display:  "vaults",
@@ -3718,18 +3718,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "vaults",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults", "2018-02-14"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{vaultName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}", "2018-02-14"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}", "2018-02-14"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}", "2018-02-14"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}", "2018-02-14"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "secrets",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/secrets", "2018-02-14"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:       "{secretName}",
 									Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/secrets/{secretName}", "2018-02-14"),
@@ -3737,7 +3737,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									PutEndpoint:   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/secrets/{secretName}", "2018-02-14"),
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{},
+					SubResources: []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -3763,18 +3763,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "labaccounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts", "2018-10-15"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{labAccountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}", "2018-10-15"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}", "2018-10-15"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}", "2018-10-15"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}", "2018-10-15"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "galleryimages",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/galleryimages", "2018-10-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{galleryImageName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/galleryimages/{galleryImageName}", "2018-10-15"),
@@ -3786,36 +3786,36 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "labs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs", "2018-10-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{labName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}", "2018-10-15"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}", "2018-10-15"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}", "2018-10-15"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}", "2018-10-15"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "environmentsettings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings", "2018-10-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{environmentSettingName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}", "2018-10-15"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}", "2018-10-15"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}", "2018-10-15"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}", "2018-10-15"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "environments",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}/environments", "2018-10-15"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{environmentName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}/environments/{environmentName}", "2018-10-15"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}/environments/{environmentName}", "2018-10-15"),
 																	PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}/environments/{environmentName}", "2018-10-15"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/environmentsettings/{environmentSettingName}/environments/{environmentName}", "2018-10-15"),
-																	Children:       []swagger.SwaggerResourceType{},
+																	Children:       []swagger.ResourceType{},
 																}},
 														}},
 												}},
@@ -3823,7 +3823,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "users",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/users", "2018-10-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{userName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labaccounts/{labAccountName}/labs/{labName}/users/{userName}", "2018-10-15"),
@@ -3851,42 +3851,42 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "integrationAccounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts", "2016-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{integrationAccountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}", "2016-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}", "2016-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}", "2016-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}", "2016-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "agreements",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/agreements", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{agreementName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/agreements/{agreementName}", "2016-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/agreements/{agreementName}", "2016-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/agreements/{agreementName}", "2016-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "assemblies",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/assemblies", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{assemblyArtifactName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/assemblies/{assemblyArtifactName}", "2016-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/assemblies/{assemblyArtifactName}", "2016-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/assemblies/{assemblyArtifactName}", "2016-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "batchConfigurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/batchConfigurations", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{batchConfigurationName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/batchConfigurations/{batchConfigurationName}", "2016-06-01"),
@@ -3897,7 +3897,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "certificates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/certificates", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{certificateName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/certificates/{certificateName}", "2016-06-01"),
@@ -3908,43 +3908,43 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "maps",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/maps", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{mapName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/maps/{mapName}", "2016-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/maps/{mapName}", "2016-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/maps/{mapName}", "2016-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "partners",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/partners", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{partnerName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/partners/{partnerName}", "2016-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/partners/{partnerName}", "2016-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/partners/{partnerName}", "2016-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "schemas",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/schemas", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{schemaName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/schemas/{schemaName}", "2016-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/schemas/{schemaName}", "2016-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/schemas/{schemaName}", "2016-06-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "sessions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/sessions", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{sessionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/integrationAccounts/{integrationAccountName}/sessions/{sessionName}", "2016-06-01"),
@@ -3957,42 +3957,42 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "workflows",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows", "2016-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{workflowName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}", "2016-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}", "2016-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}", "2016-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}", "2016-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "runs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{runName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}", "2016-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "actions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions", "2016-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{actionName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}", "2016-06-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "repetitions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/repetitions", "2016-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{repetitionName}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/repetitions/{repetitionName}", "2016-06-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "requestHistories",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/repetitions/{repetitionName}/requestHistories", "2016-06-01"),
-																			SubResources: []swagger.SwaggerResourceType{
+																			SubResources: []swagger.ResourceType{
 																				{
 																					Display:  "{requestHistoryName}",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/repetitions/{repetitionName}/requestHistories/{requestHistoryName}", "2016-06-01"),
@@ -4003,7 +4003,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "requestHistories",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/requestHistories", "2016-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{requestHistoryName}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/requestHistories/{requestHistoryName}", "2016-06-01"),
@@ -4012,7 +4012,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "scopeRepetitions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/scopeRepetitions", "2016-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{repetitionName}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/actions/{actionName}/scopeRepetitions/{repetitionName}", "2016-06-01"),
@@ -4020,7 +4020,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														}},
 												}},
 										}},
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{operationId}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/runs/{runName}/operations/{operationId}", "2016-06-01"),
@@ -4030,19 +4030,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "triggers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/triggers", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{triggerName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/triggers/{triggerName}", "2016-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "histories",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/triggers/{triggerName}/histories", "2016-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{historyName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/triggers/{triggerName}/histories/{historyName}", "2016-06-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										},
 										{
@@ -4054,11 +4054,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "versions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/versions", "2016-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:      "{versionId}",
 									Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Logic/workflows/{workflowName}/versions/{versionId}", "2016-06-01"),
-									SubResources: []swagger.SwaggerResourceType{},
+									SubResources: []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -4074,14 +4074,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "webServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearning/webServices", "2017-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{webServiceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearning/webServices/{webServiceName}", "2017-01-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearning/webServices/{webServiceName}", "2017-01-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearning/webServices/{webServiceName}", "2017-01-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearning/webServices/{webServiceName}", "2017-01-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "listKeys",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearning/webServices/{webServiceName}/listKeys", "2017-01-01"),
@@ -4107,25 +4107,25 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "workspaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces", "2019-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{workspaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}", "2019-05-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}", "2019-05-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}", "2019-05-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}", "2019-05-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "computes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes", "2019-05-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{computeName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}", "2019-05-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}", "2019-05-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}", "2019-05-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/computes/{computeName}", "2019-05-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -4137,7 +4137,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "registrationAssignments",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.ManagedServices/registrationAssignments", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{registrationAssignmentId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.ManagedServices/registrationAssignments/{registrationAssignmentId}", "2019-06-01"),
@@ -4148,7 +4148,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "registrationDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.ManagedServices/registrationDefinitions", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{registrationDefinitionId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.ManagedServices/registrationDefinitions/{registrationDefinitionId}", "2019-06-01"),
@@ -4167,14 +4167,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "accounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maps/accounts", "2018-05-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maps/accounts/{accountName}", "2018-05-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maps/accounts/{accountName}", "2018-05-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maps/accounts/{accountName}", "2018-05-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maps/accounts/{accountName}", "2018-05-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -4192,18 +4192,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "servers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers", "2018-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serverName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}", "2018-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}", "2018-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}", "2018-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}", "2018-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "configurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/configurations", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{configurationName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/configurations/{configurationName}", "2018-06-01"),
@@ -4213,7 +4213,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/databases", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/databases/{databaseName}", "2018-06-01"),
@@ -4224,7 +4224,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "firewallRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/firewallRules", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{firewallRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/firewallRules/{firewallRuleName}", "2018-06-01"),
@@ -4243,7 +4243,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualNetworkRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/virtualNetworkRules", "2018-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualNetworkRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/virtualNetworkRules/{virtualNetworkRuleName}", "2018-06-01"),
@@ -4251,7 +4251,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/virtualNetworkRules/{virtualNetworkRuleName}", "2018-06-01"),
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:     "{securityAlertPolicyName}",
 							Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMariaDB/servers/{serverName}/securityAlertPolicies/{securityAlertPolicyName}", "2018-06-01"),
@@ -4266,11 +4266,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "agreements",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.MarketplaceOrdering/agreements", "2015-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{planId}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.MarketplaceOrdering/agreements/{publisherId}/offers/{offerId}/plans/{planId}", "2015-06-01"),
-					Children: []swagger.SwaggerResourceType{},
+					Children: []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -4281,7 +4281,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "accountFilters",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/accountFilters", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{filterName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/accountFilters/{filterName}", "2018-07-01"),
@@ -4297,7 +4297,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "mediaservices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Media/mediaservices", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{accountName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Media/mediaservices/{accountName}", "2018-07-01"),
@@ -4306,29 +4306,29 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "mediaservices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}", "2018-07-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}", "2018-07-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}", "2018-07-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}", "2018-07-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "liveEvents",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents", "2018-07-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{liveEventName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents/{liveEventName}", "2018-07-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents/{liveEventName}", "2018-07-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents/{liveEventName}", "2018-07-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents/{liveEventName}", "2018-07-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "liveOutputs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents/{liveEventName}/liveOutputs", "2018-07-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{liveOutputName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/liveEvents/{liveEventName}/liveOutputs/{liveOutputName}", "2018-07-01"),
@@ -4341,14 +4341,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "streamingEndpoints",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/streamingEndpoints", "2018-07-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{streamingEndpointName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/streamingEndpoints/{streamingEndpointName}", "2018-07-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/streamingEndpoints/{streamingEndpointName}", "2018-07-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/streamingEndpoints/{streamingEndpointName}", "2018-07-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaservices/{accountName}/streamingEndpoints/{streamingEndpointName}", "2018-07-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -4356,18 +4356,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "assets",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{assetName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets/{assetName}", "2018-07-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets/{assetName}", "2018-07-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets/{assetName}", "2018-07-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets/{assetName}", "2018-07-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "assetFilters",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets/{assetName}/assetFilters", "2018-07-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{filterName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/assets/{assetName}/assetFilters/{filterName}", "2018-07-01"),
@@ -4381,38 +4381,38 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "contentKeyPolicies",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/contentKeyPolicies", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{contentKeyPolicyName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/contentKeyPolicies/{contentKeyPolicyName}", "2018-07-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/contentKeyPolicies/{contentKeyPolicyName}", "2018-07-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/contentKeyPolicies/{contentKeyPolicyName}", "2018-07-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/contentKeyPolicies/{contentKeyPolicyName}", "2018-07-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "transforms",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{transformName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}", "2018-07-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}", "2018-07-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}", "2018-07-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}", "2018-07-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "jobs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}/jobs", "2018-07-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{jobName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}/jobs/{jobName}", "2018-07-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}/jobs/{jobName}", "2018-07-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}/jobs/{jobName}", "2018-07-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/transforms/{transformName}/jobs/{jobName}", "2018-07-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -4420,19 +4420,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "streamingLocators",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/streamingLocators", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{streamingLocatorName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/streamingLocators/{streamingLocatorName}", "2018-07-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/streamingLocators/{streamingLocatorName}", "2018-07-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/streamingLocators/{streamingLocatorName}", "2018-07-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "streamingPolicies",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/streamingPolicies", "2018-07-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{streamingPolicyName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Media/mediaServices/{accountName}/streamingPolicies/{streamingPolicyName}", "2018-07-01"),
@@ -4459,27 +4459,27 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "groups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups", "2018-02-02"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{groupName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}", "2018-02-02"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}", "2018-02-02"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}", "2018-02-02"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "assessments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}/assessments", "2018-02-02"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{assessmentName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}/assessments/{assessmentName}", "2018-02-02"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}/assessments/{assessmentName}", "2018-02-02"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}/assessments/{assessmentName}", "2018-02-02"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "assessedMachines",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}/assessments/{assessmentName}/assessedMachines", "2018-02-02"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{assessedMachineName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/groups/{groupName}/assessments/{assessmentName}/assessedMachines/{assessedMachineName}", "2018-02-02"),
@@ -4492,7 +4492,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "machines",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/machines", "2018-02-02"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{machineName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}/machines/{machineName}", "2018-02-02"),
@@ -4501,14 +4501,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "projects",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Migrate/projects", "2018-02-02"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{projectName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}", "2018-02-02"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}", "2018-02-02"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}", "2018-02-02"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Migrate/projects/{projectName}", "2018-02-02"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -4518,14 +4518,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "actionGroups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{actionGroupName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups/{actionGroupName}", "2019-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups/{actionGroupName}", "2019-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups/{actionGroupName}", "2019-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.insights/actionGroups/{actionGroupName}", "2019-06-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -4539,7 +4539,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "userAssignedIdentities",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities", "2018-11-30"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{resourceName}", "2018-11-30"),
@@ -4563,18 +4563,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "servers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers", "2017-12-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serverName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}", "2017-12-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}", "2017-12-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}", "2017-12-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}", "2017-12-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "configurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/configurations", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{configurationName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/configurations/{configurationName}", "2017-12-01"),
@@ -4584,7 +4584,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/databases", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/databases/{databaseName}", "2017-12-01"),
@@ -4595,7 +4595,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "firewallRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/firewallRules", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{firewallRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/firewallRules/{firewallRuleName}", "2017-12-01"),
@@ -4614,7 +4614,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualNetworkRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/virtualNetworkRules", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualNetworkRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/virtualNetworkRules/{virtualNetworkRuleName}", "2017-12-01"),
@@ -4622,7 +4622,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/virtualNetworkRules/{virtualNetworkRuleName}", "2017-12-01"),
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:     "{securityAlertPolicyName}",
 							Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforMySQL/servers/{serverName}/securityAlertPolicies/{securityAlertPolicyName}", "2017-12-01"),
@@ -4637,36 +4637,36 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "netAppAccounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts", "2019-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}", "2019-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}", "2019-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}", "2019-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}", "2019-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "capacityPools",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools", "2019-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{poolName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}", "2019-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}", "2019-06-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}", "2019-06-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}", "2019-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "volumes",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes", "2019-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{volumeName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}", "2019-06-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}", "2019-06-01"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}", "2019-06-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}", "2019-06-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "mountTargets",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/mountTargets", "2019-06-01"),
@@ -4674,7 +4674,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "snapshots",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/snapshots", "2019-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{snapshotName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NetApp/netAppAccounts/{accountName}/capacityPools/{poolName}/volumes/{volumeName}/snapshots/{snapshotName}", "2019-06-01"),
@@ -4704,11 +4704,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "default",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default", "2019-04-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "predefinedPolicies",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default/predefinedPolicies", "2019-04-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{predefinedPolicyName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Network/applicationGatewayAvailableSslOptions/default/predefinedPolicies/{predefinedPolicyName}", "2019-04-01"),
@@ -4726,14 +4726,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "applicationGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{applicationGatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationGateways/{applicationGatewayName}", "2019-04-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -4743,7 +4743,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "applicationSecurityGroups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationSecurityGroups", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{applicationSecurityGroupName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/applicationSecurityGroups/{applicationSecurityGroupName}", "2019-04-01"),
@@ -4775,7 +4775,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "azureFirewalls",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/azureFirewalls", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{azureFirewallName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/azureFirewalls/{azureFirewallName}", "2019-04-01"),
@@ -4794,7 +4794,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "bastionHosts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{bastionHostName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/bastionHosts/{bastionHostName}", "2019-04-01"),
@@ -4820,7 +4820,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "ddosProtectionPlans",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ddosProtectionPlans", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{ddosProtectionPlanName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ddosProtectionPlans/{ddosProtectionPlanName}", "2019-04-01"),
@@ -4844,18 +4844,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "expressRouteCircuits",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{circuitName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "authorizations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/authorizations", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{authorizationName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/authorizations/{authorizationName}", "2019-04-01"),
@@ -4866,17 +4866,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "peerings",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{peeringName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}", "2019-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "connections",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}/connections", "2019-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{connectionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}/connections/{connectionName}", "2019-04-01"),
@@ -4887,7 +4887,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "peerConnections",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}/peerConnections", "2019-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{connectionName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}/peerConnections/{connectionName}", "2019-04-01"),
@@ -4897,7 +4897,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 											Display:  "stats",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCircuits/{circuitName}/peerings/{peeringName}/stats", "2019-04-01"),
 										}},
-									SubResources: []swagger.SwaggerResourceType{},
+									SubResources: []swagger.ResourceType{},
 								}},
 						},
 						{
@@ -4913,23 +4913,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "expressRouteCrossConnections",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:       "{crossConnectionName}",
 					Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}", "2019-04-01"),
 					PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}", "2019-04-01"),
 					PutEndpoint:   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "peerings",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}/peerings", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{peeringName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}/peerings/{peeringName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}/peerings/{peeringName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteCrossConnections/{crossConnectionName}/peerings/{peeringName}", "2019-04-01"),
-									SubResources:   []swagger.SwaggerResourceType{},
+									SubResources:   []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -4941,17 +4941,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "expressRouteGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{expressRouteGatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteGateways/{expressRouteGatewayName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteGateways/{expressRouteGatewayName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteGateways/{expressRouteGatewayName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "expressRouteConnections",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteGateways/{expressRouteGatewayName}/expressRouteConnections", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{connectionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/expressRouteGateways/{expressRouteGatewayName}/expressRouteConnections/{connectionName}", "2019-04-01"),
@@ -4964,11 +4964,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "ExpressRoutePorts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePorts", "2019-04-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "ExpressRoutePortsLocations",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations", "2019-04-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{locationName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Network/ExpressRoutePortsLocations/{locationName}", "2019-04-01"),
@@ -4978,18 +4978,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "ExpressRoutePorts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{expressRoutePortName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "links",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}/links", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{linkName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ExpressRoutePorts/{expressRoutePortName}/links/{linkName}", "2019-04-01"),
@@ -5004,18 +5004,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "loadBalancers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{loadBalancerName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "backendAddressPools",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/backendAddressPools", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{backendAddressPoolName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/backendAddressPools/{backendAddressPoolName}", "2019-04-01"),
@@ -5024,7 +5024,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "frontendIPConfigurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/frontendIPConfigurations", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{frontendIPConfigurationName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/frontendIPConfigurations/{frontendIPConfigurationName}", "2019-04-01"),
@@ -5033,7 +5033,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "inboundNatRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/inboundNatRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{inboundNatRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/inboundNatRules/{inboundNatRuleName}", "2019-04-01"),
@@ -5044,7 +5044,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "loadBalancingRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/loadBalancingRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{loadBalancingRuleName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/loadBalancingRules/{loadBalancingRuleName}", "2019-04-01"),
@@ -5057,7 +5057,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "outboundRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/outboundRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{outboundRuleName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/outboundRules/{outboundRuleName}", "2019-04-01"),
@@ -5066,7 +5066,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "probes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/probes", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{probeName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/probes/{probeName}", "2019-04-01"),
@@ -5081,7 +5081,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "natGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{natGatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/natGateways/{natGatewayName}", "2019-04-01"),
@@ -5097,18 +5097,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "networkInterfaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{networkInterfaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "ipConfigurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}/ipConfigurations", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{ipConfigurationName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}/ipConfigurations/{ipConfigurationName}", "2019-04-01"),
@@ -5121,7 +5121,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "tapConfigurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}/tapConfigurations", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{tapConfigurationName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}/tapConfigurations/{tapConfigurationName}", "2019-04-01"),
@@ -5138,7 +5138,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "networkProfiles",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkProfiles", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{networkProfileName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkProfiles/{networkProfileName}", "2019-04-01"),
@@ -5154,18 +5154,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "networkSecurityGroups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{networkSecurityGroupName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "defaultSecurityRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/defaultSecurityRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{defaultSecurityRuleName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/defaultSecurityRules/{defaultSecurityRuleName}", "2019-04-01"),
@@ -5174,7 +5174,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "securityRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/securityRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{securityRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/securityRules/{securityRuleName}", "2019-04-01"),
@@ -5191,36 +5191,36 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "networkWatchers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{networkWatcherName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "connectionMonitors",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/connectionMonitors", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{connectionMonitorName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/connectionMonitors/{connectionMonitorName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/connectionMonitors/{connectionMonitorName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/connectionMonitors/{connectionMonitorName}", "2019-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "packetCaptures",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/packetCaptures", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{packetCaptureName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/packetCaptures/{packetCaptureName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/packetCaptures/{packetCaptureName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkWatchers/{networkWatcherName}/packetCaptures/{packetCaptureName}", "2019-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -5236,7 +5236,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "privateEndpoints",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{privateEndpointName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints/{privateEndpointName}", "2019-04-01"),
@@ -5251,13 +5251,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "privateLinkServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serviceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateLinkServices/{serviceName}", "2019-04-01"),
-					SubResources:   []swagger.SwaggerResourceType{},
+					SubResources:   []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -5267,7 +5267,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "publicIPAddresses",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{publicIpAddressName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}", "2019-04-01"),
@@ -5283,7 +5283,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "publicIPPrefixes",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{publicIpPrefixName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPPrefixes/{publicIpPrefixName}", "2019-04-01"),
@@ -5299,18 +5299,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "routeFilters",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{routeFilterName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "routeFilterRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{ruleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeFilters/{routeFilterName}/routeFilterRules/{ruleName}", "2019-04-01"),
@@ -5328,18 +5328,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "routeTables",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{routeTableName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables/{routeTableName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables/{routeTableName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables/{routeTableName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables/{routeTableName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "routes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables/{routeTableName}/routes", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{routeName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/routeTables/{routeTableName}/routes/{routeName}", "2019-04-01"),
@@ -5360,18 +5360,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "serviceEndpointPolicies",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serviceEndpointPolicyName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies/{serviceEndpointPolicyName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies/{serviceEndpointPolicyName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies/{serviceEndpointPolicyName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies/{serviceEndpointPolicyName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "serviceEndpointPolicyDefinitions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies/{serviceEndpointPolicyName}/serviceEndpointPolicyDefinitions", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{serviceEndpointPolicyDefinitionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/serviceEndpointPolicies/{serviceEndpointPolicyName}/serviceEndpointPolicyDefinitions/{serviceEndpointPolicyDefinitionName}", "2019-04-01"),
@@ -5396,14 +5396,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "virtualNetworks",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{virtualNetworkName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "CheckIPAddressAvailability",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/CheckIPAddressAvailability", "2019-04-01"),
@@ -5411,13 +5411,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "subnets",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{subnetName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", "2019-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "ResourceNavigationLinks",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}/ResourceNavigationLinks", "2019-04-01"),
@@ -5435,7 +5435,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualNetworkPeerings",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/virtualNetworkPeerings", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualNetworkPeeringName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/virtualNetworkPeerings/{virtualNetworkPeeringName}", "2019-04-01"),
@@ -5448,26 +5448,26 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "connections",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{virtualNetworkGatewayConnectionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:     "sharedkey",
 							Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}/sharedkey", "2019-04-01"),
 							PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/connections/{virtualNetworkGatewayConnectionName}/sharedkey", "2019-04-01"),
-							Children:    []swagger.SwaggerResourceType{},
+							Children:    []swagger.ResourceType{},
 						}},
 				}},
 		},
 		{
 			Display:  "localNetworkGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/localNetworkGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{localNetworkGatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/localNetworkGateways/{localNetworkGatewayName}", "2019-04-01"),
@@ -5479,14 +5479,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "virtualNetworkGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{virtualNetworkGatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "connections",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}/connections", "2019-04-01"),
@@ -5500,7 +5500,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "virtualNetworkTaps",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkTaps", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{tapName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkTaps/{tapName}", "2019-04-01"),
@@ -5532,31 +5532,31 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "p2svpnGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/p2svpnGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{gatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/p2svpnGateways/{gatewayName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/p2svpnGateways/{gatewayName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/p2svpnGateways/{gatewayName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/p2svpnGateways/{gatewayName}", "2019-04-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "virtualHubs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{virtualHubName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs/{virtualHubName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs/{virtualHubName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs/{virtualHubName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs/{virtualHubName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "hubVirtualNetworkConnections",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs/{virtualHubName}/hubVirtualNetworkConnections", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{connectionName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualHubs/{virtualHubName}/hubVirtualNetworkConnections/{connectionName}", "2019-04-01"),
@@ -5567,7 +5567,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "virtualWans",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{VirtualWANName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{VirtualWANName}", "2019-04-01"),
@@ -5578,7 +5578,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "p2sVpnServerConfigurations",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWanName}/p2sVpnServerConfigurations", "2019-04-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{p2SVpnServerConfigurationName}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualWans/{virtualWanName}/p2sVpnServerConfigurations/{p2SVpnServerConfigurationName}", "2019-04-01"),
@@ -5594,18 +5594,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "vpnGateways",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{gatewayName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways/{gatewayName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways/{gatewayName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways/{gatewayName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways/{gatewayName}", "2019-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "vpnConnections",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways/{gatewayName}/vpnConnections", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{connectionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnGateways/{gatewayName}/vpnConnections/{connectionName}", "2019-04-01"),
@@ -5618,7 +5618,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "vpnSites",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnSites", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{vpnSiteName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/vpnSites/{vpnSiteName}", "2019-04-01"),
@@ -5634,15 +5634,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "networkInterfaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.Compute/virtualMachineScaleSets/{virtualMachineScaleSetName}/virtualMachines/{virtualmachineIndex}/networkInterfaces", "2017-03-30"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{networkInterfaceName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.Compute/virtualMachineScaleSets/{virtualMachineScaleSetName}/virtualMachines/{virtualmachineIndex}/networkInterfaces/{networkInterfaceName}", "2017-03-30"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "ipConfigurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.Compute/virtualMachineScaleSets/{virtualMachineScaleSetName}/virtualMachines/{virtualmachineIndex}/networkInterfaces/{networkInterfaceName}/ipConfigurations", "2017-03-30"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{ipConfigurationName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.Compute/virtualMachineScaleSets/{virtualMachineScaleSetName}/virtualMachines/{virtualmachineIndex}/networkInterfaces/{networkInterfaceName}/ipConfigurations/{ipConfigurationName}", "2017-03-30"),
@@ -5657,7 +5657,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "publicipaddresses",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{virtualMachineScaleSetName}/virtualMachines/{virtualmachineIndex}/networkInterfaces/{networkInterfaceName}/ipconfigurations/{ipConfigurationName}/publicipaddresses", "2017-03-30"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{publicIpAddressName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{virtualMachineScaleSetName}/virtualMachines/{virtualmachineIndex}/networkInterfaces/{networkInterfaceName}/ipconfigurations/{ipConfigurationName}/publicipaddresses/{publicIpAddressName}", "2017-03-30"),
@@ -5670,7 +5670,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "ApplicationGatewayWebApplicationFirewallPolicies",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{policyName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/ApplicationGatewayWebApplicationFirewallPolicies/{policyName}", "2019-04-01"),
@@ -5689,47 +5689,47 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "namespaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces", "2017-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{namespaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}", "2017-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}", "2017-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}", "2017-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}", "2017-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "AuthorizationRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/AuthorizationRules", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{authorizationRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "notificationHubs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{notificationHubName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}", "2017-04-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "AuthorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}/AuthorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{authorizationRuleName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.NotificationHubs/namespaces/{namespaceName}/notificationHubs/{notificationHubName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -5751,13 +5751,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "savedSearches",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/savedSearches", "2015-03-20"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{savedSearchId}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/savedSearches/{savedSearchId}", "2015-03-20"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/savedSearches/{savedSearchId}", "2015-03-20"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/savedSearches/{savedSearchId}", "2015-03-20"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "results",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/savedSearches/{savedSearchId}/results", "2015-03-20"),
@@ -5767,7 +5767,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "storageInsightConfigs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/storageInsightConfigs", "2015-03-20"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{storageInsightName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.OperationalInsights/workspaces/{workspaceName}/storageInsightConfigs/{storageInsightName}", "2015-03-20"),
@@ -5802,14 +5802,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "servers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers", "2017-12-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{serverName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}", "2017-12-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}", "2017-12-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}", "2017-12-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}", "2017-12-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "Replicas",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/Replicas", "2017-12-01"),
@@ -5817,7 +5817,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "configurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/configurations", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{configurationName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/configurations/{configurationName}", "2017-12-01"),
@@ -5827,7 +5827,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "databases",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/databases", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{databaseName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/databases/{databaseName}", "2017-12-01"),
@@ -5838,7 +5838,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "firewallRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/firewallRules", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{firewallRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/firewallRules/{firewallRuleName}", "2017-12-01"),
@@ -5853,7 +5853,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualNetworkRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/virtualNetworkRules", "2017-12-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualNetworkRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/virtualNetworkRules/{virtualNetworkRuleName}", "2017-12-01"),
@@ -5861,7 +5861,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/virtualNetworkRules/{virtualNetworkRuleName}", "2017-12-01"),
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:     "{securityAlertPolicyName}",
 							Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/servers/{serverName}/securityAlertPolicies/{securityAlertPolicyName}", "2017-12-01"),
@@ -5884,14 +5884,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "capacities",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities", "2017-10-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{dedicatedCapacityName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/{dedicatedCapacityName}", "2017-10-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/{dedicatedCapacityName}", "2017-10-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/{dedicatedCapacityName}", "2017-10-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/{dedicatedCapacityName}", "2017-10-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "skus",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBIDedicated/capacities/{dedicatedCapacityName}/skus", "2017-10-01"),
@@ -5909,14 +5909,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "workspaceCollections",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBI/workspaceCollections", "2016-01-29"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{workspaceCollectionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBI/workspaceCollections/{workspaceCollectionName}", "2016-01-29"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBI/workspaceCollections/{workspaceCollectionName}", "2016-01-29"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBI/workspaceCollections/{workspaceCollectionName}", "2016-01-29"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBI/workspaceCollections/{workspaceCollectionName}", "2016-01-29"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "workspaces",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PowerBI/workspaceCollections/{workspaceCollectionName}/workspaces", "2016-01-29"),
@@ -5930,14 +5930,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "privateDnsZones",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones", "2018-09-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{privateZoneName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", "2018-09-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", "2018-09-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", "2018-09-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", "2018-09-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "ALL",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/ALL", "2018-09-01"),
@@ -5945,7 +5945,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualNetworkLinks",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/virtualNetworkLinks", "2018-09-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualNetworkLinkName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/virtualNetworkLinks/{virtualNetworkLinkName}", "2018-09-01"),
@@ -5954,11 +5954,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/virtualNetworkLinks/{virtualNetworkLinkName}", "2018-09-01"),
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{recordType}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}", "2018-09-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{relativeRecordSetName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/{recordType}/{relativeRecordSetName}", "2018-09-01"),
@@ -5984,14 +5984,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "vaults",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults", "2016-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{vaultName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}", "2016-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}", "2016-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}", "2016-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}", "2016-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:       "vaultExtendedInfo",
 							Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/extendedInformation/vaultExtendedInfo", "2016-06-01"),
@@ -6013,8 +6013,8 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "backupJobs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobs", "2017-07-01"),
-			Children: []swagger.SwaggerResourceType{},
-			SubResources: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{},
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{operationId}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{vaultName}/backupJobs/operationResults/{operationId}", "2017-07-01"),
@@ -6047,7 +6047,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationAlertSettings",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationAlertSettings", "2018-07-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:     "{alertSettingName}",
 					Endpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationAlertSettings/{alertSettingName}", "2018-07-10"),
@@ -6057,7 +6057,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationEvents",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationEvents", "2018-07-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{eventName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationEvents/{eventName}", "2018-07-10"),
@@ -6066,17 +6066,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationFabrics",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics", "2018-07-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{fabricName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}", "2018-07-10"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}", "2018-07-10"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}", "2018-07-10"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "replicationLogicalNetworks",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationLogicalNetworks", "2018-07-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{logicalNetworkName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationLogicalNetworks/{logicalNetworkName}", "2018-07-10"),
@@ -6085,15 +6085,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "replicationNetworks",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationNetworks", "2018-07-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{networkName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationNetworks/{networkName}", "2018-07-10"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "replicationNetworkMappings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationNetworks/{networkName}/replicationNetworkMappings", "2018-07-10"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{networkMappingName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationNetworks/{networkName}/replicationNetworkMappings/{networkMappingName}", "2018-07-10"),
@@ -6107,27 +6107,27 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "replicationProtectionContainers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers", "2018-07-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:     "{protectionContainerName}",
 									Endpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}", "2018-07-10"),
 									PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}", "2018-07-10"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "replicationMigrationItems",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems", "2018-07-10"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{migrationItemName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}", "2018-07-10"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}", "2018-07-10"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}", "2018-07-10"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}", "2018-07-10"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "migrationRecoveryPoints",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}/migrationRecoveryPoints", "2018-07-10"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{migrationRecoveryPointName}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationMigrationItems/{migrationItemName}/migrationRecoveryPoints/{migrationRecoveryPointName}", "2018-07-10"),
@@ -6138,7 +6138,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "replicationProtectableItems",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectableItems", "2018-07-10"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{protectableItemName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectableItems/{protectableItemName}", "2018-07-10"),
@@ -6147,18 +6147,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "replicationProtectedItems",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems", "2018-07-10"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{replicatedProtectedItemName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}", "2018-07-10"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}", "2018-07-10"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}", "2018-07-10"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}", "2018-07-10"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "recoveryPoints",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}/recoveryPoints", "2018-07-10"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{recoveryPointName}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectedItems/{replicatedProtectedItemName}/recoveryPoints/{recoveryPointName}", "2018-07-10"),
@@ -6173,14 +6173,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "replicationProtectionContainerMappings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings", "2018-07-10"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{mappingName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings/{mappingName}", "2018-07-10"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings/{mappingName}", "2018-07-10"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings/{mappingName}", "2018-07-10"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationProtectionContainers/{protectionContainerName}/replicationProtectionContainerMappings/{mappingName}", "2018-07-10"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -6188,27 +6188,27 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "replicationRecoveryServicesProviders",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationRecoveryServicesProviders", "2018-07-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{providerName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationRecoveryServicesProviders/{providerName}", "2018-07-10"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationRecoveryServicesProviders/{providerName}", "2018-07-10"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationRecoveryServicesProviders/{providerName}", "2018-07-10"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "replicationStorageClassifications",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationStorageClassifications", "2018-07-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{storageClassificationName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationStorageClassifications/{storageClassificationName}", "2018-07-10"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "replicationStorageClassificationMappings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationStorageClassifications/{storageClassificationName}/replicationStorageClassificationMappings", "2018-07-10"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{storageClassificationMappingName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationStorageClassifications/{storageClassificationName}/replicationStorageClassificationMappings/{storageClassificationMappingName}", "2018-07-10"),
@@ -6221,7 +6221,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "replicationvCenters",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationvCenters", "2018-07-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{vCenterName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationFabrics/{fabricName}/replicationvCenters/{vCenterName}", "2018-07-10"),
@@ -6235,12 +6235,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationJobs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationJobs", "2018-07-10"),
-			Children: []swagger.SwaggerResourceType{},
-			SubResources: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{},
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{jobName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationJobs/{jobName}", "2018-07-10"),
-					Children: []swagger.SwaggerResourceType{},
+					Children: []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -6258,7 +6258,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationPolicies",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationPolicies", "2018-07-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{policyName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationPolicies/{policyName}", "2018-07-10"),
@@ -6282,14 +6282,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationRecoveryPlans",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans", "2018-07-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{recoveryPlanName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans/{recoveryPlanName}", "2018-07-10"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans/{recoveryPlanName}", "2018-07-10"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans/{recoveryPlanName}", "2018-07-10"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationRecoveryPlans/{recoveryPlanName}", "2018-07-10"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -6311,12 +6311,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "replicationVaultHealth",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationVaultHealth", "2018-07-10"),
-			Children: []swagger.SwaggerResourceType{},
+			Children: []swagger.ResourceType{},
 		},
 		{
 			Display:  "replicationVaultSettings",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationVaultSettings", "2018-07-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:     "{vaultSettingName}",
 					Endpoint:    endpoints.MustGetEndpointInfoFromURL("/Subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.RecoveryServices/vaults/{resourceName}/replicationVaultSettings/{vaultSettingName}", "2018-07-10"),
@@ -6338,18 +6338,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "Redis",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis", "2018-03-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{name}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}", "2018-03-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}", "2018-03-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}", "2018-03-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}", "2018-03-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "linkedServers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}/linkedServers", "2018-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{linkedServerName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}/linkedServers/{linkedServerName}", "2018-03-01"),
@@ -6361,7 +6361,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "listUpgradeNotifications",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}/listUpgradeNotifications", "2018-03-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{default}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{name}/patchSchedules/{default}", "2018-03-01"),
@@ -6372,7 +6372,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "firewallRules",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{cacheName}/firewallRules", "2018-03-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{ruleName}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/Redis/{cacheName}/firewallRules/{ruleName}", "2018-03-01"),
@@ -6396,46 +6396,46 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "namespaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces", "2017-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{namespaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}", "2017-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}", "2017-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}", "2017-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}", "2017-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "authorizationRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/authorizationRules", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{authorizationRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "hybridConnections",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{hybridConnectionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "authorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}/authorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{authorizationRuleName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/hybridConnections/{hybridConnectionName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -6443,23 +6443,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "wcfRelays",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{relayName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "authorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}/authorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{authorizationRuleName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Relay/namespaces/{namespaceName}/wcfRelays/{relayName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -6473,20 +6473,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "reservationOrders",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Capacity/reservationOrders", "2017-11-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{reservationOrderId}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}", "2017-11-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "reservations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations", "2017-11-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:       "{reservationId}",
 									Endpoint:      endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}", "2017-11-01"),
 									PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}", "2017-11-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "revisions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Capacity/reservationOrders/{reservationOrderId}/reservations/{reservationId}/revisions", "2017-11-01"),
@@ -6522,7 +6522,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "availabilityStatuses",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses", "2017-07-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "current",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceUri}/providers/Microsoft.ResourceHealth/availabilityStatuses/current", "2017-07-01"),
@@ -6531,7 +6531,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "childAvailabilityStatuses",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses", "2017-07-01"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "current",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceUri}/providers/Microsoft.ResourceHealth/childAvailabilityStatuses/current", "2017-07-01"),
@@ -6568,7 +6568,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "policyDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Authorization/policyDefinitions", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{policyDefinitionName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}", "2019-01-01"),
@@ -6577,7 +6577,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "policyDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{policyDefinitionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}", "2019-01-01"),
@@ -6588,7 +6588,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "policyDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policyDefinitions", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{policyDefinitionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policyDefinitions/{policyDefinitionName}", "2019-01-01"),
@@ -6599,7 +6599,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "policySetDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Authorization/policySetDefinitions", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{policySetDefinitionName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Authorization/policySetDefinitions/{policySetDefinitionName}", "2019-01-01"),
@@ -6608,7 +6608,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "policySetDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policySetDefinitions", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{policySetDefinitionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementgroups/{managementGroupId}/providers/Microsoft.Authorization/policySetDefinitions/{policySetDefinitionName}", "2019-01-01"),
@@ -6619,7 +6619,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "policySetDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{policySetDefinitionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Authorization/policySetDefinitions/{policySetDefinitionName}", "2019-01-01"),
@@ -6638,27 +6638,27 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "features",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Features/providers/{resourceProviderNamespace}/features", "2015-12-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{featureName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Features/providers/{resourceProviderNamespace}/features/{featureName}", "2015-12-01"),
-					Children: []swagger.SwaggerResourceType{},
+					Children: []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "deployments",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/", "2019-05-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{deploymentName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "operations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations", "2019-05-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{operationId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Management/managementGroups/{groupId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}", "2019-05-10"),
@@ -6673,21 +6673,21 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "providers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers", "2019-05-10"),
-			Children: []swagger.SwaggerResourceType{
+			Children: []swagger.ResourceType{
 				{
 					Display:  "deployments",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/", "2019-05-10"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{deploymentName}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
 							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
 							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "operations",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations", "2019-05-10"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{operationId}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Resources/deployments/{deploymentName}/operations/{operationId}", "2019-05-10"),
@@ -6714,7 +6714,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "settings",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/settings", "2019-01-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:     "{settingName}",
 							Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/settings/{settingName}", "2019-01-01"),
@@ -6802,11 +6802,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "topLevelDomains",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.DomainRegistration/topLevelDomains", "2018-02-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{name}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.DomainRegistration/topLevelDomains/{name}", "2018-02-01"),
-							Children: []swagger.SwaggerResourceType{},
+							Children: []swagger.ResourceType{},
 						}},
 				},
 				{
@@ -6832,8 +6832,8 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:      "recommendations",
 					Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Web/recommendations", "2018-02-01"),
-					Children:     []swagger.SwaggerResourceType{},
-					SubResources: []swagger.SwaggerResourceType{},
+					Children:     []swagger.ResourceType{},
+					SubResources: []swagger.ResourceType{},
 				},
 				{
 					Display:  "resourceHealthMetadata",
@@ -6863,26 +6863,26 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 					Display:  "sites",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Web/sites", "2018-02-01"),
 				}},
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{resourceProviderNamespace}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/{resourceProviderNamespace}", "2019-05-10"),
-					Children: []swagger.SwaggerResourceType{},
+					Children: []swagger.ResourceType{},
 				},
 				{
 					Display:  "alerts",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/locations/{ascLocation}/alerts", "2019-01-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:      "{alertName}",
 							Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/locations/{ascLocation}/alerts/{alertName}", "2019-01-01"),
-							SubResources: []swagger.SwaggerResourceType{},
+							SubResources: []swagger.ResourceType{},
 						}},
 				},
 				{
 					Display:  "{default}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.SerialConsole/consoleServices/{default}", "2018-05-01"),
-					Children: []swagger.SwaggerResourceType{},
+					Children: []swagger.ResourceType{},
 				},
 				{
 					Display:  "regions",
@@ -6891,7 +6891,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "clusterVersions",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/clusterVersions", "2018-02-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{clusterVersion}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/clusterVersions/{clusterVersion}", "2018-02-01"),
@@ -6900,7 +6900,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "clusterVersions",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/clusterVersions", "2018-02-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{clusterVersion}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/clusterVersions/{clusterVersion}", "2018-02-01"),
@@ -6917,7 +6917,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "usages",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationName}/usages", "2015-05-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{usageName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Sql/locations/{locationName}/usages/{usageName}", "2015-05-01"),
@@ -6942,15 +6942,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "privateClouds",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds", "2019-04-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{pcName}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}", "2019-04-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "resourcePools",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}/resourcePools", "2019-04-01"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{resourcePoolName}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}/resourcePools/{resourcePoolName}", "2019-04-01"),
@@ -6959,7 +6959,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 								{
 									Display:  "virtualMachineTemplates",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}/virtualMachineTemplates", "2019-04-01"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{virtualMachineTemplateName}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}/virtualMachineTemplates/{virtualMachineTemplateName}", "2019-04-01"),
@@ -6968,7 +6968,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 								{
 									Display:  "virtualNetworks",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}/virtualNetworks", "2019-04-01"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{virtualNetworkName}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.VMwareCloudSimple/locations/{regionId}/privateClouds/{pcName}/virtualNetworks/{virtualNetworkName}", "2019-04-01"),
@@ -6983,7 +6983,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 				{
 					Display:  "deletedSites",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Web/locations/{location}/deletedSites", "2018-02-01"),
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "{deletedSiteId}",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Web/locations/{location}/deletedSites/{deletedSiteId}", "2018-02-01"),
@@ -6997,24 +6997,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "resourcegroups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups", "2019-05-10"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{resourceGroupName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}", "2019-05-10"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}", "2019-05-10"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}", "2019-05-10"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}", "2019-05-10"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "deployments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/", "2019-05-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{deploymentName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Resources/deployments/{deploymentName}", "2019-05-10"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
@@ -7024,15 +7024,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "streamingjobs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs", "2016-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{jobName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}", "2016-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}", "2016-03-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}", "2016-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}", "2016-03-01"),
-									Children:       []swagger.SwaggerResourceType{},
-									SubResources: []swagger.SwaggerResourceType{
+									Children:       []swagger.ResourceType{},
+									SubResources: []swagger.ResourceType{
 										{
 											Display:       "{transformationName}",
 											Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/transformations/{transformationName}", "2016-03-01"),
@@ -7041,11 +7041,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										}},
 								}},
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "operations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments/{deploymentName}/operations", "2019-05-10"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{operationId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/deployments/{deploymentName}/operations/{operationId}", "2019-05-10"),
@@ -7061,40 +7061,40 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "functions",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/functions", "2016-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{functionName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/functions/{functionName}", "2016-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/functions/{functionName}", "2016-03-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/functions/{functionName}", "2016-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/functions/{functionName}", "2016-03-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "inputs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/inputs", "2016-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{inputName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/inputs/{inputName}", "2016-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/inputs/{inputName}", "2016-03-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/inputs/{inputName}", "2016-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/inputs/{inputName}", "2016-03-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "outputs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/outputs", "2016-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{outputName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/outputs/{outputName}", "2016-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/outputs/{outputName}", "2016-03-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/outputs/{outputName}", "2016-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.StreamAnalytics/streamingjobs/{jobName}/outputs/{outputName}", "2016-03-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -7102,7 +7102,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:      "tagNames",
 			Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/tagNames", "2019-05-10"),
-			SubResources: []swagger.SwaggerResourceType{},
+			SubResources: []swagger.ResourceType{},
 		},
 		{
 			Display:        "{resourceId}",
@@ -7114,7 +7114,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "applicationDefinitions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions", "2018-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{applicationDefinitionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applicationDefinitions/{applicationDefinitionName}", "2018-06-01"),
@@ -7125,7 +7125,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "applications",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications", "2018-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{applicationName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Solutions/applications/{applicationName}", "2018-06-01"),
@@ -7144,25 +7144,25 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "jobCollections",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections", "2016-03-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{jobCollectionName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}", "2016-03-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}", "2016-03-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}", "2016-03-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}", "2016-03-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "jobs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}/jobs", "2016-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{jobName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}/jobs/{jobName}", "2016-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}/jobs/{jobName}", "2016-03-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}/jobs/{jobName}", "2016-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}/jobs/{jobName}", "2016-03-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "history",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Scheduler/jobCollections/{jobCollectionName}/jobs/{jobName}/history", "2016-03-01"),
@@ -7178,19 +7178,19 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "searchServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices", "2015-08-19"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{searchServiceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}", "2015-08-19"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}", "2015-08-19"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}", "2015-08-19"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}", "2015-08-19"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "listQueryKeys",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}/listQueryKeys", "2015-08-19"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{},
+					SubResources: []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -7200,11 +7200,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "alerts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/locations/{ascLocation}/alerts", "2019-01-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:      "{alertName}",
 					Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Security/locations/{ascLocation}/alerts/{alertName}", "2019-01-01"),
-					SubResources: []swagger.SwaggerResourceType{},
+					SubResources: []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -7214,45 +7214,45 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "namespaces",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces", "2017-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{namespaceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}", "2017-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}", "2017-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}", "2017-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}", "2017-04-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "AuthorizationRules",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/AuthorizationRules", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{authorizationRuleName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "disasterRecoveryConfigs",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs", "2017-04-01"),
-							Children: []swagger.SwaggerResourceType{},
-							SubResources: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{},
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{alias}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "AuthorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}/AuthorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{authorizationRuleName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/disasterRecoveryConfigs/{alias}/AuthorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -7264,13 +7264,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "migrationConfigurations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/migrationConfigurations", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{configName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/migrationConfigurations/{configName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/migrationConfigurations/{configName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/migrationConfigurations/{configName}", "2017-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
@@ -7281,23 +7281,23 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "queues",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{queueName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "authorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}/authorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{authorizationRuleName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/queues/{queueName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -7305,39 +7305,39 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "topics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics", "2017-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{topicName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}", "2017-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}", "2017-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}", "2017-04-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "authorizationRules",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/authorizationRules", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{authorizationRuleName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/authorizationRules/{authorizationRuleName}", "2017-04-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "subscriptions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions", "2017-04-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{subscriptionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}", "2017-04-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}", "2017-04-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}", "2017-04-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "rules",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}/rules", "2017-04-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{ruleName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceBus/namespaces/{namespaceName}/topics/{topicName}/subscriptions/{subscriptionName}/rules/{ruleName}", "2017-04-01"),
@@ -7369,7 +7369,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:      "SignalR",
 			Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/SignalR", "2018-10-01"),
-			SubResources: []swagger.SwaggerResourceType{},
+			SubResources: []swagger.ResourceType{},
 		},
 		{
 			Display:        "{resourceName}",
@@ -7377,7 +7377,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}", "2018-10-01"),
 			PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}", "2018-10-01"),
 			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.SignalRService/signalR/{resourceName}", "2018-10-01"),
-			Children:       []swagger.SwaggerResourceType{},
+			Children:       []swagger.ResourceType{},
 		},
 		{
 			Display:  "operations",
@@ -7386,18 +7386,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "managers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers", "2017-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{managerName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}", "2017-06-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}", "2017-06-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}", "2017-06-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}", "2017-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "accessControlRecords",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/accessControlRecords", "2017-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{accessControlRecordName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/accessControlRecords/{accessControlRecordName}", "2017-06-01"),
@@ -7416,13 +7416,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "devices",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices", "2017-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{deviceName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}", "2017-06-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}", "2017-06-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}", "2017-06-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:     "default",
 											Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/alertSettings/default", "2017-06-01"),
@@ -7431,7 +7431,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "backupScheduleGroups",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupScheduleGroups", "2016-10-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{scheduleGroupName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupScheduleGroups/{scheduleGroupName}", "2016-10-01"),
@@ -7442,12 +7442,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:      "backups",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backups", "2017-06-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										},
 										{
 											Display:  "chapSettings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/chapSettings", "2016-10-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{chapUserName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/chapSettings/{chapUserName}", "2016-10-01"),
@@ -7462,17 +7462,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "fileservers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers", "2016-10-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{fileServerName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}", "2016-10-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}", "2016-10-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}", "2016-10-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "metrics",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/metrics", "2016-10-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "metricsDefinitions",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/metricsDefinitions", "2016-10-01"),
@@ -7481,17 +7481,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "shares",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/shares", "2016-10-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{shareName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/shares/{shareName}", "2016-10-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/shares/{shareName}", "2016-10-01"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/shares/{shareName}", "2016-10-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "metrics",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/shares/{shareName}/metrics", "2016-10-01"),
-																			Children: []swagger.SwaggerResourceType{
+																			Children: []swagger.ResourceType{
 																				{
 																					Display:  "metricsDefinitions",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/fileservers/{fileServerName}/shares/{shareName}/metricsDefinitions", "2016-10-01"),
@@ -7504,27 +7504,27 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "iscsiservers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers", "2016-10-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{iscsiServerName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}", "2016-10-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}", "2016-10-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}", "2016-10-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "disks",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/disks", "2016-10-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{diskName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/disks/{diskName}", "2016-10-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/disks/{diskName}", "2016-10-01"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/disks/{diskName}", "2016-10-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "metrics",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/disks/{diskName}/metrics", "2016-10-01"),
-																			Children: []swagger.SwaggerResourceType{
+																			Children: []swagger.ResourceType{
 																				{
 																					Display:  "metricsDefinitions",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/disks/{diskName}/metricsDefinitions", "2016-10-01"),
@@ -7535,7 +7535,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "metrics",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/metrics", "2016-10-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "metricsDefinitions",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/iscsiservers/{iscsiServerName}/metricsDefinitions", "2016-10-01"),
@@ -7546,17 +7546,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "jobs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/jobs", "2017-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{jobName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/jobs/{jobName}", "2017-06-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "metrics",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/metrics", "2017-06-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:  "metricsDefinitions",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/metricsDefinitions", "2017-06-01"),
@@ -7583,17 +7583,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "backupPolicies",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupPolicies", "2017-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{backupPolicyName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupPolicies/{backupPolicyName}", "2017-06-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupPolicies/{backupPolicyName}", "2017-06-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupPolicies/{backupPolicyName}", "2017-06-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "schedules",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupPolicies/{backupPolicyName}/schedules", "2017-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{backupScheduleName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/backupPolicies/{backupPolicyName}/schedules/{backupScheduleName}", "2017-06-01"),
@@ -7606,28 +7606,28 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:      "hardwareComponentGroups",
 											Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/hardwareComponentGroups", "2017-06-01"),
-											SubResources: []swagger.SwaggerResourceType{},
+											SubResources: []swagger.ResourceType{},
 										},
 										{
 											Display:       "default",
 											Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/securitySettings/default", "2017-06-01"),
 											PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/securitySettings/default", "2017-06-01"),
-											Children:      []swagger.SwaggerResourceType{},
+											Children:      []swagger.ResourceType{},
 										},
 										{
 											Display:  "volumeContainers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers", "2017-06-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{volumeContainerName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}", "2017-06-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}", "2017-06-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}", "2017-06-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "metrics",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/metrics", "2017-06-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "metricsDefinitions",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/metricsDefinitions", "2017-06-01"),
@@ -7636,17 +7636,17 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "volumes",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/volumes", "2017-06-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{volumeName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/volumes/{volumeName}", "2017-06-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/volumes/{volumeName}", "2017-06-01"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/volumes/{volumeName}", "2017-06-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "metrics",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/volumes/{volumeName}/metrics", "2017-06-01"),
-																			Children: []swagger.SwaggerResourceType{
+																			Children: []swagger.ResourceType{
 																				{
 																					Display:  "metricsDefinitions",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/devices/{deviceName}/volumeContainers/{volumeContainerName}/volumes/{volumeName}/metricsDefinitions", "2017-06-01"),
@@ -7688,7 +7688,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "metrics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/metrics", "2017-06-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "metricsDefinitions",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/metricsDefinitions", "2017-06-01"),
@@ -7697,7 +7697,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "storageAccountCredentials",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/storageAccountCredentials", "2017-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{credentialName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/storageAccountCredentials/{credentialName}", "2016-10-01"),
@@ -7714,7 +7714,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "storageDomains",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/storageDomains", "2016-10-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{storageDomainName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/storageDomains/{storageDomainName}", "2016-10-01"),
@@ -7725,7 +7725,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "bandwidthSettings",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/bandwidthSettings", "2017-06-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{bandwidthSettingName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/bandwidthSettings/{bandwidthSettingName}", "2017-06-01"),
@@ -7741,21 +7741,21 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 							Display:  "features",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorSimple/managers/{managerName}/features", "2017-06-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{},
+					SubResources: []swagger.ResourceType{},
 				}},
 		},
 		{
 			Display:  "containers",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{containerName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}", "2019-04-01"),
-					Children:       []swagger.SwaggerResourceType{},
-					SubResources: []swagger.SwaggerResourceType{
+					Children:       []swagger.ResourceType{},
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{immutabilityPolicyName}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}/immutabilityPolicies/{immutabilityPolicyName}", "2019-04-01"),
@@ -7776,15 +7776,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "storageAccounts",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts", "2019-04-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{accountName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", "2019-04-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", "2019-04-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", "2019-04-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", "2019-04-01"),
-					Children:       []swagger.SwaggerResourceType{},
-					SubResources: []swagger.SwaggerResourceType{
+					Children:       []swagger.ResourceType{},
+					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{managementPolicyName}",
 							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/managementPolicies/{managementPolicyName}", "2019-04-01"),
@@ -7796,7 +7796,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "locations",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ImportExport/locations", "2016-11-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{locationName}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ImportExport/locations/{locationName}", "2016-11-01"),
@@ -7809,14 +7809,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "jobs",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ImportExport/jobs", "2016-11-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{jobName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ImportExport/jobs/{jobName}", "2016-11-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ImportExport/jobs/{jobName}", "2016-11-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ImportExport/jobs/{jobName}", "2016-11-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ImportExport/jobs/{jobName}", "2016-11-01"),
-					Children:       []swagger.SwaggerResourceType{},
+					Children:       []swagger.ResourceType{},
 				}},
 		},
 		{
@@ -7830,59 +7830,59 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "storageSyncServices",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices", "2019-03-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{storageSyncServiceName}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}", "2019-03-01"),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}", "2019-03-01"),
 					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}", "2019-03-01"),
 					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}", "2019-03-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "registeredServers",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/registeredServers", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{serverId}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/registeredServers/{serverId}", "2019-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/registeredServers/{serverId}", "2019-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/registeredServers/{serverId}", "2019-03-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "syncGroups",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{syncGroupName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}", "2019-03-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}", "2019-03-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}", "2019-03-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "cloudEndpoints",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/cloudEndpoints", "2019-03-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{cloudEndpointName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/cloudEndpoints/{cloudEndpointName}", "2019-03-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/cloudEndpoints/{cloudEndpointName}", "2019-03-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/cloudEndpoints/{cloudEndpointName}", "2019-03-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "serverEndpoints",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/serverEndpoints", "2019-03-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{serverEndpointName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/serverEndpoints/{serverEndpointName}", "2019-03-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/serverEndpoints/{serverEndpointName}", "2019-03-01"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/serverEndpoints/{serverEndpointName}", "2019-03-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/syncGroups/{syncGroupName}/serverEndpoints/{serverEndpointName}", "2019-03-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -7890,11 +7890,11 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "workflows",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/workflows", "2019-03-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{workflowId}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.StorageSync/storageSyncServices/{storageSyncServiceName}/workflows/{workflowId}", "2019-03-01"),
-									Children: []swagger.SwaggerResourceType{},
+									Children: []swagger.ResourceType{},
 								}},
 						}},
 				}},
@@ -7906,31 +7906,31 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "subscriptions",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions", "2016-06-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{subscriptionId}",
 					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}", "2016-06-01"),
-					Children: []swagger.SwaggerResourceType{
+					Children: []swagger.ResourceType{
 						{
 							Display:  "locations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/locations", "2016-06-01"),
 						}},
-					SubResources: []swagger.SwaggerResourceType{
+					SubResources: []swagger.ResourceType{
 						{
 							Display:  "environments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments", "2017-11-15"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{environmentName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}", "2017-11-15"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}", "2017-11-15"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}", "2017-11-15"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}", "2017-11-15"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "accessPolicies",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}/accessPolicies", "2017-11-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{accessPolicyName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}/accessPolicies/{accessPolicyName}", "2017-11-15"),
@@ -7942,7 +7942,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "eventSources",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}/eventSources", "2017-11-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{eventSourceName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}/eventSources/{eventSourceName}", "2017-11-15"),
@@ -7954,7 +7954,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "referenceDataSets",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}/referenceDataSets", "2017-11-15"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{referenceDataSetName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.TimeSeriesInsights/environments/{environmentName}/referenceDataSets/{referenceDataSetName}", "2017-11-15"),
@@ -7968,14 +7968,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "trafficmanagerprofiles",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles", "2018-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{profileName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}", "2018-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}", "2018-04-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}", "2018-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}", "2018-04-01"),
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{heatMapType}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles/{profileName}/heatMaps/{heatMapType}", "2018-04-01"),
@@ -7992,7 +7992,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "dedicatedCloudNodes",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/dedicatedCloudNodes", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{dedicatedCloudNodeName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/dedicatedCloudNodes/{dedicatedCloudNodeName}", "2019-04-01"),
@@ -8004,7 +8004,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "dedicatedCloudServices",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/dedicatedCloudServices", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{dedicatedCloudServiceName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/dedicatedCloudServices/{dedicatedCloudServiceName}", "2019-04-01"),
@@ -8016,31 +8016,31 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "virtualMachines",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/virtualMachines", "2019-04-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{virtualMachineName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/virtualMachines/{virtualMachineName}", "2019-04-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/virtualMachines/{virtualMachineName}", "2019-04-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/virtualMachines/{virtualMachineName}", "2019-04-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.VMwareCloudSimple/virtualMachines/{virtualMachineName}", "2019-04-01"),
-									Children:       []swagger.SwaggerResourceType{},
+									Children:       []swagger.ResourceType{},
 								}},
 						},
 						{
 							Display:  "certificateOrders",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{certificateOrderName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}", "2018-02-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}", "2018-02-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}", "2018-02-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "certificates",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}/certificates", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{name}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CertificateRegistration/certificateOrders/{certificateOrderName}/certificates/{name}", "2018-02-01"),
@@ -8054,18 +8054,18 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "domains",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{domainName}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}", "2018-02-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}", "2018-02-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}", "2018-02-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "domainOwnershipIdentifiers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}/domainOwnershipIdentifiers", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{name}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DomainRegistration/domains/{domainName}/domainOwnershipIdentifiers/{name}", "2018-02-01"),
@@ -8079,14 +8079,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "hostingEnvironments",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}", "2018-02-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}", "2018-02-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}", "2018-02-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "compute",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/capacities/compute", "2018-02-01"),
@@ -8098,7 +8098,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "diagnostics",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/diagnostics", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{diagnosticsName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/diagnostics/{diagnosticsName}", "2018-02-01"),
@@ -8119,13 +8119,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "multiRolePools",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:       "default",
 													Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools/default", "2018-02-01"),
 													PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools/default", "2018-02-01"),
 													PutEndpoint:   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools/default", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "metricdefinitions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools/default/metricdefinitions", "2018-02-01"),
@@ -8142,7 +8142,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 															Display:  "usages",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools/default/usages", "2018-02-01"),
 														}},
-													SubResources: []swagger.SwaggerResourceType{
+													SubResources: []swagger.ResourceType{
 														{
 															Display:  "metricdefinitions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/multiRolePools/default/instances/{instance}/metricdefinitions", "2018-02-01"),
@@ -8176,13 +8176,13 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "workerPools",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:       "{workerPoolName}",
 													Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools/{workerPoolName}", "2018-02-01"),
 													PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools/{workerPoolName}", "2018-02-01"),
 													PutEndpoint:   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools/{workerPoolName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "metricdefinitions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools/{workerPoolName}/metricdefinitions", "2018-02-01"),
@@ -8199,7 +8199,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 															Display:  "usages",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools/{workerPoolName}/usages", "2018-02-01"),
 														}},
-													SubResources: []swagger.SwaggerResourceType{
+													SubResources: []swagger.ResourceType{
 														{
 															Display:  "metricdefinitions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/workerPools/{workerPoolName}/instances/{instance}/metricdefinitions", "2018-02-01"),
@@ -8213,7 +8213,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "detectors",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/detectors", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{detectorName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{name}/detectors/{detectorName}", "2018-02-01"),
@@ -8227,26 +8227,26 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 								{
 									Display:  "recommendations",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{hostingEnvironmentName}/recommendations", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{},
-									SubResources: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{},
+									SubResources: []swagger.ResourceType{
 										{
 											Display:  "{name}",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/hostingEnvironments/{hostingEnvironmentName}/recommendations/{name}", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{},
+											Children: []swagger.ResourceType{},
 										}},
 								}},
 						},
 						{
 							Display:  "serverfarms",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}", "2018-02-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}", "2018-02-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}", "2018-02-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "capabilities",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/capabilities", "2018-02-01"),
@@ -8282,15 +8282,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "virtualNetworkConnections",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{vnetName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "routes",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{routeName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes/{routeName}", "2018-02-01"),
@@ -8299,7 +8299,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/routes/{routeName}", "2018-02-01"),
 																}},
 														}},
-													SubResources: []swagger.SwaggerResourceType{
+													SubResources: []swagger.ResourceType{
 														{
 															Display:     "{gatewayName}",
 															Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}", "2018-02-01"),
@@ -8307,12 +8307,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														}},
 												}},
 										}},
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:        "{relayName}",
 											Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 											DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:  "sites",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}/sites", "2018-02-01"),
@@ -8323,7 +8323,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "certificates",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/certificates", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/certificates/{name}", "2018-02-01"),
@@ -8335,7 +8335,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "detectors",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/detectors", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{detectorName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/detectors/{detectorName}", "2018-02-01"),
@@ -8344,29 +8344,29 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "diagnostics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/diagnostics", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{diagnosticCategory}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/diagnostics/{diagnosticCategory}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "analyses",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/diagnostics/{diagnosticCategory}/analyses", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{analysisName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/diagnostics/{diagnosticCategory}/analyses/{analysisName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "detectors",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/diagnostics/{diagnosticCategory}/detectors", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{detectorName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/diagnostics/{diagnosticCategory}/detectors/{detectorName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -8374,7 +8374,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "detectors",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/detectors", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{detectorName}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/detectors/{detectorName}", "2018-02-01"),
@@ -8383,29 +8383,29 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "diagnostics",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/diagnostics", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{diagnosticCategory}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/diagnostics/{diagnosticCategory}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "analyses",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/diagnostics/{diagnosticCategory}/analyses", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{analysisName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/diagnostics/{diagnosticCategory}/analyses/{analysisName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "detectors",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/diagnostics/{diagnosticCategory}/detectors", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{detectorName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/slots/{slot}/diagnostics/{diagnosticCategory}/detectors/{detectorName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{},
+													Children: []swagger.ResourceType{},
 												}},
 										}},
 								}},
@@ -8417,12 +8417,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "recommendations",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/recommendations", "2018-02-01"),
-							Children: []swagger.SwaggerResourceType{},
-							SubResources: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{},
+							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{name}",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/recommendations/{name}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{},
+									Children: []swagger.ResourceType{},
 								}},
 						},
 						{
@@ -8432,7 +8432,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "resourceHealthMetadata",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/resourceHealthMetadata", "2018-02-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "default",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/resourceHealthMetadata/default", "2018-02-01"),
@@ -8441,7 +8441,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "resourceHealthMetadata",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/resourceHealthMetadata", "2018-02-01"),
-							Children: []swagger.SwaggerResourceType{
+							Children: []swagger.ResourceType{
 								{
 									Display:  "default",
 									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/resourceHealthMetadata/default", "2018-02-01"),
@@ -8450,14 +8450,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 						{
 							Display:  "sites",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites", "2018-02-01"),
-							SubResources: []swagger.SwaggerResourceType{
+							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{name}",
 									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
 									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
 									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
 									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}", "2018-02-01"),
-									Children: []swagger.SwaggerResourceType{
+									Children: []swagger.ResourceType{
 										{
 											Display:  "analyzeCustomHostname",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/analyzeCustomHostname", "2018-02-01"),
@@ -8465,7 +8465,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "config",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:     "appsettings",
 													Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list", "2018-02-01"),
@@ -8529,15 +8529,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 													Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
 													PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
 													PutEndpoint:   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "snapshots",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web/snapshots", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{snapshotId}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/web/snapshots/{snapshotId}", "2018-02-01"),
-																	Children: []swagger.SwaggerResourceType{},
+																	Children: []swagger.ResourceType{},
 																}},
 														}},
 												}},
@@ -8545,24 +8545,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "continuouswebjobs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{webJobName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs/{webJobName}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/continuouswebjobs/{webJobName}", "2018-02-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "deployments",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{id}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments/{id}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments/{id}", "2018-02-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments/{id}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "log",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/deployments/{id}/log", "2018-02-01"),
@@ -8572,7 +8572,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "domainOwnershipIdentifiers",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/domainOwnershipIdentifiers", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{domainOwnershipIdentifierName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/domainOwnershipIdentifiers/{domainOwnershipIdentifierName}", "2018-02-01"),
@@ -8585,7 +8585,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 											Display:     "MSDeploy",
 											Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy", "2018-02-01"),
 											PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:  "log",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/extensions/MSDeploy/log", "2018-02-01"),
@@ -8594,24 +8594,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "functions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:  "token",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/admin/token", "2018-02-01"),
 												}},
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{functionName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/{functionName}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/{functionName}", "2018-02-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/functions/{functionName}", "2018-02-01"),
-													Children:       []swagger.SwaggerResourceType{},
+													Children:       []swagger.ResourceType{},
 												}},
 										},
 										{
 											Display:  "hostNameBindings",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostNameBindings", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{hostName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hostNameBindings/{hostName}", "2018-02-01"),
@@ -8626,7 +8626,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "hybridconnection",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{entityName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridconnection/{entityName}", "2018-02-01"),
@@ -8638,12 +8638,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "instances",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:     "MSDeploy",
 													Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy", "2018-02-01"),
 													PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "log",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/extensions/MSDeploy/log", "2018-02-01"),
@@ -8652,12 +8652,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 												{
 													Display:  "processes",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes", "2018-02-01"),
-													SubResources: []swagger.SwaggerResourceType{
+													SubResources: []swagger.ResourceType{
 														{
 															Display:        "{processId}",
 															Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}", "2018-02-01"),
 															DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}", "2018-02-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "dump",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/dump", "2018-02-01"),
@@ -8665,7 +8665,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																{
 																	Display:  "modules",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules", "2018-02-01"),
-																	SubResources: []swagger.SwaggerResourceType{
+																	SubResources: []swagger.ResourceType{
 																		{
 																			Display:  "{baseAddress}",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
@@ -8674,7 +8674,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																{
 																	Display:  "threads",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/threads", "2018-02-01"),
-																	SubResources: []swagger.SwaggerResourceType{
+																	SubResources: []swagger.ResourceType{
 																		{
 																			Display:  "{threadId}",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/instances/{instanceId}/processes/{processId}/threads/{threadId}", "2018-02-01"),
@@ -8709,7 +8709,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "premieraddons",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/premieraddons", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{premierAddOnName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/premieraddons/{premierAddOnName}", "2018-02-01"),
@@ -8726,12 +8726,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "processes",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{processId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "dump",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/dump", "2018-02-01"),
@@ -8739,7 +8739,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "modules",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{baseAddress}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
@@ -8748,7 +8748,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "threads",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/threads", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{threadId}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/processes/{processId}/threads/{threadId}", "2018-02-01"),
@@ -8759,7 +8759,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "publicCertificates",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/publicCertificates", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{publicCertificateName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/publicCertificates/{publicCertificateName}", "2018-02-01"),
@@ -8770,7 +8770,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "siteextensions",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{siteExtensionId}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/siteextensions/{siteExtensionId}", "2018-02-01"),
@@ -8781,15 +8781,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "slots",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{},
-											SubResources: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{},
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{slot}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "analyzeCustomHostname",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/analyzeCustomHostname", "2018-02-01"),
@@ -8797,7 +8797,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "config",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config", "2018-02-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:     "logs",
 																	Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/logs", "2018-02-01"),
@@ -8808,15 +8808,15 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																	Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web", "2018-02-01"),
 																	PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web", "2018-02-01"),
 																	PutEndpoint:   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web", "2018-02-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "snapshots",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web/snapshots", "2018-02-01"),
-																			SubResources: []swagger.SwaggerResourceType{
+																			SubResources: []swagger.ResourceType{
 																				{
 																					Display:  "{snapshotId}",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/config/web/snapshots/{snapshotId}", "2018-02-01"),
-																					Children: []swagger.SwaggerResourceType{},
+																					Children: []swagger.ResourceType{},
 																				}},
 																		}},
 																}},
@@ -8824,24 +8824,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "continuouswebjobs",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{webJobName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs/{webJobName}", "2018-02-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/continuouswebjobs/{webJobName}", "2018-02-01"),
-																	Children:       []swagger.SwaggerResourceType{},
+																	Children:       []swagger.ResourceType{},
 																}},
 														},
 														{
 															Display:  "deployments",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{id}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments/{id}", "2018-02-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments/{id}", "2018-02-01"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments/{id}", "2018-02-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "log",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/deployments/{id}/log", "2018-02-01"),
@@ -8851,7 +8851,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "domainOwnershipIdentifiers",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/domainOwnershipIdentifiers", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{domainOwnershipIdentifierName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/domainOwnershipIdentifiers/{domainOwnershipIdentifierName}", "2018-02-01"),
@@ -8864,7 +8864,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 															Display:     "MSDeploy",
 															Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy", "2018-02-01"),
 															PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy", "2018-02-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "log",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/extensions/MSDeploy/log", "2018-02-01"),
@@ -8873,24 +8873,24 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "functions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions", "2018-02-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "token",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/admin/token", "2018-02-01"),
 																}},
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{functionName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/{functionName}", "2018-02-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/{functionName}", "2018-02-01"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/functions/{functionName}", "2018-02-01"),
-																	Children:       []swagger.SwaggerResourceType{},
+																	Children:       []swagger.ResourceType{},
 																}},
 														},
 														{
 															Display:  "hostNameBindings",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hostNameBindings", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{hostName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hostNameBindings/{hostName}", "2018-02-01"),
@@ -8905,7 +8905,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "hybridconnection",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{entityName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridconnection/{entityName}", "2018-02-01"),
@@ -8917,12 +8917,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "instances",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:     "MSDeploy",
 																	Endpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy", "2018-02-01"),
 																	PutEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy", "2018-02-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "log",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/extensions/MSDeploy/log", "2018-02-01"),
@@ -8931,12 +8931,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																{
 																	Display:  "processes",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes", "2018-02-01"),
-																	SubResources: []swagger.SwaggerResourceType{
+																	SubResources: []swagger.ResourceType{
 																		{
 																			Display:        "{processId}",
 																			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}", "2018-02-01"),
 																			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}", "2018-02-01"),
-																			Children: []swagger.SwaggerResourceType{
+																			Children: []swagger.ResourceType{
 																				{
 																					Display:  "dump",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/dump", "2018-02-01"),
@@ -8944,7 +8944,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																				{
 																					Display:  "modules",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules", "2018-02-01"),
-																					SubResources: []swagger.SwaggerResourceType{
+																					SubResources: []swagger.ResourceType{
 																						{
 																							Display:  "{baseAddress}",
 																							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
@@ -8953,7 +8953,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																				{
 																					Display:  "threads",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/threads", "2018-02-01"),
-																					SubResources: []swagger.SwaggerResourceType{
+																					SubResources: []swagger.ResourceType{
 																						{
 																							Display:  "{threadId}",
 																							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/instances/{instanceId}/processes/{processId}/threads/{threadId}", "2018-02-01"),
@@ -8992,7 +8992,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "premieraddons",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/premieraddons", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{premierAddOnName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/premieraddons/{premierAddOnName}", "2018-02-01"),
@@ -9009,12 +9009,12 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "processes",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{processId}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}", "2018-02-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}", "2018-02-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "dump",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/dump", "2018-02-01"),
@@ -9022,7 +9022,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																		{
 																			Display:  "modules",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules", "2018-02-01"),
-																			SubResources: []swagger.SwaggerResourceType{
+																			SubResources: []swagger.ResourceType{
 																				{
 																					Display:  "{baseAddress}",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/modules/{baseAddress}", "2018-02-01"),
@@ -9031,7 +9031,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 																		{
 																			Display:  "threads",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/threads", "2018-02-01"),
-																			SubResources: []swagger.SwaggerResourceType{
+																			SubResources: []swagger.ResourceType{
 																				{
 																					Display:  "{threadId}",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/processes/{processId}/threads/{threadId}", "2018-02-01"),
@@ -9042,7 +9042,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "publicCertificates",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/publicCertificates", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{publicCertificateName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/publicCertificates/{publicCertificateName}", "2018-02-01"),
@@ -9053,7 +9053,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "siteextensions",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{siteExtensionId}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/siteextensions/{siteExtensionId}", "2018-02-01"),
@@ -9064,7 +9064,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "snapshots",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/snapshots", "2018-02-01"),
-															Children: []swagger.SwaggerResourceType{
+															Children: []swagger.ResourceType{
 																{
 																	Display:  "snapshotsdr",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/snapshotsdr", "2018-02-01"),
@@ -9080,16 +9080,16 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "triggeredwebjobs",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{webJobName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}", "2018-02-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}", "2018-02-01"),
-																	Children: []swagger.SwaggerResourceType{
+																	Children: []swagger.ResourceType{
 																		{
 																			Display:  "history",
 																			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history", "2018-02-01"),
-																			SubResources: []swagger.SwaggerResourceType{
+																			SubResources: []swagger.ResourceType{
 																				{
 																					Display:  "{id}",
 																					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/triggeredwebjobs/{webJobName}/history/{id}", "2018-02-01"),
@@ -9104,14 +9104,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "virtualNetworkConnections",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:        "{vnetName}",
 																	Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 																	DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 																	PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 																	PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
-																	SubResources: []swagger.SwaggerResourceType{
+																	SubResources: []swagger.ResourceType{
 																		{
 																			Display:       "{gatewayName}",
 																			Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}", "2018-02-01"),
@@ -9123,20 +9123,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 														{
 															Display:  "webjobs",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/webjobs", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{webJobName}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/webjobs/{webJobName}", "2018-02-01"),
 																}},
 														}},
-													SubResources: []swagger.SwaggerResourceType{
+													SubResources: []swagger.ResourceType{
 														{
 															Display:        "{relayName}",
 															Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 															DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 															PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 															PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/slots/{slot}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
-															Children:       []swagger.SwaggerResourceType{},
+															Children:       []swagger.ResourceType{},
 														},
 														{
 															Display:  "{view}",
@@ -9163,7 +9163,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "snapshots",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/snapshots", "2018-02-01"),
-											Children: []swagger.SwaggerResourceType{
+											Children: []swagger.ResourceType{
 												{
 													Display:  "snapshotsdr",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/snapshotsdr", "2018-02-01"),
@@ -9179,16 +9179,16 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "triggeredwebjobs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{webJobName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}", "2018-02-01"),
-													Children: []swagger.SwaggerResourceType{
+													Children: []swagger.ResourceType{
 														{
 															Display:  "history",
 															Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history", "2018-02-01"),
-															SubResources: []swagger.SwaggerResourceType{
+															SubResources: []swagger.ResourceType{
 																{
 																	Display:  "{id}",
 																	Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/triggeredwebjobs/{webJobName}/history/{id}", "2018-02-01"),
@@ -9203,14 +9203,14 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "virtualNetworkConnections",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{vnetName}",
 													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
 													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}", "2018-02-01"),
-													SubResources: []swagger.SwaggerResourceType{
+													SubResources: []swagger.ResourceType{
 														{
 															Display:       "{gatewayName}",
 															Endpoint:      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/virtualNetworkConnections/{vnetName}/gateways/{gatewayName}", "2018-02-01"),
@@ -9222,20 +9222,20 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 										{
 											Display:  "webjobs",
 											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/webjobs", "2018-02-01"),
-											SubResources: []swagger.SwaggerResourceType{
+											SubResources: []swagger.ResourceType{
 												{
 													Display:  "{webJobName}",
 													Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/webjobs/{webJobName}", "2018-02-01"),
 												}},
 										}},
-									SubResources: []swagger.SwaggerResourceType{
+									SubResources: []swagger.ResourceType{
 										{
 											Display:        "{relayName}",
 											Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 											DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 											PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
 											PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/hybridConnectionNamespaces/{namespaceName}/relays/{relayName}", "2018-02-01"),
-											Children:       []swagger.SwaggerResourceType{},
+											Children:       []swagger.ResourceType{},
 										},
 										{
 											Display:  "{view}",
@@ -9301,7 +9301,7 @@ func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourc
 		{
 			Display:  "sourcecontrols",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Web/sourcecontrols", "2018-02-01"),
-			SubResources: []swagger.SwaggerResourceType{
+			SubResources: []swagger.ResourceType{
 				{
 					Display:     "{sourceControlType}",
 					Endpoint:    endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Web/sourcecontrols/{sourceControlType}", "2018-02-01"),

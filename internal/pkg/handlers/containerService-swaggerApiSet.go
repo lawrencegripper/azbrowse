@@ -12,65 +12,78 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
-// ResourceResponse Resources list rest type
-type KubernetesListResponse struct {
-	Items []KubernetesItem `json:"items"`
+type kubernetesListResponse struct {
+	Items []kubernetesItem `json:"items"`
 }
-type KubernetesItem struct {
+type kubernetesItem struct {
 	Metadata struct {
 		Name     string `yaml:"name"`
 		SelfLink string `yaml:"selfLink"`
-	} `yaml:"metadata`
+	} `yaml:"metadata"`
 }
 
-type SwaggerConfigContainerService struct {
-	resourceTypes []swagger.SwaggerResourceType
+// SwaggerAPISetContainerService holds the config for working with an AKS cluster API
+type SwaggerAPISetContainerService struct {
+	resourceTypes []swagger.ResourceType
 	httpClient    http.Client
 	clusterID     string
-	serverUrl     string
+	serverURL     string
 }
 
-func NewSwaggerConfigContainerService(resourceTypes []swagger.SwaggerResourceType, httpClient http.Client, clusterID string, serverUrl string) SwaggerConfigContainerService {
-	c := SwaggerConfigContainerService{}
+// NewSwaggerAPISetContainerService creates a new SwaggerAPISetContainerService
+func NewSwaggerAPISetContainerService(resourceTypes []swagger.ResourceType, httpClient http.Client, clusterID string, serverURL string) SwaggerAPISetContainerService {
+	c := SwaggerAPISetContainerService{}
 	c.resourceTypes = resourceTypes
 	c.httpClient = httpClient
 	c.clusterID = clusterID
-	c.serverUrl = serverUrl
+	c.serverURL = serverURL
 	return c
 }
 
-func (c SwaggerConfigContainerService) ID() string {
+// ID returns the ID for the APISet
+func (c SwaggerAPISetContainerService) ID() string {
 	return c.clusterID
 }
-func (c SwaggerConfigContainerService) MatchChildNodesByName() bool {
+
+// MatchChildNodesByName indicates whether child nodes should be matched by name (or position)
+func (c SwaggerAPISetContainerService) MatchChildNodesByName() bool {
 	return false
 }
-func (c SwaggerConfigContainerService) AppliesToNode(node *TreeNode) bool {
-	// this function is only called for nodes that don't have the SwaggerConfigID set
+
+// AppliesToNode is called by the Swagger exapnder to test whether the node applies to this APISet
+func (c SwaggerAPISetContainerService) AppliesToNode(node *TreeNode) bool {
+	// this function is only called for nodes that don't have the SwaggerAPISetID set
 	// this should never happen for containerService nodes
 	return false
 }
-func (c SwaggerConfigContainerService) GetResourceTypes() []swagger.SwaggerResourceType {
+
+// GetResourceTypes returns the ResourceTypes for the API Set
+func (c SwaggerAPISetContainerService) GetResourceTypes() []swagger.ResourceType {
 	return c.resourceTypes
 }
 
-func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.SwaggerResourceType) (ConfigExpandResponse, error) {
+// ExpandResource returns metadata about child resources of the specified resource node
+func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
-	url := c.serverUrl + currentItem.ExpandURL
+	url := c.serverURL + currentItem.ExpandURL
 	request, err := http.NewRequest("GET", url, bytes.NewReader([]byte("")))
+	if err != nil {
+		err = fmt.Errorf("Failed to create request" + err.Error() + currentItem.ExpandURL)
+		return APISetExpandResponse{}, err
+	}
 
 	request.Header.Set("Accept", "application/yaml")
 
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
-		return ConfigExpandResponse{}, err
+		return APISetExpandResponse{}, err
 	}
 	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		err = fmt.Errorf("Failed to read body: %s", err)
-		return ConfigExpandResponse{}, err
+		return APISetExpandResponse{}, err
 	}
 	data := string(buf)
 
@@ -79,18 +92,18 @@ func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, curre
 	if len(resourceType.SubResources) > 0 {
 		// We have defined subResources - Unmarshal the response and add these to newItems
 
-		var listResponse KubernetesListResponse
+		var listResponse kubernetesListResponse
 		err = yaml.Unmarshal([]byte(data), &listResponse)
 		if err != nil {
 			err = fmt.Errorf("Error parsing YAML response: %s", err)
-			return ConfigExpandResponse{Response: data}, err
+			return APISetExpandResponse{Response: data}, err
 		}
 
 		for _, item := range listResponse.Items {
 			subResourceType := getResourceTypeForURL(ctx, item.Metadata.SelfLink, resourceType.SubResources)
 			if subResourceType == nil {
 				err = fmt.Errorf("SubResource type not found! %s", item.Metadata.SelfLink)
-				return ConfigExpandResponse{Response: data}, err
+				return APISetExpandResponse{Response: data}, err
 			}
 			name := item.Metadata.Name
 			deleteURL := ""
@@ -99,7 +112,7 @@ func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, curre
 				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
 				if err != nil {
 					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
-					return ConfigExpandResponse{Response: data}, err
+					return APISetExpandResponse{Response: data}, err
 				}
 			}
 			subResource := SubResource{
@@ -113,7 +126,7 @@ func (c SwaggerConfigContainerService) ExpandResource(ctx context.Context, curre
 		}
 	}
 
-	return ConfigExpandResponse{
+	return APISetExpandResponse{
 		Response:     data,
 		SubResources: subResources,
 	}, nil

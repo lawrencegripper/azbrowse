@@ -59,6 +59,7 @@ func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo
 	}, nil
 }
 
+// MustGetEndpointInfoFromURL creates an endpoint or panics
 func MustGetEndpointInfoFromURL(url string, apiVersion string) *EndpointInfo {
 	endpoint, err := GetEndpointInfoFromURL(url, apiVersion)
 	if err != nil {
@@ -127,6 +128,7 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 	return url, nil
 }
 
+// GenerateValueArrayFromMap builds an ordered array of template match values from a templateValues map for use with BuildURLFromArray
 func (ei *EndpointInfo) GenerateValueArrayFromMap(templateValues map[string]string) []string {
 	valueArray := make([]string, len(templateValues))
 	valueArrayIndex := 0

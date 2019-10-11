@@ -12,6 +12,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
+// MergeSwaggerDoc merges api endpoints from the specified swagger doc into the Paths array
 func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
 	swaggerVersion := doc.Spec().Info.Version
 	spec := doc.Analyzer
@@ -21,16 +22,16 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validat
 		override := config.Overrides[swaggerPath.Path]
 
 		searchPathTemp := override.Path
-		var searchPath PathAndCondensedPath
+		var searchPath PathAndNameStrippedPath
 		if searchPathTemp == "" {
-			searchPath = PathAndCondensedPath{
-				Path:          swaggerPath.Path,
-				CondensedPath: swaggerPath.CondensedPath,
+			searchPath = PathAndNameStrippedPath{
+				Path:             swaggerPath.Path,
+				NameStrippedPath: swaggerPath.NameStrippedPath,
 			}
 		} else {
-			searchPath = PathAndCondensedPath{
-				Path:          searchPathTemp,
-				CondensedPath: condensePath(searchPathTemp), // condense overridden path,
+			searchPath = PathAndNameStrippedPath{
+				Path:             searchPathTemp,
+				NameStrippedPath: stripPathNames(searchPathTemp), // condense overridden path,
 			}
 		}
 		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath.Path, swaggerVersion) // logical path
@@ -46,7 +47,7 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validat
 		path := Path{
 			Endpoint:              &endpoint,
 			Name:                  name,
-			CondensedEndpointPath: searchPath.CondensedPath,
+			CondensedEndpointPath: searchPath.NameStrippedPath,
 		}
 
 		getVerb := override.GetVerb
@@ -132,8 +133,9 @@ func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validat
 	return paths, nil
 }
 
-func ConvertToSwaggerResourceTypes(paths []*Path) []SwaggerResourceType {
-	resourceTypes := []SwaggerResourceType{}
+// ConvertToSwaggerResourceTypes converts the Path array to an array of SwaggerResourceTypes for use with the Swagger expander
+func ConvertToSwaggerResourceTypes(paths []*Path) []ResourceType {
+	resourceTypes := []ResourceType{}
 	for _, path := range paths {
 		if path.Operations.Get.Endpoint != nil { // ignore endpoints without a GET
 			resourceType := convertToSwaggerResourceType(path)
@@ -143,8 +145,8 @@ func ConvertToSwaggerResourceTypes(paths []*Path) []SwaggerResourceType {
 	return resourceTypes
 }
 
-func convertToSwaggerResourceType(path *Path) SwaggerResourceType {
-	resourceType := SwaggerResourceType{
+func convertToSwaggerResourceType(path *Path) ResourceType {
+	resourceType := ResourceType{
 		Display:      path.Name,
 		Endpoint:     endpoints.MustGetEndpointInfoFromURL(path.Operations.Get.Endpoint.TemplateURL, path.Operations.Get.Endpoint.APIVersion),
 		Children:     ConvertToSwaggerResourceTypes(path.Children),
@@ -166,42 +168,57 @@ func convertToSwaggerResourceType(path *Path) SwaggerResourceType {
 	return resourceType
 }
 
-type PathAndCondensedPath struct {
-	Path          string
-	CondensedPath string
+// PathAndNameStrippedPath holds a full path and the path with names stripped out. E.g. for `/foo/{wibble}/bar` the stripped path is `/foo/{}/bar`
+type PathAndNameStrippedPath struct {
+	Path             string
+	NameStrippedPath string
 }
-type PathAndCondensedPathList []PathAndCondensedPath
 
-func (a PathAndCondensedPathList) Len() int { return len(a) }
-func (a PathAndCondensedPathList) Less(i, j int) bool {
-	return strings.Compare(a[i].CondensedPath, a[j].CondensedPath) < 0
+// GetValue is a small helper to get the path value as determined by the `strippedPath` parameter
+func (p PathAndNameStrippedPath) GetValue(strippedPath bool) string {
+	if strippedPath {
+		return p.NameStrippedPath
+	}
+	return p.Path
 }
-func (a PathAndCondensedPathList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func getSortedPaths(spec *analysis.Spec) []PathAndCondensedPath {
+// PathAndNameStrippedPathList is allows sorting PathAndNameStrippedPath array by NameStrippedPath
+type PathAndNameStrippedPathList []PathAndNameStrippedPath
+
+func (a PathAndNameStrippedPathList) Len() int { return len(a) }
+func (a PathAndNameStrippedPathList) Less(i, j int) bool {
+	return strings.Compare(a[i].NameStrippedPath, a[j].NameStrippedPath) < 0
+}
+func (a PathAndNameStrippedPathList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+func getSortedPaths(spec *analysis.Spec) []PathAndNameStrippedPath {
 	// Sort ignoring names of captured sections (e.g. wibble in `/foo/{wibble}/bar`)
 
-	pathPairs := make([]PathAndCondensedPath, len(spec.AllPaths()))
+	pathPairs := make([]PathAndNameStrippedPath, len(spec.AllPaths()))
 	i := 0
 	for key := range spec.AllPaths() {
-		pathPairs[i] = PathAndCondensedPath{
-			Path:          key,
-			CondensedPath: condensePath(key),
+		pathPairs[i] = PathAndNameStrippedPath{
+			Path:             key,
+			NameStrippedPath: stripPathNames(key),
 		}
 		i++
 	}
-	sort.Sort(PathAndCondensedPathList(pathPairs))
+	sort.Sort(PathAndNameStrippedPathList(pathPairs))
 
 	return pathPairs
 }
 
-var regexpCondense *regexp.Regexp
+var regexpStripNames *regexp.Regexp
 
-func condensePath(path string) string {
-	if regexpCondense == nil {
-		regexpCondense, _ = regexp.Compile("\\{[^}]*}") // TODO - handle error
+func stripPathNames(path string) string {
+	if regexpStripNames == nil {
+		var err error
+		regexpStripNames, err = regexp.Compile(`\{[^}]*}`)
+		if err != nil {
+			panic(err)
+		}
 	}
-	return regexpCondense.ReplaceAllString(path, "{}")
+	return regexpStripNames.ReplaceAllString(path, "{}")
 
 }
 
@@ -242,27 +259,27 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 }
 
 // findDeepestPath searches the endpoints tree to find the deepest point that the specified path can be nested at (used to build up the endpoint hierarchy)
-func findDeepestPath(paths []*Path, pathToFind PathAndCondensedPath, useCondensedPath bool) *Path {
+func findDeepestPath(paths []*Path, pathToFind PathAndNameStrippedPath, useStrippedNamesPath bool) *Path {
 	for _, path := range paths {
 		var matchString string
-		if useCondensedPath {
+		if useStrippedNamesPath {
 			matchString = path.CondensedEndpointPath
 		} else {
 			matchString = path.Endpoint.TemplateURL
 		}
 
 		var pathString string
-		if useCondensedPath {
-			pathString = pathToFind.CondensedPath
+		if useStrippedNamesPath {
+			pathString = pathToFind.NameStrippedPath
 		} else {
 			pathString = pathToFind.Path
 		}
 
 		if strings.HasPrefix(pathString, matchString) {
 			// matches endpoint. Check children
-			match := findDeepestPath(path.Children, pathToFind, useCondensedPath)
+			match := findDeepestPath(path.Children, pathToFind, useStrippedNamesPath)
 			if match == nil {
-				match = findDeepestPath(path.SubPaths, pathToFind, useCondensedPath)
+				match = findDeepestPath(path.SubPaths, pathToFind, useStrippedNamesPath)
 				if match == nil {
 					return path
 				}

@@ -25,15 +25,15 @@ type clusterCredentialsResponse struct {
 	} `json:"kubeconfigs"`
 }
 
-// kubeConfig is a minimal struct for parsing the parts of the response that we care about
-type kubeConfig struct {
+// kubeConfigResponse is a minimal struct for parsing the parts of the response that we care about
+type kubeConfigResponse struct {
 	Clusters []struct {
 		Name    string `yaml:"name"`
 		Cluster struct {
 			CertificateAuthorityData string `yaml:"certificate-authority-data"`
 			Server                   string `yaml:"server"`
 		} `yaml:"cluster"`
-	} `yaml: clusters`
+	} `yaml:"clusters"`
 	Users []struct {
 		Name string `yaml:"name"`
 		User struct {
@@ -46,7 +46,6 @@ type kubeConfig struct {
 
 // AzureKubernetesServiceExpander expands the kubernetes aspects of AKS
 type AzureKubernetesServiceExpander struct {
-	client *http.Client
 }
 
 // Name returns the name of the expander
@@ -101,7 +100,7 @@ func (e *AzureKubernetesServiceExpander) Expand(ctx context.Context, currentItem
 	}
 
 	if currentItem.Namespace == "AzureKubernetesService" && currentItem.ItemType == SubResourceType {
-		return e.expandKubernetesApiRoot(ctx, currentItem)
+		return e.expandKubernetesAPIRoot(ctx, currentItem)
 	}
 
 	return ExpanderResult{
@@ -111,7 +110,7 @@ func (e *AzureKubernetesServiceExpander) Expand(ctx context.Context, currentItem
 	}
 }
 
-func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	clusterID := currentItem.Metadata["ClusterID"]
 
@@ -127,7 +126,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 	// NOTE - at the time of writing the AKS API returns a single cluster/user
 	// so we're not fully parsing the config, just taking the first user and cluster
 
-	httpClient, err := e.getHttpClientFromConfig(kubeConfig)
+	httpClient, err := e.getHTTPClientFromConfig(kubeConfig)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -136,9 +135,9 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 		}
 	}
 
-	serverUrl := kubeConfig.Clusters[0].Cluster.Server
+	serverURL := kubeConfig.Clusters[0].Cluster.Server
 
-	swaggerResourceTypes, err := e.getSwaggerResourceTypes(*httpClient, serverUrl)
+	swaggerResourceTypes, err := e.getSwaggerResourceTypes(*httpClient, serverURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -148,8 +147,8 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 	}
 
 	// Register the swagger config so that the swagger expander can take over
-	config := NewSwaggerConfigContainerService(swaggerResourceTypes, *httpClient, currentItem.ID, serverUrl)
-	GetSwaggerResourceExpander().AddConfig(config)
+	apiSet := NewSwaggerAPISetContainerService(swaggerResourceTypes, *httpClient, currentItem.ID, serverURL)
+	GetSwaggerResourceExpander().AddAPISet(apiSet)
 
 	// TODO think about how to avoid re-registering - add something to the current node's metadata?
 	newItems := []*TreeNode{}
@@ -169,7 +168,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 			ItemType:            SubResourceType,
 			SwaggerResourceType: &resourceType,
 			Metadata: map[string]string{
-				"SwaggerConfigID": currentItem.ID,
+				"SwaggerAPISetID": currentItem.ID,
 			},
 		})
 	}
@@ -183,11 +182,11 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesApiRoot(ctx context.Con
 	}
 }
 
-func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http.Client, serverUrl string) ([]swagger.SwaggerResourceType, error) {
+func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http.Client, serverURL string) ([]swagger.ResourceType, error) {
 
-	var swaggerResourceTypes []swagger.SwaggerResourceType
+	var swaggerResourceTypes []swagger.ResourceType
 
-	url := serverUrl + "/openapi/v2"
+	url := serverURL + "/openapi/v2"
 
 	response, err := httpClient.Get(url)
 	if err != nil {
@@ -213,20 +212,19 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 		return swaggerResourceTypes, err
 	}
 
-	// tempBuf, err := json.Marshal(paths)
-	// ioutil.WriteFile("/tmp/k8s-paths.json", tempBuf, 0644)
-	tempBuf, err := yaml.Marshal(paths)
-	ioutil.WriteFile("/tmp/k8s-paths.yml", tempBuf, 0644)
-	if err != nil {
-		return swaggerResourceTypes, err
-	}
-	_ = err
+	// uncomment this code to help debug the generated API paths!
+	// tempBuf, err := yaml.Marshal(paths)
+	// ioutil.WriteFile("/tmp/k8s-paths.yml", tempBuf, 0644)
+	// if err != nil {
+	// 	return swaggerResourceTypes, err
+	// }
+	// _ = err
 
 	swaggerResourceTypes = swagger.ConvertToSwaggerResourceTypes(paths)
 	return swaggerResourceTypes, nil
 }
 
-func (e *AzureKubernetesServiceExpander) getHttpClientFromConfig(kubeConfig kubeConfig) (*http.Client, error) {
+func (e *AzureKubernetesServiceExpander) getHTTPClientFromConfig(kubeConfig kubeConfigResponse) (*http.Client, error) {
 
 	clientCertificate, err := base64.StdEncoding.DecodeString(kubeConfig.Users[0].User.ClientCertificateData)
 	if err != nil {
@@ -273,23 +271,23 @@ func (e *AzureKubernetesServiceExpander) getHttpClientFromConfig(kubeConfig kube
 
 }
 
-func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, clusterID string) (kubeConfig, error) {
+func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, clusterID string) (kubeConfigResponse, error) {
 
 	data, err := armclient.DoRequest(ctx, "POST", clusterID+"/listClusterUserCredential?api-version=2019-08-01")
 	if err != nil {
-		return kubeConfig{}, fmt.Errorf("Failed to get credentials: " + err.Error() + clusterID)
+		return kubeConfigResponse{}, fmt.Errorf("Failed to get credentials: " + err.Error() + clusterID)
 	}
 
 	var response clusterCredentialsResponse
 	err = json.Unmarshal([]byte(data), &response)
 	if err != nil {
 		err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, clusterID)
-		return kubeConfig{}, err
+		return kubeConfigResponse{}, err
 	}
 
 	if len(response.KubeConfigs) < 1 {
 		err = fmt.Errorf("Response has no KubeConfigs\nURL:%s", clusterID)
-		return kubeConfig{}, err
+		return kubeConfigResponse{}, err
 	}
 
 	configBase64 := response.KubeConfigs[0].Value
@@ -297,10 +295,10 @@ func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, c
 	config, err := base64.StdEncoding.DecodeString(configBase64)
 	if err != nil {
 		err = fmt.Errorf("Error decoding kubeconfig: %s\nURL:%s", err, clusterID)
-		return kubeConfig{}, err
+		return kubeConfigResponse{}, err
 	}
 
-	var kubeConfig kubeConfig
+	var kubeConfig kubeConfigResponse
 	err = yaml.Unmarshal(config, &kubeConfig)
 	if err != nil {
 		err = fmt.Errorf("Error parsing kubeconfig: %s\nURL:%s", err, clusterID)

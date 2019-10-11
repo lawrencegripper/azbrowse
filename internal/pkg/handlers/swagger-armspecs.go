@@ -9,39 +9,49 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
-type SwaggerConfigARMResources struct {
-	resourceTypes []swagger.SwaggerResourceType
+// SwaggerAPISetARMResources holds the config for working with ARM resources as per the published Swagger specs
+type SwaggerAPISetARMResources struct {
+	resourceTypes []swagger.ResourceType
 }
 
-func NewSwaggerConfigARMResources() SwaggerConfigARMResources {
-	c := SwaggerConfigARMResources{}
+// NewSwaggerAPISetARMResources creates a new SwaggerAPISetARMResources
+func NewSwaggerAPISetARMResources() SwaggerAPISetARMResources {
+	c := SwaggerAPISetARMResources{}
 	c.resourceTypes = c.loadResourceTypes()
 	return c
 }
 
-func (c SwaggerConfigARMResources) ID() string {
+// ID returns the ID for the APISet
+func (c SwaggerAPISetARMResources) ID() string {
 	return "ARM_RESOURCES_FROM_SPECS"
 }
-func (c SwaggerConfigARMResources) MatchChildNodesByName() bool {
+
+// MatchChildNodesByName indicates whether child nodes should be matched by name (or position)
+func (c SwaggerAPISetARMResources) MatchChildNodesByName() bool {
 	return true
 }
-func (c SwaggerConfigARMResources) AppliesToNode(node *TreeNode) bool {
-	// this function is only called for nodes that don't have the SwaggerConfigID set
+
+// AppliesToNode is called by the Swagger exapnder to test whether the node applies to this APISet
+func (c SwaggerAPISetARMResources) AppliesToNode(node *TreeNode) bool {
+	// this function is only called for nodes that don't have the SwaggerAPISetID set
 
 	// handle resource/subresource types
 	return node.ItemType == ResourceType || node.ItemType == SubResourceType
 }
-func (c SwaggerConfigARMResources) GetResourceTypes() []swagger.SwaggerResourceType {
+
+// GetResourceTypes returns the ResourceTypes for the API Set
+func (c SwaggerAPISetARMResources) GetResourceTypes() []swagger.ResourceType {
 	return c.resourceTypes
 }
 
-func (c SwaggerConfigARMResources) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.SwaggerResourceType) (ConfigExpandResponse, error) {
+// ExpandResource returns metadata about child resources of the specified resource node
+func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	method := resourceType.Verb
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
-		return ConfigExpandResponse{Response: data}, err
+		return APISetExpandResponse{Response: data}, err
 	}
 	subResources := []SubResource{}
 
@@ -52,14 +62,14 @@ func (c SwaggerConfigARMResources) ExpandResource(ctx context.Context, currentIt
 		err = json.Unmarshal([]byte(data), &resourceResponse)
 		if err != nil {
 			err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-			return ConfigExpandResponse{Response: data}, err
+			return APISetExpandResponse{Response: data}, err
 		}
 
 		for _, resource := range resourceResponse.Resources {
 			subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
 			if subResourceType == nil {
 				err = fmt.Errorf("SubResource type not found! %s", resource.ID)
-				return ConfigExpandResponse{Response: data}, err
+				return APISetExpandResponse{Response: data}, err
 			}
 			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
@@ -69,7 +79,7 @@ func (c SwaggerConfigARMResources) ExpandResource(ctx context.Context, currentIt
 				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
 				if err != nil {
 					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
-					return ConfigExpandResponse{Response: data}, err
+					return APISetExpandResponse{Response: data}, err
 				}
 			}
 
@@ -84,7 +94,7 @@ func (c SwaggerConfigARMResources) ExpandResource(ctx context.Context, currentIt
 		}
 	}
 
-	return ConfigExpandResponse{
+	return APISetExpandResponse{
 		Response:     data,
 		SubResources: subResources,
 	}, nil

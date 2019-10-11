@@ -2,10 +2,11 @@ package handlers
 
 var swaggerResourceExpander *SwaggerResourceExpander
 
+// GetSwaggerResourceExpander returns the (singleton) instance of SwaggerResourceExpander
 func GetSwaggerResourceExpander() *SwaggerResourceExpander {
 	if swaggerResourceExpander == nil {
 		swaggerResourceExpander = NewSwaggerResourcesExpander()
-		swaggerResourceExpander.AddConfig(NewSwaggerConfigARMResources())
+		swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources())
 	}
 	return swaggerResourceExpander
 }

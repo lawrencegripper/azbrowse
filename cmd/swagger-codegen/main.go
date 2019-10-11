@@ -96,7 +96,7 @@ func getFirstNonCommonPath(path string) string {
 
 func getConfig() swagger.Config {
 	config := swagger.Config{
-		Overrides: map[string]swagger.SwaggerPathOverride{
+		Overrides: map[string]swagger.PathOverride{
 			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list": {
 				Path:    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings",
 				GetVerb: "post",

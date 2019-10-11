@@ -18,7 +18,7 @@ const tmpl = `
 	{{- if .SubPaths}}
 	SubResources: {{template "PathList" .SubPaths}},{{end}}
 },{{end }}{{ end }}
-{{define "PathList"}}[]swagger.SwaggerResourceType{ {{range .}}{{template "Path" .}}{{end}} } {{end}}
+{{define "PathList"}}[]swagger.ResourceType{ {{range .}}{{template "Path" .}}{{end}} } {{end}}
 package handlers
 
 import (
@@ -26,7 +26,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"	
 )
 
-func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.SwaggerResourceType {
+func (e *SwaggerConfigARMResources) loadResourceTypes() []swagger.ResourceType {
 	return  {{template "PathList" .Paths }}
 
 }

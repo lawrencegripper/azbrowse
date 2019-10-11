@@ -4,16 +4,16 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
-// SwaggerResourceType holds information about resources that can be displayed
-type SwaggerResourceType struct {
+// ResourceType holds information about resources that can be displayed
+type ResourceType struct {
 	Display        string
 	Endpoint       *endpoints.EndpointInfo
 	Verb           string
 	DeleteEndpoint *endpoints.EndpointInfo
 	PatchEndpoint  *endpoints.EndpointInfo
 	PutEndpoint    *endpoints.EndpointInfo
-	Children       []SwaggerResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
-	SubResources   []SwaggerResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
+	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
+	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -64,11 +64,11 @@ type PathOperation struct {
 // Config handles configuration of url handling
 type Config struct {
 	// Overrides is keyed on url and
-	Overrides map[string]SwaggerPathOverride
+	Overrides map[string]PathOverride
 }
 
-// SwaggerPathOverride captures Path and/or Verb overrides
-type SwaggerPathOverride struct {
+// PathOverride captures Path and/or Verb overrides
+type PathOverride struct {
 	Path    string // actual url to use
 	GetVerb string // Verb to use for logical GET requests
 }
