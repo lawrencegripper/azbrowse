@@ -347,7 +347,7 @@ func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title 
 
 // SetNodes allows others to set the list nodes
 func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
-	
+
 	// Capture current view to navstack
 	if w.HasCurrentItem() {
 		w.navStack.Push(&Page{
@@ -357,7 +357,7 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 			Selection:        w.selected,
 			ExpandedNodeItem: w.CurrentItem(),
 		})
-		
+
 		currentID := w.CurrentItem().ID
 		for _, node := range nodes {
 			if node.ID == currentID {
@@ -365,7 +365,7 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 			}
 		}
 	}
-	
+
 	w.selected = 0
 	w.items = nodes
 	w.ClearFilter()
