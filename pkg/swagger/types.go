@@ -67,6 +67,8 @@ type Config struct {
 	Overrides map[string]PathOverride
 	// AdditionalGetPaths contains extra paths to include as GET
 	AdditionalGetPaths []string
+	// SuppressAPIVersion true to prevent the api version querystring
+	SuppressAPIVersion bool
 }
 
 // PathOverride captures Path and/or Verb overrides

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"gopkg.in/yaml.v2"
 
@@ -20,6 +21,13 @@ type kubernetesItem struct {
 		Name     string `yaml:"name"`
 		SelfLink string `yaml:"selfLink"`
 	} `yaml:"metadata"`
+}
+type containerResponse struct {
+	Spec struct {
+		Containers []struct {
+			Name string `yaml:"name"`
+		} `yaml:"containers`
+	} `yaml:"spec"`
 }
 
 // SwaggerAPISetContainerService holds the config for working with an AKS cluster API
@@ -62,30 +70,82 @@ func (c SwaggerAPISetContainerService) GetResourceTypes() []swagger.ResourceType
 	return c.resourceTypes
 }
 
-// ExpandResource returns metadata about child resources of the specified resource node
-func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
-
-	url := c.serverURL + currentItem.ExpandURL
+func (c SwaggerAPISetContainerService) doRequest(verb string, url string) (string, error) {
 	request, err := http.NewRequest("GET", url, bytes.NewReader([]byte("")))
 	if err != nil {
-		err = fmt.Errorf("Failed to create request" + err.Error() + currentItem.ExpandURL)
-		return APISetExpandResponse{}, err
+		err = fmt.Errorf("Failed to create request" + err.Error() + url)
+		return "", err
 	}
 
 	request.Header.Set("Accept", "application/yaml")
-
 	response, err := c.httpClient.Do(request)
 	if err != nil {
-		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
-		return APISetExpandResponse{}, err
+		err = fmt.Errorf("Failed" + err.Error() + url)
+		return "", err
 	}
-	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		defer response.Body.Close() //nolint: errcheck
+		buf, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			err = fmt.Errorf("Failed to read body: %s", err)
+			return "", err
+		}
+		data := string(buf)
+		return data, nil
+	}
+	return "", fmt.Errorf("Response failed with %s (%s)", response.Status, url)
+}
+
+// ExpandResource returns metadata about child resources of the specified resource node
+func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
+
+	if resourceType.Endpoint.TemplateURL == "/api/v1/namespaces/{namespace}/pods/{name}/log" {
+		if strings.Index(currentItem.ExpandURL, "?") < 0 { // we haven't already set the container name!
+
+			logUrl := c.serverURL + currentItem.ExpandURL
+			containerUrl := logUrl[:len(logUrl)-3]
+			data, err := c.doRequest("GET", containerUrl)
+			if err != nil {
+				err = fmt.Errorf("Failed to make request: %s", err)
+				return APISetExpandResponse{}, err
+			}
+
+			var containerResponse containerResponse
+			err = yaml.Unmarshal([]byte(data), &containerResponse)
+			if err != nil {
+				err = fmt.Errorf("Error parsing YAML response: %s", err)
+				return APISetExpandResponse{Response: data}, err
+			}
+			if containerResponse.Spec.Containers == nil || len(containerResponse.Spec.Containers) == 0 {
+				err = fmt.Errorf("No containers in response: %s", err)
+				return APISetExpandResponse{}, err
+			}
+
+			if len(containerResponse.Spec.Containers) > 1 { // if only a single resopnse then fall through to just return logs for the single container
+				subResources := []SubResource{}
+				for _, container := range containerResponse.Spec.Containers {
+					subResource := SubResource{
+						ID:           currentItem.ID + "/" + container.Name,
+						Name:         container.Name,
+						ResourceType: resourceType,
+						ExpandURL:    currentItem.ExpandURL + "?container=" + container.Name,
+					}
+					subResources = append(subResources, subResource)
+				}
+				return APISetExpandResponse{
+					Response:     "Pick a container to view logs",
+					SubResources: subResources,
+				}, nil
+			}
+		}
+	}
+
+	url := c.serverURL + currentItem.ExpandURL
+	data, err := c.doRequest("GET", url)
 	if err != nil {
-		err = fmt.Errorf("Failed to read body: %s", err)
+		err = fmt.Errorf("Failed to make request: %s", err)
 		return APISetExpandResponse{}, err
 	}
-	data := string(buf)
 
 	subResources := []SubResource{}
 
@@ -139,18 +199,10 @@ func (c SwaggerAPISetContainerService) Delete(ctx context.Context, item *TreeNod
 	}
 
 	url := c.serverURL + item.DeleteURL
-	request, err := http.NewRequest("DELETE", url, bytes.NewReader([]byte("")))
-	if err != nil {
-		err = fmt.Errorf("Failed to create request: %s (%s)", err.Error(), item.DeleteURL)
-		return false, err
-	}
-	response, err := c.httpClient.Do(request)
+	_, err := c.doRequest("DELETE", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
 		return false, err
 	}
-	if 200 <= response.StatusCode && response.StatusCode < 300 {
-		return true, nil
-	}
-	return false, fmt.Errorf("Delete failed with %s (%s)", response.Status, item.DeleteURL)
+	return true, nil
 }

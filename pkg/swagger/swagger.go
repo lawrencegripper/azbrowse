@@ -25,6 +25,9 @@ func addConfigPaths(paths map[string]spec.PathItem, config *Config) map[string]s
 // MergeSwaggerDoc merges api endpoints from the specified swagger doc into the Paths array
 func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
 	swaggerVersion := doc.Spec().Info.Version
+	if config.SuppressAPIVersion {
+		swaggerVersion = ""
+	}
 	spec := doc.Analyzer
 	allPaths := spec.AllPaths()
 	allPaths = addConfigPaths(allPaths, config)
