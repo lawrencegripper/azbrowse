@@ -2,12 +2,57 @@ package views
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"strings"
+	"text/template"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/stuartleeks/gocui"
 )
+
+const tmplText = `
+--> PRESS {{ index . "help" }} TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH {{ index . "help" }} AT ANY TIME. <--
+                             _       ___
+                            /_\   __| _ )_ _ _____ __ _____ ___
+                           / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_)
+                          /_/ \_\/__|___/_| \___/\_/\_//__/\___|
+                        Interactive CLI for browsing Azure resources
+# Navigation
+ 
+| Action                   | Key(s)
+| -------------------------| --------------------
+| Select resource          | {{ index . "listup" }} / {{ index . "listdown" }}
+| Select menu/JSON         | {{ index . "itemleft" }} / {{ index . "listright" }}
+| Go back                  | {{ index . "listback" }}
+| Expand/View resource     | {{ index . "listexpand" }}
+| Refresh                  | {{ index . "listrefresh" }}
+| Filter                   | {{ index . "filter" }}
+| Clear filter             | {{ index . "listclearfilter" }}
+| Open Command Panel       | {{ index . "commandpanelopen" }}
+| Close Command Panel      | {{ index . "commandpanelclose" }}
+| Show this help page      | {{ index . "help" }}
+| Quit                     | {{ index . "quit" }}
+ 
+# Operations
+ 
+| Action                   | Key(s)
+| -------------------------| --------------------
+| Toggle browse JSON       | {{ index . "listedit" }}
+| Toggle fullscreen        | {{ index . "fullscreen" }}
+| Open Azure portal        | {{ index . "listopen" }}
+| Delete resource          | {{ index . "listdelete" }}
+| Save JSON to clipboard   | {{ index . "copy" }}
+| View actions for resource| {{ index . "listactions" }}
+| Edit Resource            | {{ index . "listupdate" }}
+ 
+# Status Icons
+
+Deleting:  ☠   Failed:  ⛈   Updating:  ⟳   Resuming/Starting:  ⛅   Provisioning:  ⌛                                                                                                                                  
+Creating\Preparing:  🏗   Scaling:  ⚖   Suspended/Suspending:  ⛔   Succeeded:  🌣                                                                                                                                        
+
+For bugs, issue or to contribute visit: https://github.com/lawrencegripper/azbrowse
+`
 
 // DrawHelp renders the popup help view
 func DrawHelp(keyBindings map[string][]string, v *gocui.View) {
@@ -18,67 +63,18 @@ func DrawHelp(keyBindings map[string][]string, v *gocui.View) {
 		}
 	}
 
-	view := fmt.Sprintf(`
---> PRESS %s TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH %s AT ANY TIME. <--
-                             _       ___
-                            /_\   __| _ )_ _ _____ __ _____ ___
-                           / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_)
-                          /_/ \_\/__|___/_| \___/\_/\_//__/\___|
-                        Interactive CLI for browsing Azure resources
- 
-# Navigation
- 
-| Action                   | Key(s)
-| -------------------------| --------------------
-| Select resource          | %s / %s
-| Select menu/JSON         | %s / %s
-| Go back                  | %s
-| Expand/View resource     | %s
-| Refresh                  | %s
-| Show this help page      | %s
-| Quit                     | %s
- 
-# Operations
- 
-| Action                   | Key(s)
-| -------------------------| --------------------
-| Toggle browse JSON       | %s
-| Toggle fullscreen        | %s
-| Open Azure portal        | %s
-| Delete resource          | %s
-| Save JSON to clipboard   | %s
-| View actions for resource| %s
-| Edit Resource            | %s
- 
-For bugs, issue or to contribute visit: https://github.com/lawrencegripper/azbrowse
- 
-# Status Icons
- 
-Deleting:  ☠   Failed:  ⛈   Updating:  ⟳   Resuming/Starting:  ⛅   Provisioning:  ⌛                                                                                                                                  
-Creating\Preparing:  🏗   Scaling:  ⚖   Suspended/Suspending:  ⛔   Succeeded:  🌣                                                                                                                                        
- 
---> PRESS %s TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH %s AT ANY TIME. <--
+	tmpl, err := template.New("help").Parse(tmplText)
+	if err != nil {
+		panic("Failed to parse help template. This is a Bug please raise an issue on GH. " + err.Error())
+	}
 
-`, keyBindings["help"],
-		keyBindings["help"],
-		keyBindings["listup"],
-		keyBindings["listdown"],
-		keyBindings["itemleft"],
-		keyBindings["listright"],
-		keyBindings["listback"],
-		keyBindings["listexpand"],
-		keyBindings["listrefresh"],
-		keyBindings["help"],
-		keyBindings["quit"],
-		keyBindings["listedit"],
-		keyBindings["fullscreen"],
-		keyBindings["listopen"],
-		keyBindings["listdelete"],
-		keyBindings["copy"],
-		keyBindings["listactions"],
-		keyBindings["listupdate"],
-		keyBindings["help"],
-		keyBindings["help"])
+	buf := new(bytes.Buffer)
+	err = tmpl.Execute(buf, keyBindings)
+	if err != nil {
+		panic("Failed to execute help template. This is a Bug please raise an issue on GH. " + err.Error())
+	}
+
+	view := buf.String()
 
 	maxWidth, maxHeight := v.Size()
 

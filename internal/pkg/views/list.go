@@ -15,9 +15,14 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y                 int
-	w, h                 int
-	items                []*handlers.TreeNode
+	x, y  int
+	w, h  int
+	g     *gocui.Gui
+	items []*handlers.TreeNode
+
+	filteredItems []*handlers.TreeNode
+	filterString  string
+
 	contentView          *ItemWidget
 	statusView           *StatusbarWidget
 	navStack             Stack
@@ -33,8 +38,63 @@ type ListWidget struct {
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string) *ListWidget {
-	return &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, title: title}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, g *gocui.Gui) *ListWidget {
+	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, g: g}
+	go func() {
+		filterChannel := eventing.SubscribeToTopic("filter")
+		for {
+			filterStringInterface := <-filterChannel
+			filterString := strings.ToLower(strings.TrimSpace(strings.Replace(filterStringInterface.(string), "/", "", 1)))
+
+			filteredItems := []*handlers.TreeNode{}
+			for _, item := range listWidget.items {
+				if strings.Contains(strings.ToLower(item.Display), filterString) {
+					filteredItems = append(filteredItems, item)
+				}
+			}
+
+			listWidget.selected = 0
+			listWidget.filterString = filterString
+			listWidget.filteredItems = filteredItems
+
+			g.Update(func(gui *gocui.Gui) error {
+				return nil
+			})
+		}
+	}()
+	return listWidget
+}
+
+func (w *ListWidget) itemCount() int {
+	if w.filterString == "" {
+		return len(w.items)
+	}
+
+	return len(w.filteredItems)
+}
+
+// ClearFilter clears a filter if applied
+func (w *ListWidget) ClearFilter() {
+	w.filterString = ""
+}
+
+func (w *ListWidget) itemsToShow() []*handlers.TreeNode {
+	if w.filterString == "" {
+		return w.items
+	}
+
+	return w.filteredItems
+}
+
+func highlightText(displayText string, highlight string) string {
+	if highlight == "" {
+		return displayText
+	}
+	index := strings.Index(strings.ToLower(displayText), highlight)
+	if index < 0 {
+		return displayText
+	}
+	return displayText[:index] + style.Highlight(displayText[index:index+len(highlight)]) + displayText[index+len(highlight):]
 }
 
 // Layout draws the widget in the gocui view
@@ -46,29 +106,30 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	v.Clear()
 	w.view = v
 
-	if len(w.items) < 1 {
+	if w.itemCount() < 1 {
 		return nil
 	}
 
 	linesUsedCount := 0
-	allItems := make([]string, 0, len(w.items))
+	renderedItems := make([]string, 0, w.itemCount())
 
-	allItems = append(allItems, style.Separator("  ---\n"))
+	renderedItems = append(renderedItems, style.Separator("  ---\n"))
 
-	for i, s := range w.items {
+	for i, s := range w.itemsToShow() {
 		var itemToShow string
 		if i == w.selected {
 			itemToShow = "▶ "
 		} else {
 			itemToShow = "  "
 		}
-		itemToShow = itemToShow + s.Display + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
+
+		itemToShow = itemToShow + highlightText(s.Display, w.filterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
-		allItems = append(allItems, itemToShow)
+		renderedItems = append(renderedItems, itemToShow)
 	}
 
-	linesPerItem := linesUsedCount / len(w.items)
+	linesPerItem := linesUsedCount / w.itemCount()
 	maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
 
 	topIndex := w.lastTopIndex
@@ -87,25 +148,29 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		bottomIndex -= diff
 	}
 	w.lastTopIndex = topIndex
-	if bottomIndex > len(allItems) {
-		bottomIndex = len(allItems) - 1
+	if bottomIndex > len(renderedItems) {
+		bottomIndex = len(renderedItems) - 1
 	}
 
 	for index := topIndex; index < bottomIndex+1; index++ {
-		if index < len(allItems) {
-			item := allItems[index]
+		if index < len(renderedItems) {
+			item := renderedItems[index]
 			fmt.Fprint(v, item)
 		}
 	}
 
 	// If the title is getting too long trim things
 	// down from the front
-	if len(w.title) > w.w {
-		trimLength := len(w.title) - w.w + 5 // Add five for spacing and elipsis
-		w.title = ".." + w.title[trimLength:]
+	title := w.title
+	if w.filterString != "" {
+		title += "[filter=" + w.filterString + "]"
+	}
+	if len(title) > w.w {
+		trimLength := len(title) - w.w + 5 // Add five for spacing and elipsis
+		title = ".." + title[trimLength:]
 	}
 
-	w.view.Title = w.title
+	w.view.Title = title
 
 	return nil
 }
@@ -120,10 +185,17 @@ func (w *ListWidget) Refresh() {
 
 	w.ChangeSelection(currentSelection)
 	w.statusView.Status("Done refreshing", false)
+
+	w.ClearFilter()
 }
 
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
+	if w.filterString != "" {
+		// initial Back action is to clear filter, subsequent Back actions are normal
+		w.ClearFilter()
+		return
+	}
 	previousPage := w.navStack.Pop()
 	if previousPage == nil {
 		return
@@ -138,11 +210,13 @@ func (w *ListWidget) GoBack() {
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
+
 	if w.title == "Subscriptions" {
 		w.title = ""
 	}
 
 	currentItem := w.CurrentItem()
+	w.ClearFilter()
 
 	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		InProgress: true,
@@ -294,12 +368,13 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 	}
 
 	w.items = nodes
+	w.ClearFilter()
 }
 
 // ChangeSelection updates the selected item
 func (w *ListWidget) ChangeSelection(i int) {
-	if i >= len(w.items) {
-		i = len(w.items) - 1
+	if i >= w.itemCount() {
+		i = w.itemCount() - 1
 	} else if i < 0 {
 		i = 0
 	}
@@ -319,7 +394,7 @@ func (w *ListWidget) HasCurrentItem() bool {
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 	if w.HasCurrentItem() {
-		return w.items[w.selected]
+		return w.itemsToShow()[w.selected]
 	}
 	return nil
 }
@@ -333,8 +408,8 @@ func (w *ListWidget) CurrentExpandedItem() *handlers.TreeNode {
 func (w *ListWidget) MovePageDown() {
 	i := w.selected
 
-	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i < len(w.items); i++ {
-		item := w.items[i]
+	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i < w.itemCount(); i++ {
+		item := w.itemsToShow()[i]
 		remainingLinesToPage -= strings.Count(item.Display, "\n") + 1 // +1 as there is an implicit newline
 		remainingLinesToPage--                                        // separator
 	}
@@ -347,7 +422,7 @@ func (w *ListWidget) MovePageUp() {
 	i := w.selected
 
 	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i >= 0; i-- {
-		item := w.items[i]
+		item := w.itemsToShow()[i]
 		remainingLinesToPage -= strings.Count(item.Display, "\n") + 1 // +1 as there is an implicit newline
 		remainingLinesToPage--                                        // separator
 	}
@@ -362,7 +437,7 @@ func (w *ListWidget) MoveHome() {
 
 // MoveEnd changes the selection to the bottom of the list
 func (w *ListWidget) MoveEnd() {
-	w.ChangeSelection(len(w.items) - 1)
+	w.ChangeSelection(w.itemCount() - 1)
 }
 
 // MoveUp moves the selection up one item
