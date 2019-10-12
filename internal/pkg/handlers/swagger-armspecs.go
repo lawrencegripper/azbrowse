@@ -99,3 +99,17 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 		SubResources: subResources,
 	}, nil
 }
+
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (c SwaggerAPISetARMResources) Delete(ctx context.Context, item *TreeNode) (bool, error) {
+	if item.DeleteURL == "" {
+		return false, fmt.Errorf("Item cannot be deleted (No DeleteURL)")
+	}
+
+	_, err := armclient.DoRequest(context.Background(), "DELETE", item.DeleteURL)
+	if err != nil {
+		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
+		return false, err
+	}
+	return true, nil
+}

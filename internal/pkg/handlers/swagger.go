@@ -17,6 +17,7 @@ type SwaggerAPISet interface {
 	AppliesToNode(node *TreeNode) bool
 	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error)
 	MatchChildNodesByName() bool
+	Delete(context context.Context, node *TreeNode) (bool, error)
 }
 
 // SubResource is used to pass sub resource information from SwaggerAPISet to the expander
@@ -237,6 +238,18 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		Response:          data,
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
+}
+
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (e *SwaggerResourceExpander) Delete(context context.Context, item *TreeNode) (bool, error) {
+
+	apiSetPtr := e.getAPISetForItem(item)
+	if apiSetPtr == nil {
+		return false, nil // false indicates we didn't try to delete
+	}
+	apiSet := *apiSetPtr
+
+	return apiSet.Delete(context, item)
 }
 
 // substituteValues applies a value map to strings such as "Name: {name}"

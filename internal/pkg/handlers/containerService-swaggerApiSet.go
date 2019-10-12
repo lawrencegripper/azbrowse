@@ -131,3 +131,26 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 		SubResources: subResources,
 	}, nil
 }
+
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (c SwaggerAPISetContainerService) Delete(ctx context.Context, item *TreeNode) (bool, error) {
+	if item.DeleteURL == "" {
+		return false, fmt.Errorf("Item cannot be deleted (No DeleteURL)")
+	}
+
+	url := c.serverURL + item.DeleteURL
+	request, err := http.NewRequest("DELETE", url, bytes.NewReader([]byte("")))
+	if err != nil {
+		err = fmt.Errorf("Failed to create request: %s (%s)", err.Error(), item.DeleteURL)
+		return false, err
+	}
+	response, err := c.httpClient.Do(request)
+	if err != nil {
+		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
+		return false, err
+	}
+	if 200 <= response.StatusCode && response.StatusCode < 300 {
+		return true, nil
+	}
+	return false, fmt.Errorf("Delete failed with %s (%s)", response.Status, item.DeleteURL)
+}
