@@ -8,17 +8,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/stuartleeks/gocui"
 )
-
-type pendingDelete struct {
-	display string
-	url     string
-}
 
 // NotificationWidget controls the notifications windows in the top right
 type NotificationWidget struct {
@@ -27,7 +23,7 @@ type NotificationWidget struct {
 	name                          string
 	x, y                          int
 	w                             int
-	pendingDeletes                []pendingDelete
+	pendingDeletes                []*handlers.TreeNode
 	deleteMutex                   sync.Mutex // ensure delete occurs only once
 	deleteInProgress              bool
 	gui                           *gocui.Gui
@@ -35,7 +31,7 @@ type NotificationWidget struct {
 
 // AddPendingDelete queues deletes for
 // delete once confirmed
-func (w *NotificationWidget) AddPendingDelete(display, url string) {
+func (w *NotificationWidget) AddPendingDelete(item *handlers.TreeNode) {
 	if w.deleteInProgress {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
@@ -45,10 +41,10 @@ func (w *NotificationWidget) AddPendingDelete(display, url string) {
 		return
 	}
 
-	if url == "" {
+	if item.DeleteURL == "" {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
-			Message: "Item `" + display + "` doesn't support delete",
+			Message: "Item `" + item.Name + "` doesn't support delete",
 			Timeout: time.Second * 5,
 		})
 		return
@@ -60,7 +56,7 @@ func (w *NotificationWidget) AddPendingDelete(display, url string) {
 	if len(w.pendingDeletes) > (yMax - 12) {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
-			Message: "Can't add `" + display + "` run out of space to draw the `Pending delete` list!",
+			Message: "Can't add `" + item.Name + "` run out of space to draw the `Pending delete` list!",
 			Timeout: time.Second * 5,
 		})
 		return
@@ -70,20 +66,17 @@ func (w *NotificationWidget) AddPendingDelete(display, url string) {
 	defer w.deleteMutex.Unlock()
 
 	for _, i := range w.pendingDeletes {
-		if i.url == url {
+		if i.DeleteURL == item.DeleteURL {
 			eventing.SendStatusEvent(eventing.StatusEvent{
 				Failure: true,
-				Message: "Item already `" + display + "` in pending delete list",
+				Message: "Item already `" + item.Name + "` in pending delete list",
 				Timeout: time.Second * 5,
 			})
 			return
 		}
 	}
 
-	w.pendingDeletes = append(w.pendingDeletes, pendingDelete{
-		url:     url,
-		display: display,
-	})
+	w.pendingDeletes = append(w.pendingDeletes, item)
 }
 
 // ConfirmDelete delete all queued/pending deletes
@@ -101,7 +94,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 	w.deleteInProgress = true
 
 	// Take a copy of the current pending deletes
-	pending := make([]pendingDelete, len(w.pendingDeletes))
+	pending := make([]*handlers.TreeNode, len(w.pendingDeletes))
 	copy(pending, w.pendingDeletes)
 
 	w.deleteMutex.Unlock()
@@ -119,14 +112,14 @@ func (w *NotificationWidget) ConfirmDelete() {
 		})
 
 		for _, i := range pending {
-			_, err := armclient.DoRequest(context.Background(), "DELETE", i.url)
+			_, err := armclient.DoRequest(context.Background(), "DELETE", i.DeleteURL)
 			if err != nil {
 				event.Failure = true
 				event.InProgress = false
-				event.Message = "Failed to delete `" + i.display + "` with error:" + err.Error()
+				event.Message = "Failed to delete `" + i.Name + "` with error:" + err.Error()
 				event.Update()
 
-				w.pendingDeletes = []pendingDelete{}
+				w.pendingDeletes = []*handlers.TreeNode{}
 				// In the event that a delete fails in the
 				// batch of pending deletes lets give up on the rest
 				// as something might have gone wrong and best
@@ -134,7 +127,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 				return
 			}
 
-			event.Message = "Deleted: " + i.display
+			event.Message = "Deleted: " + i.Name
 			event.Update()
 		}
 
@@ -142,7 +135,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 		event.InProgress = false
 		event.Update()
 
-		w.pendingDeletes = []pendingDelete{}
+		w.pendingDeletes = []*handlers.TreeNode{}
 	}()
 }
 
@@ -157,7 +150,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 			Timeout:    time.Second * 2,
 		})
 
-		w.pendingDeletes = []pendingDelete{}
+		w.pendingDeletes = []*handlers.TreeNode{}
 		w.deleteMutex.Unlock()
 		done()
 
@@ -173,7 +166,7 @@ func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *Notificat
 		y:              y,
 		w:              w,
 		gui:            g,
-		pendingDeletes: []pendingDelete{},
+		pendingDeletes: []*handlers.TreeNode{},
 	}
 	return widget
 }
@@ -205,7 +198,7 @@ func (w *NotificationWidget) layoutInternal(v io.Writer) error {
 
 	fmt.Fprintln(v, style.Title("Pending Deletes:"))
 	for _, i := range pending {
-		fmt.Fprintln(v, " - "+i.display)
+		fmt.Fprintln(v, " - "+i.Name)
 	}
 	fmt.Fprintln(v, "")
 	fmt.Fprintln(v, "Do you want to delete these items?")
