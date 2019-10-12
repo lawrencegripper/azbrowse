@@ -22,11 +22,11 @@ type kubernetesItem struct {
 		SelfLink string `yaml:"selfLink"`
 	} `yaml:"metadata"`
 }
-type containerResponse struct {
+type podResponse struct {
 	Spec struct {
 		Containers []struct {
 			Name string `yaml:"name"`
-		} `yaml:"containers`
+		} `yaml:"containers"`
 	} `yaml:"spec"`
 }
 
@@ -100,30 +100,30 @@ func (c SwaggerAPISetContainerService) doRequest(verb string, url string) (strin
 func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	if resourceType.Endpoint.TemplateURL == "/api/v1/namespaces/{namespace}/pods/{name}/log" {
-		if strings.Index(currentItem.ExpandURL, "?") < 0 { // we haven't already set the container name!
+		if strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name!
 
-			logUrl := c.serverURL + currentItem.ExpandURL
-			containerUrl := logUrl[:len(logUrl)-3]
-			data, err := c.doRequest("GET", containerUrl)
+			logURL := c.serverURL + currentItem.ExpandURL
+			containerURL := logURL[:len(logURL)-3]
+			data, err := c.doRequest("GET", containerURL)
 			if err != nil {
 				err = fmt.Errorf("Failed to make request: %s", err)
 				return APISetExpandResponse{}, err
 			}
 
-			var containerResponse containerResponse
-			err = yaml.Unmarshal([]byte(data), &containerResponse)
+			var podInfo podResponse
+			err = yaml.Unmarshal([]byte(data), &podInfo)
 			if err != nil {
 				err = fmt.Errorf("Error parsing YAML response: %s", err)
 				return APISetExpandResponse{Response: data}, err
 			}
-			if containerResponse.Spec.Containers == nil || len(containerResponse.Spec.Containers) == 0 {
+			if podInfo.Spec.Containers == nil || len(podInfo.Spec.Containers) == 0 {
 				err = fmt.Errorf("No containers in response: %s", err)
 				return APISetExpandResponse{}, err
 			}
 
-			if len(containerResponse.Spec.Containers) > 1 { // if only a single resopnse then fall through to just return logs for the single container
+			if len(podInfo.Spec.Containers) > 1 { // if only a single resopnse then fall through to just return logs for the single container
 				subResources := []SubResource{}
-				for _, container := range containerResponse.Spec.Containers {
+				for _, container := range podInfo.Spec.Containers {
 					subResource := SubResource{
 						ID:           currentItem.ID + "/" + container.Name,
 						Name:         container.Name,
