@@ -205,7 +205,11 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 		return swaggerResourceTypes, err
 	}
 
-	config := swagger.Config{}
+	config := swagger.Config{
+		AdditionalGetPaths: []string{
+			"/api/v1/watch/", // add a placeholder for /api/v1/watch/* as otherwise they end up directly under /api/v1 and show as duplicates of /api/v1/nodes etc
+		},
+	}
 	var paths []*swagger.Path
 	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc, false)
 	if err != nil {

@@ -6,18 +6,30 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-openapi/analysis"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
+
+func addConfigPaths(paths map[string]spec.PathItem, config *Config) map[string]spec.PathItem {
+	if config.AdditionalGetPaths != nil {
+		for _, pathToAdd := range config.AdditionalGetPaths {
+			newPath := spec.PathItem{}
+			newPath.Get = &spec.Operation{}
+			paths[pathToAdd] = newPath
+		}
+	}
+	return paths
+}
 
 // MergeSwaggerDoc merges api endpoints from the specified swagger doc into the Paths array
 func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
 	swaggerVersion := doc.Spec().Info.Version
 	spec := doc.Analyzer
 	allPaths := spec.AllPaths()
-	swaggerPaths := getSortedPaths(spec)
+	allPaths = addConfigPaths(allPaths, config)
+
+	swaggerPaths := getSortedPaths(allPaths)
 	for _, swaggerPath := range swaggerPaths {
 		override := config.Overrides[swaggerPath.Path]
 
@@ -191,12 +203,12 @@ func (a PathAndNameStrippedPathList) Less(i, j int) bool {
 }
 func (a PathAndNameStrippedPathList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func getSortedPaths(spec *analysis.Spec) []PathAndNameStrippedPath {
+func getSortedPaths(paths map[string]spec.PathItem) []PathAndNameStrippedPath {
 	// Sort ignoring names of captured sections (e.g. wibble in `/foo/{wibble}/bar`)
 
-	pathPairs := make([]PathAndNameStrippedPath, len(spec.AllPaths()))
+	pathPairs := make([]PathAndNameStrippedPath, len(paths))
 	i := 0
-	for key := range spec.AllPaths() {
+	for key := range paths {
 		pathPairs[i] = PathAndNameStrippedPath{
 			Path:             key,
 			NameStrippedPath: stripPathNames(key),

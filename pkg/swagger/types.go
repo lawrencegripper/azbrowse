@@ -63,8 +63,10 @@ type PathOperation struct {
 
 // Config handles configuration of url handling
 type Config struct {
-	// Overrides is keyed on url and
+	// Overrides is keyed on url
 	Overrides map[string]PathOverride
+	// AdditionalGetPaths contains extra paths to include as GET
+	AdditionalGetPaths []string
 }
 
 // PathOverride captures Path and/or Verb overrides
