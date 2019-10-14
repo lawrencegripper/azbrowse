@@ -18,6 +18,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
+const clusterTemplateURL string = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}"
+
 type clusterCredentialsResponse struct {
 	KubeConfigs []struct {
 		Name  string `json:"name"`
@@ -57,7 +59,7 @@ func (e *AzureKubernetesServiceExpander) Name() string {
 func (e *AzureKubernetesServiceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
 	swaggerResourceType := currentItem.SwaggerResourceType
 	if currentItem.ItemType == "resource" && swaggerResourceType != nil {
-		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}" {
+		if swaggerResourceType.Endpoint.TemplateURL == clusterTemplateURL {
 			return true, nil
 		}
 	}
@@ -73,7 +75,7 @@ func (e *AzureKubernetesServiceExpander) Expand(ctx context.Context, currentItem
 	swaggerResourceType := currentItem.SwaggerResourceType
 	if currentItem.Namespace != "AzureKubernetesService" &&
 		swaggerResourceType != nil &&
-		swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}" {
+		swaggerResourceType.Endpoint.TemplateURL == clusterTemplateURL {
 		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
 			ID:        currentItem.ID + "/<k8sapi>",
