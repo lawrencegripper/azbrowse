@@ -114,41 +114,22 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 
 	clusterID := currentItem.Metadata["ClusterID"]
 
-	kubeConfig, err := e.getClusterConfig(ctx, clusterID)
-	if err != nil {
-		return ExpanderResult{
-			Err:               err,
-			Response:          "Error!",
-			SourceDescription: "AzureKubernetesServiceExpander request",
+	// Check for existing config for the cluster
+	apiSet := e.getAPISetForCluster(clusterID)
+	var err error
+	if apiSet == nil {
+		apiSet, err = e.createAPISetForCluster(ctx, clusterID)
+		if err != nil {
+			return ExpanderResult{
+				Err:               err,
+				Response:          "Error!",
+				SourceDescription: "AzureKubernetesServiceExpander request",
+			}
 		}
+		GetSwaggerResourceExpander().AddAPISet(*apiSet)
 	}
 
-	// NOTE - at the time of writing the AKS API returns a single cluster/user
-	// so we're not fully parsing the config, just taking the first user and cluster
-
-	httpClient, err := e.getHTTPClientFromConfig(kubeConfig)
-	if err != nil {
-		return ExpanderResult{
-			Err:               err,
-			Response:          "Error!",
-			SourceDescription: "AzureKubernetesServiceExpander request",
-		}
-	}
-
-	serverURL := kubeConfig.Clusters[0].Cluster.Server
-
-	swaggerResourceTypes, err := e.getSwaggerResourceTypes(*httpClient, serverURL)
-	if err != nil {
-		return ExpanderResult{
-			Err:               err,
-			Response:          "Error!",
-			SourceDescription: "AzureKubernetesServiceExpander request",
-		}
-	}
-
-	// Register the swagger config so that the swagger expander can take over
-	apiSet := NewSwaggerAPISetContainerService(swaggerResourceTypes, *httpClient, currentItem.ID, serverURL)
-	GetSwaggerResourceExpander().AddAPISet(apiSet)
+	swaggerResourceTypes := apiSet.GetResourceTypes()
 
 	// TODO think about how to avoid re-registering - add something to the current node's metadata?
 	newItems := []*TreeNode{}
@@ -180,6 +161,41 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
 	}
+}
+
+func (e *AzureKubernetesServiceExpander) createAPISetForCluster(ctx context.Context, clusterID string) (*SwaggerAPISetContainerService, error) {
+	kubeConfig, err := e.getClusterConfig(ctx, clusterID)
+	if err != nil {
+		return nil, err
+	}
+
+	// NOTE - at the time of writing the AKS API returns a single cluster/user
+	// so we're not fully parsing the config, just taking the first user and cluster
+
+	httpClient, err := e.getHTTPClientFromConfig(kubeConfig)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL := kubeConfig.Clusters[0].Cluster.Server
+
+	swaggerResourceTypes, err := e.getSwaggerResourceTypes(*httpClient, serverURL)
+	if err != nil {
+		return nil, err
+	}
+
+	// Register the swagger config so that the swagger expander can take over
+	apiSet := NewSwaggerAPISetContainerService(swaggerResourceTypes, *httpClient, clusterID+"/<k8sapi>", serverURL)
+	return &apiSet, nil
+}
+func (e *AzureKubernetesServiceExpander) getAPISetForCluster(clusterID string) *SwaggerAPISetContainerService {
+
+	swaggerAPISet := GetSwaggerResourceExpander().GetAPISet(clusterID + "/<k8sapi>")
+	if swaggerAPISet == nil {
+		return nil
+	}
+	apiSet := (*swaggerAPISet).(SwaggerAPISetContainerService)
+	return &apiSet
 }
 
 func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http.Client, serverURL string) ([]swagger.ResourceType, error) {
