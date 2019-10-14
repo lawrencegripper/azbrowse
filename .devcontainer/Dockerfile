@@ -62,6 +62,9 @@ RUN apt-get update \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME \
     #
+    # Change GOPATH ownership
+    && chown -R $USERNAME /go \
+    #
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
