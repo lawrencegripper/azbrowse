@@ -150,7 +150,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	if err != nil {
 		return ExpanderResult{
 			Nodes:    nil,
-			Response: armResponse.Result,
+			Response: ExpanderResponse{Response: armResponse.Result, ResponseType: ResponseJSON},
 			Err:      fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
 		}
 	}
@@ -160,7 +160,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 		return ExpanderResult{
 			Nodes:             nil,
-			Response:          armResponse.Result,
+			Response:          ExpanderResponse{Response: armResponse.Result, ResponseType: ResponseJSON},
 			IsPrimaryResponse: true,
 			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
 		}
@@ -199,7 +199,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          armResponse.Result,
+		Response:          ExpanderResponse{Response: armResponse.Result, ResponseType: ResponseJSON},
 		SourceDescription: "Resources Request",
 		IsPrimaryResponse: true,
 	}

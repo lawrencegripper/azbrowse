@@ -151,7 +151,7 @@ func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) Expander
 	}
 
 	return ExpanderResult{
-		Response:          data,
+		Response:          ExpanderResponse{Response: data},
 		IsPrimaryResponse: true,
 		Nodes:             newItems,
 		SourceDescription: "MetricsExpander build response metric namespaces",
@@ -196,7 +196,7 @@ func expandGraph(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 		asciigraph.Caption("time: 4hrs ago ----> now"))
 
 	return ExpanderResult{
-		Response:          "\n\n" + caption + "\n\n" + style.Graph(graph),
+		Response:          ExpanderResponse{Response: "\n\n" + caption + "\n\n" + style.Graph(graph)},
 		IsPrimaryResponse: true,
 		SourceDescription: "MetricsExpander build graph",
 	}

@@ -79,7 +79,7 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 		return ExpanderResult{
 			Err:               nil,
-			Response:          "", // Swagger expander will supply the response
+			Response:          ExpanderResponse{Response: ""}, // Swagger expander will supply the response
 			SourceDescription: "AppInsightsExpander request",
 			Nodes:             newItems,
 			IsPrimaryResponse: false,
@@ -94,7 +94,7 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 	return ExpanderResult{
 		Err:               fmt.Errorf("Error - unhandled Expand"),
-		Response:          "Error!",
+		Response:          ExpanderResponse{Response: "Error!"},
 		SourceDescription: "AppInsightsExpander request",
 	}
 }
@@ -148,7 +148,7 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 	return ExpanderResult{
 		IsPrimaryResponse: true,
 		Nodes:             newItems,
-		Response:          data,
+		Response:          ExpanderResponse{Response: data, ResponseType: ResponseJSON},
 		SourceDescription: "AppInsightsExpander request",
 	}
 }
@@ -170,7 +170,7 @@ func (e *AppInsightsExpander) expandAnalyticsItem(ctx context.Context, currentIt
 	return ExpanderResult{
 		IsPrimaryResponse: true,
 		Nodes:             newItems,
-		Response:          data,
+		Response:          ExpanderResponse{Response: data, ResponseType: ResponseJSON},
 		SourceDescription: "AppInsightsExpander request",
 	}
 }

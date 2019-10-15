@@ -54,7 +54,7 @@ func (e *ContainerInstanceExpander) Expand(ctx context.Context, currentItem *Tre
 
 	return ExpanderResult{
 		Err:               fmt.Errorf("Error - unhandled Expand"),
-		Response:          "Error!",
+		Response:          ExpanderResponse{Response: "Error!"},
 		SourceDescription: "ContainerInstanceExpander request",
 	}
 }
@@ -74,7 +74,7 @@ func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, curren
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          "",
+			Response:          ExpanderResponse{Response: ""},
 			SourceDescription: "expandContainers list",
 			IsPrimaryResponse: false,
 		}
@@ -120,7 +120,7 @@ func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem 
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          "",
+			Response:          ExpanderResponse{Response: ""},
 			SourceDescription: "expandContainers logs",
 			IsPrimaryResponse: true,
 		}
@@ -134,7 +134,7 @@ func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem 
 
 	return ExpanderResult{
 		IsPrimaryResponse: true,
-		Response:          containerLogResponse.Content,
+		Response:          ExpanderResponse{Response: containerLogResponse.Content},
 		SourceDescription: "ContainerInstanceExpander request",
 	}
 }

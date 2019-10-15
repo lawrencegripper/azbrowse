@@ -51,7 +51,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
-		return APISetExpandResponse{Response: data}, err
+		return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
 	}
 	subResources := []SubResource{}
 
@@ -62,14 +62,14 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 		err = json.Unmarshal([]byte(data), &resourceResponse)
 		if err != nil {
 			err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-			return APISetExpandResponse{Response: data}, err
+			return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
 		}
 
 		for _, resource := range resourceResponse.Resources {
 			subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
 			if subResourceType == nil {
 				err = fmt.Errorf("SubResource type not found! %s", resource.ID)
-				return APISetExpandResponse{Response: data}, err
+				return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
 			}
 			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
@@ -79,7 +79,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
 				if err != nil {
 					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
-					return APISetExpandResponse{Response: data}, err
+					return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
 				}
 			}
 
@@ -96,6 +96,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 
 	return APISetExpandResponse{
 		Response:     data,
+		ResponseType: ResponseJSON,
 		SubResources: subResources,
 	}, nil
 }

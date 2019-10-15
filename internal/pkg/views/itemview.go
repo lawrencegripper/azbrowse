@@ -14,12 +14,13 @@ import (
 
 // ItemWidget is response for showing the text response from the Rest requests
 type ItemWidget struct {
-	x, y      int
-	w, h      int
-	hideGuids bool
-	content   string
-	view      *gocui.View
-	g         *gocui.Gui
+	x, y        int
+	w, h        int
+	hideGuids   bool
+	content     string
+	contentType handlers.ExpanderResponseType
+	view        *gocui.View
+	g           *gocui.Gui
 }
 
 // NewItemWidget creates a new instance of ItemWidget
@@ -47,8 +48,13 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		return nil
 	}
 
-	if (string(w.content[0]) == "[" || string(w.content[0]) == "{") && !w.hideGuids {
-
+	if w.hideGuids {
+		if w.hideGuids {
+			w.content = stripSecretVals(w.content)
+		}
+	}
+	switch w.contentType {
+	case handlers.ResponseJSON:
 		d := json.NewDecoder(strings.NewReader(w.content))
 		d.UseNumber()
 		var obj interface{}
@@ -72,10 +78,8 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		} else {
 			fmt.Fprint(v, string(s))
 		}
-	} else {
-		if w.hideGuids {
-			w.content = stripSecretVals(w.content)
-		}
+	// TODO - add YAML colorisation here
+	default:
 		fmt.Fprint(v, w.content)
 	}
 
@@ -128,9 +132,10 @@ func (w *ItemWidget) PageUp() {
 }
 
 // SetContent displays the string in the itemview
-func (w *ItemWidget) SetContent(content string, title string) {
+func (w *ItemWidget) SetContent(content string, contentType handlers.ExpanderResponseType, title string) {
 	w.g.Update(func(g *gocui.Gui) error {
 		w.content = content
+		w.contentType = contentType
 		// Reset the cursor and origin (scroll poisition)
 		// so we don't start at the bottom of a new doc
 		w.view.SetCursor(0, 0) //nolint: errcheck
@@ -143,4 +148,9 @@ func (w *ItemWidget) SetContent(content string, title string) {
 // GetContent returns the current content
 func (w *ItemWidget) GetContent() string {
 	return w.content
+}
+
+// GetContentType returns the current content type
+func (w *ItemWidget) GetContentType() handlers.ExpanderResponseType {
+	return w.contentType
 }

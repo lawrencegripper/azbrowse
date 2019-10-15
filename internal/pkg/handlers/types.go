@@ -17,9 +17,27 @@ type Expander interface {
 	Name() string
 }
 
+// ExpanderResponseType is used to indicate the text format of a response
+type ExpanderResponseType string
+
+const (
+	// ResponsePlainText indicates the response type should not be parsed or colourised
+	ResponsePlainText ExpanderResponseType = "Text"
+	// ResponseJSON indicates the response type can be parsed and colourised as JSON
+	ResponseJSON ExpanderResponseType = "JSON"
+	// ResponseYAML indicates the response type can be parsed and colourised as YAML
+	ResponseYAML ExpanderResponseType = "YAML"
+)
+
+// ExpanderResponse captures the response text and formt of an expander response
+type ExpanderResponse struct {
+	Response     string               // the response text
+	ResponseType ExpanderResponseType // the response
+}
+
 // ExpanderResult used to wrap mult-value return for use in channels
 type ExpanderResult struct {
-	Response          string
+	Response          ExpanderResponse
 	Nodes             []*TreeNode
 	Err               error
 	SourceDescription string

@@ -188,6 +188,7 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 
 	return APISetExpandResponse{
 		Response:     data,
+		ResponseType: ResponseYAML,
 		SubResources: subResources,
 	}, nil
 }

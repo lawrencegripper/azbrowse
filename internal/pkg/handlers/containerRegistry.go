@@ -74,7 +74,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 
 		return ExpanderResult{
 			Err:               nil,
-			Response:          "", // Swagger expander will supply the response
+			Response:          ExpanderResponse{Response: ""}, // Swagger expander will supply the response
 			SourceDescription: "ContainerRegistryExpander request",
 			Nodes:             newItems,
 			IsPrimaryResponse: false,
@@ -97,7 +97,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 
 	return ExpanderResult{
 		Err:               fmt.Errorf("Error - unhandled Expand"),
-		Response:          "Error!",
+		Response:          ExpanderResponse{Response: "Error!"},
 		SourceDescription: "ContainerRegistryExpander request",
 	}
 }
@@ -181,7 +181,7 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          response,
+		Response:          ExpanderResponse{Response: response, ResponseType: ResponseJSON},
 		SourceDescription: "ContainerRegistryExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
@@ -241,7 +241,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          response,
+		Response:          ExpanderResponse{Response: response, ResponseType: ResponseJSON},
 		SourceDescription: "ContainerRegistryExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
@@ -414,7 +414,7 @@ func (e *ContainerRegistryExpander) expandNode(
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          response,
+		Response:          ExpanderResponse{Response: response, ResponseType: ResponseJSON},
 		SourceDescription: "ContainerRegistryExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,

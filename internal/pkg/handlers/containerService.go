@@ -94,7 +94,7 @@ func (e *AzureKubernetesServiceExpander) Expand(ctx context.Context, currentItem
 
 		return ExpanderResult{
 			Err:               nil,
-			Response:          "", // Swagger expander will supply the response
+			Response:          ExpanderResponse{Response: ""}, // Swagger expander will supply the response
 			SourceDescription: "AzureKubernetesServiceExpander request",
 			Nodes:             newItems,
 			IsPrimaryResponse: false,
@@ -107,7 +107,7 @@ func (e *AzureKubernetesServiceExpander) Expand(ctx context.Context, currentItem
 
 	return ExpanderResult{
 		Err:               fmt.Errorf("Error - unhandled Expand"),
-		Response:          "Error!",
+		Response:          ExpanderResponse{Response: "Error!"},
 		SourceDescription: "AzureKubernetesServiceExpander request",
 	}
 }
@@ -124,7 +124,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 		if err != nil {
 			return ExpanderResult{
 				Err:               err,
-				Response:          "Error!",
+				Response:          ExpanderResponse{Response: "Error!"},
 				SourceDescription: "AzureKubernetesServiceExpander request",
 			}
 		}
@@ -158,7 +158,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          "TODO - what should go here?",
+		Response:          ExpanderResponse{Response: "TODO - what should go here?"},
 		SourceDescription: "AzureKubernetesServiceExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,

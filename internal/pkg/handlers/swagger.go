@@ -32,6 +32,7 @@ type SubResource struct {
 // APISetExpandResponse returns the result of expanding a Resource
 type APISetExpandResponse struct {
 	Response     string
+	ResponseType ExpanderResponseType
 	SubResources []SubResource
 }
 
@@ -148,7 +149,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	if err != nil {
 		return ExpanderResult{
 			Nodes:             nil,
-			Response:          expandResult.Response,
+			Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
 			Err:               err,
 			SourceDescription: "SwaggerResourceExpander",
 		}
@@ -192,7 +193,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
 			return ExpanderResult{
 				Nodes:             nil,
-				Response:          expandResult.Response,
+				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
 				Err:               err,
 				SourceDescription: "SwaggerResourceExpander",
 			}
@@ -211,7 +212,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
 				return ExpanderResult{
 					Nodes:             nil,
-					Response:          expandResult.Response,
+					Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
 					Err:               err,
 					SourceDescription: "SwaggerResourceExpander",
 				}
@@ -235,7 +236,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          data,
+		Response:          ExpanderResponse{Response: data, ResponseType: expandResult.ResponseType},
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
 }

@@ -239,16 +239,19 @@ func main() {
 			}
 
 			var newContent string
+			var newContentType handlers.ExpanderResponseType
 			var newTitle string
 			if err != nil {
 				newContent = err.Error()
+				newContentType = handlers.ResponsePlainText
 				newTitle = "Error"
 			} else {
 				newContent = data
+				newContentType = handlers.ResponseJSON
 				newTitle = "Subscriptions response"
 			}
 
-			list.Navigate(newList, newContent, newTitle)
+			list.Navigate(newList, handlers.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
 
 			return nil
 		})
