@@ -54,6 +54,9 @@ RUN apt-get update \
         github.com/mgechev/revive \
         github.com/derekparker/delve/cmd/dlv 2>&1 \
     #
+    # Install Azure CLI
+    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
+    #
     # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
     && groupadd --gid $USER_GID $USERNAME \
     && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
