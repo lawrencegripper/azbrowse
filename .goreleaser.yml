@@ -15,26 +15,28 @@ builds:
 checksum:
   name_template: '{{ .ProjectName }}_checksums.txt'
 
-archive:
-  name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-  format_overrides:
-  - goos: windows
-    format: zip
+archives:
+  - id: zip
+    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    format_overrides:
+    - goos: windows
+      format: zip
 
-nfpm:
-  name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-  homepage:  https://github.com/lawrencegripper/azbrowse
-  description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
-  maintainer: Lawrence Gripper <info@grippers.co.uk>
-  license: MIT
-  vendor: LawrenceGripper
-  formats:
-  - deb
-  - rpm
-  dependencies:
-  - git
-  recommends:
-  - rpm
+nfpms:
+  - 
+    name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    homepage:  https://github.com/lawrencegripper/azbrowse
+    description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+    maintainer: Lawrence Gripper <info@grippers.co.uk>
+    license: MIT
+    vendor: LawrenceGripper
+    formats:
+    - deb
+    - rpm
+    dependencies:
+    - git
+    recommends:
+    - rpm
 
 dockers:
   - goos: linux
@@ -54,15 +56,16 @@ dockers:
     - "--label=org.label-schema.version={{.Version}}"
     - "--label=org.label-schema.name={{.ProjectName}}"
 
-brew:
-  github:
-    owner: lawrencegripper
-    name: homebrew-tap
-  folder: Formula
-  homepage:  https://github.com/lawrencegripper/azbrowse
-  description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
-  test: |
-    system "#{bin}/azbrowse --version"
+brews:
+  -
+    github:
+      owner: lawrencegripper
+      name: homebrew-tap
+    folder: Formula
+    homepage:  https://github.com/lawrencegripper/azbrowse
+    description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+    test: |
+      system "#{bin}/azbrowse --version"
 
 scoop:
   bucket:
