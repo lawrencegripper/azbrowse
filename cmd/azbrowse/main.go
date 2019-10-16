@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
@@ -55,6 +56,7 @@ func main() {
 		if strings.Contains(arg, "debug") {
 			enableTracing = true
 			tracing.EnableDebug()
+			config.SetDebuggingEnabled(true)
 			handled = true
 		}
 		if strings.Contains(arg, "demo") {

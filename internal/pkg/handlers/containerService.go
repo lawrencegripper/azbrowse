@@ -9,10 +9,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 
 	"gopkg.in/yaml.v2"
 
 	"github.com/go-openapi/loads"
+
+	azbrowse_config "github.com/lawrencegripper/azbrowse/internal/pkg/config"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
@@ -235,13 +238,18 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 		return swaggerResourceTypes, err
 	}
 
-	// uncomment this code to help debug the generated API paths!
-	// tempBuf, err := yaml.Marshal(paths)
-	// ioutil.WriteFile("/tmp/k8s-paths.yml", tempBuf, 0644)
-	// if err != nil {
-	// 	return swaggerResourceTypes, err
-	// }
-	// _ = err
+	if azbrowse_config.GetDebuggingEnabled() {
+		tempBuf, err := yaml.Marshal(paths)
+		if err != nil {
+			return swaggerResourceTypes, err
+		}
+		tmpDir := os.Getenv("TEMP")
+		if tmpDir == "" {
+			tmpDir = "/tmp"
+		}
+		tmpPath := tmpDir + "/k8s-paths.yml"
+		ioutil.WriteFile(tmpPath, tempBuf, 0644) //nolint:errcheck
+	}
 
 	swaggerResourceTypes = swagger.ConvertToSwaggerResourceTypes(paths)
 	return swaggerResourceTypes, nil

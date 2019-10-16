@@ -55,3 +55,17 @@ func Load() (Config, error) {
 	}
 	return config, nil
 }
+
+var (
+	debuggingEnabled = false
+)
+
+// SetDebuggingEnabled sets whether debugging is enabled
+func SetDebuggingEnabled(value bool) {
+	debuggingEnabled = value
+}
+
+// GetDebuggingEnabled gets whether debugging is enabled
+func GetDebuggingEnabled() bool {
+	return debuggingEnabled
+}
