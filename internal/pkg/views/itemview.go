@@ -1,6 +1,7 @@
 package views
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -10,6 +11,11 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/stuartleeks/colorjson"
 	"github.com/stuartleeks/gocui"
+
+	"github.com/alecthomas/chroma"
+	"github.com/alecthomas/chroma/lexers"
+	"github.com/alecthomas/chroma/quick"
+	"github.com/alecthomas/chroma/styles"
 )
 
 // ItemWidget is response for showing the text response from the Rest requests
@@ -25,6 +31,8 @@ type ItemWidget struct {
 
 // NewItemWidget creates a new instance of ItemWidget
 func NewItemWidget(x, y, w, h int, hideGuids bool, content string) *ItemWidget {
+	configureYAMLHighlighting()
+
 	return &ItemWidget{x: x, y: y, w: w, h: h, hideGuids: hideGuids, content: content}
 }
 
@@ -78,7 +86,14 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		} else {
 			fmt.Fprint(v, string(s))
 		}
-	// TODO - add YAML colorisation here
+	case handlers.ResponseYAML:
+		var buf bytes.Buffer
+		err = quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
+		if err != nil {
+			fmt.Fprint(v, w.content)
+		} else {
+			fmt.Fprint(v, buf.String())
+		}
 	default:
 		fmt.Fprint(v, w.content)
 	}
@@ -153,4 +168,57 @@ func (w *ItemWidget) GetContent() string {
 // GetContentType returns the current content type
 func (w *ItemWidget) GetContentType() handlers.ExpanderResponseType {
 	return w.contentType
+}
+
+func configureYAMLHighlighting() {
+	lexer := chroma.MustNewLexer(
+		&chroma.Config{
+			Name:      "YAML-azbrowse",
+			Aliases:   []string{"yaml"},
+			Filenames: []string{"*.yaml", "*.yml"},
+			MimeTypes: []string{"text/x-yaml"},
+		},
+		chroma.Rules{
+			"root": {
+				chroma.Include("whitespace"),
+				{`#.*`, chroma.Comment, nil},                         //nolint:govet
+				{`!![^\s]+`, chroma.CommentPreproc, nil},             //nolint:govet
+				{`&[^\s]+`, chroma.CommentPreproc, nil},              //nolint:govet
+				{`\*[^\s]+`, chroma.CommentPreproc, nil},             //nolint:govet
+				{`^%include\s+[^\n\r]+`, chroma.CommentPreproc, nil}, //nolint:govet
+				{`([>|+-]\s+)(\s+)((?:(?:.*?$)(?:[\n\r]*?)?)*)`, chroma.ByGroups(chroma.StringDoc, chroma.StringDoc, chroma.StringDoc), nil}, //nolint:govet
+				chroma.Include("value"),                //nolint:govet
+				{`[?:,\[\]]`, chroma.Punctuation, nil}, //nolint:govet
+				{`.`, chroma.Text, nil},                //nolint:govet
+			},
+			"value": {
+				{chroma.Words(``, `\b`, "true", "false", "null"), chroma.KeywordConstant, nil},                       //nolint:govet
+				{`"(?:\\.|[^"])*"`, chroma.StringDouble, nil},                                                        //nolint:govet
+				{`'(?:\\.|[^'])*'`, chroma.StringSingle, nil},                                                        //nolint:govet
+				{`\d\d\d\d-\d\d-\d\d([T ]\d\d:\d\d:\d\d(\.\d+)?(Z|\s+[-+]\d+)?)?`, chroma.LiteralDate, nil},          //nolint:govet
+				{`\b[+\-]?(0x[\da-f]+|0o[0-7]+|(\d+\.?\d*|\.?\d+)(e[\+\-]?\d+)?|\.inf|\.nan)\b`, chroma.Number, nil}, //nolint:govet
+				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)(\d+\.?\d*|\.?\d+)(\s)`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.Number, chroma.Whitespace), nil}, //nolint:govet
+				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)(true)\b`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), nil},                    //nolint:govet
+				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)(false)\b`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), nil},                   //nolint:govet
+				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)([\w\./\-_]+)\b`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.StringDouble), nil},                     //nolint:govet
+				// {`\b(?:[\w]+)(?:[:\b]+)(?:[\w+])\b`, ByGroups(KeywordReserved, Punctuation, StringDouble), nil},
+				{`\b[\w]+\b`, chroma.Text, nil}, //nolint:govet
+			},
+			"whitespace": {
+				{`\s+`, chroma.Whitespace, nil}, //nolint:govet
+			},
+		},
+	)
+
+	lexers.Register(lexer)
+
+	style := chroma.MustNewStyle(
+		"azbrowse",
+		chroma.StyleEntries{
+			chroma.LiteralString:        "#00aa00",
+			chroma.LiteralStringBoolean: "#b3760e",
+			chroma.LiteralNumber:        "#0099ff",
+		},
+	)
+	styles.Register(style)
 }
