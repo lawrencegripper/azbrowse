@@ -30,6 +30,8 @@ type podResponse struct {
 	} `yaml:"spec"`
 }
 
+var _ SwaggerAPISet = SwaggerAPISetContainerService{}
+
 // SwaggerAPISetContainerService holds the config for working with an AKS cluster API
 type SwaggerAPISetContainerService struct {
 	resourceTypes []swagger.ResourceType
@@ -71,7 +73,10 @@ func (c SwaggerAPISetContainerService) GetResourceTypes() []swagger.ResourceType
 }
 
 func (c SwaggerAPISetContainerService) doRequest(verb string, url string) (string, error) {
-	request, err := http.NewRequest("GET", url, bytes.NewReader([]byte("")))
+	return c.doRequestWithBody(verb, url, "")
+}
+func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string, body string) (string, error) {
+	request, err := http.NewRequest(verb, url, bytes.NewReader([]byte(body)))
 	if err != nil {
 		err = fmt.Errorf("Failed to create request" + err.Error() + url)
 		return "", err
@@ -206,4 +211,25 @@ func (c SwaggerAPISetContainerService) Delete(ctx context.Context, item *TreeNod
 		return false, err
 	}
 	return true, nil
+}
+
+// Update attempts to update the specified item with new content
+func (c SwaggerAPISetContainerService) Update(ctx context.Context, item *TreeNode, content string) error {
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+	putURL, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+	putURL = c.serverURL + putURL
+	if err != nil {
+		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
+	}
+	// done := h.status.Status(fmt.Sprintf("Making PUT request: %s", putURL), true)
+	_, err = c.doRequestWithBody("PUT", putURL, content)
+	// done()
+	if err != nil {
+		return fmt.Errorf("Error making PUT request: %s", err)
+	}
+
+	return nil
 }

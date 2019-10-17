@@ -18,6 +18,7 @@ type SwaggerAPISet interface {
 	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error)
 	MatchChildNodesByName() bool
 	Delete(context context.Context, node *TreeNode) (bool, error)
+	Update(context context.Context, node *TreeNode, content string) error
 }
 
 // SubResource is used to pass sub resource information from SwaggerAPISet to the expander
