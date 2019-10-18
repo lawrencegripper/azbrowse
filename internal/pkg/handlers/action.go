@@ -40,7 +40,7 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 
 	return ExpanderResult{
 		Err:               err,
-		Response:          string(data),
+		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 		SourceDescription: "Resource Group Request",
 		IsPrimaryResponse: true,
 	}

@@ -24,7 +24,7 @@ func (e *JSONExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (b
 func (e *JSONExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	return ExpanderResult{
 		Err:               nil,
-		Response:          currentItem.Metadata["jsonItem"],
+		Response:          ExpanderResponse{Response: currentItem.Metadata["jsonItem"], ResponseType: ResponseJSON},
 		SourceDescription: "Deployments Subdeployment",
 		IsPrimaryResponse: true,
 	}

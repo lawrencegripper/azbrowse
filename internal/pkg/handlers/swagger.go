@@ -2,32 +2,60 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
-	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
+	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
-	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
+
+// SwaggerAPISet represents the configuration for a set of swagger API endpoints that the SwaggerResourceExpander can handle
+type SwaggerAPISet interface {
+	ID() string
+	GetResourceTypes() []swagger.ResourceType
+	AppliesToNode(node *TreeNode) bool
+	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error)
+	MatchChildNodesByName() bool
+	Delete(context context.Context, node *TreeNode) (bool, error)
+}
+
+// SubResource is used to pass sub resource information from SwaggerAPISet to the expander
+type SubResource struct {
+	ID           string
+	Name         string
+	ResourceType swagger.ResourceType
+	ExpandURL    string
+	DeleteURL    string
+}
+
+// APISetExpandResponse returns the result of expanding a Resource
+type APISetExpandResponse struct {
+	Response     string
+	ResponseType ExpanderResponseType
+	SubResources []SubResource
+}
 
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
-	initialized   bool
-	ResourceTypes []SwaggerResourceType
+	apiSets map[string]*SwaggerAPISet
 }
 
-// SwaggerResourceType holds information about resources that can be displayed
-type SwaggerResourceType struct {
-	Display        string
-	Endpoint       *endpoints.EndpointInfo
-	Verb           string
-	DeleteEndpoint *endpoints.EndpointInfo
-	PatchEndpoint  *endpoints.EndpointInfo
-	PutEndpoint    *endpoints.EndpointInfo
-	Children       []SwaggerResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
-	SubResources   []SwaggerResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
+// NewSwaggerResourcesExpander creates a new SwaggerResourceExpander
+func NewSwaggerResourcesExpander() *SwaggerResourceExpander {
+	return &SwaggerResourceExpander{
+		apiSets: map[string]*SwaggerAPISet{},
+	}
+}
+
+// AddAPISet adds a SwaggerAPISet to the APIs that the expander will handle
+func (e *SwaggerResourceExpander) AddAPISet(apiSet SwaggerAPISet) {
+	e.apiSets[apiSet.ID()] = &apiSet
+}
+
+// GetAPISet returns a SwaggerAPISet by id
+func (e *SwaggerResourceExpander) GetAPISet(id string) *SwaggerAPISet {
+	return e.apiSets[id]
 }
 
 // Name returns the name of the expander
@@ -35,20 +63,12 @@ func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"
 }
 
-func mustGetEndpointInfoFromURL(url string, apiVersion string) *endpoints.EndpointInfo {
-	endpoint, err := endpoints.GetEndpointInfoFromURL(url, apiVersion)
-	if err != nil {
-		panic(err)
-	}
-	return &endpoint
-}
-
-func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []SwaggerResourceType) *SwaggerResourceType {
+func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
 	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
 	defer span.Finish()
 	return getResourceTypeForURLInner(url, resourceTypes)
 }
-func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType) *SwaggerResourceType {
+func getResourceTypeForURLInner(url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
 	for _, resourceType := range resourceTypes {
 		matchResult := resourceType.Endpoint.Match(url)
 		if matchResult.IsMatch {
@@ -64,28 +84,42 @@ func getResourceTypeForURLInner(url string, resourceTypes []SwaggerResourceType)
 	return nil
 }
 
-func (e *SwaggerResourceExpander) ensureInitialized() {
-	if !e.initialized {
-		e.ResourceTypes = e.getResourceTypes()
-		e.initialized = true
+func (e *SwaggerResourceExpander) getAPISetForItem(currentItem *TreeNode) *SwaggerAPISet {
+
+	if currentItem.Metadata == nil {
+		currentItem.Metadata = make(map[string]string)
 	}
+	if apiSetID := currentItem.Metadata["SwaggerAPISetID"]; apiSetID != "" {
+		return e.GetAPISet(apiSetID)
+	}
+	for _, apiSetPtr := range e.apiSets {
+		apiSet := *apiSetPtr
+		if apiSet.AppliesToNode(currentItem) {
+			currentItem.Metadata["SwaggerAPISetID"] = apiSet.ID()
+			return apiSetPtr
+		}
+	}
+	return nil
 }
 
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	e.ensureInitialized()
 	if currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
 		return false, nil
 	}
-	if currentItem.ItemType == ResourceType || currentItem.ItemType == SubResourceType {
-		if currentItem.SwaggerResourceType != nil {
-			return true, nil
-		}
-		resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, e.ResourceTypes)
-		if resourceType != nil {
-			currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
-			return true, nil
-		}
+	apiSetPtr := e.getAPISetForItem(currentItem)
+	if apiSetPtr == nil {
+		return false, nil
+	}
+	apiSet := *apiSetPtr
+
+	if currentItem.SwaggerResourceType != nil {
+		return true, nil
+	}
+	resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, apiSet.GetResourceTypes())
+	if resourceType != nil {
+		currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
+		return true, nil
 	}
 
 	return false, nil
@@ -102,70 +136,86 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		panic(fmt.Errorf("SwaggerResourceType not set"))
 	}
 
-	method := resourceType.Verb
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	apiSetPtr := e.getAPISetForItem(currentItem)
+	if apiSetPtr == nil {
+		panic(fmt.Errorf("SwaggerAPISet not set"))
+	}
+	apiSet := *apiSetPtr
+
+	data := ""
+
+	// Get sub resources from config
+	expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
 	if err != nil {
 		return ExpanderResult{
 			Nodes:             nil,
-			Response:          string(data),
-			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
+			Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+			Err:               err,
 			SourceDescription: "SwaggerResourceExpander",
 		}
 	}
+	data = expandResult.Response
 
 	newItems := []*TreeNode{}
-	matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL) // TODO - return the matches from getHandledTypeForURL to avoid re-calculating!
-	templateValues := matchResult.Values
-
-	if len(resourceType.SubResources) > 0 {
-		// We have defined subResources - Unmarshal the ARM response and add these to newItems
-		var resourceResponse armclient.ResourceResponse
-		err = json.Unmarshal([]byte(data), &resourceResponse)
-		if err != nil {
-			err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-			panic(err)
-		}
-		for _, resource := range resourceResponse.Resources {
-			subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
-			if subResourceType == nil {
-				panic(fmt.Errorf("SubResource type not found! %s", resource.ID))
-			}
-			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
-			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
-			deleteURL := ""
-			if subResourceType.DeleteEndpoint != nil {
-				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
-				if err != nil {
-					panic(fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err))
-				}
-			}
+	if len(expandResult.SubResources) > 0 {
+		for _, subResource := range expandResult.SubResources {
 			newItems = append(newItems, &TreeNode{
 				Parentid:            currentItem.ID,
 				Namespace:           "swagger",
-				Name:                name,
-				Display:             name,
-				ID:                  resource.ID,
-				ExpandURL:           resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
+				Name:                subResource.Name,
+				Display:             subResource.Name,
+				ID:                  subResource.ID,
+				ExpandURL:           subResource.ExpandURL,
 				ItemType:            SubResourceType,
-				DeleteURL:           deleteURL,
-				SwaggerResourceType: subResourceType,
+				DeleteURL:           subResource.DeleteURL,
+				SwaggerResourceType: &subResource.ResourceType,
+				Metadata: map[string]string{
+					"SwaggerAPISetID": apiSet.ID(),
+				},
 			})
 		}
 	}
+
 	// Add any children to newItems
+	matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL)
+	templateValues := matchResult.Values
 	for _, child := range resourceType.Children {
 		loopChild := child
-		url, err := child.Endpoint.BuildURL(templateValues)
+
+		var url string
+		if apiSet.MatchChildNodesByName() {
+			url, err = child.Endpoint.BuildURL(templateValues)
+		} else {
+			valueArray := resourceType.Endpoint.GenerateValueArrayFromMap(templateValues)
+			url, err = child.Endpoint.BuildURLFromArray(valueArray)
+		}
 		if err != nil {
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
-			panic(err)
+			return ExpanderResult{
+				Nodes:             nil,
+				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+				Err:               err,
+				SourceDescription: "SwaggerResourceExpander",
+			}
 		}
+
 		display := substituteValues(child.Display, templateValues)
 		deleteURL := ""
 		if child.DeleteEndpoint != nil {
-			deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+			if apiSet.MatchChildNodesByName() {
+				deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+			} else {
+				valueArray := child.DeleteEndpoint.GenerateValueArrayFromMap(templateValues)
+				deleteURL, err = child.DeleteEndpoint.BuildURLFromArray(valueArray)
+			}
 			if err != nil {
-				panic(fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err))
+				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
+				return ExpanderResult{
+					Nodes:             nil,
+					Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+					Err:               err,
+					SourceDescription: "SwaggerResourceExpander",
+				}
 			}
 		}
 		newItems = append(newItems, &TreeNode{
@@ -178,17 +228,32 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			ItemType:            SubResourceType,
 			DeleteURL:           deleteURL,
 			SwaggerResourceType: &loopChild,
+			Metadata: map[string]string{
+				"SwaggerAPISetID": apiSet.ID(),
+			},
 		})
 	}
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          string(data),
+		Response:          ExpanderResponse{Response: data, ResponseType: expandResult.ResponseType},
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
 }
 
-// substituteValues applys a value map to strings such as "Name: {name}"
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (e *SwaggerResourceExpander) Delete(context context.Context, item *TreeNode) (bool, error) {
+
+	apiSetPtr := e.getAPISetForItem(item)
+	if apiSetPtr == nil {
+		return false, nil // false indicates we didn't try to delete
+	}
+	apiSet := *apiSetPtr
+
+	return apiSet.Delete(context, item)
+}
+
+// substituteValues applies a value map to strings such as "Name: {name}"
 func substituteValues(fmtString string, values map[string]string) string {
 	for name, value := range values {
 		fmtString = strings.Replace(fmtString, "{"+name+"}", value, -1)

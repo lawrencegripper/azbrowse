@@ -33,7 +33,7 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          "",
+			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 			SourceDescription: "Activity Log",
 			IsPrimaryResponse: true,
 		}
@@ -72,7 +72,7 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 	return ExpanderResult{
 		Err:               err,
-		Response:          string(data),
+		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 		SourceDescription: "Deployments request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,

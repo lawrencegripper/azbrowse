@@ -6,6 +6,7 @@ import "github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 type Page struct {
 	Value            []*handlers.TreeNode
 	Data             string
+	DataType         handlers.ExpanderResponseType
 	Title            string
 	Selection        int
 	ExpandedNodeItem *handlers.TreeNode

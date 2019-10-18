@@ -1,5 +1,16 @@
 package handlers
 
+var swaggerResourceExpander *SwaggerResourceExpander
+
+// GetSwaggerResourceExpander returns the (singleton) instance of SwaggerResourceExpander
+func GetSwaggerResourceExpander() *SwaggerResourceExpander {
+	if swaggerResourceExpander == nil {
+		swaggerResourceExpander = NewSwaggerResourcesExpander()
+		swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources())
+	}
+	return swaggerResourceExpander
+}
+
 // Register tracks all the current handlers
 // add new handlers to the array to augment the
 // processing of items in the
@@ -8,7 +19,7 @@ var Register = []Expander{
 	&SubscriptionExpander{},
 	&ActionExpander{},
 	&MetricsExpander{},
-	&SwaggerResourceExpander{},
+	GetSwaggerResourceExpander(),
 	&DeploymentsExpander{},
 	&ActivityLogExpander{},
 	&JSONExpander{},
@@ -16,4 +27,5 @@ var Register = []Expander{
 	NewContainerRegistryExpander(),       // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 	&ContainerInstanceExpander{},
 	&AppInsightsExpander{},
+	&AzureKubernetesServiceExpander{},
 }

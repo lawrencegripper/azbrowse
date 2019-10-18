@@ -33,6 +33,7 @@ func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo
 	// This is currently generating at runtime, but would be a build-time task that generated code :-)
 	originalTemplateURL := templateURL
 	templateURL = strings.TrimPrefix(templateURL, "/")
+	templateURL = strings.TrimSuffix(templateURL, "/")
 	templateURLSegments := strings.Split(templateURL, "/")
 	urlSegments := make([]EndpointSegment, len(templateURLSegments))
 	for i, s := range templateURLSegments {
@@ -56,6 +57,15 @@ func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo
 		APIVersion:  apiVersion,
 		URLSegments: urlSegments,
 	}, nil
+}
+
+// MustGetEndpointInfoFromURL creates an endpoint or panics
+func MustGetEndpointInfoFromURL(url string, apiVersion string) *EndpointInfo {
+	endpoint, err := GetEndpointInfoFromURL(url, apiVersion)
+	if err != nil {
+		panic(err)
+	}
+	return &endpoint
 }
 
 // Match tests whether a URL matches the EndpointInfo (ignoring query string values)
@@ -108,6 +118,42 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 				return "", fmt.Errorf("No value was found with name '%s'", segment.Match)
 			}
 			url += "/" + value
+		} else {
+			url += "/" + segment.Match
+		}
+	}
+	if ei.APIVersion != "" {
+		url += "?api-version=" + ei.APIVersion
+	}
+	return url, nil
+}
+
+// GenerateValueArrayFromMap builds an ordered array of template match values from a templateValues map for use with BuildURLFromArray
+func (ei *EndpointInfo) GenerateValueArrayFromMap(templateValues map[string]string) []string {
+	valueArray := make([]string, len(templateValues))
+	valueArrayIndex := 0
+	for _, segment := range ei.URLSegments {
+		if segment.Name != "" {
+			valueArray[valueArrayIndex] = templateValues[segment.Name]
+			valueArrayIndex++
+		}
+	}
+	return valueArray
+}
+
+// BuildURLFromArray generates a URL based on the templateURL filling in placeholders with the values array by index
+func (ei *EndpointInfo) BuildURLFromArray(values []string) (string, error) {
+
+	url := ""
+	valueIndex := 0
+	for _, segment := range ei.URLSegments {
+		if segment.Match == "" {
+			if valueIndex >= len(values) {
+				return "", fmt.Errorf("Too few values")
+			}
+			value := values[valueIndex] // TODO - check array bounds!
+			url += "/" + value
+			valueIndex++
 		} else {
 			url += "/" + segment.Match
 		}

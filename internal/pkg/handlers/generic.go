@@ -37,7 +37,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          string(data),
+			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 			SourceDescription: "Resource Group Request",
 		}
 	}
@@ -47,7 +47,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          string(data),
+			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 			SourceDescription: "Resource Group Request",
 		}
 	}
@@ -64,7 +64,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 
 	return ExpanderResult{
 		Err:               err,
-		Response:          string(data),
+		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 		SourceDescription: "Resource Group Request",
 	}
 }

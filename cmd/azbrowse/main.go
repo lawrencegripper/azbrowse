@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
@@ -55,6 +56,7 @@ func main() {
 		if strings.Contains(arg, "debug") {
 			enableTracing = true
 			tracing.EnableDebug()
+			config.SetDebuggingEnabled(true)
 			handled = true
 		}
 		if strings.Contains(arg, "demo") {
@@ -239,16 +241,19 @@ func main() {
 			}
 
 			var newContent string
+			var newContentType handlers.ExpanderResponseType
 			var newTitle string
 			if err != nil {
 				newContent = err.Error()
+				newContentType = handlers.ResponsePlainText
 				newTitle = "Error"
 			} else {
 				newContent = data
+				newContentType = handlers.ResponseJSON
 				newTitle = "Subscriptions response"
 			}
 
-			list.Navigate(newList, newContent, newTitle)
+			list.Navigate(newList, handlers.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
 
 			return nil
 		})

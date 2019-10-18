@@ -200,7 +200,7 @@ func (w *ListWidget) GoBack() {
 	if previousPage == nil {
 		return
 	}
-	w.contentView.SetContent(previousPage.Data, "Response")
+	w.contentView.SetContent(previousPage.Data, previousPage.DataType, "Response")
 	w.selected = 0
 	w.items = previousPage.Value
 	w.title = previousPage.Title
@@ -262,7 +262,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	} else {
 		timeout = time.After(time.Second * 45)
 	}
-	var newContent string
+	var newContent handlers.ExpanderResponse
 	var newTitle string
 
 	observedError := false
@@ -331,13 +331,13 @@ func (w *ListWidget) ExpandCurrentSelection() {
 }
 
 // Navigate updates the currently selected list nodes, title and details content
-func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title string) {
+func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content handlers.ExpanderResponse, title string) {
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
 		w.SetNodes(nodes)
 	}
 	w.expandedNodeItem = currentItem
-	w.contentView.SetContent(content, title)
+	w.contentView.SetContent(content.Response, content.ResponseType, title)
 	if currentItem != nil {
 		w.title = w.title + ">" + currentItem.Name
 	}
@@ -347,12 +347,12 @@ func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content string, title 
 
 // SetNodes allows others to set the list nodes
 func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
-	w.selected = 0
 
 	// Capture current view to navstack
 	if w.HasCurrentItem() {
 		w.navStack.Push(&Page{
 			Data:             w.contentView.GetContent(),
+			DataType:         w.contentView.GetContentType(),
 			Value:            w.items,
 			Title:            w.title,
 			Selection:        w.selected,
@@ -367,6 +367,7 @@ func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
 		}
 	}
 
+	w.selected = 0
 	w.items = nodes
 	w.ClearFilter()
 }

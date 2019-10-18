@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"context"
+
+	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
 // Expander is used to open/expand items in the left list panel
@@ -15,9 +17,27 @@ type Expander interface {
 	Name() string
 }
 
+// ExpanderResponseType is used to indicate the text format of a response
+type ExpanderResponseType string
+
+const (
+	// ResponsePlainText indicates the response type should not be parsed or colourised
+	ResponsePlainText ExpanderResponseType = "Text"
+	// ResponseJSON indicates the response type can be parsed and colourised as JSON
+	ResponseJSON ExpanderResponseType = "JSON"
+	// ResponseYAML indicates the response type can be parsed and colourised as YAML
+	ResponseYAML ExpanderResponseType = "YAML"
+)
+
+// ExpanderResponse captures the response text and formt of an expander response
+type ExpanderResponse struct {
+	Response     string               // the response text
+	ResponseType ExpanderResponseType // the response
+}
+
 // ExpanderResult used to wrap mult-value return for use in channels
 type ExpanderResult struct {
-	Response          string
+	Response          ExpanderResponse
 	Nodes             []*TreeNode
 	Err               error
 	SourceDescription string
@@ -28,20 +48,20 @@ type ExpanderResult struct {
 
 // TreeNode is an item in the ListWidget
 type TreeNode struct {
-	Parentid            string               // The ID of the parent resource
-	ID                  string               // The ID of the resource in ARM
-	Name                string               // The name of the object returned by the API
-	Display             string               // The Text used to draw the object in the list
-	ExpandURL           string               // The URL to call to expand the item
-	ItemType            string               // The type of item either subscription, resourcegroup, resource, deployment or action
-	ExpandReturnType    string               // The type of the items returned by the expandURL
-	DeleteURL           string               // The URL to call to delete the current resource
-	Namespace           string               // The ARM Namespace of the item eg StorageAccount
-	ArmType             string               // The ARM type of the item eg Microsoft.Storage/StorageAccount
-	Metadata            map[string]string    // Metadata is used to pass arbritray data between `Expander`'s
-	SubscriptionID      string               // The SubId of this item
-	StatusIndicator     string               // Displays the resources status
-	SwaggerResourceType *SwaggerResourceType // caches the swagger ResourceType to avoid repeated lookups
+	Parentid            string                // The ID of the parent resource
+	ID                  string                // The ID of the resource in ARM
+	Name                string                // The name of the object returned by the API
+	Display             string                // The Text used to draw the object in the list
+	ExpandURL           string                // The URL to call to expand the item
+	ItemType            string                // The type of item either subscription, resourcegroup, resource, deployment or action
+	ExpandReturnType    string                // The type of the items returned by the expandURL
+	DeleteURL           string                // The URL to call to delete the current resource
+	Namespace           string                // The ARM Namespace of the item eg StorageAccount
+	ArmType             string                // The ARM type of the item eg Microsoft.Storage/StorageAccount
+	Metadata            map[string]string     // Metadata is used to pass arbritray data between `Expander`'s
+	SubscriptionID      string                // The SubId of this item
+	StatusIndicator     string                // Displays the resources status
+	SwaggerResourceType *swagger.ResourceType // caches the swagger ResourceType to avoid repeated lookups
 }
 
 const (
