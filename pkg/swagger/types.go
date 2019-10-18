@@ -23,6 +23,7 @@ type ResourceType struct {
 type Path struct {
 	Name                  string
 	CondensedEndpointPath string
+	FixedContent          string
 	Endpoint              *endpoints.EndpointInfo // The logical endpoint. May be overridden for an operation
 	Operations            PathOperations
 	Children              []*Path
@@ -65,8 +66,8 @@ type PathOperation struct {
 type Config struct {
 	// Overrides is keyed on url
 	Overrides map[string]PathOverride
-	// AdditionalGetPaths contains extra paths to include as GET
-	AdditionalGetPaths []string
+	// AdditionalPaths contains extra paths to include in the generated hierarchy
+	AdditionalPaths []AdditionalPath
 	// SuppressAPIVersion true to prevent the api version querystring
 	SuppressAPIVersion bool
 }
@@ -75,4 +76,14 @@ type Config struct {
 type PathOverride struct {
 	Path    string // actual url to use
 	GetVerb string // Verb to use for logical GET requests
+}
+
+// AdditionalPath provides metadata for additional paths to inject into the generated hierarchy
+type AdditionalPath struct {
+	// Path is the path to inject in the hierarchy
+	Path string
+	// GetPath allows the actual path used at runtime to be overridden
+	GetPath string
+	// FixedContent provides static content to render in place of making an API call
+	FixedContent string
 }

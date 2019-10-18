@@ -227,8 +227,15 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 	}
 
 	config := swagger.Config{
-		AdditionalGetPaths: []string{
-			"/api/v1/watch/", // add a placeholder for /api/v1/watch/* as otherwise they end up directly under /api/v1 and show as duplicates of /api/v1/nodes etc
+		AdditionalPaths: []swagger.AdditionalPath{
+			// add a placeholder for /api/v1/watch/* as otherwise they end up directly under /api/v1 and show as duplicates of /api/v1/nodes etc
+			{Path: "/api/v1/watch", FixedContent: "Select a node to expand"},
+			// add a placeholder for /api/v1/watch/* as otherwise they end up directly under /api/v1 and show as duplicates of /api/v1/nodes etc
+			{Path: "/apis/apps/v1/watch", FixedContent: "Select a node to expand"},
+			// add as a missing path - and direct to a different endpoint
+			{Path: "/apis/apps/v1/namespaces", GetPath: "/api/v1/namespaces"},
+			// add as a missing path - also overridden to map to the actual endpoint that exists!
+			{Path: "/apis/apps/v1/namespaces/{namespace}", FixedContent: "Select a node to expand"},
 		},
 		SuppressAPIVersion: true,
 	}
