@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -31,6 +32,7 @@ type podResponse struct {
 }
 
 var _ SwaggerAPISet = SwaggerAPISetContainerService{}
+var maxTailLines = 100
 
 // SwaggerAPISetContainerService holds the config for working with an AKS cluster API
 type SwaggerAPISetContainerService struct {
@@ -106,7 +108,7 @@ func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string
 func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	if resourceType.Endpoint.TemplateURL == "/api/v1/namespaces/{namespace}/pods/{name}/log" {
-		if !strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name!
+		if !strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name/tailLines!
 
 			logURL := c.serverURL + currentItem.ExpandURL
 			containerURL := logURL[:len(logURL)-3]
@@ -127,21 +129,26 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 				return APISetExpandResponse{}, err
 			}
 
-			if len(podInfo.Spec.Containers) > 1 { // if only a single resopnse then fall through to just return logs for the single container
-				subResources := []SubResource{}
-				for _, container := range podInfo.Spec.Containers {
-					subResource := SubResource{
-						ID:           currentItem.ID + "/" + container.Name,
-						Name:         container.Name,
-						ResourceType: resourceType,
-						ExpandURL:    currentItem.ExpandURL + "?container=" + container.Name,
+			if len(podInfo.Spec.Containers) == 1 {
+				// if only a single resopnse then set the tailLines param and  fall through to just return logs for the single container
+				currentItem.ExpandURL += "?tailLines=" + strconv.Itoa(maxTailLines)
+			} else {
+				if len(podInfo.Spec.Containers) > 1 {
+					subResources := []SubResource{}
+					for _, container := range podInfo.Spec.Containers {
+						subResource := SubResource{
+							ID:           currentItem.ID + "/" + container.Name,
+							Name:         container.Name,
+							ResourceType: resourceType,
+							ExpandURL:    currentItem.ExpandURL + "?container=" + container.Name + "&tailLines=" + strconv.Itoa(maxTailLines),
+						}
+						subResources = append(subResources, subResource)
 					}
-					subResources = append(subResources, subResource)
+					return APISetExpandResponse{
+						Response:     "Pick a container to view logs",
+						SubResources: subResources,
+					}, nil
 				}
-				return APISetExpandResponse{
-					Response:     "Pick a container to view logs",
-					SubResources: subResources,
-				}, nil
 			}
 		}
 	}
