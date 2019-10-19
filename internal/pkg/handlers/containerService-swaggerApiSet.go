@@ -82,23 +82,24 @@ func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string
 		return "", err
 	}
 
+	request.Header.Set("Content-Type", "application/yaml")
 	request.Header.Set("Accept", "application/yaml")
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + url)
 		return "", err
 	}
+	defer response.Body.Close() //nolint: errcheck
+	buf, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		err = fmt.Errorf("Failed to read body: %s", err)
+		return "", err
+	}
+	data := string(buf)
 	if 200 <= response.StatusCode && response.StatusCode < 300 {
-		defer response.Body.Close() //nolint: errcheck
-		buf, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			err = fmt.Errorf("Failed to read body: %s", err)
-			return "", err
-		}
-		data := string(buf)
 		return data, nil
 	}
-	return "", fmt.Errorf("Response failed with %s (%s)", response.Status, url)
+	return "", fmt.Errorf("Response failed with %s (%s): ", response.Status, url, data)
 }
 
 // ExpandResource returns metadata about child resources of the specified resource node
