@@ -186,7 +186,7 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 				}
 			}
 			subResource := SubResource{
-				ID:           c.clusterID + item.Metadata.SelfLink,
+				ID:           c.clusterID + subResourceURL,
 				Name:         name,
 				ResourceType: *subResourceType,
 				ExpandURL:    subResourceURL,
