@@ -21,6 +21,28 @@ func showUsage() {
 	fmt.Println("")
 	flag.Usage()
 }
+
+// The input folder structure is as below
+// The bash script that generates this ensures that there is only a single version
+// spec folder for each resource type. It is most likely to be `stable`, but it could be
+// `preview` if no `stable` version exists for that type
+//
+//  swagger-specs
+//   |- top-level
+//          |-service1 (e.g. `cdn` or `compute`)
+//          |   |-common   (want these)
+//          |   |-quickstart-templates
+//          |   |-data-plane
+//          |   |-resource-manager (we're only interested in the contents of this folder)
+//          |       |- resource-type1 (e.g. `Microsoft.Compute`)
+//          |       |    |- common
+//          |       |    |   |- *.json (want these)
+//          |       |    |- stable (NB - may preview if no stable)
+//          |       |    |    |- 2018-10-01
+//          |       |    |        |- *.json   (want these)
+//          |       |- misc files (e.g. readme)
+//           ...
+
 func main() {
 	outputFileFlag := flag.String("output-file", "", "path to the file to output the generated code to")
 	flag.Parse()
@@ -32,20 +54,22 @@ func main() {
 	config := getConfig()
 	var paths []*swagger.Path
 
-	serviceFileInfos, err := ioutil.ReadDir("swagger-specs/top-level")
+	serviceFileInfos, err := ioutil.ReadDir("swagger-specs")
 	if err != nil {
 		panic(err)
 	}
 	for _, serviceFileInfo := range serviceFileInfos {
-		if serviceFileInfo.IsDir() {
+		if serviceFileInfo.IsDir() && serviceFileInfo.Name() != "common-types" {
 			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
-			resourceTypeFileInfos, err := ioutil.ReadDir("swagger-specs/top-level/" + serviceFileInfo.Name())
+			// TODO - handle service folder/common folder
+			resourceTypeFileInfos, err := ioutil.ReadDir(fmt.Sprintf("swagger-specs/%s/resource-manager", serviceFileInfo.Name()))
 			if err != nil {
 				panic(err)
 			}
 			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
 				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
-					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath("swagger-specs/top-level/" + serviceFileInfo.Name() + "/" + resourceTypeFileInfo.Name()))
+					// TODO handle common
+					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/%s/resource-manager/%s", serviceFileInfo.Name(), resourceTypeFileInfo.Name())))
 					swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
 					if err != nil {
 						panic(err)
@@ -79,6 +103,7 @@ func main() {
 	writeTemplate(writer, paths, &config)
 }
 
+// getFirstNonCommonPath returns the first subfolder under path that is not named 'common'
 func getFirstNonCommonPath(path string) string {
 	// get the first non `common` path
 
@@ -164,7 +189,7 @@ func loadDoc(path string) *loads.Document {
 
 	document, err = document.Expanded(&spec.ExpandOptions{RelativeBase: path})
 	if err != nil {
-		log.Panicf("Error opening Swagger: %s", err)
+		log.Panicf("Error expanding Swagger: %s", err)
 	}
 
 	return document

@@ -25,6 +25,7 @@ mkdir ./swagger-specs
 #
 #     specification
 #          |-service1 (e.g. `cdn` or `compute`)
+#          |   |-common
 #          |   |-quickstart-templates
 #          |   |-data-plane
 #          |   |-resource-manager (we're only interested in the contents of this folder)
@@ -51,36 +52,32 @@ mkdir ./swagger-specs
 # For each resource type find the latest stable release (or the latest preview if no stable is available)
 #   and then take the json files in that directory (ignoring subfolders such as examples)
 #
+#
 # The output to create is
-#     swagger-specs
-#       |- top-level
-#           |- common-types
-#           |- service1
-#           |    |- resource-type1
-#           |    |    |- common 
-#           |    |    |    |- *.json
-#           |    |    |- latest 
-#           |    |         |- placeholder (need to preserve the relative layout of the versioned files and common folder) 
-#           |    |              |- *.json
-#           |    |- resource-type2
-#           |         |- latest 
-#           |              |- placeholder 
-#           |                   |- *.json
-#           |- service2
-#           |    |- resource-type1
-#           |    |    |- latest 
-#           |    |         |- placeholder 
-#           |    |              |- *.json
+#  swagger-specs
+#          |-service1 (e.g. `cdn` or `compute`)
+#          |   |-common   (want these)
+#          |   |-quickstart-templates
+#          |   |-data-plane
+#          |   |-resource-manager (we're only interested in the contents of this folder)
+#          |       |- resource-type1 (e.g. `Microsoft.Compute`)
+#          |       |    |- common
+#          |       |    |   |- *.json (want these)
+#          |       |    |- stable (NB - may preview if no stable)
+#          |       |    |    |- 2018-10-01
+#          |       |    |        |- *.json   (want these)
+#          |       |- misc files (e.g. readme) 
 #           ...
 
 
 # Get top-level 'service' folders
 serviceFolders=$(ls -d $ApiRepo/specification/*/)
 
-for serviceFolder in $serviceFolders
+# serviceFolder: e.g. specification/web
+for serviceFolder in $serviceFolders 
 do
     serviceName=$(basename $serviceFolder)
-    echo "$serviceName"
+    echo "$serviceName - $serviceFolder"
 
     # Get resource-type folders 
     { 
@@ -92,10 +89,11 @@ do
     } || {
         swaggerFolders=""
     }
+    # swaggerFolder: specification/web/resource-manager/Microsoft.Web
     for swaggerFolder in $swaggerFolders
     do
         resourceType=$(basename $swaggerFolder)
-        echo "    $resourceType"
+        echo "    $resourceType - $swaggerFolder"
 
         # Get latest version folder
         {        
@@ -109,6 +107,7 @@ do
             specBranch=""
         }
         latestSpecFolder=""
+        # specFolder: specification/web/resource-manager/Microsoft.Web/stable/2000-01-01
         for specFolder in $specFolders
         do
             latestSpecFolder=$specFolder
@@ -119,21 +118,22 @@ do
         then
             latestSpec=$(basename $latestSpecFolder)
 
-            # Check if we have a common folder to copy
-            if [[ -d $swaggerFolder/common ]];
-            then
-                mkdir swagger-specs/top-level/$serviceName/$resourceType --parents
-                cp $swaggerFolder/common swagger-specs/top-level/$serviceName/$resourceType -r
-            fi
-            # Check if we have a common folder to copy
+            # Check if we have a common folder to copy at the serviceFolder level
             if [[ -d ${serviceFolder}resource-manager/common ]];
             then
-                mkdir swagger-specs/top-level/$serviceName --parents
-                cp ${serviceFolder}resource-manager/common swagger-specs/top-level/$serviceName -r
+                mkdir swagger-specs/$serviceName/resource-manager --parents
+                cp ${serviceFolder}resource-manager/common swagger-specs/$serviceName/resource-manager -r
+            fi
+            # Check if we have a common folder to copy at the swaggerFolder level
+            if [[ -d ${serviceFolder}resource-manager/$resourceType/common ]];
+            then
+                mkdir swagger-specs/$serviceName/resource-manager/$resourceType --parents
+                cp $swaggerFolder/common swagger-specs/$serviceName/resource-manager/$resourceType -r
             fi
 
-            mkdir swagger-specs/top-level/$serviceName/$resourceType/$specBranch/$latestSpec --parents
-            cp ${latestSpecFolder}* swagger-specs/top-level/$serviceName/$resourceType/$specBranch/$latestSpec/ -r
+            # Copy the spec folder
+            mkdir swagger-specs/$serviceName/resource-manager/$resourceType/$specBranch/$latestSpec --parents
+            cp ${latestSpecFolder}* swagger-specs/$serviceName/resource-manager/$resourceType/$specBranch/$latestSpec/ -r
         fi
     done
     echo ""
