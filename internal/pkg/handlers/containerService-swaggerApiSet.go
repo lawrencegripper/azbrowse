@@ -106,7 +106,7 @@ func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string
 func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	if resourceType.Endpoint.TemplateURL == "/api/v1/namespaces/{namespace}/pods/{name}/log" {
-		if strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name!
+		if !strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name!
 
 			logURL := c.serverURL + currentItem.ExpandURL
 			containerURL := logURL[:len(logURL)-3]
