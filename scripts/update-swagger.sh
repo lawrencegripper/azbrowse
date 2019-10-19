@@ -139,5 +139,22 @@ do
     echo ""
 done
 
+# Temporary fixup for Microsoft.Web
+# The latest version is 2019-08-01, but in testing this wasn't yet rolled out
+# Since the 2018-11-01 Certificates has no real difference (and has references to the 2018-02-01 folder), just use 2018-02-1
+# manually copy back the 2018-02-01 files
+echo "WARNING: Forcing 2018-02-01 version of web/Microsoft.Web etc as a temporary fix"
+rm swagger-specs/web/resource-manager/Microsoft.Web/stable/2019-08-01 -r # this will fail if there is a newer version than 2018-11-01, which is a good sanity check in case we haven't remembered to revert by then
+mkdir swagger-specs/web/resource-manager/Microsoft.Web/stable/2018-02-01 --parents
+cp $ApiRepo/specification/web/resource-manager/Microsoft.Web/stable/2018-02-01/*.json swagger-specs/web/resource-manager/Microsoft.Web/stable/2018-02-01
+
+rm swagger-specs/web/resource-manager/Microsoft.CertificateRegistration/stable/2019-08-01 -r # this will fail if there is a newer version than 2018-11-01, which is a good sanity check in case we haven't remembered to revert by then
+mkdir swagger-specs/web/resource-manager/Microsoft.CertificateRegistration/stable/2018-02-01 --parents
+cp $ApiRepo/specification/web/resource-manager/Microsoft.CertificateRegistration/stable/2018-02-01/*.json swagger-specs/web/resource-manager/Microsoft.CertificateRegistration/stable/2018-02-01
+
+rm swagger-specs/web/resource-manager/Microsoft.DomainRegistration/stable/2019-08-01 -r # this will fail if there is a newer version than 2018-11-01, which is a good sanity check in case we haven't remembered to revert by then
+mkdir swagger-specs/web/resource-manager/Microsoft.DomainRegistration/stable/2018-02-01 --parents
+cp $ApiRepo/specification/web/resource-manager/Microsoft.DomainRegistration/stable/2018-02-01/*.json swagger-specs/web/resource-manager/Microsoft.DomainRegistration/stable/2018-02-01
+
 # copy the top-level `common-types` folder
 cp $ApiRepo/specification/common-types swagger-specs -r
