@@ -146,14 +146,6 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 		}
 	}
 
-	if resourceType.FixedContent != "" {
-		return APISetExpandResponse{
-			Response:     resourceType.FixedContent,
-			ResponseType: ResponsePlainText,
-			SubResources: []SubResource{},
-		}, nil
-	}
-
 	subResources := []SubResource{}
 	url := c.serverURL + currentItem.ExpandURL
 	data, err := c.doRequest("GET", url)

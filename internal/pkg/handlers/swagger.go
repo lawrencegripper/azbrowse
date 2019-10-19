@@ -144,37 +144,41 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	apiSet := *apiSetPtr
 
 	data := ""
-
-	// Get sub resources from config
-	expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
-	if err != nil {
-		return ExpanderResult{
-			Nodes:             nil,
-			Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
-			Err:               err,
-			SourceDescription: "SwaggerResourceExpander",
-		}
-	}
-	data = expandResult.Response
-
 	newItems := []*TreeNode{}
-	if len(expandResult.SubResources) > 0 {
-		for _, subResource := range expandResult.SubResources {
-			newItems = append(newItems, &TreeNode{
-				Parentid:            currentItem.ID,
-				Namespace:           "swagger",
-				Name:                subResource.Name,
-				Display:             subResource.Name,
-				ID:                  subResource.ID,
-				ExpandURL:           subResource.ExpandURL,
-				ItemType:            SubResourceType,
-				DeleteURL:           subResource.DeleteURL,
-				SwaggerResourceType: &subResource.ResourceType,
-				Metadata: map[string]string{
-					"SwaggerAPISetID": apiSet.ID(),
-				},
-			})
+
+	if resourceType.FixedContent == "" {
+		// Get sub resources from config
+		expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
+		if err != nil {
+			return ExpanderResult{
+				Nodes:             nil,
+				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+				Err:               err,
+				SourceDescription: "SwaggerResourceExpander",
+			}
 		}
+		data = expandResult.Response
+
+		if len(expandResult.SubResources) > 0 {
+			for _, subResource := range expandResult.SubResources {
+				newItems = append(newItems, &TreeNode{
+					Parentid:            currentItem.ID,
+					Namespace:           "swagger",
+					Name:                subResource.Name,
+					Display:             subResource.Name,
+					ID:                  subResource.ID,
+					ExpandURL:           subResource.ExpandURL,
+					ItemType:            SubResourceType,
+					DeleteURL:           subResource.DeleteURL,
+					SwaggerResourceType: &subResource.ResourceType,
+					Metadata: map[string]string{
+						"SwaggerAPISetID": apiSet.ID(),
+					},
+				})
+			}
+		}
+	} else {
+		data = resourceType.FixedContent
 	}
 
 	// Add any children to newItems
