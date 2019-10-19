@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -145,14 +146,21 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 		}
 	}
 
+	if resourceType.FixedContent != "" {
+		return APISetExpandResponse{
+			Response:     resourceType.FixedContent,
+			ResponseType: ResponsePlainText,
+			SubResources: []SubResource{},
+		}, nil
+	}
+
+	subResources := []SubResource{}
 	url := c.serverURL + currentItem.ExpandURL
 	data, err := c.doRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %s", err)
 		return APISetExpandResponse{}, err
 	}
-
-	subResources := []SubResource{}
 
 	if len(resourceType.SubResources) > 0 {
 		// We have defined subResources - Unmarshal the response and add these to newItems
@@ -164,16 +172,30 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 			return APISetExpandResponse{Response: data}, err
 		}
 
+		var subResourceRegex *regexp.Regexp
+		if resourceType.SubPathRegex != nil { // TODO - should we cache these? (e.g. by template url)
+			subResourceRegex, err = regexp.Compile(resourceType.SubPathRegex.Match)
+			if err != nil {
+				err = fmt.Errorf("Error parsing YAML response: %s", err)
+				return APISetExpandResponse{Response: data}, err
+			}
+		}
+
 		for _, item := range listResponse.Items {
-			subResourceType := getResourceTypeForURL(ctx, item.Metadata.SelfLink, resourceType.SubResources)
+			subResourceURL := item.Metadata.SelfLink
+			if subResourceRegex != nil {
+				subResourceURL = subResourceRegex.ReplaceAllString(subResourceURL, resourceType.SubPathRegex.Replace)
+			}
+
+			subResourceType := getResourceTypeForURL(ctx, subResourceURL, resourceType.SubResources)
 			if subResourceType == nil {
-				err = fmt.Errorf("SubResource type not found! %s", item.Metadata.SelfLink)
+				err = fmt.Errorf("SubResource type not found! %s", subResourceURL)
 				return APISetExpandResponse{Response: data}, err
 			}
 			name := item.Metadata.Name
 			deleteURL := ""
 			if subResourceType.DeleteEndpoint != nil {
-				subResourceTemplateValues := subResourceType.Endpoint.Match(item.Metadata.SelfLink).Values
+				subResourceTemplateValues := subResourceType.Endpoint.Match(subResourceURL).Values
 				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
 				if err != nil {
 					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
@@ -184,7 +206,7 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 				ID:           c.clusterID + item.Metadata.SelfLink,
 				Name:         name,
 				ResourceType: *subResourceType,
-				ExpandURL:    item.Metadata.SelfLink,
+				ExpandURL:    subResourceURL,
 				DeleteURL:    deleteURL,
 			}
 			subResources = append(subResources, subResource)

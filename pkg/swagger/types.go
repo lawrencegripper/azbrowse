@@ -14,6 +14,8 @@ type ResourceType struct {
 	PutEndpoint    *endpoints.EndpointInfo
 	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
 	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
+	FixedContent string
+	SubPathRegex   *RegexReplace
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -28,6 +30,13 @@ type Path struct {
 	Operations            PathOperations
 	Children              []*Path
 	SubPaths              []*Path
+	SubPathRegex          *RegexReplace
+}
+
+// RegexReplace holds match and replacement info
+type RegexReplace struct {
+	Match   string
+	Replace string
 }
 
 // PathOperations gives details on the operations for a resource
@@ -80,10 +89,14 @@ type PathOverride struct {
 
 // AdditionalPath provides metadata for additional paths to inject into the generated hierarchy
 type AdditionalPath struct {
+	// Name is the name to use for the generated path
+	Name string
 	// Path is the path to inject in the hierarchy
 	Path string
 	// GetPath allows the actual path used at runtime to be overridden
 	GetPath string
 	// FixedContent provides static content to render in place of making an API call
 	FixedContent string
+	// SubPathRegesx holds regex info for modifying subpath URLs
+	SubPathRegex *RegexReplace
 }

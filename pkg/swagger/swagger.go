@@ -90,6 +90,8 @@ func convertToSwaggerResourceType(path *Path) ResourceType {
 		Endpoint:     endpoints.MustGetEndpointInfoFromURL(path.Operations.Get.Endpoint.TemplateURL, path.Operations.Get.Endpoint.APIVersion),
 		Children:     ConvertToSwaggerResourceTypes(path.Children),
 		SubResources: ConvertToSwaggerResourceTypes(path.SubPaths),
+		FixedContent: path.FixedContent,
+		SubPathRegex: path.SubPathRegex,
 	}
 	if path.Operations.Get.Verb != "" {
 		resourceType.Verb = path.Operations.Get.Verb
@@ -125,13 +127,16 @@ func getSortedPaths(paths []Path) []Path {
 func addConfigPaths(paths []Path, config *Config) ([]Path, error) {
 	if config.AdditionalPaths != nil {
 		for _, additionalPath := range config.AdditionalPaths {
-			endpoint, err := endpoints.GetEndpointInfoFromURL(additionalPath.Path, "")
+			path := strings.TrimRight(additionalPath.Path, "/")
+			endpoint, err := endpoints.GetEndpointInfoFromURL(path, "")
 			if err != nil {
 				return []Path{}, err
 			}
 			newPath := Path{
+				Name:                  additionalPath.Name,
 				Endpoint:              &endpoint,
-				CondensedEndpointPath: stripPathNames(additionalPath.Path),
+				CondensedEndpointPath: stripPathNames(path),
+				SubPathRegex:          additionalPath.SubPathRegex,
 			}
 			if additionalPath.FixedContent != "" {
 				newPath.FixedContent = additionalPath.FixedContent
@@ -180,6 +185,7 @@ func getPathsFromSwagger(doc *loads.Document, config *Config) ([]Path, error) {
 		} else {
 			searchPath = searchPathTemp
 		}
+		searchPath = strings.TrimRight(searchPath, "/")
 		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, swaggerVersion) // logical path
 		if err != nil {
 			return []Path{}, err
