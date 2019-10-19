@@ -138,7 +138,6 @@ func Test_HandleTrailingSlash(t *testing.T) {
 	assert.Assert(t, is.Len(path.SubPaths, 0))
 }
 
-
 func Test_Simple_NonOrderedSpec(t *testing.T) {
 
 	// Test a simple hierarchy that is not in the order needed for hierarchy matching to automatically work

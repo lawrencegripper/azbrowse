@@ -234,11 +234,11 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 			{Name: "watch", Path: "/apis/apps/v1/watch", FixedContent: "Select a node to expand"},
 			// add as a missing path - and direct to a different endpoint
 			{
-				Name: "namespaces", 
-				Path: "/apis/apps/v1/namespaces", 
+				Name:    "namespaces",
+				Path:    "/apis/apps/v1/namespaces",
 				GetPath: "/api/v1/namespaces",
 				SubPathRegex: &swagger.RegexReplace{
-					Match: "/api/v1/namespaces/",
+					Match:   "/api/v1/namespaces/",
 					Replace: "/apis/apps/v1/namespaces/",
 				},
 			},

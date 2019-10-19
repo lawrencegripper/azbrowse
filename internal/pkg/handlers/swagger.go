@@ -144,6 +144,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	apiSet := *apiSetPtr
 
 	data := ""
+	dataType := ResponsePlainText
 	newItems := []*TreeNode{}
 
 	if resourceType.FixedContent == "" {
@@ -158,6 +159,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			}
 		}
 		data = expandResult.Response
+		dataType = expandResult.ResponseType
 
 		if len(expandResult.SubResources) > 0 {
 			for _, subResource := range expandResult.SubResources {
@@ -188,6 +190,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		loopChild := child
 
 		var url string
+		var err error
 		if apiSet.MatchChildNodesByName() {
 			url, err = child.Endpoint.BuildURL(templateValues)
 		} else {
@@ -198,7 +201,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
 			return ExpanderResult{
 				Nodes:             nil,
-				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+				Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 				Err:               err,
 				SourceDescription: "SwaggerResourceExpander",
 			}
@@ -217,7 +220,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
 				return ExpanderResult{
 					Nodes:             nil,
-					Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+					Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 					Err:               err,
 					SourceDescription: "SwaggerResourceExpander",
 				}
@@ -241,7 +244,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          ExpanderResponse{Response: data, ResponseType: expandResult.ResponseType},
+		Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
 }

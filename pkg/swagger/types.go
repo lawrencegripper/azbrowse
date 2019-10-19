@@ -14,7 +14,7 @@ type ResourceType struct {
 	PutEndpoint    *endpoints.EndpointInfo
 	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
 	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
-	FixedContent string
+	FixedContent   string
 	SubPathRegex   *RegexReplace
 }
 
