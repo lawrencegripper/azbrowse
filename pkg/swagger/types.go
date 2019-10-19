@@ -44,7 +44,7 @@ func (r ResourceType) GetSubResourceTypeForURL(ctx context.Context, url string) 
 	return GetResourceTypeForURL(ctx, url, r.SubResources)
 }
 
-// Gets the resource type matching the url
+// GetResourceTypeForURL Gets the resource type matching the url
 func GetResourceTypeForURL(ctx context.Context, url string, resourceTypes []ResourceType) *ResourceType {
 	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
 	defer span.Finish()

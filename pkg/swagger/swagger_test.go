@@ -14,7 +14,7 @@ func Test_Simple_PreOrderedSpec(t *testing.T) {
 
 	// Test a simple hierarchy that is preordered
 
-	specJson := `{  "swagger": "2.0",
+	specJSON := `{  "swagger": "2.0",
   "info": {
     "title": "DnsManagementClient",
     "description": "The DNS Management Client.",
@@ -37,7 +37,7 @@ func Test_Simple_PreOrderedSpec(t *testing.T) {
 	}
 }
 `
-	spec := json.RawMessage(specJson)
+	spec := json.RawMessage(specJSON)
 	doc, err := loads.Analyzed(spec, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
@@ -78,7 +78,7 @@ func Test_HandleTrailingSlash(t *testing.T) {
 
 	// Test a simple hierarchy that is preordered
 
-	specJson := `{  "swagger": "2.0",
+	specJSON := `{  "swagger": "2.0",
   "info": {
     "title": "DnsManagementClient",
     "description": "The DNS Management Client.",
@@ -101,7 +101,7 @@ func Test_HandleTrailingSlash(t *testing.T) {
 	}
 }
 `
-	spec := json.RawMessage(specJson)
+	spec := json.RawMessage(specJSON)
 	doc, err := loads.Analyzed(spec, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
@@ -142,7 +142,7 @@ func Test_Simple_NonOrderedSpec(t *testing.T) {
 
 	// Test a simple hierarchy that is not in the order needed for hierarchy matching to automatically work
 
-	specJson := `{  "swagger": "2.0",
+	specJSON := `{  "swagger": "2.0",
   "info": {
     "title": "DnsManagementClient",
     "description": "The DNS Management Client.",
@@ -165,7 +165,7 @@ func Test_Simple_NonOrderedSpec(t *testing.T) {
 	}
 }
 `
-	spec := json.RawMessage(specJson)
+	spec := json.RawMessage(specJSON)
 	doc, err := loads.Analyzed(spec, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
@@ -206,7 +206,7 @@ func Test_PathOverride(t *testing.T) {
 
 	// Test a simple hierarchy that is not in the order needed for hierarchy matching to automatically work
 
-	specJson := `{  "swagger": "2.0",
+	specJSON := `{  "swagger": "2.0",
   "info": {
     "title": "DnsManagementClient",
     "description": "The DNS Management Client.",
@@ -229,7 +229,7 @@ func Test_PathOverride(t *testing.T) {
 	}
 }
 `
-	spec := json.RawMessage(specJson)
+	spec := json.RawMessage(specJSON)
 	doc, err := loads.Analyzed(spec, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
@@ -278,7 +278,7 @@ func Test_AdditionalPaths(t *testing.T) {
 
 	// Test a simple hierarchy that is not in the order needed for hierarchy matching to automatically work
 
-	specJson := `{  "swagger": "2.0",
+	specJSON := `{  "swagger": "2.0",
   "info": {
     "title": "DnsManagementClient",
     "description": "The DNS Management Client.",
@@ -303,7 +303,7 @@ func Test_AdditionalPaths(t *testing.T) {
 	}
 }
 `
-	spec := json.RawMessage(specJson)
+	spec := json.RawMessage(specJSON)
 	doc, err := loads.Analyzed(spec, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)

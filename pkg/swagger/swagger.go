@@ -6,7 +6,6 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/go-openapi/analysis"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/spec"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
@@ -167,8 +166,7 @@ func getPathsFromSwagger(doc *loads.Document, config *Config) ([]Path, error) {
 		swaggerVersion = ""
 	}
 
-	var spec *analysis.Spec
-	spec = doc.Analyzer
+	spec := doc.Analyzer
 
 	swaggerPaths := spec.AllPaths()
 	paths := make([]Path, len(swaggerPaths))

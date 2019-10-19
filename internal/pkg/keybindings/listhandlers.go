@@ -472,10 +472,8 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		switch contentType {
 		case handlers.ResponseJSON:
 			fileExtension = ".json"
-			break
 		case handlers.ResponseYAML:
 			fileExtension = ".yaml"
-			break
 		}
 
 		tempDir := editorConfig.TempDir
