@@ -1,21 +1,69 @@
 package swagger
 
 import (
+	"context"
+	"regexp"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
 // ResourceType holds information about resources that can be displayed
 type ResourceType struct {
-	Display        string
-	Endpoint       *endpoints.EndpointInfo
-	Verb           string
-	DeleteEndpoint *endpoints.EndpointInfo
-	PatchEndpoint  *endpoints.EndpointInfo
-	PutEndpoint    *endpoints.EndpointInfo
-	Children       []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
-	SubResources   []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
-	FixedContent   string
-	SubPathRegex   *RegexReplace
+	Display              string
+	Endpoint             *endpoints.EndpointInfo
+	Verb                 string
+	DeleteEndpoint       *endpoints.EndpointInfo
+	PatchEndpoint        *endpoints.EndpointInfo
+	PutEndpoint          *endpoints.EndpointInfo
+	Children             []ResourceType // Children are auto-loaded (must be able to build the URL => no additional template URL values)
+	SubResources         []ResourceType // SubResources are not auto-loaded (these come from the request to the endpoint)
+	FixedContent         string
+	SubPathRegex         *RegexReplace
+	subPathRegexInstance *regexp.Regexp
+}
+
+// PerformSubPathReplace performs any configured SubPathRegex replacement
+func (r ResourceType) PerformSubPathReplace(url string) (string, error) {
+
+	if r.SubPathRegex == nil {
+		return url, nil
+	}
+	if r.subPathRegexInstance == nil {
+		re, err := regexp.Compile(r.SubPathRegex.Match)
+		if err != nil {
+			return "", err
+		}
+		r.subPathRegexInstance = re
+	}
+	return r.subPathRegexInstance.ReplaceAllString(url, r.SubPathRegex.Replace), nil
+}
+
+// GetSubResourceTypeForURL gets the SubResource matching the URL
+func (r ResourceType) GetSubResourceTypeForURL(ctx context.Context, url string) *ResourceType {
+	return GetResourceTypeForURL(ctx, url, r.SubResources)
+}
+
+// Gets the resource type matching the url
+func GetResourceTypeForURL(ctx context.Context, url string, resourceTypes []ResourceType) *ResourceType {
+	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
+	defer span.Finish()
+	return getResourceTypeForURLInner(url, resourceTypes)
+}
+func getResourceTypeForURLInner(url string, resourceTypes []ResourceType) *ResourceType {
+	for _, resourceType := range resourceTypes {
+		matchResult := resourceType.Endpoint.Match(url)
+		if matchResult.IsMatch {
+			return &resourceType
+		}
+		if result := getResourceTypeForURLInner(url, resourceType.SubResources); result != nil {
+			return result
+		}
+		if result := getResourceTypeForURLInner(url, resourceType.Children); result != nil {
+			return result
+		}
+	}
+	return nil
 }
 
 /////////////////////////////////////////////////////////////////////////////

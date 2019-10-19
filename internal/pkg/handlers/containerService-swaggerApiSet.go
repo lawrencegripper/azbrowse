@@ -164,22 +164,14 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 			return APISetExpandResponse{Response: data}, err
 		}
 
-		var subResourceRegex *regexp.Regexp
-		if resourceType.SubPathRegex != nil { // TODO - should we cache these? (e.g. by template url)
-			subResourceRegex, err = regexp.Compile(resourceType.SubPathRegex.Match)
+		for _, item := range listResponse.Items {
+			subResourceURL, err := resourceType.PerformSubPathReplace(item.Metadata.SelfLink)
 			if err != nil {
 				err = fmt.Errorf("Error parsing YAML response: %s", err)
 				return APISetExpandResponse{Response: data}, err
 			}
-		}
 
-		for _, item := range listResponse.Items {
-			subResourceURL := item.Metadata.SelfLink
-			if subResourceRegex != nil {
-				subResourceURL = subResourceRegex.ReplaceAllString(subResourceURL, resourceType.SubPathRegex.Replace)
-			}
-
-			subResourceType := getResourceTypeForURL(ctx, subResourceURL, resourceType.SubResources)
+			subResourceType := resourceType.GetSubResourceTypeForURL(ctx, subResourceURL)
 			if subResourceType == nil {
 				err = fmt.Errorf("SubResource type not found! %s", subResourceURL)
 				return APISetExpandResponse{Response: data}, err

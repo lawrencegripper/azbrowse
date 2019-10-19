@@ -69,12 +69,18 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 		}
 
 		for _, resource := range resourceResponse.Resources {
-			subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
+			subResourceURL, err := resourceType.PerformSubPathReplace(resource.ID)
+			if err != nil {
+				err = fmt.Errorf("Error parsing YAML response: %s", err)
+				return APISetExpandResponse{Response: data}, err
+			}
+
+			subResourceType := resourceType.GetSubResourceTypeForURL(ctx, subResourceURL)
 			if subResourceType == nil {
-				err = fmt.Errorf("SubResource type not found! %s", resource.ID)
+				err = fmt.Errorf("SubResource type not found! %s", subResourceURL)
 				return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
 			}
-			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
+			subResourceTemplateValues := subResourceType.Endpoint.Match(subResourceURL).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
 
 			deleteURL := ""
@@ -87,10 +93,10 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 			}
 
 			subResource := SubResource{
-				ID:           resource.ID,
+				ID:           subResourceURL,
 				Name:         name,
 				ResourceType: *subResourceType,
-				ExpandURL:    resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
+				ExpandURL:    subResourceURL + "?api-version=" + subResourceType.Endpoint.APIVersion,
 				DeleteURL:    deleteURL,
 			}
 			subResources = append(subResources, subResource)

@@ -64,27 +64,6 @@ func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"
 }
 
-func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
-	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
-	defer span.Finish()
-	return getResourceTypeForURLInner(url, resourceTypes)
-}
-func getResourceTypeForURLInner(url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
-	for _, resourceType := range resourceTypes {
-		matchResult := resourceType.Endpoint.Match(url)
-		if matchResult.IsMatch {
-			return &resourceType
-		}
-		if result := getResourceTypeForURLInner(url, resourceType.SubResources); result != nil {
-			return result
-		}
-		if result := getResourceTypeForURLInner(url, resourceType.Children); result != nil {
-			return result
-		}
-	}
-	return nil
-}
-
 func (e *SwaggerResourceExpander) getAPISetForItem(currentItem *TreeNode) *SwaggerAPISet {
 
 	if currentItem.Metadata == nil {
@@ -117,7 +96,7 @@ func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *T
 	if currentItem.SwaggerResourceType != nil {
 		return true, nil
 	}
-	resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, apiSet.GetResourceTypes())
+	resourceType := swagger.GetResourceTypeForURL(ctx, currentItem.ExpandURL, apiSet.GetResourceTypes())
 	if resourceType != nil {
 		currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
 		return true, nil
