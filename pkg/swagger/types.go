@@ -131,8 +131,9 @@ type Config struct {
 
 // PathOverride captures Path and/or Verb overrides
 type PathOverride struct {
-	Path    string // actual url to use
-	GetVerb string // Verb to use for logical GET requests
+	Path        string // actual url to use
+	GetVerb     string // Verb to use for logical GET requests
+	RewritePath bool   // rewrite the path in generated code. Only advised to address case issues or inconsistent match segment names
 }
 
 // AdditionalPath provides metadata for additional paths to inject into the generated hierarchy
