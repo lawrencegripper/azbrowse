@@ -60,7 +60,7 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
 			Parentid:  currentItem.ID,
-			ID: currentItem.ID + "/<repositories>",
+			ID:        currentItem.ID + "/<repositories>",
 			Namespace: "containerRegistry",
 			Name:      "Repositories",
 			Display:   "Repositories",
@@ -125,7 +125,7 @@ func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, curr
 		func(currentItem *TreeNode, item string) *TreeNode {
 			return &TreeNode{
 				Parentid:  currentItem.ID,
-				ID:  currentItem.ID + "/" + item,
+				ID:        currentItem.ID + "/" + item,
 				Namespace: "containerRegistry",
 				Name:      item,
 				Display:   item,
@@ -140,7 +140,7 @@ func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, curr
 		func(currentItem *TreeNode, lastItem string) *TreeNode {
 			return &TreeNode{
 				Parentid:  currentItem.ID,
-				ID:  currentItem.ID + "/<more>",
+				ID:        currentItem.ID + "/<more>",
 				Namespace: "containerRegistry",
 				Name:      "more...",
 				Display:   "more...",
@@ -288,7 +288,7 @@ func (e *ContainerRegistryExpander) getCreateManifestNodeFunc(loginServer string
 	return func(currentItem *TreeNode, item string) *TreeNode {
 		return &TreeNode{
 			Parentid:  currentItem.ID,
-			ID:  currentItem.ID + "/" + item,
+			ID:        currentItem.ID + "/" + item,
 			Namespace: "containerRegistry",
 			Name:      item,
 			Display:   item,
@@ -307,7 +307,7 @@ func (e *ContainerRegistryExpander) getCreateTagNodeFunc(loginServer string, rep
 	return func(currentItem *TreeNode, item string) *TreeNode {
 		return &TreeNode{
 			Parentid:  currentItem.ID,
-			ID:  currentItem.ID + "/" + item,
+			ID:        currentItem.ID + "/" + item,
 			Namespace: "containerRegistry",
 			Name:      item,
 			Display:   item,
@@ -327,7 +327,7 @@ func (e *ContainerRegistryExpander) getCreateManifestsNodeFunc(loginServer strin
 		return &TreeNode{
 			Parentid:  currentItem.ID,
 			Namespace: "containerRegistry",
-			ID:  currentItem.ID + "/" + title,
+			ID:        currentItem.ID + "/" + title,
 			Name:      title,
 			Display:   title,
 			ItemType:  "containerRegistry.repository.manifests",
@@ -345,7 +345,7 @@ func (e *ContainerRegistryExpander) getCreateTagsNodeFunc(loginServer string, re
 	return func(currentItem *TreeNode, lastItem string) *TreeNode {
 		return &TreeNode{
 			Parentid:  currentItem.ID,
-			ID:  currentItem.ID + "/" + title,
+			ID:        currentItem.ID + "/" + title,
 			Namespace: "containerRegistry",
 			Name:      title,
 			Display:   title,
