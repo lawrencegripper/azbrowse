@@ -263,6 +263,7 @@ func main() {
 	}()
 
 	if navigateToID != "" {
+		navigateToIDLower := strings.ToLower(navigateToID)
 		go func() {
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 			var lastNavigatedNode *handlers.TreeNode
@@ -284,7 +285,8 @@ func main() {
 							// use prefix matching
 							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
 							// additional check is that the lengths match, or the next char in target is a '/'
-							if strings.HasPrefix(navigateToID, node.ID) && (len(navigateToID) == len(node.ID) || navigateToID[len(node.ID)] == '/') {
+							nodeIDLower := strings.ToLower(node.ID)
+							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(navigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
 								list.ChangeSelection(nodeIndex)
 								lastNavigatedNode = node
 								list.ExpandCurrentSelection()
