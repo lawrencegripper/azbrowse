@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -14,13 +13,6 @@ import (
 	"github.com/go-openapi/spec"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
-
-func showUsage() {
-	fmt.Println("swagger-codegen")
-	fmt.Println("===============")
-	fmt.Println("")
-	flag.Usage()
-}
 
 // The input folder structure is as below
 // The bash script that generates this ensures that there is only a single version
@@ -44,52 +36,13 @@ func showUsage() {
 //           ...
 
 func main() {
-	outputFileFlag := flag.String("output-file", "", "path to the file to output the generated code to")
-	flag.Parse()
-	if *outputFileFlag == "" {
-		showUsage()
-		return
-	}
+	config := getARMConfig()
+	paths := loadARMSwagger(config)
+	writeOutput(paths, config, "./internal/pkg/handlers/swagger-armspecs.generated.go")
+}
 
-	config := getConfig()
-	var paths []*swagger.Path
-
-	serviceFileInfos, err := ioutil.ReadDir("swagger-specs")
-	if err != nil {
-		panic(err)
-	}
-	for _, serviceFileInfo := range serviceFileInfos {
-		if serviceFileInfo.IsDir() && serviceFileInfo.Name() != "common-types" {
-			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
-			// TODO - handle service folder/common folder
-			resourceTypeFileInfos, err := ioutil.ReadDir(fmt.Sprintf("swagger-specs/%s/resource-manager", serviceFileInfo.Name()))
-			if err != nil {
-				panic(err)
-			}
-			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
-				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
-					// TODO handle common
-					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/%s/resource-manager/%s", serviceFileInfo.Name(), resourceTypeFileInfo.Name())))
-					swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
-					if err != nil {
-						panic(err)
-					}
-					for _, swaggerFileInfo := range swaggerFileInfos {
-						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
-							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
-							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
-							paths, err = swagger.MergeSwaggerDoc(paths, &config, doc, true)
-							if err != nil {
-								panic(err)
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	writer, err := os.Create(*outputFileFlag)
+func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string) {
+	writer, err := os.Create(filename)
 	if err != nil {
 		panic(fmt.Errorf("Error opening file: %s", err))
 	}
@@ -100,7 +53,7 @@ func main() {
 		}
 	}()
 
-	writeTemplate(writer, paths, &config)
+	writeTemplate(writer, paths, config)
 }
 
 // getFirstNonCommonPath returns the first subfolder under path that is not named 'common'
@@ -119,8 +72,47 @@ func getFirstNonCommonPath(path string) string {
 	panic(fmt.Errorf("No suitable path found"))
 }
 
-func getConfig() swagger.Config {
-	config := swagger.Config{
+func loadARMSwagger(config *swagger.Config) []*swagger.Path {
+	var paths []*swagger.Path
+
+	serviceFileInfos, err := ioutil.ReadDir("swagger-specs")
+	if err != nil {
+		panic(err)
+	}
+	for _, serviceFileInfo := range serviceFileInfos {
+		if serviceFileInfo.IsDir() && serviceFileInfo.Name() != "common-types" {
+			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
+			resourceTypeFileInfos, err := ioutil.ReadDir(fmt.Sprintf("swagger-specs/%s/resource-manager", serviceFileInfo.Name()))
+			if err != nil {
+				panic(err)
+			}
+			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
+				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
+					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/%s/resource-manager/%s", serviceFileInfo.Name(), resourceTypeFileInfo.Name())))
+					swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
+					if err != nil {
+						panic(err)
+					}
+					for _, swaggerFileInfo := range swaggerFileInfos {
+						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
+							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
+							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
+							paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true)
+							if err != nil {
+								panic(err)
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return paths
+}
+
+// getARMConfig returns the config for ARM Swagger processing
+func getARMConfig() *swagger.Config {
+	config := &swagger.Config{
 		Overrides: map[string]swagger.PathOverride{
 			// App Service patches
 			"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config/appsettings/list": {
