@@ -62,6 +62,7 @@ type TreeNode struct {
 	SubscriptionID      string                // The SubId of this item
 	StatusIndicator     string                // Displays the resources status
 	SwaggerResourceType *swagger.ResourceType // caches the swagger ResourceType to avoid repeated lookups
+	Expander            Expander              // The Expander that created the node (set automatically by the list)
 }
 
 const (

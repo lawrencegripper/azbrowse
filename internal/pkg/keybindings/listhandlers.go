@@ -2,20 +2,20 @@ package keybindings
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+
 	"github.com/nsf/termbox-go"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/stuartleeks/gocui"
@@ -449,7 +449,9 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		item := h.List.CurrentExpandedItem()
 		if item == nil ||
 			item.SwaggerResourceType == nil ||
-			item.SwaggerResourceType.PutEndpoint == nil {
+			item.SwaggerResourceType.PutEndpoint == nil ||
+			item.Metadata == nil ||
+			item.Metadata["SwaggerAPISetID"] == "" {
 			return nil
 		}
 
@@ -458,11 +460,20 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			return err
 		}
 
+		fileExtension := ".txt"
+		contentType := h.Content.GetContentType()
+		switch contentType {
+		case handlers.ResponseJSON:
+			fileExtension = ".json"
+		case handlers.ResponseYAML:
+			fileExtension = ".yaml"
+		}
+
 		tempDir := editorConfig.TempDir
 		if tempDir == "" {
 			tempDir = os.TempDir() // fall back to Temp dir as default
 		}
-		tmpFile, err := ioutil.TempFile(tempDir, "azbrowse-*.json")
+		tmpFile, err := ioutil.TempFile(tempDir, "azbrowse-*"+fileExtension)
 		if err != nil {
 			h.status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
 			return err
@@ -542,34 +553,19 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			return nil
 		}
 
-		matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
-		if !matchResult.IsMatch {
-			h.status.Status(fmt.Sprintf("item.ExpandURL didn't match current Endpoint"), false)
-			return err
+		apiSetID := item.Metadata["SwaggerAPISetID"]
+		apiSetPtr := handlers.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+		if apiSetPtr == nil {
+			return nil
 		}
-		putURL, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+		apiSet := *apiSetPtr
+
+		err = apiSet.Update(h.Context, item, updatedJSON)
 		if err != nil {
-			h.status.Status(fmt.Sprintf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err), false)
+			h.status.Status(fmt.Sprintf("Error updating: %s", err), false)
 			return nil
 		}
 
-		done := h.status.Status(fmt.Sprintf("Making PUT request: %s", putURL), true)
-		data, err := armclient.DoRequestWithBody(h.Context, "PUT", putURL, string(updatedJSON))
-		done()
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Error making PUT request: %s", err), false)
-			return nil
-		}
-
-		errorMessage, err := getAPIErrorMessage(data)
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Error checking for API Error message: %s: %s", data, err), false)
-			return nil
-		}
-		if errorMessage != "" {
-			h.status.Status(fmt.Sprintf("Error: %s", errorMessage), false)
-			return nil
-		}
 		h.status.Status("Done", false)
 		return nil
 	}
@@ -584,28 +580,6 @@ func openEditor(command config.CommandConfig, filename string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
-}
-func getAPIErrorMessage(responseString string) (string, error) {
-	var response map[string]interface{}
-
-	err := json.Unmarshal([]byte(responseString), &response)
-	if err != nil {
-		err = fmt.Errorf("Error parsing API response: %s: %s", responseString, err)
-		return "", err
-	}
-	if response["error"] != nil {
-		serializedError, err := json.Marshal(response["error"])
-		if err != nil {
-			err = fmt.Errorf("Error serializing error message: %s: %s", responseString, err)
-			return "", err
-		}
-		message := string(serializedError)
-		message = strings.Replace(message, "\r", "", -1)
-		message = strings.Replace(message, "\n", "", -1)
-		return message, nil
-		// could dig into the JSON to pull out the error message property
-	}
-	return "", nil
 }
 
 ////////////////////////////////////////////////////////////////////

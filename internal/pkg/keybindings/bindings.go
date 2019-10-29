@@ -12,7 +12,7 @@ import (
 // KeyMap reprsents the current mappings from Handler -> Key
 type KeyMap map[string][]interface{}
 
-var handlers []KeyHandler
+var keyHandlers []KeyHandler
 var overrides KeyMap
 var usedKeys map[string]string
 
@@ -35,12 +35,12 @@ func bindWithConfigOverrides(g *gocui.Gui, keyOverrideSettings map[string]interf
 
 // AddHandler Adds a keybinding handler for use in Bind
 func AddHandler(hnd KeyHandler) {
-	handlers = append(handlers, hnd)
+	keyHandlers = append(keyHandlers, hnd)
 }
 
 func getKeyBindings() KeyMap {
 	keyBindings := KeyMap{}
-	for _, handler := range handlers {
+	for _, handler := range keyHandlers {
 		if override, ok := overrides[handler.ID()]; ok {
 			keyBindings[handler.ID()] = override
 		} else {
@@ -66,7 +66,7 @@ func GetKeyBindingsAsStrings() map[string][]string {
 
 func bindHandlersToKeys(g *gocui.Gui) error {
 	usedKeys = map[string]string{}
-	for _, hnd := range handlers {
+	for _, hnd := range keyHandlers {
 		if err := bindHandlerToKey(g, hnd); err != nil {
 			return err
 		}
@@ -164,7 +164,7 @@ func parseKeyValues(keyOverrideSettings map[string]interface{}) (KeyMap, error) 
 
 func parseKey(key string) (string, error) {
 	target := cleanKey(key)
-	for _, k := range handlers {
+	for _, k := range keyHandlers {
 		if k.ID() == target {
 			return target, nil
 		}

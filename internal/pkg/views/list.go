@@ -230,7 +230,11 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	// New handler approach
 	handlerExpanding := 0
-	completedExpands := make(chan handlers.ExpanderResult)
+	type expanderAndResponse struct {
+		Expander       handlers.Expander
+		ExpanderResult handlers.ExpanderResult
+	}
+	completedExpands := make(chan expanderAndResponse)
 
 	// Check which expanders are interested and kick them off
 	spanQuery, _ := tracing.StartSpanFromContext(ctx, "querexpanders", tracing.SetTag("item", currentItem))
@@ -247,7 +251,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		// Fire each handler in parallel
 		hCurrent := h // capture current iteration variable
 		go func() {
-			completedExpands <- hCurrent.Expand(ctx, currentItem)
+			completedExpands <- expanderAndResponse{
+				Expander:       hCurrent,
+				ExpanderResult: hCurrent.Expand(ctx, currentItem),
+			}
 		}()
 
 		handlerExpanding = handlerExpanding + 1
@@ -269,33 +276,37 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	for index := 0; index < handlerExpanding; index++ {
 		select {
 		case done := <-completedExpands:
-			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+done.SourceDescription, tracing.SetTag("result", done))
+			result := done.ExpanderResult
+			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+result.SourceDescription, tracing.SetTag("result", done))
 			// Did it fail?
-			if done.Err != nil {
+			if result.Err != nil {
 				eventing.SendStatusEvent(eventing.StatusEvent{
 					Failure: true,
-					Message: "Expander '" + done.SourceDescription + "' failed on resource: " + currentItem.ID + "Err: " + done.Err.Error(),
+					Message: "Expander '" + result.SourceDescription + "' failed on resource: " + currentItem.ID + "Err: " + result.Err.Error(),
 					Timeout: time.Duration(time.Second * 15),
 				})
 				observedError = true
 			}
-			if done.IsPrimaryResponse {
+			if result.IsPrimaryResponse {
 				if hasPrimaryResponse {
 					panic("Two handlers returned a primary response for this item... failing")
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				newContent = done.Response
+				newContent = result.Response
 				newTitle = fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 			}
-			if done.Nodes == nil {
+			if result.Nodes == nil {
 				continue
 			}
+			for _, node := range result.Nodes {
+				node.Expander = done.Expander
+			}
 			// Add the items it found
-			if done.IsPrimaryResponse {
-				newItems = append(done.Nodes, newItems...)
+			if result.IsPrimaryResponse {
+				newItems = append(result.Nodes, newItems...)
 			} else {
-				newItems = append(newItems, done.Nodes...)
+				newItems = append(newItems, result.Nodes...)
 			}
 			span.Finish()
 		case <-timeout:

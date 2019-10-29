@@ -11,141 +11,64 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
-func addConfigPaths(paths map[string]spec.PathItem, config *Config) map[string]spec.PathItem {
-	if config.AdditionalGetPaths != nil {
-		for _, pathToAdd := range config.AdditionalGetPaths {
-			newPath := spec.PathItem{}
-			newPath.Get = &spec.Operation{}
-			paths[pathToAdd] = newPath
-		}
-	}
-	return paths
-}
-
 // MergeSwaggerDoc merges api endpoints from the specified swagger doc into the Paths array
-func MergeSwaggerDoc(paths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
-	swaggerVersion := doc.Spec().Info.Version
-	if config.SuppressAPIVersion {
-		swaggerVersion = ""
+func MergeSwaggerDoc(currentPaths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
+	allPaths, err := getPathsFromSwagger(doc, config)
+	if err != nil {
+		empty := []*Path{}
+		return empty, err // TODO add context to errors!
 	}
-	spec := doc.Analyzer
-	allPaths := spec.AllPaths()
-	allPaths = addConfigPaths(allPaths, config)
+	allPaths, err = addConfigPaths(allPaths, config)
+	if err != nil {
+		empty := []*Path{}
+		return empty, err
+	}
 
-	swaggerPaths := getSortedPaths(allPaths)
-	for _, swaggerPath := range swaggerPaths {
-		override := config.Overrides[swaggerPath.Path]
+	allPaths = getSortedPaths(allPaths)
 
-		searchPathTemp := override.Path
-		var searchPath PathAndNameStrippedPath
-		if searchPathTemp == "" {
-			searchPath = PathAndNameStrippedPath{
-				Path:             swaggerPath.Path,
-				NameStrippedPath: swaggerPath.NameStrippedPath,
-			}
-		} else {
-			searchPath = PathAndNameStrippedPath{
-				Path:             searchPathTemp,
-				NameStrippedPath: stripPathNames(searchPathTemp), // condense overridden path,
-			}
-		}
-		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath.Path, swaggerVersion) // logical path
-		if err != nil {
-			empty := []*Path{}
-			return empty, err
-		}
-		lastSegment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
-		name := lastSegment.Match
-		if name == "" {
-			name = "{" + lastSegment.Name + "}"
-		}
-		path := Path{
-			Endpoint:              &endpoint,
-			Name:                  name,
-			CondensedEndpointPath: searchPath.NameStrippedPath,
-		}
+	resultPaths := currentPaths
 
-		getVerb := override.GetVerb
-		if getVerb == "" {
-			getVerb = "get"
-		}
-		pathItem := allPaths[swaggerPath.Path]
-		getOperation, err := getOperationByVerb(&pathItem, getVerb)
-		if err != nil {
-			empty := []*Path{}
-			return empty, err
-		}
-		if getOperation != nil {
-			path.Operations.Get.Permitted = true
-			if getVerb != "get" {
-				path.Operations.Get.Verb = getVerb
-			}
-			if override.Path == "" {
-				path.Operations.Get.Endpoint = path.Endpoint
-			} else {
-				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath.Path, swaggerVersion)
-				if err != nil {
-					empty := []*Path{}
-					return empty, err
-				}
-				path.Operations.Get.Endpoint = &overriddenEndpoint
-			}
-		}
-		if allPaths[swaggerPath.Path].Delete != nil && getVerb != "delete" {
-			path.Operations.Delete.Permitted = true
-			path.Operations.Delete.Endpoint = path.Endpoint
-		}
-		if allPaths[swaggerPath.Path].Patch != nil && getVerb != "patch" {
-			path.Operations.Patch.Permitted = true
-			path.Operations.Patch.Endpoint = path.Endpoint
-		}
-		if allPaths[swaggerPath.Path].Post != nil && getVerb != "post" {
-			path.Operations.Post.Permitted = true
-			path.Operations.Post.Endpoint = path.Endpoint
-		}
-		if allPaths[swaggerPath.Path].Put != nil && getVerb != "put" {
-			path.Operations.Put.Permitted = true
-			path.Operations.Put.Endpoint = path.Endpoint
-		}
+	for _, path := range allPaths {
+		loopPath := path
 
 		// Add endpoint to paths
-		parent := findDeepestPath(paths, searchPath, !validateCapturedSegments)
+		parent := findDeepestPath(resultPaths, loopPath, !validateCapturedSegments)
 		if parent == nil {
-			paths = append(paths, &path)
+			resultPaths = append(resultPaths, &loopPath)
 		} else {
-			if parent.Endpoint.TemplateURL == path.Endpoint.TemplateURL {
+			if parent.Endpoint.TemplateURL == loopPath.Endpoint.TemplateURL {
 				// we have multiple entries with the same path (e.g. when applying a URL override)
 				// merge the two entries
 				// TODO Consider checking if there is a clash when merging operations
-				if path.Operations.Get.Permitted {
-					copyOperationFrom(path.Operations.Get, &parent.Operations.Get)
+				if loopPath.Operations.Get.Permitted {
+					copyOperationFrom(loopPath.Operations.Get, &parent.Operations.Get)
 				}
-				if path.Operations.Delete.Permitted {
-					copyOperationFrom(path.Operations.Delete, &parent.Operations.Delete)
+				if loopPath.Operations.Delete.Permitted {
+					copyOperationFrom(loopPath.Operations.Delete, &parent.Operations.Delete)
 				}
-				if path.Operations.Patch.Permitted {
-					copyOperationFrom(path.Operations.Patch, &parent.Operations.Patch)
+				if loopPath.Operations.Patch.Permitted {
+					copyOperationFrom(loopPath.Operations.Patch, &parent.Operations.Patch)
 				}
-				if path.Operations.Post.Permitted {
-					copyOperationFrom(path.Operations.Post, &parent.Operations.Post)
+				if loopPath.Operations.Post.Permitted {
+					copyOperationFrom(loopPath.Operations.Post, &parent.Operations.Post)
 				}
-				if path.Operations.Put.Permitted {
-					copyOperationFrom(path.Operations.Put, &parent.Operations.Put)
+				if loopPath.Operations.Put.Permitted {
+					copyOperationFrom(loopPath.Operations.Put, &parent.Operations.Put)
 				}
 				parent.Children = append(parent.Children, path.Children...)
 				parent.SubPaths = append(parent.SubPaths, path.SubPaths...)
 			} else {
 				if countNameSegments(parent.Endpoint) == countNameSegments(path.Endpoint) {
 					// this is a child
-					parent.Children = append(parent.Children, &path)
+					parent.Children = append(parent.Children, &loopPath)
 				} else {
 					// this is a sub-resource
-					parent.SubPaths = append(parent.SubPaths, &path)
+					parent.SubPaths = append(parent.SubPaths, &loopPath)
 				}
 			}
 		}
 	}
-	return paths, nil
+	return resultPaths, nil
 }
 
 // ConvertToSwaggerResourceTypes converts the Path array to an array of SwaggerResourceTypes for use with the Swagger expander
@@ -166,6 +89,8 @@ func convertToSwaggerResourceType(path *Path) ResourceType {
 		Endpoint:     endpoints.MustGetEndpointInfoFromURL(path.Operations.Get.Endpoint.TemplateURL, path.Operations.Get.Endpoint.APIVersion),
 		Children:     ConvertToSwaggerResourceTypes(path.Children),
 		SubResources: ConvertToSwaggerResourceTypes(path.SubPaths),
+		FixedContent: path.FixedContent,
+		SubPathRegex: path.SubPathRegex,
 	}
 	if path.Operations.Get.Verb != "" {
 		resourceType.Verb = path.Operations.Get.Verb
@@ -183,44 +108,143 @@ func convertToSwaggerResourceType(path *Path) ResourceType {
 	return resourceType
 }
 
-// PathAndNameStrippedPath holds a full path and the path with names stripped out. E.g. for `/foo/{wibble}/bar` the stripped path is `/foo/{}/bar`
-type PathAndNameStrippedPath struct {
-	Path             string
-	NameStrippedPath string
+type pathArraySortByCondensedPath []Path
+
+func (a pathArraySortByCondensedPath) Len() int { return len(a) }
+func (a pathArraySortByCondensedPath) Less(i, j int) bool {
+	return strings.Compare(a[i].CondensedEndpointPath, a[j].CondensedEndpointPath) < 0
 }
+func (a pathArraySortByCondensedPath) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-// GetValue is a small helper to get the path value as determined by the `strippedPath` parameter
-func (p PathAndNameStrippedPath) GetValue(strippedPath bool) string {
-	if strippedPath {
-		return p.NameStrippedPath
-	}
-	return p.Path
-}
-
-// PathAndNameStrippedPathList is allows sorting PathAndNameStrippedPath array by NameStrippedPath
-type PathAndNameStrippedPathList []PathAndNameStrippedPath
-
-func (a PathAndNameStrippedPathList) Len() int { return len(a) }
-func (a PathAndNameStrippedPathList) Less(i, j int) bool {
-	return strings.Compare(a[i].NameStrippedPath, a[j].NameStrippedPath) < 0
-}
-func (a PathAndNameStrippedPathList) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-
-func getSortedPaths(paths map[string]spec.PathItem) []PathAndNameStrippedPath {
+func getSortedPaths(paths []Path) []Path {
 	// Sort ignoring names of captured sections (e.g. wibble in `/foo/{wibble}/bar`)
 
-	pathPairs := make([]PathAndNameStrippedPath, len(paths))
-	i := 0
-	for key := range paths {
-		pathPairs[i] = PathAndNameStrippedPath{
-			Path:             key,
-			NameStrippedPath: stripPathNames(key),
-		}
-		i++
-	}
-	sort.Sort(PathAndNameStrippedPathList(pathPairs))
+	sort.Sort(pathArraySortByCondensedPath(paths))
+	return paths
+}
 
-	return pathPairs
+func addConfigPaths(paths []Path, config *Config) ([]Path, error) {
+	if config.AdditionalPaths != nil {
+		for _, additionalPath := range config.AdditionalPaths {
+			path := strings.TrimRight(additionalPath.Path, "/")
+			endpoint, err := endpoints.GetEndpointInfoFromURL(path, "")
+			if err != nil {
+				return []Path{}, err
+			}
+			newPath := Path{
+				Name:                  additionalPath.Name,
+				Endpoint:              &endpoint,
+				CondensedEndpointPath: stripPathNames(path),
+				SubPathRegex:          additionalPath.SubPathRegex,
+			}
+			if additionalPath.FixedContent != "" {
+				newPath.FixedContent = additionalPath.FixedContent
+			}
+			getOperation := PathOperation{
+				Permitted: true,
+			}
+			if additionalPath.GetPath == "" {
+				getOperation.Endpoint = &endpoint
+			} else {
+				getEndpoint, err := endpoints.GetEndpointInfoFromURL(additionalPath.GetPath, "")
+				if err != nil {
+					return []Path{}, err
+				}
+				getOperation.Endpoint = &getEndpoint
+			}
+			newPath.Operations.Get = getOperation
+			paths = append(paths, newPath)
+		}
+	}
+	return paths, nil
+}
+
+func getPathsFromSwagger(doc *loads.Document, config *Config) ([]Path, error) {
+
+	swaggerVersion := doc.Spec().Info.Version
+	if config.SuppressAPIVersion {
+		swaggerVersion = ""
+	}
+
+	spec := doc.Analyzer
+
+	swaggerPaths := spec.AllPaths()
+	paths := make([]Path, len(swaggerPaths))
+
+	pathIndex := 0
+	for swaggerPath, swaggerPathItem := range swaggerPaths {
+
+		override := config.Overrides[swaggerPath]
+
+		searchPathTemp := override.Path
+		var searchPath string
+		if searchPathTemp == "" {
+			searchPath = swaggerPath
+		} else {
+			searchPath = searchPathTemp
+		}
+		searchPath = strings.TrimRight(searchPath, "/")
+		endpoint, err := endpoints.GetEndpointInfoFromURL(searchPath, swaggerVersion) // logical path
+		if err != nil {
+			return []Path{}, err
+		}
+		lastSegment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
+		name := lastSegment.Match
+		if name == "" {
+			name = "{" + lastSegment.Name + "}"
+		}
+		path := Path{
+			Endpoint:              &endpoint,
+			Name:                  name,
+			CondensedEndpointPath: stripPathNames(searchPath),
+		}
+
+		getVerb := override.GetVerb
+		if getVerb == "" {
+			getVerb = "get"
+		}
+
+		getOperation, err := getOperationByVerb(&swaggerPathItem, getVerb)
+		if err != nil {
+			return []Path{}, err
+		}
+		if getOperation != nil {
+			path.Operations.Get.Permitted = true
+			if getVerb != "get" {
+				path.Operations.Get.Verb = getVerb
+			}
+			if override.Path == "" {
+				path.Operations.Get.Endpoint = path.Endpoint
+			} else {
+				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
+				if err != nil {
+					return []Path{}, err
+				}
+				path.Operations.Get.Endpoint = &overriddenEndpoint
+			}
+		}
+		if swaggerPathItem.Delete != nil && getVerb != "delete" {
+			path.Operations.Delete.Permitted = true
+			path.Operations.Delete.Endpoint = path.Endpoint
+		}
+		if swaggerPathItem.Patch != nil && getVerb != "patch" {
+			path.Operations.Patch.Permitted = true
+			path.Operations.Patch.Endpoint = path.Endpoint
+		}
+		if swaggerPathItem.Post != nil && getVerb != "post" {
+			path.Operations.Post.Permitted = true
+			path.Operations.Post.Endpoint = path.Endpoint
+		}
+		if swaggerPathItem.Put != nil && getVerb != "put" {
+			path.Operations.Put.Permitted = true
+			path.Operations.Put.Endpoint = path.Endpoint
+		}
+
+		paths[pathIndex] = path
+		pathIndex++
+	}
+
+	return paths, nil
 }
 
 var regexpStripNames *regexp.Regexp
@@ -274,23 +298,22 @@ func countNameSegments(endpoint *endpoints.EndpointInfo) int {
 }
 
 // findDeepestPath searches the endpoints tree to find the deepest point that the specified path can be nested at (used to build up the endpoint hierarchy)
-func findDeepestPath(paths []*Path, pathToFind PathAndNameStrippedPath, useStrippedNamesPath bool) *Path {
+func findDeepestPath(paths []*Path, pathToFind Path, useStrippedNamesPath bool) *Path {
 	for _, path := range paths {
 		var matchString string
+		var pathToFindString string
 		if useStrippedNamesPath {
 			matchString = path.CondensedEndpointPath
+			pathToFindString = pathToFind.CondensedEndpointPath
 		} else {
 			matchString = path.Endpoint.TemplateURL
+			pathToFindString = pathToFind.Endpoint.TemplateURL
 		}
 
-		var pathString string
-		if useStrippedNamesPath {
-			pathString = pathToFind.NameStrippedPath
-		} else {
-			pathString = pathToFind.Path
-		}
-
-		if strings.HasPrefix(pathString, matchString) {
+		// Test if matchString is a prefix match on pathToFindString
+		// But need to verify that it hasn't matched /example against /examples but does against /example/test
+		// ok if strings are equal or substring match with a slash on
+		if pathToFindString == matchString || strings.HasPrefix(pathToFindString, matchString+"/") {
 			// matches endpoint. Check children
 			match := findDeepestPath(path.Children, pathToFind, useStrippedNamesPath)
 			if match == nil {

@@ -4,10 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
+
+var _ SwaggerAPISet = SwaggerAPISetARMResources{}
 
 // SwaggerAPISetARMResources holds the config for working with ARM resources as per the published Swagger specs
 type SwaggerAPISetARMResources struct {
@@ -66,12 +69,18 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 		}
 
 		for _, resource := range resourceResponse.Resources {
-			subResourceType := getResourceTypeForURL(ctx, resource.ID, resourceType.SubResources)
+			subResourceURL, err := resourceType.PerformSubPathReplace(resource.ID)
+			if err != nil {
+				err = fmt.Errorf("Error parsing YAML response: %s", err)
+				return APISetExpandResponse{Response: data}, err
+			}
+
+			subResourceType := resourceType.GetSubResourceTypeForURL(ctx, subResourceURL)
 			if subResourceType == nil {
-				err = fmt.Errorf("SubResource type not found! %s", resource.ID)
+				err = fmt.Errorf("SubResource type not found! %s", subResourceURL)
 				return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
 			}
-			subResourceTemplateValues := subResourceType.Endpoint.Match(resource.ID).Values
+			subResourceTemplateValues := subResourceType.Endpoint.Match(subResourceURL).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
 
 			deleteURL := ""
@@ -84,10 +93,10 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 			}
 
 			subResource := SubResource{
-				ID:           resource.ID,
+				ID:           subResourceURL,
 				Name:         name,
 				ResourceType: *subResourceType,
-				ExpandURL:    resource.ID + "?api-version=" + subResourceType.Endpoint.APIVersion,
+				ExpandURL:    subResourceURL + "?api-version=" + subResourceType.Endpoint.APIVersion,
 				DeleteURL:    deleteURL,
 			}
 			subResources = append(subResources, subResource)
@@ -113,4 +122,54 @@ func (c SwaggerAPISetARMResources) Delete(ctx context.Context, item *TreeNode) (
 		return false, err
 	}
 	return true, nil
+}
+
+// Update attempts to update the specified item with new content
+func (c SwaggerAPISetARMResources) Update(ctx context.Context, item *TreeNode, content string) error {
+
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+	putURL, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+	if err != nil {
+		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
+	}
+
+	data, err := armclient.DoRequestWithBody(ctx, "PUT", putURL, content)
+	if err != nil {
+		return fmt.Errorf("Error making PUT request: %s", err)
+	}
+
+	errorMessage, err := getAPIErrorMessage(data)
+	if err != nil {
+		return fmt.Errorf("Error checking for API Error message: %s: %s", data, err)
+	}
+	if errorMessage != "" {
+		return fmt.Errorf("Error: %s", errorMessage)
+	}
+	return nil
+}
+
+func getAPIErrorMessage(responseString string) (string, error) {
+	var response map[string]interface{}
+
+	err := json.Unmarshal([]byte(responseString), &response)
+	if err != nil {
+		err = fmt.Errorf("Error parsing API response: %s: %s", responseString, err)
+		return "", err
+	}
+	if response["error"] != nil {
+		serializedError, err := json.Marshal(response["error"])
+		if err != nil {
+			err = fmt.Errorf("Error serializing error message: %s: %s", responseString, err)
+			return "", err
+		}
+		message := string(serializedError)
+		message = strings.Replace(message, "\r", "", -1)
+		message = strings.Replace(message, "\n", "", -1)
+		return message, nil
+		// could dig into the JSON to pull out the error message property
+	}
+	return "", nil
 }

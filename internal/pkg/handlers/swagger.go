@@ -18,6 +18,7 @@ type SwaggerAPISet interface {
 	ExpandResource(context context.Context, node *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error)
 	MatchChildNodesByName() bool
 	Delete(context context.Context, node *TreeNode) (bool, error)
+	Update(context context.Context, node *TreeNode, content string) error
 }
 
 // SubResource is used to pass sub resource information from SwaggerAPISet to the expander
@@ -63,27 +64,6 @@ func (e *SwaggerResourceExpander) Name() string {
 	return "SwaggerResourceExpander"
 }
 
-func getResourceTypeForURL(ctx context.Context, url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
-	span, _ := tracing.StartSpanFromContext(ctx, "getResourceTypeForURL:"+url)
-	defer span.Finish()
-	return getResourceTypeForURLInner(url, resourceTypes)
-}
-func getResourceTypeForURLInner(url string, resourceTypes []swagger.ResourceType) *swagger.ResourceType {
-	for _, resourceType := range resourceTypes {
-		matchResult := resourceType.Endpoint.Match(url)
-		if matchResult.IsMatch {
-			return &resourceType
-		}
-		if result := getResourceTypeForURLInner(url, resourceType.SubResources); result != nil {
-			return result
-		}
-		if result := getResourceTypeForURLInner(url, resourceType.Children); result != nil {
-			return result
-		}
-	}
-	return nil
-}
-
 func (e *SwaggerResourceExpander) getAPISetForItem(currentItem *TreeNode) *SwaggerAPISet {
 
 	if currentItem.Metadata == nil {
@@ -116,7 +96,7 @@ func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *T
 	if currentItem.SwaggerResourceType != nil {
 		return true, nil
 	}
-	resourceType := getResourceTypeForURL(ctx, currentItem.ExpandURL, apiSet.GetResourceTypes())
+	resourceType := swagger.GetResourceTypeForURL(ctx, currentItem.ExpandURL, apiSet.GetResourceTypes())
 	if resourceType != nil {
 		currentItem.SwaggerResourceType = resourceType // cache to avoid looking up in Expand
 		return true, nil
@@ -143,37 +123,43 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	apiSet := *apiSetPtr
 
 	data := ""
-
-	// Get sub resources from config
-	expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
-	if err != nil {
-		return ExpanderResult{
-			Nodes:             nil,
-			Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
-			Err:               err,
-			SourceDescription: "SwaggerResourceExpander",
-		}
-	}
-	data = expandResult.Response
-
+	dataType := ResponsePlainText
 	newItems := []*TreeNode{}
-	if len(expandResult.SubResources) > 0 {
-		for _, subResource := range expandResult.SubResources {
-			newItems = append(newItems, &TreeNode{
-				Parentid:            currentItem.ID,
-				Namespace:           "swagger",
-				Name:                subResource.Name,
-				Display:             subResource.Name,
-				ID:                  subResource.ID,
-				ExpandURL:           subResource.ExpandURL,
-				ItemType:            SubResourceType,
-				DeleteURL:           subResource.DeleteURL,
-				SwaggerResourceType: &subResource.ResourceType,
-				Metadata: map[string]string{
-					"SwaggerAPISetID": apiSet.ID(),
-				},
-			})
+
+	if resourceType.FixedContent == "" {
+		// Get sub resources from config
+		expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
+		if err != nil {
+			return ExpanderResult{
+				Nodes:             nil,
+				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+				Err:               err,
+				SourceDescription: "SwaggerResourceExpander",
+			}
 		}
+		data = expandResult.Response
+		dataType = expandResult.ResponseType
+
+		if len(expandResult.SubResources) > 0 {
+			for _, subResource := range expandResult.SubResources {
+				newItems = append(newItems, &TreeNode{
+					Parentid:            currentItem.ID,
+					Namespace:           "swagger",
+					Name:                subResource.Name,
+					Display:             subResource.Name,
+					ID:                  subResource.ID,
+					ExpandURL:           subResource.ExpandURL,
+					ItemType:            SubResourceType,
+					DeleteURL:           subResource.DeleteURL,
+					SwaggerResourceType: &subResource.ResourceType,
+					Metadata: map[string]string{
+						"SwaggerAPISetID": apiSet.ID(),
+					},
+				})
+			}
+		}
+	} else {
+		data = resourceType.FixedContent
 	}
 
 	// Add any children to newItems
@@ -183,6 +169,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		loopChild := child
 
 		var url string
+		var err error
 		if apiSet.MatchChildNodesByName() {
 			url, err = child.Endpoint.BuildURL(templateValues)
 		} else {
@@ -193,7 +180,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
 			return ExpanderResult{
 				Nodes:             nil,
-				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+				Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 				Err:               err,
 				SourceDescription: "SwaggerResourceExpander",
 			}
@@ -212,7 +199,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
 				return ExpanderResult{
 					Nodes:             nil,
-					Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+					Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 					Err:               err,
 					SourceDescription: "SwaggerResourceExpander",
 				}
@@ -236,7 +223,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          ExpanderResponse{Response: data, ResponseType: expandResult.ResponseType},
+		Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
 	}
 }

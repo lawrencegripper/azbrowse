@@ -19,6 +19,7 @@ require (
 	github.com/go-openapi/strfmt v0.18.0 // indirect
 	github.com/go-openapi/swag v0.18.0 // indirect
 	github.com/gogo/protobuf v1.2.0 // indirect
+	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
@@ -39,6 +40,7 @@ require (
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/tools v0.0.0-20190405180640-052fc3cfdbc2 // indirect
 	gopkg.in/yaml.v2 v2.2.4
+	gotest.tools v2.2.0+incompatible
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20180531100431-4c381bd170b4
 	sourcegraph.com/sourcegraph/appdash-data v0.0.0-20151005221446-73f23eafcf67 // indirect
 )

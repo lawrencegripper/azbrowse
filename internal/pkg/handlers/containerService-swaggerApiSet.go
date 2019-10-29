@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"gopkg.in/yaml.v2"
@@ -29,6 +30,9 @@ type podResponse struct {
 		} `yaml:"containers"`
 	} `yaml:"spec"`
 }
+
+var _ SwaggerAPISet = SwaggerAPISetContainerService{}
+var maxTailLines = 100
 
 // SwaggerAPISetContainerService holds the config for working with an AKS cluster API
 type SwaggerAPISetContainerService struct {
@@ -71,36 +75,40 @@ func (c SwaggerAPISetContainerService) GetResourceTypes() []swagger.ResourceType
 }
 
 func (c SwaggerAPISetContainerService) doRequest(verb string, url string) (string, error) {
-	request, err := http.NewRequest("GET", url, bytes.NewReader([]byte("")))
+	return c.doRequestWithBody(verb, url, "")
+}
+func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string, body string) (string, error) {
+	request, err := http.NewRequest(verb, url, bytes.NewReader([]byte(body)))
 	if err != nil {
 		err = fmt.Errorf("Failed to create request" + err.Error() + url)
 		return "", err
 	}
 
+	request.Header.Set("Content-Type", "application/yaml")
 	request.Header.Set("Accept", "application/yaml")
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + url)
 		return "", err
 	}
+	defer response.Body.Close() //nolint: errcheck
+	buf, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		err = fmt.Errorf("Failed to read body: %s", err)
+		return "", err
+	}
+	data := string(buf)
 	if 200 <= response.StatusCode && response.StatusCode < 300 {
-		defer response.Body.Close() //nolint: errcheck
-		buf, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			err = fmt.Errorf("Failed to read body: %s", err)
-			return "", err
-		}
-		data := string(buf)
 		return data, nil
 	}
-	return "", fmt.Errorf("Response failed with %s (%s)", response.Status, url)
+	return "", fmt.Errorf("Response failed with %s (%s): %s", response.Status, url, data)
 }
 
 // ExpandResource returns metadata about child resources of the specified resource node
 func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	if resourceType.Endpoint.TemplateURL == "/api/v1/namespaces/{namespace}/pods/{name}/log" {
-		if strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name!
+		if !strings.Contains(currentItem.ExpandURL, "?") { // we haven't already set the container name/tailLines!
 
 			logURL := c.serverURL + currentItem.ExpandURL
 			containerURL := logURL[:len(logURL)-3]
@@ -121,33 +129,37 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 				return APISetExpandResponse{}, err
 			}
 
-			if len(podInfo.Spec.Containers) > 1 { // if only a single resopnse then fall through to just return logs for the single container
-				subResources := []SubResource{}
-				for _, container := range podInfo.Spec.Containers {
-					subResource := SubResource{
-						ID:           currentItem.ID + "/" + container.Name,
-						Name:         container.Name,
-						ResourceType: resourceType,
-						ExpandURL:    currentItem.ExpandURL + "?container=" + container.Name,
+			if len(podInfo.Spec.Containers) == 1 {
+				// if only a single resopnse then set the tailLines param and  fall through to just return logs for the single container
+				currentItem.ExpandURL += "?tailLines=" + strconv.Itoa(maxTailLines)
+			} else {
+				if len(podInfo.Spec.Containers) > 1 {
+					subResources := []SubResource{}
+					for _, container := range podInfo.Spec.Containers {
+						subResource := SubResource{
+							ID:           currentItem.ID + "/" + container.Name,
+							Name:         container.Name,
+							ResourceType: resourceType,
+							ExpandURL:    currentItem.ExpandURL + "?container=" + container.Name + "&tailLines=" + strconv.Itoa(maxTailLines),
+						}
+						subResources = append(subResources, subResource)
 					}
-					subResources = append(subResources, subResource)
+					return APISetExpandResponse{
+						Response:     "Pick a container to view logs",
+						SubResources: subResources,
+					}, nil
 				}
-				return APISetExpandResponse{
-					Response:     "Pick a container to view logs",
-					SubResources: subResources,
-				}, nil
 			}
 		}
 	}
 
+	subResources := []SubResource{}
 	url := c.serverURL + currentItem.ExpandURL
 	data, err := c.doRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %s", err)
 		return APISetExpandResponse{}, err
 	}
-
-	subResources := []SubResource{}
 
 	if len(resourceType.SubResources) > 0 {
 		// We have defined subResources - Unmarshal the response and add these to newItems
@@ -160,15 +172,21 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 		}
 
 		for _, item := range listResponse.Items {
-			subResourceType := getResourceTypeForURL(ctx, item.Metadata.SelfLink, resourceType.SubResources)
+			subResourceURL, err := resourceType.PerformSubPathReplace(item.Metadata.SelfLink)
+			if err != nil {
+				err = fmt.Errorf("Error parsing YAML response: %s", err)
+				return APISetExpandResponse{Response: data}, err
+			}
+
+			subResourceType := resourceType.GetSubResourceTypeForURL(ctx, subResourceURL)
 			if subResourceType == nil {
-				err = fmt.Errorf("SubResource type not found! %s", item.Metadata.SelfLink)
+				err = fmt.Errorf("SubResource type not found! %s", subResourceURL)
 				return APISetExpandResponse{Response: data}, err
 			}
 			name := item.Metadata.Name
 			deleteURL := ""
 			if subResourceType.DeleteEndpoint != nil {
-				subResourceTemplateValues := subResourceType.Endpoint.Match(item.Metadata.SelfLink).Values
+				subResourceTemplateValues := subResourceType.Endpoint.Match(subResourceURL).Values
 				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
 				if err != nil {
 					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
@@ -176,10 +194,10 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 				}
 			}
 			subResource := SubResource{
-				ID:           c.clusterID + item.Metadata.SelfLink,
+				ID:           c.clusterID + subResourceURL,
 				Name:         name,
 				ResourceType: *subResourceType,
-				ExpandURL:    item.Metadata.SelfLink,
+				ExpandURL:    subResourceURL,
 				DeleteURL:    deleteURL,
 			}
 			subResources = append(subResources, subResource)
@@ -206,4 +224,23 @@ func (c SwaggerAPISetContainerService) Delete(ctx context.Context, item *TreeNod
 		return false, err
 	}
 	return true, nil
+}
+
+// Update attempts to update the specified item with new content
+func (c SwaggerAPISetContainerService) Update(ctx context.Context, item *TreeNode, content string) error {
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+	putURL, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+	putURL = c.serverURL + putURL
+	if err != nil {
+		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
+	}
+	_, err = c.doRequestWithBody("PUT", putURL, content)
+	if err != nil {
+		return fmt.Errorf("Error making PUT request: %s", err)
+	}
+
+	return nil
 }
