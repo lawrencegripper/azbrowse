@@ -237,9 +237,7 @@ func (c SwaggerAPISetContainerService) Update(ctx context.Context, item *TreeNod
 	if err != nil {
 		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
 	}
-	// done := h.status.Status(fmt.Sprintf("Making PUT request: %s", putURL), true)
 	_, err = c.doRequestWithBody("PUT", putURL, content)
-	// done()
 	if err != nil {
 		return fmt.Errorf("Error making PUT request: %s", err)
 	}

@@ -136,10 +136,7 @@ func (c SwaggerAPISetARMResources) Update(ctx context.Context, item *TreeNode, c
 		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
 	}
 
-	// TODO - should we add status updates here?
-	// done := h.status.Status(fmt.Sprintf("Making PUT request: %s", putURL), true)
 	data, err := armclient.DoRequestWithBody(ctx, "PUT", putURL, content)
-	// done()
 	if err != nil {
 		return fmt.Errorf("Error making PUT request: %s", err)
 	}
