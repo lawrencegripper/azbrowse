@@ -455,13 +455,6 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			return nil
 		}
 
-		apiSetID := item.Metadata["SwaggerAPISetID"]
-		apiSetPtr := handlers.GetSwaggerResourceExpander().GetAPISet(apiSetID)
-		if apiSetPtr == nil {
-			return nil
-		}
-		apiSet := *apiSetPtr
-
 		editorConfig, err := h.getEditorConfig()
 		if err != nil {
 			return err
@@ -559,6 +552,13 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			h.status.Status("Updated JSON empty - no further action.", false)
 			return nil
 		}
+		
+		apiSetID := item.Metadata["SwaggerAPISetID"]
+		apiSetPtr := handlers.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+		if apiSetPtr == nil {
+			return nil
+		}
+		apiSet := *apiSetPtr
 
 		err = apiSet.Update(h.Context, item, updatedJSON)
 		if err != nil {
