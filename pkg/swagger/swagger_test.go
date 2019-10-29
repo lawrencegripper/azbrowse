@@ -274,6 +274,76 @@ func Test_PathOverride(t *testing.T) {
 	assert.Assert(t, is.Len(path.SubPaths, 0))
 }
 
+func Test_PathOverrideWithRewrites(t *testing.T) {
+
+	// Test a simple hierarchy that is not in the order needed for hierarchy matching to automatically work
+
+	specJSON := `{  "swagger": "2.0",
+  "info": {
+    "title": "DnsManagementClient",
+    "description": "The DNS Management Client.",
+    "version": "2018-05-01"
+  },
+  "host": "management.azure.com",
+  "schemes": [
+    "https"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+	],
+	"paths": {
+		"/test/{testname}/child1/{name2}": { "get": {} },
+		"/test/{testnameedited}/child1": {  "get": {} },
+		"/test/{testname}": { "get": {} }
+	}
+}
+`
+	spec := json.RawMessage(specJSON)
+	doc, err := loads.Analyzed(spec, "")
+	if err != nil {
+		t.Logf("Failed to load spec: %v", err)
+		t.Fail()
+	}
+
+	config := Config{
+		Overrides: map[string]PathOverride{
+			// These paths would not be aggregated under /test/... without overrides
+			"/test/{testnameedited}/child1": {Path: "/test/{testname}/child1", RewritePath: true},
+		},
+	}
+
+	var paths []*Path
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	if err != nil {
+		t.Logf("Failed to load spec: %v", err)
+		t.Fail()
+	}
+
+	assert.Assert(t, is.Len(paths, 1))
+
+	// /test/{testname}
+	path := paths[0]
+	assert.Equal(t, path.Endpoint.TemplateURL, "/test/{testname}")
+	assert.Assert(t, is.Len(path.Children, 1))
+	assert.Assert(t, is.Len(path.SubPaths, 0))
+
+	// /test/{testname}/child1
+	path = path.Children[0]
+	assert.Equal(t, path.Endpoint.TemplateURL, "/test/{testname}/child1")
+	assert.Equal(t, path.Operations.Get.Endpoint.TemplateURL, "/test/{testname}/child1")
+	assert.Assert(t, is.Len(path.Children, 0))
+	assert.Assert(t, is.Len(path.SubPaths, 1))
+
+	// /test/{testname}/child1/{name2}
+	path = path.SubPaths[0]
+	assert.Equal(t, path.Endpoint.TemplateURL, "/test/{testname}/child1/{name2}")
+	assert.Equal(t, path.Operations.Get.Endpoint.TemplateURL, "/test/{testname}/child1/{name2}")
+	assert.Assert(t, is.Len(path.Children, 0))
+	assert.Assert(t, is.Len(path.SubPaths, 0))
+}
 func Test_AdditionalPaths(t *testing.T) {
 
 	// Test a simple hierarchy that is not in the order needed for hierarchy matching to automatically work

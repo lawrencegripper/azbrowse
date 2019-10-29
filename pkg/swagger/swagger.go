@@ -213,7 +213,7 @@ func getPathsFromSwagger(doc *loads.Document, config *Config) ([]Path, error) {
 			if getVerb != "get" {
 				path.Operations.Get.Verb = getVerb
 			}
-			if override.Path == "" {
+			if override.Path == "" || override.RewritePath {
 				path.Operations.Get.Endpoint = path.Endpoint
 			} else {
 				overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL(swaggerPath, swaggerVersion)
