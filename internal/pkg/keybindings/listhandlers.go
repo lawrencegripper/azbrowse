@@ -552,7 +552,7 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 			h.status.Status("Updated JSON empty - no further action.", false)
 			return nil
 		}
-		
+
 		apiSetID := item.Metadata["SwaggerAPISetID"]
 		apiSetPtr := handlers.GetSwaggerResourceExpander().GetAPISet(apiSetID)
 		if apiSetPtr == nil {
