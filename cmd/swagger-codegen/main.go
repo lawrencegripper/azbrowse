@@ -36,40 +36,13 @@ import (
 //           ...
 
 func main() {
+	
+	// Process ARM specs
 	config := getARMConfig()
 	paths := loadARMSwagger(config)
 	writeOutput(paths, config, "./internal/pkg/handlers/swagger-armspecs.generated.go")
-}
 
-func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string) {
-	writer, err := os.Create(filename)
-	if err != nil {
-		panic(fmt.Errorf("Error opening file: %s", err))
-	}
-	defer func() {
-		err := writer.Close()
-		if err != nil {
-			panic(fmt.Errorf("Failed to close output file: %s", err))
-		}
-	}()
-
-	writeTemplate(writer, paths, config)
-}
-
-// getFirstNonCommonPath returns the first subfolder under path that is not named 'common'
-func getFirstNonCommonPath(path string) string {
-	// get the first non `common` path
-
-	subfolders, err := ioutil.ReadDir(path)
-	if err != nil {
-		panic(err)
-	}
-	for _, subpath := range subfolders {
-		if subpath.IsDir() && subpath.Name() != "common" {
-			return path + "/" + subpath.Name()
-		}
-	}
-	panic(fmt.Errorf("No suitable path found"))
+	
 }
 
 func loadARMSwagger(config *swagger.Config) []*swagger.Path {
@@ -212,4 +185,34 @@ func loadDoc(path string) *loads.Document {
 	}
 
 	return document
+}
+func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string) {
+	writer, err := os.Create(filename)
+	if err != nil {
+		panic(fmt.Errorf("Error opening file: %s", err))
+	}
+	defer func() {
+		err := writer.Close()
+		if err != nil {
+			panic(fmt.Errorf("Failed to close output file: %s", err))
+		}
+	}()
+
+	writeTemplate(writer, paths, config)
+}
+
+// getFirstNonCommonPath returns the first subfolder under path that is not named 'common'
+func getFirstNonCommonPath(path string) string {
+	// get the first non `common` path
+
+	subfolders, err := ioutil.ReadDir(path)
+	if err != nil {
+		panic(err)
+	}
+	for _, subpath := range subfolders {
+		if subpath.IsDir() && subpath.Name() != "common" {
+			return path + "/" + subpath.Name()
+		}
+	}
+	panic(fmt.Errorf("No suitable path found"))
 }
