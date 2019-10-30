@@ -79,62 +79,71 @@ do
     serviceName=$(basename $serviceFolder)
     echo "$serviceName - $serviceFolder"
 
-    # Get resource-type folders 
-    { 
-        swaggerFolders=""
-        if [[ -d "${serviceFolder}resource-manager" ]] 
-        then
-            swaggerFolders=$(ls -d ${serviceFolder}resource-manager/*/)
-        fi
-    } || {
-        swaggerFolders=""
-    }
-    # swaggerFolder: specification/web/resource-manager/Microsoft.Web
-    for swaggerFolder in $swaggerFolders
+    apiTypes=("resource-manager" "data-plane")
+    for apiType in "${apiTypes[@]}"
     do
-        resourceType=$(basename $swaggerFolder)
-        echo "    $resourceType - $swaggerFolder"
+        # Get resource-type folders 
+        { 
+            swaggerFolders=""
+            if [[ -d "${serviceFolder}$apiType" ]] 
+            then
+                swaggerFolders=$(ls -d ${serviceFolder}$apiType/*/)
+            fi
+        } || {
+            swaggerFolders=""
+        }
+        # swaggerFolder: specification/web/resource-manager/Microsoft.Web
+        for swaggerFolder in $swaggerFolders
+        do
+            resourceType=$(basename $swaggerFolder)
+            echo "    $resourceType - $swaggerFolder"
 
-        # Get latest version folder
-        {        
-            specFolders=$(ls -d ${swaggerFolder}stable/*/ 2>/dev/null)
-            specBranch="stable"
-        } || {
-            specFolders=$(ls -d ${swaggerFolder}preview/*/ 2>/dev/null)
-            specBranch="preview"
-        } || {
+            # Get latest version folder
+            set +e # ls commands below may error - temporarily continue on errors
             specFolders=""
             specBranch=""
-        }
-        latestSpecFolder=""
-        # specFolder: specification/web/resource-manager/Microsoft.Web/stable/2000-01-01
-        for specFolder in $specFolders
-        do
-            latestSpecFolder=$specFolder
+            specFolders=$(ls -d ${swaggerFolder}stable/*/ 2>/dev/null)
+            echo $specFolders
+            if [[ -n "$specFolders" ]]; 
+            then
+                specBranch="stable"
+            fi
+            if [[ -z "$specBranch" ]]; 
+            then 
+                specFolders=$(ls -d ${swaggerFolder}preview/*/ 2>/dev/null)
+                specBranch="preview"
+            fi
+            latestSpecFolder=""
+            # specFolder: specification/web/resource-manager/Microsoft.Web/stable/2000-01-01
+            for specFolder in $specFolders
+            do
+                latestSpecFolder=$specFolder
+            done
+            set -e
+
+            # if we found a latest version then start copying
+            if [[ -n "$latestSpecFolder" ]];
+            then
+                latestSpec=$(basename $latestSpecFolder)
+
+                # Check if we have a common folder to copy at the serviceFolder level
+                if [[ -d ${serviceFolder}$apiType/common ]];
+                then
+                    mkdir swagger-specs/$serviceName/$apiType --parents
+                    cp ${serviceFolder}$apiType/common swagger-specs/$serviceName/$apiType -r
+                fi
+                # Check if we have a common folder to copy at the swaggerFolder level
+                if [[ -d ${serviceFolder}$apiType/$resourceType/common ]];
+                then
+                    mkdir swagger-specs/$serviceName/$apiType/$resourceType --parents
+                    cp $swaggerFolder/common swagger-specs/$serviceName/$apiType/$resourceType -r
+                fi
+
+                # Copy the spec folder
+                mkdir swagger-specs/$serviceName/$apiType/$resourceType/$specBranch/$latestSpec --parents
+                cp ${latestSpecFolder}* swagger-specs/$serviceName/$apiType/$resourceType/$specBranch/$latestSpec/ -r
+            fi
         done
-
-        # if we found a latest version then start copying
-        if [[ -n "$latestSpecFolder" ]];
-        then
-            latestSpec=$(basename $latestSpecFolder)
-
-            # Check if we have a common folder to copy at the serviceFolder level
-            if [[ -d ${serviceFolder}resource-manager/common ]];
-            then
-                mkdir swagger-specs/$serviceName/resource-manager --parents
-                cp ${serviceFolder}resource-manager/common swagger-specs/$serviceName/resource-manager -r
-            fi
-            # Check if we have a common folder to copy at the swaggerFolder level
-            if [[ -d ${serviceFolder}resource-manager/$resourceType/common ]];
-            then
-                mkdir swagger-specs/$serviceName/resource-manager/$resourceType --parents
-                cp $swaggerFolder/common swagger-specs/$serviceName/resource-manager/$resourceType -r
-            fi
-
-            # Copy the spec folder
-            mkdir swagger-specs/$serviceName/resource-manager/$resourceType/$specBranch/$latestSpec --parents
-            cp ${latestSpecFolder}* swagger-specs/$serviceName/resource-manager/$resourceType/$specBranch/$latestSpec/ -r
-        fi
     done
     echo ""
 done
