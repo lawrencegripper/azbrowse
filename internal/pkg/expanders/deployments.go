@@ -46,7 +46,7 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 	newItems := []*TreeNode{}
 
 	if currentItem.ItemType == deploymentsType {
-		var deployments armclient.DeploymentsResponse
+		var deployments DeploymentsResponse
 		err = json.Unmarshal([]byte(data), &deployments)
 		if err != nil {
 			panic(err)
@@ -76,7 +76,7 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		}
 	} else if currentItem.ItemType == deploymentType {
 
-		var operations armclient.DeploymentOperationsResponse
+		var operations DeploymentOperationsResponse
 		err = json.Unmarshal([]byte(data), &operations)
 		if err != nil {
 			panic(err)
@@ -123,4 +123,69 @@ func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		Nodes:             newItems,
 		IsPrimaryResponse: isPrimaryResponse,
 	}
+}
+
+// DeploymentsResponse is returned by a request for deployments in an RG
+type DeploymentsResponse struct {
+	Value []struct {
+		ID         string `json:"id"`
+		Name       string `json:"name"`
+		Properties struct {
+			CorrelationID string `json:"correlationId"`
+			Dependencies  []struct {
+				DependsOn []struct {
+					ID           string `json:"id"`
+					ResourceName string `json:"resourceName"`
+					ResourceType string `json:"resourceType"`
+				} `json:"dependsOn"`
+				ID           string `json:"id"`
+				ResourceName string `json:"resourceName"`
+				ResourceType string `json:"resourceType"`
+			} `json:"dependencies"`
+			Duration        string `json:"duration"`
+			Mode            string `json:"mode"`
+			OutputResources []struct {
+				ID string `json:"id"`
+			} `json:"outputResources"`
+			Outputs    map[string]interface{} `json:"outputs"`
+			Parameters map[string]interface{} `json:"parameters"`
+			Providers  []struct {
+				Namespace     string `json:"namespace"`
+				ResourceTypes []struct {
+					Locations    []string `json:"locations"`
+					ResourceType string   `json:"resourceType"`
+				} `json:"resourceTypes"`
+			} `json:"providers"`
+			ProvisioningState string                 `json:"provisioningState"`
+			TemplateHash      string                 `json:"templateHash"`
+			Template          map[string]interface{} `json:"template"`
+			TemplateLink      struct {
+				ContentVersion string `json:"contentVersion"`
+				URI            string `json:"uri"`
+			} `json:"templateLink"`
+			Timestamp string `json:"timestamp"`
+		} `json:"properties"`
+	} `json:"value"`
+}
+
+// DeploymentOperationsResponse is a struct to enable splitting out json value array
+type DeploymentOperationsResponse struct {
+	Value []struct {
+		ID          string `json:"id"`
+		OperationID string `json:"operationId"`
+		Properties  struct {
+			StatusCode            string      `json:"statusCode"`
+			StatusMessage         interface{} `json:"statusMessage"`
+			Timestamp             string      `json:"timestamp"`
+			Duration              string      `json:"duration"`
+			ProvisioningOperation string      `json:"provisioningOperation"`
+			ProvisioningState     string      `json:"provisioningState"`
+			TrackingID            string      `json:"trackingId"`
+			TargetResource        struct {
+				ID           string `json:"id"`
+				ResourceType string `json:"resourceType"`
+				ResourceName string `json:"resourceName"`
+			} `json:"targetResource"`
+		} `json:"properties"`
+	} `json:"value"`
 }

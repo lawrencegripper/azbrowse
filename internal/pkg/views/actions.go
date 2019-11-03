@@ -41,7 +41,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	if err != nil {
 		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}
-	var opsRequest armclient.OperationsRequest
+	var opsRequest OperationsRequest
 	err = json.Unmarshal([]byte(data), &opsRequest)
 	if err != nil {
 		panic(err)
@@ -74,4 +74,32 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	list.statusView.Status("Fetched available Actions", false)
 
 	return nil
+}
+
+// OperationsRequest list the actions that can be performed
+type OperationsRequest struct {
+	DisplayName string `json:"displayName"`
+	Operations  []struct {
+		Name         string      `json:"name"`
+		DisplayName  string      `json:"displayName"`
+		Description  string      `json:"description"`
+		Origin       interface{} `json:"origin"`
+		Properties   interface{} `json:"properties"`
+		IsDataAction bool        `json:"isDataAction"`
+	} `json:"operations"`
+	ResourceTypes []struct {
+		Name        string `json:"name"`
+		DisplayName string `json:"displayName"`
+		Operations  []struct {
+			Name         string      `json:"name"`
+			DisplayName  string      `json:"displayName"`
+			Description  string      `json:"description"`
+			Origin       interface{} `json:"origin"`
+			Properties   interface{} `json:"properties"`
+			IsDataAction bool        `json:"isDataAction"`
+		} `json:"operations"`
+	} `json:"resourceTypes"`
+	ID   string `json:"id"`
+	Type string `json:"type"`
+	Name string `json:"name"`
 }

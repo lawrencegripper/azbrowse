@@ -56,7 +56,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 		// return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
 	}
 
-	var subRequest armclient.SubResponse
+	var subRequest SubResponse
 	err = json.Unmarshal([]byte(data), &subRequest)
 	if err != nil {
 		return ExpanderResult{
@@ -101,4 +101,19 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 			ResponseType: newContentType,
 		},
 	}
+}
+
+// SubResponse Subscriptions REST type
+type SubResponse struct {
+	Subs []struct {
+		ID                   string `json:"id"`
+		SubscriptionID       string `json:"subscriptionId"`
+		DisplayName          string `json:"displayName"`
+		State                string `json:"state"`
+		SubscriptionPolicies struct {
+			LocationPlacementID string `json:"locationPlacementId"`
+			QuotaID             string `json:"quotaId"`
+			SpendingLimit       string `json:"spendingLimit"`
+		} `json:"subscriptionPolicies"`
+	} `json:"value"`
 }
