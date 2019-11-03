@@ -33,10 +33,55 @@ var (
 
 var enableTracing bool
 var hideGuids bool
+var navigateToID string
 
 func main() {
-	var navigateToID string
+	readCommandLineArgs()
 
+	confirmAndSelfUpdate()
+
+	// Setup the root context and span for open tracing
+	ctx, span := configureTracing()
+
+	// Create an ARMClient instance for us to use
+	armClient := armclient.NewClientFromCLI()
+
+	// Initialize the expanders which will let the user walk the tree of
+	// resources in Azure
+	expanders.InitializeExpanders(armClient)
+
+	// Start up gocui and configure some settings
+	g, err := gocui.NewGui(gocui.OutputNormal)
+	if err != nil {
+		log.Panicln(err)
+	}
+	defer g.Close()
+	g.Highlight = true
+	g.SelFgColor = gocui.ColorCyan
+	g.InputEsc = true
+
+	// Create the views we'll use to display information and
+	// bind up all the keys use to interact with the views
+	list := setupViewsAndKeybindings(ctx, g, armClient)
+
+	// Start a go routine to populate the list with root of the nodes
+	startPopulatingList(ctx, g, list, armClient)
+
+	// Start a go routine to handling automated naviging to an item via the
+	// `--navigate` command
+	handleNavigateTo(list)
+
+	// Close the span used to track startup times
+	span.Finish()
+
+	// Start the main loop of gocui to draw the UI
+	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		log.Panicln(err)
+	}
+
+}
+
+func readCommandLineArgs() {
 	args := os.Args[1:] // skip first arg
 
 	for len(args) >= 1 {
@@ -81,8 +126,9 @@ func main() {
 
 		args = args[1:] // move to the next arg
 	}
+}
 
-	confirmAndSelfUpdate()
+func configureTracing() (context.Context, opentracing.Span) {
 	var ctx context.Context
 	var span opentracing.Span
 
@@ -119,24 +165,21 @@ func main() {
 		}()
 	}
 
-	armClient := armclient.NewClientFromCLI()
-	expanders.InitializeExpanders(armClient)
+	return ctx, span
+}
 
-	g, err := gocui.NewGui(gocui.OutputNormal)
-	if err != nil {
-		log.Panicln(err)
-	}
-	defer g.Close()
-
-	g.Highlight = true
-	g.SelFgColor = gocui.ColorCyan
-	g.InputEsc = true
-
-	list := setupViewsAndKeybindings(ctx, g, armClient)
-
+func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidget, armClient *armclient.Client) {
 	go func() {
 		time.Sleep(time.Second * 1)
+
+		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+			Message:    "Updating API Version details",
+			InProgress: true,
+		})
+
 		armClient.PopulateResourceAPILookup(ctx)
+
+		done()
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
@@ -145,6 +188,7 @@ func main() {
 			// to show the current tenants subscriptions
 			newContent, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
 				ItemType:  expanders.TentantItemType,
+				ID:        "AvailableSubscriptions",
 				ExpandURL: expanders.ExpandURLNotSupported,
 			})
 
@@ -157,56 +201,6 @@ func main() {
 			return nil
 		})
 	}()
-
-	if navigateToID != "" {
-		navigateToIDLower := strings.ToLower(navigateToID)
-		go func() {
-			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-			var lastNavigatedNode *expanders.TreeNode
-
-			processNavigations := true
-
-			for {
-				nodeListInterface := <-navigatedChannel
-
-				if processNavigations {
-					nodeList := nodeListInterface.([]*expanders.TreeNode)
-
-					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
-						processNavigations = false
-					} else {
-
-						gotNode := false
-						for nodeIndex, node := range nodeList {
-							// use prefix matching
-							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
-							// additional check is that the lengths match, or the next char in target is a '/'
-							nodeIDLower := strings.ToLower(node.ID)
-							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(navigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
-								list.ChangeSelection(nodeIndex)
-								lastNavigatedNode = node
-								list.ExpandCurrentSelection()
-								gotNode = true
-								break
-							}
-						}
-
-						if !gotNode {
-							// we got as far as we could - now stop!
-							processNavigations = false
-						}
-					}
-				}
-			}
-		}()
-	}
-
-	span.Finish()
-
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Panicln(err)
-	}
-
 }
 
 func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclient.Client) *views.ListWidget {
@@ -291,4 +285,49 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclie
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
 	return list
+}
+
+func handleNavigateTo(list *views.ListWidget) {
+	if navigateToID != "" {
+		navigateToIDLower := strings.ToLower(navigateToID)
+		go func() {
+			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+			var lastNavigatedNode *expanders.TreeNode
+
+			processNavigations := true
+
+			for {
+				nodeListInterface := <-navigatedChannel
+
+				if processNavigations {
+					nodeList := nodeListInterface.([]*expanders.TreeNode)
+
+					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
+						processNavigations = false
+					} else {
+
+						gotNode := false
+						for nodeIndex, node := range nodeList {
+							// use prefix matching
+							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
+							// additional check is that the lengths match, or the next char in target is a '/'
+							nodeIDLower := strings.ToLower(node.ID)
+							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(navigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
+								list.ChangeSelection(nodeIndex)
+								lastNavigatedNode = node
+								list.ExpandCurrentSelection()
+								gotNode = true
+								break
+							}
+						}
+
+						if !gotNode {
+							// we got as far as we could - now stop!
+							processNavigations = false
+						}
+					}
+				}
+			}
+		}()
+	}
 }

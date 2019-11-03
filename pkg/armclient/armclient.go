@@ -243,7 +243,6 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 			resourceAPIVersionLookup = providerCache
 		}
 		span.Finish()
-
 	}
 }
 
