@@ -11,7 +11,9 @@ import (
 var _ Expander = &SubscriptionExpander{}
 
 // SubscriptionExpander expands RGs under a subscription
-type SubscriptionExpander struct{}
+type SubscriptionExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *SubscriptionExpander) Name() string {
@@ -31,7 +33,7 @@ func (e *SubscriptionExpander) DoesExpand(ctx context.Context, currentItem *Tree
 func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
 
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	newItems := []*TreeNode{}
 
 	//    \/ It's not the usual ... look out

@@ -12,7 +12,9 @@ import (
 var _ Expander = &DeploymentsExpander{}
 
 // DeploymentsExpander expands RGs under a subscription
-type DeploymentsExpander struct{}
+type DeploymentsExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *DeploymentsExpander) Name() string {
@@ -32,7 +34,7 @@ func (e *DeploymentsExpander) DoesExpand(ctx context.Context, currentItem *TreeN
 func (e *DeploymentsExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
 	isPrimaryResponse := true
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,

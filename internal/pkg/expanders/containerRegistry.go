@@ -20,9 +20,10 @@ type containerRegistryResponse struct {
 }
 
 // NewContainerRegistryExpander creates a new instance of ContainerRegistryExpander
-func NewContainerRegistryExpander() *ContainerRegistryExpander {
+func NewContainerRegistryExpander(armclient *armclient.Client) *ContainerRegistryExpander {
 	return &ContainerRegistryExpander{
-		client: &http.Client{},
+		client:    &http.Client{},
+		armClient: armclient,
 	}
 }
 
@@ -31,7 +32,8 @@ var _ Expander = &ContainerRegistryExpander{}
 
 // ContainerRegistryExpander expands Tthe data-plane aspects of a Container Registry
 type ContainerRegistryExpander struct {
-	client *http.Client
+	client    *http.Client
+	armClient *armclient.Client
 }
 
 // Name returns the name of the expander
@@ -505,7 +507,7 @@ func (e *ContainerRegistryExpander) doRequest(ctx context.Context, url string, a
 }
 
 func (e *ContainerRegistryExpander) getLoginServer(ctx context.Context, registryID string) (string, error) {
-	data, err := armclient.DoRequest(ctx, "GET", registryID)
+	data, err := e.armClient.DoRequest(ctx, "GET", registryID)
 	if err != nil {
 		return "", fmt.Errorf("Failed to get registry: " + err.Error() + registryID)
 	}
@@ -543,8 +545,8 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 	// TODO - currently using the loginServer to generate the realm etc but should consider pulling from the WWW-Authenticate header value
 
 	// Make an accesstoken request
-	tenantID := armclient.GetTenantID()
-	armCLIToken, err := armclient.GetToken()
+	tenantID := e.armClient.GetTenantID()
+	armCLIToken, err := e.armClient.GetToken()
 	if err != nil {
 		return "", fmt.Errorf("Failed to get CLI token: %s", err)
 	}

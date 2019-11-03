@@ -54,6 +54,7 @@ var _ Expander = &AzureKubernetesServiceExpander{}
 
 // AzureKubernetesServiceExpander expands the kubernetes aspects of AKS
 type AzureKubernetesServiceExpander struct {
+	client *armclient.Client
 }
 
 // Name returns the name of the expander
@@ -134,7 +135,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 				SourceDescription: "AzureKubernetesServiceExpander request",
 			}
 		}
-		GetSwaggerResourceExpander().AddAPISet(*apiSet)
+		GetSwaggerResourceExpander(e.client).AddAPISet(*apiSet)
 	}
 
 	swaggerResourceTypes := apiSet.GetResourceTypes()
@@ -198,7 +199,7 @@ func (e *AzureKubernetesServiceExpander) createAPISetForCluster(ctx context.Cont
 }
 func (e *AzureKubernetesServiceExpander) getAPISetForCluster(clusterID string) *SwaggerAPISetContainerService {
 
-	swaggerAPISet := GetSwaggerResourceExpander().GetAPISet(clusterID + "/<k8sapi>")
+	swaggerAPISet := GetSwaggerResourceExpander(e.client).GetAPISet(clusterID + "/<k8sapi>")
 	if swaggerAPISet == nil {
 		return nil
 	}
@@ -322,7 +323,7 @@ func (e *AzureKubernetesServiceExpander) getHTTPClientFromConfig(kubeConfig kube
 
 func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, clusterID string) (kubeConfigResponse, error) {
 
-	data, err := armclient.DoRequest(ctx, "POST", clusterID+"/listClusterUserCredential?api-version=2019-08-01")
+	data, err := e.client.DoRequest(ctx, "POST", clusterID+"/listClusterUserCredential?api-version=2019-08-01")
 	if err != nil {
 		return kubeConfigResponse{}, fmt.Errorf("Failed to get credentials: " + err.Error() + clusterID)
 	}

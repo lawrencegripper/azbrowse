@@ -25,6 +25,7 @@ var _ Expander = &AppInsightsExpander{}
 
 // AppInsightsExpander expands aspects of App Insights that don't naturally flow from the api spec
 type AppInsightsExpander struct {
+	client *armclient.Client
 }
 
 // Name returns the name of the expander
@@ -106,7 +107,7 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 
 	newItems := []*TreeNode{}
 
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, "GET", currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -160,7 +161,7 @@ func (e *AppInsightsExpander) expandAnalyticsItem(ctx context.Context, currentIt
 
 	newItems := []*TreeNode{}
 
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, "GET", currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,

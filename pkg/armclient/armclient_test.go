@@ -18,16 +18,15 @@ func Test_ArmClient_AzCliToken_Refresh(t *testing.T) {
 	time.Sleep(time.Second * 5)
 
 	cacheCleared := false
-	// Set the ARM client to use out test server
-	SetClient(ts.Client())
-	SetAquireToken(func(clearCache bool) (AzCLIToken, error) {
+	tokenFunc := func(clearCache bool) (AzCLIToken, error) {
 		if clearCache {
 			cacheCleared = true
 		}
 		return AzCLIToken{}, nil
-	})
+	}
+	client := NewClientFromClientAndTokenFunc(ts.Client(), tokenFunc)
 
-	DoRequest(context.Background(), "GET", ts.URL+"/subscriptions/1/resourceGroups/rg1") //nolint: errcheck
+	client.DoRequest(context.Background(), "GET", ts.URL+"/subscriptions/1/resourceGroups/rg1") //nolint: errcheck
 
 	if !cacheCleared {
 		t.Error("Expected cache to be cleared for azcli token")
@@ -45,16 +44,16 @@ func Test_ArmClient_AzCliToken_DontRefresh(t *testing.T) {
 	time.Sleep(time.Second * 5)
 
 	cacheCleared := false
-	// Set the ARM client to use out test server
-	SetClient(ts.Client())
-	SetAquireToken(func(clearCache bool) (AzCLIToken, error) {
+	tokenFunc := func(clearCache bool) (AzCLIToken, error) {
 		if clearCache {
 			cacheCleared = true
 		}
 		return AzCLIToken{}, nil
-	})
+	}
+	// Set the ARM client to use out test server
+	client := NewClientFromClientAndTokenFunc(ts.Client(), tokenFunc)
 
-	DoRequest(context.Background(), "GET", ts.URL+"/subscriptions/1/resourceGroups/rg1") //nolint: errcheck
+	client.DoRequest(context.Background(), "GET", ts.URL+"/subscriptions/1/resourceGroups/rg1") //nolint: errcheck
 
 	if cacheCleared {
 		t.Error("Expected cache not to be cleared for azcli token")

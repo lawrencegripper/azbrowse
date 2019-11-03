@@ -18,7 +18,9 @@ const (
 var _ Expander = &TenantExpander{}
 
 // TenantExpander expands the subscriptions under a tenant
-type TenantExpander struct{}
+type TenantExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *TenantExpander) Name() string {
@@ -40,7 +42,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	defer span.Finish()
 
 	// Get Subscriptions
-	data, err := armclient.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
+	data, err := e.client.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: e.Name(),

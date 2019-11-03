@@ -19,35 +19,56 @@ const (
 	providerCacheKey = "providerCache"
 )
 
-func init() {
-	client = &http.Client{}
-	aquireToken = aquireTokenFromAzCLI
+// TokenFunc is the interface to meet for functions which retrieve tokens for the ARMClient
+type TokenFunc func(clearCache bool) (AzCLIToken, error)
+
+// Client is used to talk to the ARM API's in Azure
+type Client struct {
+	client   *http.Client
+	tenantID string
+
+	aquireToken TokenFunc
 }
 
-var tenantID string
-var client *http.Client
-var aquireToken func(clearCache bool) (AzCLIToken, error)
+// LegacyInstance is a singleton ARMClient used while migrating to the
+// injected client
+var LegacyInstance = NewClientFromCLI()
+
+// NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
+func NewClientFromCLI() *Client {
+	return &Client{
+		aquireToken: aquireTokenFromAzCLI,
+	}
+}
+
+// NewClientFromClientAndTokenFunc create a client for testing using custom token func and httpclient
+func NewClientFromClientAndTokenFunc(client *http.Client, tokenFunc TokenFunc) *Client {
+	return &Client{
+		aquireToken: tokenFunc,
+		client:      client,
+	}
+}
 
 // SetClient is used to override the HTTP Client used.
 // This is useful when testing
-func SetClient(newClient *http.Client) {
-	client = newClient
+func (c *Client) SetClient(newClient *http.Client) {
+	c.client = newClient
 }
 
 // SetAquireToken lets you override the token func for testing
 // or other purposes
-func SetAquireToken(aquireFunc func(clearCache bool) (AzCLIToken, error)) {
-	aquireToken = aquireFunc
+func (c *Client) SetAquireToken(aquireFunc func(clearCache bool) (AzCLIToken, error)) {
+	c.aquireToken = aquireFunc
 }
 
 // GetTenantID gets the current tenandid from AzCli
-func GetTenantID() string {
-	return tenantID
+func (c *Client) GetTenantID() string {
+	return c.tenantID
 }
 
 // GetToken gets the cached cli token
-func GetToken() (AzCLIToken, error) {
-	return aquireToken(false)
+func (c *Client) GetToken() (AzCLIToken, error) {
+	return c.aquireToken(false)
 }
 
 // RequestResult used with async channel
@@ -57,10 +78,10 @@ type RequestResult struct {
 }
 
 // DoRequestAsync makes an ARM rest request
-func DoRequestAsync(ctx context.Context, method, path string) chan RequestResult {
+func (c *Client) DoRequestAsync(ctx context.Context, method, path string) chan RequestResult {
 	requestResultChan := make(chan RequestResult)
 	go func() {
-		data, err := DoRequestWithBody(ctx, method, path, "")
+		data, err := c.DoRequestWithBody(ctx, method, path, "")
 		requestResultChan <- RequestResult{
 			Error:  err,
 			Result: data,
@@ -70,12 +91,12 @@ func DoRequestAsync(ctx context.Context, method, path string) chan RequestResult
 }
 
 // DoRequest makes an ARM rest request
-func DoRequest(ctx context.Context, method, path string) (string, error) {
-	return DoRequestWithBody(ctx, method, path, "")
+func (c *Client) DoRequest(ctx context.Context, method, path string) (string, error) {
+	return c.DoRequestWithBody(ctx, method, path, "")
 }
 
 // DoRequestWithBody makes an ARM rest request
-func DoRequestWithBody(ctx context.Context, method, path, body string) (string, error) {
+func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body string) (string, error) {
 	span, _ := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
 	defer span.Finish()
 
@@ -89,11 +110,11 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 		return "", errors.New("Failed to create request for body: " + err.Error())
 	}
 
-	cliToken, err := aquireToken(false)
+	cliToken, err := c.aquireToken(false)
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
-	tenantID = cliToken.Tenant
+	c.tenantID = cliToken.Tenant
 
 	req.Header.Set("Authorization", cliToken.TokenType+" "+cliToken.AccessToken)
 	req.Header.Set("User-Agent", userAgentStr)
@@ -101,18 +122,18 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	response, err := client.Do(req)
+	response, err := c.client.Do(req)
 	if response != nil && response.StatusCode == 401 {
 		// This might be because the token we've cached has expired.
 		// Get a new token forcing it to clear cache
-		cliToken, err := aquireToken(true)
+		cliToken, err := c.aquireToken(true)
 		if err != nil {
 			return "", errors.New("Failed to acquire auth token: " + err.Error())
 		}
-		tenantID = cliToken.Tenant
+		c.tenantID = cliToken.Tenant
 
 		// Retry the request now we have a valid token
-		response, err = client.Do(req) //nolint:staticcheck
+		response, err = c.client.Do(req) //nolint:staticcheck
 	}
 	if err != nil {
 		return "", errors.New("Request failed: " + err.Error())
@@ -149,12 +170,12 @@ func DoRequestWithBody(ctx context.Context, method, path, body string) (string, 
 }
 
 // DoResourceGraphQuery performs an azure graph query
-func DoResourceGraphQuery(ctx context.Context, subscription, query string) (string, error) {
+func (c *Client) DoResourceGraphQuery(ctx context.Context, subscription, query string) (string, error) {
 	messageBody := `{"subscriptions": ["SUB_HERE"], "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0}}`
 	messageBody = strings.Replace(messageBody, "SUB_HERE", subscription, -1)
 	messageBody = strings.Replace(messageBody, "QUERY_HERE", query, -1)
 	tracing.SetTagOnCtx(ctx, "query", messageBody)
-	return DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
+	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
 }
 
 var resourceAPIVersionLookup map[string]string
@@ -170,7 +191,7 @@ func GetAPIVersion(armType string) (string, error) {
 
 // PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
 // this is needed when requesting details from a resource as APIVersion isn't known and is required
-func PopulateResourceAPILookup(ctx context.Context) {
+func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 	// w.statusView.Status("Getting provider data from cache", true)
 	if resourceAPIVersionLookup == nil {
 		span, ctx := tracing.StartSpanFromContext(ctx, "populateResCache")
@@ -185,7 +206,7 @@ func PopulateResourceAPILookup(ctx context.Context) {
 			span.SetTag("cacheData", providerData)
 
 			// Get Subscriptions
-			data, err := DoRequest(ctx, "GET", "/providers?api-version=2017-05-10")
+			data, err := c.DoRequest(ctx, "GET", "/providers?api-version=2017-05-10")
 			if err != nil {
 				panic(err)
 			}

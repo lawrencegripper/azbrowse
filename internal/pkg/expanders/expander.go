@@ -33,7 +33,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 
 	// Check which expanders are interested and kick them off
 	spanQuery, _ := tracing.StartSpanFromContext(ctx, "querexpanders", tracing.SetTag("item", currentItem))
-	for _, h := range Register {
+	for _, h := range getRegisteredExpanders() {
 		doesExpand, err := h.DoesExpand(ctx, currentItem)
 		spanQuery.SetTag(h.Name(), doesExpand)
 		if err != nil {

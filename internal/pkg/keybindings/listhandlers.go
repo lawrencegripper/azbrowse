@@ -336,7 +336,7 @@ func (h ListOpenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		if portalURL == "" {
 			portalURL = "https://portal.azure.com"
 		}
-		url := portalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.ID
+		url := portalURL + "/#@" + armclient.LegacyInstance.GetTenantID() + "/resource/" + item.ID
 		span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
 		err := open.Run(url)
 		if err != nil {
@@ -554,7 +554,7 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		apiSetID := item.Metadata["SwaggerAPISetID"]
-		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+		apiSetPtr := expanders.GetSwaggerResourceExpander(armclient.LegacyInstance).GetAPISet(apiSetID)
 		if apiSetPtr == nil {
 			return nil
 		}

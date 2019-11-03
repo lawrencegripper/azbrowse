@@ -20,6 +20,7 @@ var _ Expander = &ContainerInstanceExpander{}
 
 // ContainerInstanceExpander expands the data-plane aspects of a Container Instance
 type ContainerInstanceExpander struct {
+	client *armclient.Client
 }
 
 // Name returns the name of the expander
@@ -73,7 +74,7 @@ func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, curren
 	}
 	containersListURL := currentItem.ID + "?api-version=" + resourceAPIVersion
 
-	data, err := armclient.DoRequest(ctx, "GET", containersListURL)
+	data, err := e.client.DoRequest(ctx, "GET", containersListURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -119,7 +120,7 @@ func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, curren
 func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	containersLogURL := currentItem.ExpandURL
 
-	data, err := armclient.DoRequest(ctx, "GET", containersLogURL)
+	data, err := e.client.DoRequest(ctx, "GET", containersLogURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,

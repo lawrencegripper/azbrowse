@@ -11,7 +11,9 @@ import (
 )
 
 // ActivityLogExpander expands activity logs under an RG
-type ActivityLogExpander struct{}
+type ActivityLogExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *ActivityLogExpander) Name() string {
@@ -29,7 +31,7 @@ func (e *ActivityLogExpander) DoesExpand(ctx context.Context, currentItem *TreeN
 // Expand returns Resources in the RG
 func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,

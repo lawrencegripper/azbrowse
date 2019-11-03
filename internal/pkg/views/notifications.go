@@ -27,6 +27,7 @@ type NotificationWidget struct {
 	deleteMutex                   sync.Mutex // ensure delete occurs only once
 	deleteInProgress              bool
 	gui                           *gocui.Gui
+	client                        *armclient.Client
 }
 
 // AddPendingDelete queues deletes for
@@ -111,13 +112,13 @@ func (w *NotificationWidget) ConfirmDelete() {
 			Timeout:    time.Second * 15,
 		})
 
-		swaggerExpander := expanders.GetSwaggerResourceExpander()
+		swaggerExpander := expanders.GetSwaggerResourceExpander(w.client)
 
 		for _, i := range pending {
 			swaggerDeleted, err := swaggerExpander.Delete(context.Background(), i)
 			if err == nil && !swaggerDeleted {
 				// fallback to ARM request to delete
-				_, err = armclient.DoRequest(context.Background(), "DELETE", i.DeleteURL)
+				_, err = w.client.DoRequest(context.Background(), "DELETE", i.DeleteURL)
 			}
 			if err != nil {
 				event.Failure = true
@@ -165,7 +166,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 }
 
 // NewNotificationWidget create new instance and start go routine for spinner
-func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *NotificationWidget {
+func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui, client *armclient.Client) *NotificationWidget {
 	widget := &NotificationWidget{
 		name:           "notificationWidget",
 		x:              x,
@@ -173,6 +174,7 @@ func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *Notificat
 		w:              w,
 		gui:            g,
 		pendingDeletes: []*expanders.TreeNode{},
+		client:         client,
 	}
 	return widget
 }

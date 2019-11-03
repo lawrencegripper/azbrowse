@@ -3,5 +3,5 @@
     "go.lintFlags": [
         "--fast"
     ],
-    "go.useLanguageServer": true
+    "go.useLanguageServer": true,
 }

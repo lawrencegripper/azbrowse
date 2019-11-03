@@ -119,6 +119,9 @@ func main() {
 		}()
 	}
 
+	armClient := armclient.NewClientFromCLI()
+	expanders.InitializeExpanders(armClient)
+
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		log.Panicln(err)
@@ -129,11 +132,11 @@ func main() {
 	g.SelFgColor = gocui.ColorCyan
 	g.InputEsc = true
 
-	list := setupViewsAndKeybindings(ctx, g)
+	list := setupViewsAndKeybindings(ctx, g, armClient)
 
 	go func() {
 		time.Sleep(time.Second * 1)
-		armclient.PopulateResourceAPILookup(ctx)
+		armClient.PopulateResourceAPILookup(ctx)
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
@@ -206,7 +209,7 @@ func main() {
 
 }
 
-func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui) *views.ListWidget {
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclient.Client) *views.ListWidget {
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -222,7 +225,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui) *views.ListWidg
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions", g)
-	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
+	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g, client)
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
 
 	g.SetManager(status, content, list, notifications, commandPanel)

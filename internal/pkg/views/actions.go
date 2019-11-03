@@ -37,7 +37,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	span, ctx := tracing.StartSpanFromContext(ctx, "actions:"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
 
-	data, err := armclient.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
+	data, err := armclient.LegacyInstance.DoRequest(ctx, "GET", "/providers/Microsoft.Authorization/providerOperations/"+namespace+"?api-version=2018-01-01-preview&$expand=resourceTypes")
 	if err != nil {
 		list.statusView.Status("Failed to get actions: "+err.Error(), false)
 	}

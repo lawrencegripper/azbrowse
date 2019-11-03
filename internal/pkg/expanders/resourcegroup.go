@@ -18,7 +18,9 @@ import (
 var _ Expander = &ResourceGroupResourceExpander{}
 
 // ResourceGroupResourceExpander expands resource under an RG
-type ResourceGroupResourceExpander struct{}
+type ResourceGroupResourceExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *ResourceGroupResourceExpander) Name() string {
@@ -45,7 +47,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	go func() {
 		// Use resource graph to enrich response
 		query := "where resourceGroup=='" + currentItem.Name + "' | project name, id, sku, kind, location, tags, properties.provisioningState"
-		queryData, err := armclient.DoResourceGraphQuery(ctx, currentItem.SubscriptionID, query)
+		queryData, err := e.client.DoResourceGraphQuery(ctx, currentItem.SubscriptionID, query)
 		span.SetTag("queryResponse", queryData)
 		span.SetTag("queryError", err)
 		if err != nil {
@@ -113,7 +115,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 	// Get the latest from the ARM API
 	method := "GET"
-	responseChan := armclient.DoRequestAsync(ctx, method, currentItem.ExpandURL)
+	responseChan := e.client.DoRequestAsync(ctx, method, currentItem.ExpandURL)
 
 	stateMap := map[string]string{}
 	armResponse := &armclient.RequestResult{}
