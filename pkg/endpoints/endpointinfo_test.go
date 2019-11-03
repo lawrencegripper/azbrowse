@@ -100,6 +100,45 @@ func TestMatchWithQueryString(t *testing.T) {
 	}
 }
 
+func TestBuildWithParameterisedName(t *testing.T) {
+	endpoint, err := GetEndpointInfoFromURL(
+		"/datasources('{name}')",
+		"")
+	if err != nil {
+		t.Errorf("Expected success but got error: %s", err)
+		return
+	}
+	url, err := endpoint.BuildURL(map[string]string{
+		"name": "wibble",
+	})
+	expectedURL := "/datasources('wibble')"
+	if err != nil {
+		t.Errorf("Expected success but got error: %s", err)
+		return
+	}
+	if url != expectedURL {
+		t.Errorf("Expected URL '%s' but got '%s", url, expectedURL)
+	}
+}
+func TestMatchWithParameterisedNameMatch(t *testing.T) {
+
+	matchResult := getMatchResult(
+		"/datasources('{name}')",
+		"/datasources('wibble')")
+
+	if !matchResult.IsMatch {
+		t.Error("Expected IsMatch to be true")
+	} else {
+		t.Log("verifying values")
+		verifyMap(
+			t,
+			map[string]string{
+				"name": "wibble",
+			},
+			matchResult.Values)
+	}
+}
+
 func TestBuildWithoutQueryString(t *testing.T) {
 	endpoint, err := GetEndpointInfoFromURL(
 		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}/config",

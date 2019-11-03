@@ -34,24 +34,46 @@ type MatchResult struct {
 func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo, error) {
 	// This is currently generating at runtime, but would be a build-time task that generated code :-)
 	originalTemplateURL := templateURL
+
 	templateURL = strings.TrimPrefix(templateURL, "/")
 	templateURL = strings.TrimSuffix(templateURL, "/")
+
 	templateURLSegments := strings.Split(templateURL, "/")
-	urlSegments := make([]EndpointSegment, len(templateURLSegments))
+	urlSegments := []EndpointSegment{}
 	for i, s := range templateURLSegments {
 		if strings.HasPrefix(s, "{") && strings.HasSuffix(s, "}") {
 			name := strings.TrimPrefix(strings.TrimSuffix(s, "}"), "{")
 			if name == "" {
 				return EndpointInfo{}, fmt.Errorf("Segment index %d is a named segment but is missing the name", i)
 			}
-			urlSegments[i] = EndpointSegment{
+			urlSegments = append(urlSegments, EndpointSegment{
 				Prefix: "/",
-				Name: name,
-			}
+				Name:   name,
+			})
 		} else {
-			urlSegments[i] = EndpointSegment{
-				Prefix: "/",
-				Match: s,
+			// check for a `docs('{name}')` style match
+			parameterIndex := strings.Index(s, "('{")
+			if parameterIndex < 0 {
+				// Fixed value segment
+				urlSegments = append(urlSegments, EndpointSegment{
+					Prefix: "/",
+					Match:  s,
+				})
+			} else {
+				// If we have a segment such as `docs('{name}')` we expect the string to end with `}')`
+				if !strings.HasSuffix(s, "}')") {
+					return EndpointInfo{}, fmt.Errorf("Found parameterised segment but didn't find expected suffix")
+				}
+				fixedValue := s[:parameterIndex]
+				name := s[parameterIndex+3 : len(s)-3]
+				urlSegments = append(urlSegments, EndpointSegment{
+					Prefix: "/",
+					Match:  fixedValue,
+				}, EndpointSegment{
+					Prefix: "('",
+					Suffix: "')",
+					Name:   name,
+				})
 			}
 		}
 	}
@@ -75,34 +97,61 @@ func MustGetEndpointInfoFromURL(url string, apiVersion string) *EndpointInfo {
 // Match tests whether a URL matches the EndpointInfo (ignoring query string values)
 func (ei *EndpointInfo) Match(url string) MatchResult {
 
-	url = strings.TrimPrefix(url, "/")
+	// url = strings.TrimPrefix(url, "/")
 
 	// strip off querystring for matching
 	if i := strings.Index(url, "?"); i >= 0 {
 		url = url[:i]
 	}
 
-	urlSegments := strings.Split(url, "/")
-	if len(urlSegments) == len(ei.URLSegments) {
-		isMatch := true
-		matches := make(map[string]string)
-		for i, segment := range ei.URLSegments {
-			if segment.Name == "" {
-				// literal match (ignore case)
-				if !strings.EqualFold(segment.Match, urlSegments[i]) {
-					isMatch = false
-					break
-				}
-			} else {
-				// capture name
-				matches[segment.Name] = urlSegments[i]
-			}
+	remainingURLToMatch := url
+
+	matches := make(map[string]string)
+	for i, segment := range ei.URLSegments {
+		if !strings.HasPrefix(remainingURLToMatch, segment.Prefix) {
+			return MatchResult{IsMatch: false}
 		}
-		if isMatch {
-			return MatchResult{
-				IsMatch: true,
-				Values:  matches,
+		remainingURLToMatch = remainingURLToMatch[len(segment.Prefix):]
+		if segment.Match != "" {
+			// literal match - check (case-insensitively) that the remainingURL starts with segment.Match
+			matchTest := remainingURLToMatch[:len(segment.Match)]
+			if strings.EqualFold(segment.Match, matchTest) {
+				remainingURLToMatch = remainingURLToMatch[len(segment.Match):]
+			} else {
+				return MatchResult{IsMatch: false}
 			}
+		} else {
+			// name match - match up to:
+			//  * segment.Suffix (if set)
+			//  * next Segment.Prefix (if there is a next segment)
+			//  * end of the string failing that!
+			matchTerminator := ""
+			additionalSkipAmount := 0
+			if segment.Suffix != "" {
+				matchTerminator = segment.Suffix
+				additionalSkipAmount = len(matchTerminator) // skip past the suffix if we match
+			} else {
+				if i+1 < len(ei.URLSegments) {
+					matchTerminator = ei.URLSegments[i+1].Prefix // don't skip the prefix as that will be handled on the next loop iteration
+				} else {
+					// match is the rest of the URL
+					matches[segment.Name] = remainingURLToMatch
+					continue
+				}
+			}
+			terminatorIndex := strings.Index(remainingURLToMatch, matchTerminator)
+			if terminatorIndex < 0 {
+				return MatchResult{IsMatch: false}
+			}
+			matches[segment.Name] = remainingURLToMatch[:terminatorIndex]
+			remainingURLToMatch = remainingURLToMatch[terminatorIndex+additionalSkipAmount:]
+		}
+	}
+
+	if remainingURLToMatch == "" {
+		return MatchResult{
+			IsMatch: true,
+			Values:  matches,
 		}
 	}
 
