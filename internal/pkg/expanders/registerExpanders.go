@@ -58,6 +58,9 @@ func InitializeExpanders(client *armclient.Client) {
 		&AzureKubernetesServiceExpander{
 			client: client,
 		},
+		&AzureSearchServiceExpander{
+			client: client,
+		},
 	}
 }
 

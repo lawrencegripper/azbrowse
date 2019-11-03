@@ -47,7 +47,7 @@ func Test_Simple_PreOrderedSpec(t *testing.T) {
 	config := Config{}
 
 	var paths []*Path
-	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
 		t.Fail()
@@ -111,7 +111,7 @@ func Test_HandleTrailingSlash(t *testing.T) {
 	config := Config{}
 
 	var paths []*Path
-	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
 		t.Fail()
@@ -175,7 +175,7 @@ func Test_Simple_NonOrderedSpec(t *testing.T) {
 	config := Config{}
 
 	var paths []*Path
-	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
 		t.Fail()
@@ -245,7 +245,7 @@ func Test_PathOverride(t *testing.T) {
 	}
 
 	var paths []*Path
-	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
 		t.Fail()
@@ -316,7 +316,7 @@ func Test_PathOverrideWithRewrites(t *testing.T) {
 	}
 
 	var paths []*Path
-	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
 		t.Fail()
@@ -388,7 +388,7 @@ func Test_AdditionalPaths(t *testing.T) {
 	}
 
 	var paths []*Path
-	paths, err = MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		t.Logf("Failed to load spec: %v", err)
 		t.Fail()

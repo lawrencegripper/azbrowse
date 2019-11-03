@@ -36,18 +36,27 @@ import (
 //           ...
 
 func main() {
-	
-	// Process ARM specs
+
+	fmt.Println("*******************************************")
+	fmt.Println("  Processing ARM Specs ")
+	fmt.Println("*******************************************")
 	config := getARMConfig()
 	paths := loadARMSwagger(config)
-	writeOutput(paths, config, "./internal/pkg/handlers/swagger-armspecs.generated.go")
+	writeOutput(paths, config, "./internal/pkg/handlers/swagger-armspecs.generated.go", "SwaggerAPISetARMResources")
+	fmt.Println()
 
-	
+	fmt.Println("*******************************************")
+	fmt.Println("  Processing Azure Search Data-plane Specs ")
+	fmt.Println("*******************************************")
+	config = getAzureSearchDataPlaneConfig()
+	paths = loadAzureSearchDataPlaneSpecs(config)
+	writeOutput(paths, config, "./internal/pkg/handlers/search.generated.go", "AzureSearchServiceExpander")
+	fmt.Println()
+
 }
 
 func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 	var paths []*swagger.Path
-
 	serviceFileInfos, err := ioutil.ReadDir("swagger-specs")
 	if err != nil {
 		panic(err)
@@ -57,7 +66,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
 			resourceTypeFileInfos, err := ioutil.ReadDir(fmt.Sprintf("swagger-specs/%s/resource-manager", serviceFileInfo.Name()))
 			if err != nil {
-				panic(err)
+				continue // may just be data-plane folder
 			}
 			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
 				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
@@ -70,7 +79,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
 							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
 							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
-							paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true)
+							paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true, "")
 							if err != nil {
 								panic(err)
 							}
@@ -151,25 +160,43 @@ func getARMConfig() *swagger.Config {
 	return config
 }
 
-func writeTemplate(w io.Writer, paths []*swagger.Path, config *swagger.Config) {
+// getARMConfig returns the config for ARM Swagger processing
+func getAzureSearchDataPlaneConfig() *swagger.Config {
+	return &swagger.Config{}
+}
+func loadAzureSearchDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
+	var paths []*swagger.Path
 
-	funcMap := template.FuncMap{
-		"upper": strings.ToUpper,
-	}
-	t := template.Must(template.New("code-gen").Funcs(funcMap).Parse(tmpl))
-
-	type Context struct {
-		Paths []*swagger.Path
-	}
-
-	context := Context{
-		Paths: paths,
-	}
-
-	err := t.Execute(w, context)
+	resourceTypeFileInfos, err := ioutil.ReadDir("swagger-specs/search/data-plane")
 	if err != nil {
 		panic(err)
 	}
+	for _, resourceTypeFileInfo := range resourceTypeFileInfos {
+		if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
+			swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/search/data-plane/%s", resourceTypeFileInfo.Name())))
+			swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
+			if err != nil {
+				panic(err)
+			}
+			for _, swaggerFileInfo := range swaggerFileInfos {
+				if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
+					fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
+					doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
+					pathPrefix := ""
+					if swaggerFileInfo.Name() == "searchindex.json" {
+						// searchindex.json uses a custom property to set a base URL that the paths in that file are relative to
+						// I couldn't find a way to retrieve it with the swagger library so adding some config here
+						pathPrefix = "/indexes('{indexName}')"
+					}
+					paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true, pathPrefix)
+					if err != nil {
+						panic(err)
+					}
+				}
+			}
+		}
+	}
+	return paths
 }
 
 func loadDoc(path string) *loads.Document {
@@ -186,7 +213,7 @@ func loadDoc(path string) *loads.Document {
 
 	return document
 }
-func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string) {
+func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string, structName string) {
 	writer, err := os.Create(filename)
 	if err != nil {
 		panic(fmt.Errorf("Error opening file: %s", err))
@@ -198,7 +225,29 @@ func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string)
 		}
 	}()
 
-	writeTemplate(writer, paths, config)
+	writeTemplate(writer, paths, config, structName)
+}
+func writeTemplate(w io.Writer, paths []*swagger.Path, config *swagger.Config, structName string) {
+
+	funcMap := template.FuncMap{
+		"upper": strings.ToUpper,
+	}
+	t := template.Must(template.New("code-gen").Funcs(funcMap).Parse(tmpl))
+
+	type Context struct {
+		Paths      []*swagger.Path
+		StructName string
+	}
+
+	context := Context{
+		Paths:      paths,
+		StructName: structName,
+	}
+
+	err := t.Execute(w, context)
+	if err != nil {
+		panic(err)
+	}
 }
 
 // getFirstNonCommonPath returns the first subfolder under path that is not named 'common'

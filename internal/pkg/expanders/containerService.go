@@ -252,7 +252,7 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 		SuppressAPIVersion: true,
 	}
 	var paths []*swagger.Path
-	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc, false)
+	paths, err = swagger.MergeSwaggerDoc(paths, &config, doc, false, "")
 	if err != nil {
 		return swaggerResourceTypes, err
 	}

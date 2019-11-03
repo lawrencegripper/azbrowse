@@ -12,8 +12,8 @@ import (
 )
 
 // MergeSwaggerDoc merges api endpoints from the specified swagger doc into the Paths array
-func MergeSwaggerDoc(currentPaths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool) ([]*Path, error) {
-	allPaths, err := getPathsFromSwagger(doc, config)
+func MergeSwaggerDoc(currentPaths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool, pathPrefix string) ([]*Path, error) {
+	allPaths, err := getPathsFromSwagger(doc, config, pathPrefix)
 	if err != nil {
 		empty := []*Path{}
 		return empty, err // TODO add context to errors!
@@ -159,7 +159,7 @@ func addConfigPaths(paths []Path, config *Config) ([]Path, error) {
 	return paths, nil
 }
 
-func getPathsFromSwagger(doc *loads.Document, config *Config) ([]Path, error) {
+func getPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string) ([]Path, error) {
 
 	swaggerVersion := doc.Spec().Info.Version
 	if config.SuppressAPIVersion {
@@ -174,6 +174,7 @@ func getPathsFromSwagger(doc *loads.Document, config *Config) ([]Path, error) {
 	pathIndex := 0
 	for swaggerPath, swaggerPathItem := range swaggerPaths {
 
+		swaggerPath = pathPrefix + swaggerPath
 		override := config.Overrides[swaggerPath]
 
 		searchPathTemp := override.Path
@@ -313,7 +314,11 @@ func findDeepestPath(paths []*Path, pathToFind Path, useStrippedNamesPath bool) 
 		// Test if matchString is a prefix match on pathToFindString
 		// But need to verify that it hasn't matched /example against /examples but does against /example/test
 		// ok if strings are equal or substring match with a slash on
-		if pathToFindString == matchString || strings.HasPrefix(pathToFindString, matchString+"/") {
+		if pathToFindString == matchString ||
+			(strings.HasPrefix(pathToFindString, matchString) &&
+				(pathToFindString[len(matchString)] == '/' ||
+					pathToFindString[len(matchString)] == '(')) {
+
 			// matches endpoint. Check children
 			match := findDeepestPath(path.Children, pathToFind, useStrippedNamesPath)
 			if match == nil {
