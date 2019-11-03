@@ -130,6 +130,112 @@ func main() {
 	g.SelFgColor = gocui.ColorCyan
 	g.InputEsc = true
 
+	list := setupViewsAndKeybindings(ctx, g)
+
+	go func() {
+		time.Sleep(time.Second * 1)
+
+		// status.Status("Fetching Subscriptions", true)
+		subRequest, data, err := getSubscriptions(ctx)
+		if err != nil {
+			g.Close()
+			log.Panicln(err)
+		}
+
+		g.Update(func(gui *gocui.Gui) error {
+			g.SetCurrentView("listWidget")
+
+			// status.Status("Getting provider data", true)
+
+			armclient.PopulateResourceAPILookup(ctx)
+			// status.Status("Done getting provider data", false)
+
+			newList := []*expanders.TreeNode{}
+			for _, sub := range subRequest.Subs {
+				newList = append(newList, &expanders.TreeNode{
+					Display:        sub.DisplayName,
+					Name:           sub.DisplayName,
+					ID:             sub.ID,
+					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
+					ItemType:       expanders.SubscriptionType,
+					SubscriptionID: sub.SubscriptionID,
+				})
+			}
+
+			var newContent string
+			var newContentType expanders.ExpanderResponseType
+			var newTitle string
+			if err != nil {
+				newContent = err.Error()
+				newContentType = expanders.ResponsePlainText
+				newTitle = "Error"
+			} else {
+				newContent = data
+				newContentType = expanders.ResponseJSON
+				newTitle = "Subscriptions response"
+			}
+
+			list.Navigate(newList, &expanders.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
+
+			return nil
+		})
+
+		// status.Status("Fetching Subscriptions: Completed", false)
+
+	}()
+
+	if navigateToID != "" {
+		navigateToIDLower := strings.ToLower(navigateToID)
+		go func() {
+			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+			var lastNavigatedNode *expanders.TreeNode
+
+			processNavigations := true
+
+			for {
+				nodeListInterface := <-navigatedChannel
+
+				if processNavigations {
+					nodeList := nodeListInterface.([]*expanders.TreeNode)
+
+					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
+						processNavigations = false
+					} else {
+
+						gotNode := false
+						for nodeIndex, node := range nodeList {
+							// use prefix matching
+							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
+							// additional check is that the lengths match, or the next char in target is a '/'
+							nodeIDLower := strings.ToLower(node.ID)
+							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(navigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
+								list.ChangeSelection(nodeIndex)
+								lastNavigatedNode = node
+								list.ExpandCurrentSelection()
+								gotNode = true
+								break
+							}
+						}
+
+						if !gotNode {
+							// we got as far as we could - now stop!
+							processNavigations = false
+						}
+					}
+				}
+			}
+		}()
+	}
+
+	span.Finish()
+
+	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		log.Panicln(err)
+	}
+
+}
+
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui) *views.ListWidget {
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -195,7 +301,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
 	keybindings.AddHandler(keybindings.NewItemLeftHandler(&editModeEnabled))
 
-	if err = keybindings.Bind(g); err != nil { // apply late binding for keys
+	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
 		g.Close()
 
 		fmt.Println("\n \n" + err.Error())
@@ -210,107 +316,7 @@ func main() {
 	notifications.ConfirmDeleteKeyBinding = strings.Join(keyBindings["confirmdelete"], ",")
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
-	go func() {
-		time.Sleep(time.Second * 1)
-
-		status.Status("Fetching Subscriptions", true)
-		subRequest, data, err := getSubscriptions(ctx)
-		if err != nil {
-			g.Close()
-			log.Panicln(err)
-		}
-
-		g.Update(func(gui *gocui.Gui) error {
-			g.SetCurrentView("listWidget")
-
-			status.Status("Getting provider data", true)
-
-			armclient.PopulateResourceAPILookup(ctx)
-			status.Status("Done getting provider data", false)
-
-			newList := []*expanders.TreeNode{}
-			for _, sub := range subRequest.Subs {
-				newList = append(newList, &expanders.TreeNode{
-					Display:        sub.DisplayName,
-					Name:           sub.DisplayName,
-					ID:             sub.ID,
-					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-					ItemType:       expanders.SubscriptionType,
-					SubscriptionID: sub.SubscriptionID,
-				})
-			}
-
-			var newContent string
-			var newContentType expanders.ExpanderResponseType
-			var newTitle string
-			if err != nil {
-				newContent = err.Error()
-				newContentType = expanders.ResponsePlainText
-				newTitle = "Error"
-			} else {
-				newContent = data
-				newContentType = expanders.ResponseJSON
-				newTitle = "Subscriptions response"
-			}
-
-			list.Navigate(newList, &expanders.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
-
-			return nil
-		})
-
-		status.Status("Fetching Subscriptions: Completed", false)
-
-	}()
-
-	if navigateToID != "" {
-		navigateToIDLower := strings.ToLower(navigateToID)
-		go func() {
-			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-			var lastNavigatedNode *expanders.TreeNode
-
-			processNavigations := true
-
-			for {
-				nodeListInterface := <-navigatedChannel
-
-				if processNavigations {
-					nodeList := nodeListInterface.([]*expanders.TreeNode)
-
-					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
-						processNavigations = false
-					} else {
-
-						gotNode := false
-						for nodeIndex, node := range nodeList {
-							// use prefix matching
-							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
-							// additional check is that the lengths match, or the next char in target is a '/'
-							nodeIDLower := strings.ToLower(node.ID)
-							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(navigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
-								list.ChangeSelection(nodeIndex)
-								lastNavigatedNode = node
-								list.ExpandCurrentSelection()
-								gotNode = true
-								break
-							}
-						}
-
-						if !gotNode {
-							// we got as far as we could - now stop!
-							processNavigations = false
-						}
-					}
-				}
-			}
-		}()
-	}
-
-	span.Finish()
-
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Panicln(err)
-	}
-
+	return list
 }
 
 func getSubscriptions(ctx context.Context) (armclient.SubResponse, string, error) {
