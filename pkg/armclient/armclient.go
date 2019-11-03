@@ -159,14 +159,13 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 		return "", wrappedError
 	}
 
-	prettyOutput := prettyJSON(buf)
 	if tracing.IsDebug() {
-		span.SetTag("responseBody", truncateString(prettyOutput, 1500))
+		span.SetTag("responseBody", truncateString(string(buf), 1500))
 		span.SetTag("requestBody", body)
 		span.SetTag("url", url)
 	}
 
-	return prettyOutput, responseErr
+	return string(buf), responseErr
 }
 
 // DoResourceGraphQuery performs an azure graph query
