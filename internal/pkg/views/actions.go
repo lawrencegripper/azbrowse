@@ -19,13 +19,13 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	var namespace string
 	var armType string
 	currentItem := list.CurrentItem()
-	if currentItem.ItemType == handlers.ResourceType {
+	if currentItem.ItemType == expanders.ResourceType {
 		namespace = currentItem.Namespace
 		armType = currentItem.ArmType
 	}
 
 	currentExpandedItem := list.CurrentExpandedItem()
-	if currentExpandedItem.ItemType == handlers.ResourceType {
+	if currentExpandedItem.ItemType == expanders.ResourceType {
 		namespace = currentExpandedItem.Namespace
 		armType = currentExpandedItem.ArmType
 	}
@@ -47,7 +47,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 		panic(err)
 	}
 
-	items := []*handlers.TreeNode{}
+	items := []*expanders.TreeNode{}
 	for _, resOps := range opsRequest.ResourceTypes {
 		if resOps.Name == strings.Split(armType, "/")[1] {
 			for _, op := range resOps.Operations {
@@ -57,11 +57,11 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 				}
 				stripArmType := strings.Replace(op.Name, currentItem.ArmType, "", -1)
 				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + resourceAPIVersion
-				items = append(items, &handlers.TreeNode{
+				items = append(items, &expanders.TreeNode{
 					Name:             op.DisplayName,
 					Display:          op.DisplayName,
 					ExpandURL:        currentItem.ID + "/" + actionURL,
-					ExpandReturnType: handlers.ActionType,
+					ExpandReturnType: expanders.ActionType,
 					ItemType:         "action",
 					ID:               currentItem.ID + "/" + actionURL,
 				})

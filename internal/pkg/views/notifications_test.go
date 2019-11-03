@@ -28,9 +28,9 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 	notView := NewNotificationWidget(0, 0, 47, false, g)
 	g.SetManager(notView)
 
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "s1", DeleteURL: "http://delete/s1"})
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "s2", DeleteURL: "http://delete/s2"})
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "s3", DeleteURL: "http://delete/s3"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "s1", DeleteURL: "http://delete/s1"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "s2", DeleteURL: "http://delete/s2"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "s3", DeleteURL: "http://delete/s3"})
 
 	builder := &strings.Builder{}
 	err = notView.layoutInternal(builder)
@@ -86,9 +86,9 @@ func Test_Delete_MessageSent(t *testing.T) {
 	defer g.Close()
 	notView := NewNotificationWidget(0, 0, 45, false, g)
 
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg3", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg3"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg3", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg3"})
 
 	notView.ConfirmDelete()
 
@@ -129,8 +129,8 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	defer g.Close()
 	notView := NewNotificationWidget(0, 0, 45, false, g)
 
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
 	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
@@ -173,10 +173,10 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	defer g.Close()
 	notView := NewNotificationWidget(0, 0, 45, false, g)
 
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
 	notView.ConfirmDelete()
 
-	notView.AddPendingDelete(&handlers.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
+	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
 
 	// ConfirmDelete returns before it's finished
 	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)

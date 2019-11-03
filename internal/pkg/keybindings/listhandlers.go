@@ -463,9 +463,9 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		fileExtension := ".txt"
 		contentType := h.Content.GetContentType()
 		switch contentType {
-		case handlers.ResponseJSON:
+		case expanders.ResponseJSON:
 			fileExtension = ".json"
-		case handlers.ResponseYAML:
+		case expanders.ResponseYAML:
 			fileExtension = ".yaml"
 		}
 
@@ -554,7 +554,7 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		apiSetID := item.Metadata["SwaggerAPISetID"]
-		apiSetPtr := handlers.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
 		if apiSetPtr == nil {
 			return nil
 		}

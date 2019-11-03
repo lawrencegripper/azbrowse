@@ -253,7 +253,7 @@ func main() {
 				newTitle = "Subscriptions response"
 			}
 
-			list.Navigate(newList, expanders.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
+			list.Navigate(newList, &expanders.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
 
 			return nil
 		})

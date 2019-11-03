@@ -23,7 +23,7 @@ type NotificationWidget struct {
 	name                          string
 	x, y                          int
 	w                             int
-	pendingDeletes                []*handlers.TreeNode
+	pendingDeletes                []*expanders.TreeNode
 	deleteMutex                   sync.Mutex // ensure delete occurs only once
 	deleteInProgress              bool
 	gui                           *gocui.Gui
@@ -31,7 +31,7 @@ type NotificationWidget struct {
 
 // AddPendingDelete queues deletes for
 // delete once confirmed
-func (w *NotificationWidget) AddPendingDelete(item *handlers.TreeNode) {
+func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 	if w.deleteInProgress {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			Failure: true,
@@ -94,7 +94,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 	w.deleteInProgress = true
 
 	// Take a copy of the current pending deletes
-	pending := make([]*handlers.TreeNode, len(w.pendingDeletes))
+	pending := make([]*expanders.TreeNode, len(w.pendingDeletes))
 	copy(pending, w.pendingDeletes)
 
 	w.deleteMutex.Unlock()
@@ -111,7 +111,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 			Timeout:    time.Second * 15,
 		})
 
-		swaggerExpander := handlers.GetSwaggerResourceExpander()
+		swaggerExpander := expanders.GetSwaggerResourceExpander()
 
 		for _, i := range pending {
 			swaggerDeleted, err := swaggerExpander.Delete(context.Background(), i)
@@ -125,7 +125,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 				event.Message = "Failed to delete `" + i.Name + "` with error:" + err.Error()
 				event.Update()
 
-				w.pendingDeletes = []*handlers.TreeNode{}
+				w.pendingDeletes = []*expanders.TreeNode{}
 				// In the event that a delete fails in the
 				// batch of pending deletes lets give up on the rest
 				// as something might have gone wrong and best
@@ -141,7 +141,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 		event.InProgress = false
 		event.Update()
 
-		w.pendingDeletes = []*handlers.TreeNode{}
+		w.pendingDeletes = []*expanders.TreeNode{}
 	}()
 }
 
@@ -156,7 +156,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 			Timeout:    time.Second * 2,
 		})
 
-		w.pendingDeletes = []*handlers.TreeNode{}
+		w.pendingDeletes = []*expanders.TreeNode{}
 		w.deleteMutex.Unlock()
 		done()
 
@@ -172,7 +172,7 @@ func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *Notificat
 		y:              y,
 		w:              w,
 		gui:            g,
-		pendingDeletes: []*handlers.TreeNode{},
+		pendingDeletes: []*expanders.TreeNode{},
 	}
 	return widget
 }

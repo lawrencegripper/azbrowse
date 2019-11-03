@@ -4,12 +4,10 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/stuartleeks/gocui"
 )
 
@@ -18,9 +16,9 @@ type ListWidget struct {
 	x, y  int
 	w, h  int
 	g     *gocui.Gui
-	items []*handlers.TreeNode
+	items []*expanders.TreeNode
 
-	filteredItems []*handlers.TreeNode
+	filteredItems []*expanders.TreeNode
 	filterString  string
 
 	contentView          *ItemWidget
@@ -29,7 +27,7 @@ type ListWidget struct {
 	title                string
 	ctx                  context.Context
 	selected             int
-	expandedNodeItem     *handlers.TreeNode
+	expandedNodeItem     *expanders.TreeNode
 	view                 *gocui.View
 	enableTracing        bool
 	FullscreenKeyBinding string
@@ -46,7 +44,7 @@ func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected
 			filterStringInterface := <-filterChannel
 			filterString := strings.ToLower(strings.TrimSpace(strings.Replace(filterStringInterface.(string), "/", "", 1)))
 
-			filteredItems := []*handlers.TreeNode{}
+			filteredItems := []*expanders.TreeNode{}
 			for _, item := range listWidget.items {
 				if strings.Contains(strings.ToLower(item.Display), filterString) {
 					filteredItems = append(filteredItems, item)
@@ -78,7 +76,7 @@ func (w *ListWidget) ClearFilter() {
 	w.filterString = ""
 }
 
-func (w *ListWidget) itemsToShow() []*handlers.TreeNode {
+func (w *ListWidget) itemsToShow() []*expanders.TreeNode {
 	if w.filterString == "" {
 		return w.items
 	}
@@ -218,131 +216,19 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	currentItem := w.CurrentItem()
 	w.ClearFilter()
 
-	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
-		InProgress: true,
-		Message:    "Opening: " + currentItem.ID,
-	})
+	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 
-	newItems := []*handlers.TreeNode{}
-
-	span, ctx := tracing.StartSpanFromContext(w.ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
-	defer span.Finish()
-
-	// New handler approach
-	handlerExpanding := 0
-	type expanderAndResponse struct {
-		Expander       handlers.Expander
-		ExpanderResult handlers.ExpanderResult
-	}
-	completedExpands := make(chan expanderAndResponse)
-
-	// Check which expanders are interested and kick them off
-	spanQuery, _ := tracing.StartSpanFromContext(ctx, "querexpanders", tracing.SetTag("item", currentItem))
-	for _, h := range handlers.Register {
-		doesExpand, err := h.DoesExpand(w.ctx, currentItem)
-		spanQuery.SetTag(h.Name(), doesExpand)
-		if err != nil {
-			panic(err)
-		}
-		if !doesExpand {
-			continue
-		}
-
-		// Fire each handler in parallel
-		hCurrent := h // capture current iteration variable
-		go func() {
-			completedExpands <- expanderAndResponse{
-				Expander:       hCurrent,
-				ExpanderResult: hCurrent.Expand(ctx, currentItem),
-			}
-		}()
-
-		handlerExpanding = handlerExpanding + 1
-	}
-	spanQuery.Finish()
-
-	// Lets give all the expanders 45secs to completed (unless debugging)
-	hasPrimaryResponse := false
-	var timeout <-chan time.Time
-	if w.enableTracing {
-		timeout = time.After(time.Second * 600)
-	} else {
-		timeout = time.After(time.Second * 45)
-	}
-	var newContent handlers.ExpanderResponse
-	var newTitle string
-
-	observedError := false
-	for index := 0; index < handlerExpanding; index++ {
-		select {
-		case done := <-completedExpands:
-			result := done.ExpanderResult
-			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+result.SourceDescription, tracing.SetTag("result", done))
-			// Did it fail?
-			if result.Err != nil {
-				eventing.SendStatusEvent(eventing.StatusEvent{
-					Failure: true,
-					Message: "Expander '" + result.SourceDescription + "' failed on resource: " + currentItem.ID + "Err: " + result.Err.Error(),
-					Timeout: time.Duration(time.Second * 15),
-				})
-				observedError = true
-			}
-			if result.IsPrimaryResponse {
-				if hasPrimaryResponse {
-					panic("Two handlers returned a primary response for this item... failing")
-				}
-				// Log that we have a primary response
-				hasPrimaryResponse = true
-				newContent = result.Response
-				newTitle = fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
-			}
-			if result.Nodes == nil {
-				continue
-			}
-			for _, node := range result.Nodes {
-				node.Expander = done.Expander
-			}
-			// Add the items it found
-			if result.IsPrimaryResponse {
-				newItems = append(result.Nodes, newItems...)
-			} else {
-				newItems = append(newItems, result.Nodes...)
-			}
-			span.Finish()
-		case <-timeout:
-			eventing.SendStatusEvent(eventing.StatusEvent{
-				Failure: true,
-				Message: "Timed out opening:" + currentItem.ID,
-				Timeout: time.Duration(time.Second * 10),
-			})
-			return
-		}
-	}
-
-	// Use the default handler to get the resource JSON for display
-	defaultExpanderWorksOnThisItem, _ := handlers.DefaultExpanderInstance.DoesExpand(ctx, currentItem)
-	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
-		result := handlers.DefaultExpanderInstance.Expand(ctx, currentItem)
-		if result.Err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
-				InProgress: true,
-				Message:    "Failed to expand resource: " + result.Err.Error(),
-				Timeout:    time.Duration(time.Second * 3),
-			})
-		}
-		newContent = result.Response
-		newTitle = fmt.Sprintf("[%s -> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
+	newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
+	if err != nil {
+		// Shouldn't be possible
+		panic(err)
 	}
 
 	w.Navigate(newItems, newContent, newTitle)
-
-	if !observedError {
-		done()
-	}
 }
 
 // Navigate updates the currently selected list nodes, title and details content
-func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content handlers.ExpanderResponse, title string) {
+func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.ExpanderResponse, title string) {
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
 		w.SetNodes(nodes)
@@ -357,7 +243,7 @@ func (w *ListWidget) Navigate(nodes []*handlers.TreeNode, content handlers.Expan
 }
 
 // SetNodes allows others to set the list nodes
-func (w *ListWidget) SetNodes(nodes []*handlers.TreeNode) {
+func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 
 	// Capture current view to navstack
 	if w.HasCurrentItem() {
@@ -404,7 +290,7 @@ func (w *ListWidget) HasCurrentItem() bool {
 }
 
 // CurrentItem returns the selected item as a treenode
-func (w *ListWidget) CurrentItem() *handlers.TreeNode {
+func (w *ListWidget) CurrentItem() *expanders.TreeNode {
 	if w.HasCurrentItem() {
 		return w.itemsToShow()[w.selected]
 	}
@@ -412,7 +298,7 @@ func (w *ListWidget) CurrentItem() *handlers.TreeNode {
 }
 
 // CurrentExpandedItem returns the currently expanded item as a treenode
-func (w *ListWidget) CurrentExpandedItem() *handlers.TreeNode {
+func (w *ListWidget) CurrentExpandedItem() *expanders.TreeNode {
 	return w.expandedNodeItem
 }
 
