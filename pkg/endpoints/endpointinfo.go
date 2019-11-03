@@ -17,7 +17,9 @@ type EndpointSegment struct {
 	// holds a literal to match for fixed segments (e.g. /subscriptions/)
 	Match string
 	// holds the name of a templated segment (e.g. 'name' for /{name}/)
-	Name string
+	Name   string
+	Prefix string
+	Suffix string
 }
 
 // MatchResult holds information about an EndPointInfo match
@@ -43,10 +45,12 @@ func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo
 				return EndpointInfo{}, fmt.Errorf("Segment index %d is a named segment but is missing the name", i)
 			}
 			urlSegments[i] = EndpointSegment{
+				Prefix: "/",
 				Name: name,
 			}
 		} else {
 			urlSegments[i] = EndpointSegment{
+				Prefix: "/",
 				Match: s,
 			}
 		}
@@ -112,15 +116,17 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 
 	url := ""
 	for _, segment := range ei.URLSegments {
+		segmentValue := ""
 		if segment.Match == "" {
 			value := values[segment.Name]
 			if value == "" {
 				return "", fmt.Errorf("No value was found with name '%s'", segment.Match)
 			}
-			url += "/" + value
+			segmentValue = value
 		} else {
-			url += "/" + segment.Match
+			segmentValue = segment.Match
 		}
+		url += segment.Prefix + segmentValue + segment.Suffix
 	}
 	if ei.APIVersion != "" {
 		url += "?api-version=" + ei.APIVersion
