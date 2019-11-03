@@ -43,7 +43,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 		return ExpanderResult{
 			Err:               err,
 			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
-			SourceDescription: "Resource Group Request",
+			SourceDescription: "Default Expander Request",
 		}
 	}
 
@@ -53,7 +53,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 		return ExpanderResult{
 			Err:               err,
 			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
-			SourceDescription: "Resource Group Request",
+			SourceDescription: "Default Expander Request",
 		}
 	}
 
@@ -70,6 +70,6 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	return ExpanderResult{
 		Err:               err,
 		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
-		SourceDescription: "Resource Group Request",
+		SourceDescription: "Default Expander Request",
 	}
 }
