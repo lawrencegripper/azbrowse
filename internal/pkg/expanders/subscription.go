@@ -7,6 +7,9 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// Check interface
+var _ Expander = &SubscriptionExpander{}
+
 // SubscriptionExpander expands RGs under a subscription
 type SubscriptionExpander struct{}
 

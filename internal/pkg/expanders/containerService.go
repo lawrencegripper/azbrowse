@@ -49,6 +49,9 @@ type kubeConfigResponse struct {
 	} `yaml:"users"`
 }
 
+// Check interface
+var _ Expander = &AzureKubernetesServiceExpander{}
+
 // AzureKubernetesServiceExpander expands the kubernetes aspects of AKS
 type AzureKubernetesServiceExpander struct {
 }

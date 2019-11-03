@@ -10,6 +10,9 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
+// Check interface
+var _ Expander = &SwaggerResourceExpander{}
+
 // SwaggerAPISet represents the configuration for a set of swagger API endpoints that the SwaggerResourceExpander can handle
 type SwaggerAPISet interface {
 	ID() string

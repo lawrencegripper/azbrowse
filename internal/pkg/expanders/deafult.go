@@ -10,6 +10,9 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// Check interface
+var _ Expander = &DefaultExpander{}
+
 // DefaultExpander expands RGs under a subscription
 type DefaultExpander struct{}
 

@@ -15,6 +15,9 @@ import (
 const containerInstanceTemplate = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerInstance/containerGroups/{containerGroupName}"
 const containerInstanceNamespace = "containerInstance"
 
+// Check interface
+var _ Expander = &ContainerInstanceExpander{}
+
 // ContainerInstanceExpander expands the data-plane aspects of a Container Instance
 type ContainerInstanceExpander struct {
 }

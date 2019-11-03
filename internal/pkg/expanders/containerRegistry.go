@@ -26,6 +26,9 @@ func NewContainerRegistryExpander() *ContainerRegistryExpander {
 	}
 }
 
+// Check interface
+var _ Expander = &ContainerRegistryExpander{}
+
 // ContainerRegistryExpander expands Tthe data-plane aspects of a Container Registry
 type ContainerRegistryExpander struct {
 	client *http.Client

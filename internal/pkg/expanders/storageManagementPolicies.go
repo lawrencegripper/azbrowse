@@ -10,6 +10,9 @@ import (
 // Any policy that exists also currently has to have the name "default" (i.e. can only actually have 0 or 1)
 // This expander adds the link from storage account to management policy
 
+// Check interface
+var _ Expander = &StorageManagementPoliciesExpander{}
+
 // StorageManagementPoliciesExpander expands The default management policy under a storage account
 type StorageManagementPoliciesExpander struct{}
 

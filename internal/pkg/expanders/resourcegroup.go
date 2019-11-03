@@ -14,6 +14,9 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// Check interface
+var _ Expander = &ResourceGroupResourceExpander{}
+
 // ResourceGroupResourceExpander expands resource under an RG
 type ResourceGroupResourceExpander struct{}
 

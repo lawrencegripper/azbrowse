@@ -4,6 +4,9 @@ import (
 	"context"
 )
 
+// Check interface
+var _ Expander = &JSONExpander{}
+
 // JSONExpander expands an item with "jsonItem" in its metadata
 type JSONExpander struct{}
 

@@ -24,6 +24,9 @@ var ItemWidgetHeight int
 // ItemWidgetWidth track width of item widget
 var ItemWidgetWidth int
 
+// Check interface
+var _ Expander = &MetricsExpander{}
+
 // MetricsExpander expands the data-plane aspects of the Microsoft.Insights RP
 type MetricsExpander struct {
 }
