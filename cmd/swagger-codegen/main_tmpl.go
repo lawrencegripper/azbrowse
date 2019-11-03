@@ -19,7 +19,7 @@ const tmpl = `
 	SubResources: {{template "PathList" .SubPaths}},{{end}}
 },{{end }}{{ end }}
 {{define "PathList"}}[]swagger.ResourceType{ {{range .}}{{template "Path" .}}{{end}} } {{end}}
-package handlers
+package expanders
 
 import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"	

@@ -14,7 +14,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
@@ -228,32 +228,32 @@ func main() {
 			armclient.PopulateResourceAPILookup(ctx)
 			status.Status("Done getting provider data", false)
 
-			newList := []*handlers.TreeNode{}
+			newList := []*expanders.TreeNode{}
 			for _, sub := range subRequest.Subs {
-				newList = append(newList, &handlers.TreeNode{
+				newList = append(newList, &expanders.TreeNode{
 					Display:        sub.DisplayName,
 					Name:           sub.DisplayName,
 					ID:             sub.ID,
 					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-					ItemType:       handlers.SubscriptionType,
+					ItemType:       expanders.SubscriptionType,
 					SubscriptionID: sub.SubscriptionID,
 				})
 			}
 
 			var newContent string
-			var newContentType handlers.ExpanderResponseType
+			var newContentType expanders.ExpanderResponseType
 			var newTitle string
 			if err != nil {
 				newContent = err.Error()
-				newContentType = handlers.ResponsePlainText
+				newContentType = expanders.ResponsePlainText
 				newTitle = "Error"
 			} else {
 				newContent = data
-				newContentType = handlers.ResponseJSON
+				newContentType = expanders.ResponseJSON
 				newTitle = "Subscriptions response"
 			}
 
-			list.Navigate(newList, handlers.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
+			list.Navigate(newList, expanders.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
 
 			return nil
 		})
@@ -266,7 +266,7 @@ func main() {
 		navigateToIDLower := strings.ToLower(navigateToID)
 		go func() {
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-			var lastNavigatedNode *handlers.TreeNode
+			var lastNavigatedNode *expanders.TreeNode
 
 			processNavigations := true
 
@@ -274,7 +274,7 @@ func main() {
 				nodeListInterface := <-navigatedChannel
 
 				if processNavigations {
-					nodeList := nodeListInterface.([]*handlers.TreeNode)
+					nodeList := nodeListInterface.([]*expanders.TreeNode)
 
 					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
 						processNavigations = false

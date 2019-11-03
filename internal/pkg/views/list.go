@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/stuartleeks/gocui"

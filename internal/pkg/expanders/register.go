@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 var swaggerResourceExpander *SwaggerResourceExpander
 
