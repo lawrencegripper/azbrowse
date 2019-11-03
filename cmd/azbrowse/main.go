@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -134,54 +133,26 @@ func main() {
 
 	go func() {
 		time.Sleep(time.Second * 1)
-
-		// status.Status("Fetching Subscriptions", true)
-		subRequest, data, err := getSubscriptions(ctx)
-		if err != nil {
-			g.Close()
-			log.Panicln(err)
-		}
+		armclient.PopulateResourceAPILookup(ctx)
 
 		g.Update(func(gui *gocui.Gui) error {
 			g.SetCurrentView("listWidget")
 
-			// status.Status("Getting provider data", true)
+			// Create an empty tentant TreeNode. This by default expands
+			// to show the current tenants subscriptions
+			newContent, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
+				ItemType:  expanders.TentantItemType,
+				ExpandURL: expanders.ExpandURLNotSupported,
+			})
 
-			armclient.PopulateResourceAPILookup(ctx)
-			// status.Status("Done getting provider data", false)
-
-			newList := []*expanders.TreeNode{}
-			for _, sub := range subRequest.Subs {
-				newList = append(newList, &expanders.TreeNode{
-					Display:        sub.DisplayName,
-					Name:           sub.DisplayName,
-					ID:             sub.ID,
-					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-					ItemType:       expanders.SubscriptionType,
-					SubscriptionID: sub.SubscriptionID,
-				})
-			}
-
-			var newContent string
-			var newContentType expanders.ExpanderResponseType
-			var newTitle string
 			if err != nil {
-				newContent = err.Error()
-				newContentType = expanders.ResponsePlainText
-				newTitle = "Error"
-			} else {
-				newContent = data
-				newContentType = expanders.ResponseJSON
-				newTitle = "Subscriptions response"
+				panic(err)
 			}
 
-			list.Navigate(newList, &expanders.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
+			list.Navigate(newItems, newContent, "Subscriptions")
 
 			return nil
 		})
-
-		// status.Status("Fetching Subscriptions: Completed", false)
-
 	}()
 
 	if navigateToID != "" {
@@ -317,22 +288,4 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui) *views.ListWidg
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
 	return list
-}
-
-func getSubscriptions(ctx context.Context) (armclient.SubResponse, string, error) {
-	span, ctx := tracing.StartSpanFromContext(ctx, "expand:subs")
-	defer span.Finish()
-
-	// Get Subscriptions
-	data, err := armclient.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
-	if err != nil {
-		return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
-	}
-
-	var subRequest armclient.SubResponse
-	err = json.Unmarshal([]byte(data), &subRequest)
-	if err != nil {
-		return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
-	}
-	return subRequest, data, nil
 }

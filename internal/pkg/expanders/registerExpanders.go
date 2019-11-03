@@ -15,6 +15,7 @@ func GetSwaggerResourceExpander() *SwaggerResourceExpander {
 // add new handlers to the array to augment the
 // processing of items in the
 var Register = []Expander{
+	&TenantExpander{},
 	&ResourceGroupResourceExpander{},
 	&SubscriptionExpander{},
 	&ActionExpander{},
