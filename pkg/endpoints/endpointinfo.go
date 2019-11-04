@@ -132,7 +132,11 @@ func (ei *EndpointInfo) Match(url string) MatchResult {
 				if i+1 < len(ei.URLSegments) {
 					matchTerminator = ei.URLSegments[i+1].Prefix // don't skip the prefix as that will be handled on the next loop iteration
 				} else {
-					// match is the rest of the URL
+					// Looks like match is the rest of the URL
+					if slashIndex := strings.Index(remainingURLToMatch, "/"); slashIndex >= 0 {
+						// tried to match the rest of the URL but it still has more segments to match on
+						return MatchResult{IsMatch: false}
+					}
 					matches[segment.Name] = remainingURLToMatch
 					remainingURLToMatch = ""
 					continue

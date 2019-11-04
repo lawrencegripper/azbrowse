@@ -78,6 +78,18 @@ func TestMatchEndingWithNamedSegment(t *testing.T) {
 			matchResult.Values)
 	}
 }
+func TestMatchEndingWithNamedSegmentIsNotTooGreedy(t *testing.T) {
+
+	//should match
+	matchResult := getMatchResult(
+		"/subscriptions/{subscriptionId}",
+		"/subscriptions/random/resourceGroups/aaaaa")
+
+	if matchResult.IsMatch {
+		t.Error("Shouldn't match")
+	}
+}
+
 func TestMatchDifferentCase(t *testing.T) {
 
 	//should match even though case differs on literal segments
