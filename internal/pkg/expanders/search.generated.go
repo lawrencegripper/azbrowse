@@ -8,28 +8,6 @@ import (
 func (e *AzureSearchServiceExpander) loadResourceTypes() []swagger.ResourceType {
 	return []swagger.ResourceType{
 		{
-			Display:  "docs",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs", "2019-05-06"),
-			Children: []swagger.ResourceType{
-				{
-					Display:  "$count",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/$count", "2019-05-06"),
-				},
-				{
-					Display:  "search.autocomplete",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/search.autocomplete", "2019-05-06"),
-				},
-				{
-					Display:  "search.suggest",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/search.suggest", "2019-05-06"),
-				}},
-			SubResources: []swagger.ResourceType{
-				{
-					Display:  "{key}",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs('{key}')", "2019-05-06"),
-				}},
-		},
-		{
 			Display:  "datasources",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/datasources", "2019-05-06"),
 			SubResources: []swagger.ResourceType{
@@ -69,6 +47,28 @@ func (e *AzureSearchServiceExpander) loadResourceTypes() []swagger.ResourceType 
 						{
 							Display:  "search.stats",
 							Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/search.stats", "2019-05-06"),
+						},
+						{
+							Display:  "docs",
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs", "2019-05-06"),
+							Children: []swagger.ResourceType{
+								{
+									Display:  "$count",
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/$count", "2019-05-06"),
+								},
+								{
+									Display:  "search.autocomplete",
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/search.autocomplete", "2019-05-06"),
+								},
+								{
+									Display:  "search.suggest",
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/search.suggest", "2019-05-06"),
+								}},
+							SubResources: []swagger.ResourceType{
+								{
+									Display:  "{key}",
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs('{key}')", "2019-05-06"),
+								}},
 						}},
 				}},
 		},
