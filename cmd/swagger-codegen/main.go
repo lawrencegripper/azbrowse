@@ -167,31 +167,26 @@ func getAzureSearchDataPlaneConfig() *swagger.Config {
 func loadAzureSearchDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
 	var paths []*swagger.Path
 
-	resourceTypeFileInfos, err := ioutil.ReadDir("swagger-specs/search/data-plane")
-	if err != nil {
-		panic(err)
-	}
-	for _, resourceTypeFileInfo := range resourceTypeFileInfos {
-		if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
-			swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/search/data-plane/%s", resourceTypeFileInfo.Name())))
-			swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
-			if err != nil {
-				panic(err)
-			}
-			for _, swaggerFileInfo := range swaggerFileInfos {
-				if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
-					fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
-					doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
-					pathPrefix := ""
-					if swaggerFileInfo.Name() == "searchindex.json" {
-						// searchindex.json uses a custom property to set a base URL that the paths in that file are relative to
-						// I couldn't find a way to retrieve it with the swagger library so adding some config here
-						pathPrefix = "/indexes('{indexName}')"
-					}
-					paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true, pathPrefix)
-					if err != nil {
-						panic(err)
-					}
+	directoryNames := []string{"Microsoft.Azure.Search.Service", "Microsoft.Azure.Search.Data"} // need to control the document load order
+	for _, directoryName := range directoryNames {
+		swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/search/data-plane/%s", directoryName)))
+		swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
+		if err != nil {
+			panic(err)
+		}
+		for _, swaggerFileInfo := range swaggerFileInfos {
+			if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
+				fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
+				doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
+				pathPrefix := ""
+				if swaggerFileInfo.Name() == "searchindex.json" {
+					// searchindex.json uses a custom property to set a base URL that the paths in that file are relative to
+					// I couldn't find a way to retrieve it with the swagger library so adding some config here
+					pathPrefix = "/indexes('{indexName}')"
+				}
+				paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true, pathPrefix)
+				if err != nil {
+					panic(err)
 				}
 			}
 		}
