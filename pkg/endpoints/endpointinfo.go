@@ -188,12 +188,10 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 
 // GenerateValueArrayFromMap builds an ordered array of template match values from a templateValues map for use with BuildURLFromArray
 func (ei *EndpointInfo) GenerateValueArrayFromMap(templateValues map[string]string) []string {
-	valueArray := make([]string, len(templateValues))
-	valueArrayIndex := 0
+	valueArray := []string{}
 	for _, segment := range ei.URLSegments {
 		if segment.Name != "" {
-			valueArray[valueArrayIndex] = templateValues[segment.Name]
-			valueArrayIndex++
+			valueArray = append(valueArray, templateValues[segment.Name])
 		}
 	}
 	return valueArray
