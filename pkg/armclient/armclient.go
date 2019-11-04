@@ -38,6 +38,7 @@ var LegacyInstance = NewClientFromCLI()
 func NewClientFromCLI() *Client {
 	return &Client{
 		aquireToken: aquireTokenFromAzCLI,
+		client:      &http.Client{},
 	}
 }
 
