@@ -203,16 +203,17 @@ func (ei *EndpointInfo) BuildURLFromArray(values []string) (string, error) {
 	url := ""
 	valueIndex := 0
 	for _, segment := range ei.URLSegments {
+		segmentValue := ""
 		if segment.Match == "" {
 			if valueIndex >= len(values) {
 				return "", fmt.Errorf("Too few values")
 			}
-			value := values[valueIndex] // TODO - check array bounds!
-			url += "/" + value
+			segmentValue = values[valueIndex] // TODO - check array bounds!
 			valueIndex++
 		} else {
-			url += "/" + segment.Match
+			segmentValue = segment.Match
 		}
+		url += segment.Prefix + segmentValue + segment.Suffix
 	}
 	if ei.APIVersion != "" {
 		url += "?api-version=" + ei.APIVersion
