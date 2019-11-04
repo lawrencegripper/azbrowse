@@ -102,7 +102,8 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 		return APISetExpandResponse{}, err
 	}
 
-	if len(resourceType.SubResources) > 0 {
+	// expand if we have subresources. Also don't expand Docs as they are user-defined format
+	if currentItem.SwaggerResourceType.Endpoint.TemplateURL != "/indexes('{indexName}')/docs" && len(resourceType.SubResources) > 0 {
 		if len(resourceType.SubResources) > 1 {
 			return APISetExpandResponse{}, fmt.Errorf("Only expecting a single SubResource type")
 		}
@@ -161,7 +162,17 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
 func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, error) {
-	return false, nil
+	if item.DeleteURL == "" {
+		return false, fmt.Errorf("Item cannot be deleted (No DeleteURL)")
+	}
+
+	url := c.searchEndpoint + item.DeleteURL
+	_, err := c.doRequest("DELETE", url)
+	if err != nil {
+		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
+		return false, err
+	}
+	return true, nil
 }
 
 // Update attempts to update the specified item with new content
