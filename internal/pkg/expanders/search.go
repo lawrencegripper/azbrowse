@@ -11,15 +11,11 @@ import (
 const azureSearchTemplateURL string = "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Search/searchServices/{searchServiceName}"
 
 type searchServiceResponse struct {
-	Properties struct {
-		Name string `json:"name"`
-	} `json:"properties"`
+	Name string `json:"name"`
 }
 
 type adminKeysResponse struct {
-	Properties struct {
-		PrimaryKey string `json:"primaryKey"`
-	} `json:"properties"`
+	PrimaryKey string `json:"primaryKey"`
 }
 
 // AzureSearchServiceExpander expands the kubernetes aspects of AKS
@@ -185,7 +181,13 @@ func (e *AzureSearchServiceExpander) getAdminKey(ctx context.Context, searchID s
 		return "", err
 	}
 
-	return response.Properties.PrimaryKey, nil
+	adminKey := response.PrimaryKey
+
+	if adminKey == "" {
+		return "", fmt.Errorf("Failed to get admin key")
+	}
+
+	return adminKey, nil
 }
 
 func (e *AzureSearchServiceExpander) getSearchEndpoint(ctx context.Context, searchID string) (string, error) {
@@ -201,7 +203,11 @@ func (e *AzureSearchServiceExpander) getSearchEndpoint(ctx context.Context, sear
 		return "", err
 	}
 
-	searchServiceName := response.Properties.Name
+	searchServiceName := response.Name
+
+	if searchServiceName == "" {
+		return "", fmt.Errorf("Search service name lookup failed")
+	}
 
 	searchServiceEndpoint := fmt.Sprintf("https://%s.search.windows.net", searchServiceName)
 
