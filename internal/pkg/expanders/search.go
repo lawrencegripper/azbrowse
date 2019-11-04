@@ -119,7 +119,7 @@ func (e *AzureSearchServiceExpander) expandSearchRoot(ctx context.Context, curre
 			Namespace:           "swagger",
 			Name:                display,
 			Display:             display,
-			ExpandURL:           resourceType.Endpoint.TemplateURL, // all fixed template URLs
+			ExpandURL:           resourceType.Endpoint.TemplateURL + "?api-version=" + resourceType.Endpoint.APIVersion, // all fixed template URLs
 			ItemType:            SubResourceType,
 			SwaggerResourceType: &resourceType,
 			Metadata: map[string]string{
