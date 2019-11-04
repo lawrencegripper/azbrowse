@@ -97,14 +97,12 @@ func MustGetEndpointInfoFromURL(url string, apiVersion string) *EndpointInfo {
 // Match tests whether a URL matches the EndpointInfo (ignoring query string values)
 func (ei *EndpointInfo) Match(url string) MatchResult {
 
-	// url = strings.TrimPrefix(url, "/")
+	remainingURLToMatch := url
 
 	// strip off querystring for matching
-	if i := strings.Index(url, "?"); i >= 0 {
-		url = url[:i]
+	if i := strings.Index(remainingURLToMatch, "?"); i >= 0 {
+		remainingURLToMatch = remainingURLToMatch[:i]
 	}
-
-	remainingURLToMatch := url
 
 	matches := make(map[string]string)
 	for i, segment := range ei.URLSegments {
@@ -136,6 +134,7 @@ func (ei *EndpointInfo) Match(url string) MatchResult {
 				} else {
 					// match is the rest of the URL
 					matches[segment.Name] = remainingURLToMatch
+					remainingURLToMatch = ""
 					continue
 				}
 			}

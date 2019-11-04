@@ -57,6 +57,27 @@ func TestMatch(t *testing.T) {
 			matchResult.Values)
 	}
 }
+func TestMatchEndingWithNamedSegment(t *testing.T) {
+
+	//should match
+	matchResult := getMatchResult(
+		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}",
+		"/subscriptions/random/resourceGroups/aaaaa/providers/Microsoft.Web/sites/azbrowsetest")
+
+	if !matchResult.IsMatch {
+		t.Error("Expected IsMatch to be true")
+	} else {
+		t.Log("verifying values")
+		verifyMap(
+			t,
+			map[string]string{
+				"subscriptionId":    "random",
+				"resourceGroupName": "aaaaa",
+				"name":              "azbrowsetest",
+			},
+			matchResult.Values)
+	}
+}
 func TestMatchDifferentCase(t *testing.T) {
 
 	//should match even though case differs on literal segments
