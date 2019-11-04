@@ -173,7 +173,7 @@ func (e *AzureSearchServiceExpander) getAPISetForCluster(searchID string) *Swagg
 }
 
 func (e *AzureSearchServiceExpander) getAdminKey(ctx context.Context, searchID string) (string, error) {
-	data, err := e.client.DoRequest(ctx, "POST", searchID+"/listAdminKeys?api-version=2019-05-06")
+	data, err := e.client.DoRequest(ctx, "POST", searchID+"/listAdminKeys?api-version=2015-08-19")
 	if err != nil {
 		return "", fmt.Errorf("Failed to get admin key: " + err.Error() + searchID)
 	}
@@ -189,7 +189,7 @@ func (e *AzureSearchServiceExpander) getAdminKey(ctx context.Context, searchID s
 }
 
 func (e *AzureSearchServiceExpander) getSearchEndpoint(ctx context.Context, searchID string) (string, error) {
-	data, err := e.client.DoRequest(ctx, "GET", searchID+"?api-version=2019-05-06")
+	data, err := e.client.DoRequest(ctx, "GET", searchID+"?api-version=2015-08-19")
 	if err != nil {
 		return "", fmt.Errorf("Failed to get search service data: " + err.Error() + searchID)
 	}
