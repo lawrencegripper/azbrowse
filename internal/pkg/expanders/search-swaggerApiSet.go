@@ -110,8 +110,8 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 		templateValues := matchResult.Values
 		subResourceType := resourceType.SubResources[0]
 
-		currentItemEndpoint := currentItem.SwaggerResourceType.Endpoint
-		newURLSegment := currentItemEndpoint.URLSegments[len(currentItemEndpoint.URLSegments)-1]
+		subResourceEndpoint := subResourceType.Endpoint
+		newURLSegment := subResourceEndpoint.URLSegments[len(subResourceEndpoint.URLSegments)-1]
 		newTemplateName := newURLSegment.Name
 
 		// Get the response for the current node and parse names to build up nodes based on the subResource
