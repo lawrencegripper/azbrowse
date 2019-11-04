@@ -47,7 +47,7 @@ func (c SwaggerAPISetSearch) ID() string {
 
 // MatchChildNodesByName indicates whether child nodes should be matched by name (or position)
 func (c SwaggerAPISetSearch) MatchChildNodesByName() bool {
-	return false
+	return true
 }
 
 // AppliesToNode is called by the Swagger exapnder to test whether the node applies to this APISet
