@@ -59,6 +59,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 		t.Log("Skipping integration test")
 		return
 	}
+
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -75,6 +76,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 	time.Sleep(time.Second * 5)
 
 	client := armclient.NewClientFromClientAndTokenFunc(ts.Client(), dummyTokenFunc())
+	expanders.InitializeExpanders(client)
 
 	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
