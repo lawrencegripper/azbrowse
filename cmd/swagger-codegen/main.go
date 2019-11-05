@@ -42,7 +42,7 @@ func main() {
 	fmt.Println("*******************************************")
 	config := getARMConfig()
 	paths := loadARMSwagger(config)
-	writeOutput(paths, config, "./internal/pkg/handlers/swagger-armspecs.generated.go", "SwaggerAPISetARMResources")
+	writeOutput(paths, config, "./internal/pkg/expanders/swagger-armspecs.generated.go", "SwaggerAPISetARMResources")
 	fmt.Println()
 
 	fmt.Println("*******************************************")
@@ -50,7 +50,7 @@ func main() {
 	fmt.Println("*******************************************")
 	config = getAzureSearchDataPlaneConfig()
 	paths = loadAzureSearchDataPlaneSpecs(config)
-	writeOutput(paths, config, "./internal/pkg/handlers/search.generated.go", "AzureSearchServiceExpander")
+	writeOutput(paths, config, "./internal/pkg/expanders/search.generated.go", "AzureSearchServiceExpander")
 	fmt.Println()
 
 }
