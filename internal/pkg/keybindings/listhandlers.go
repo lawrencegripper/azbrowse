@@ -554,7 +554,7 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		apiSetID := item.Metadata["SwaggerAPISetID"]
-		apiSetPtr := expanders.GetSwaggerResourceExpander(armclient.LegacyInstance).GetAPISet(apiSetID)
+		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
 		if apiSetPtr == nil {
 			return nil
 		}

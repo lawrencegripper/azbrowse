@@ -135,7 +135,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 				SourceDescription: "AzureKubernetesServiceExpander request",
 			}
 		}
-		GetSwaggerResourceExpander(e.client).AddAPISet(*apiSet)
+		GetSwaggerResourceExpander().AddAPISet(*apiSet)
 	}
 
 	swaggerResourceTypes := apiSet.GetResourceTypes()
@@ -199,7 +199,7 @@ func (e *AzureKubernetesServiceExpander) createAPISetForCluster(ctx context.Cont
 }
 func (e *AzureKubernetesServiceExpander) getAPISetForCluster(clusterID string) *SwaggerAPISetContainerService {
 
-	swaggerAPISet := GetSwaggerResourceExpander(e.client).GetAPISet(clusterID + "/<k8sapi>")
+	swaggerAPISet := GetSwaggerResourceExpander().GetAPISet(clusterID + "/<k8sapi>")
 	if swaggerAPISet == nil {
 		return nil
 	}
