@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 import (
 	"context"
@@ -9,7 +9,9 @@ import (
 )
 
 // ActionExpander handles actions
-type ActionExpander struct{}
+type ActionExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *ActionExpander) Name() string {
@@ -36,7 +38,7 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	})
 	defer done()
 
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 
 	return ExpanderResult{
 		Err:               err,

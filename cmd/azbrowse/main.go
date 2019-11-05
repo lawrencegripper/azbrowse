@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -14,7 +13,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
@@ -34,10 +33,55 @@ var (
 
 var enableTracing bool
 var hideGuids bool
+var navigateToID string
 
 func main() {
-	var navigateToID string
+	readCommandLineArgs()
 
+	confirmAndSelfUpdate()
+
+	// Setup the root context and span for open tracing
+	ctx, span := configureTracing()
+
+	// Create an ARMClient instance for us to use
+	armClient := armclient.NewClientFromCLI()
+
+	// Initialize the expanders which will let the user walk the tree of
+	// resources in Azure
+	expanders.InitializeExpanders(armClient)
+
+	// Start up gocui and configure some settings
+	g, err := gocui.NewGui(gocui.OutputNormal)
+	if err != nil {
+		log.Panicln(err)
+	}
+	defer g.Close()
+	g.Highlight = true
+	g.SelFgColor = gocui.ColorCyan
+	g.InputEsc = true
+
+	// Create the views we'll use to display information and
+	// bind up all the keys use to interact with the views
+	list := setupViewsAndKeybindings(ctx, g, armClient)
+
+	// Start a go routine to populate the list with root of the nodes
+	startPopulatingList(ctx, g, list, armClient)
+
+	// Start a go routine to handling automated naviging to an item via the
+	// `--navigate` command
+	handleNavigateTo(list)
+
+	// Close the span used to track startup times
+	span.Finish()
+
+	// Start the main loop of gocui to draw the UI
+	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		log.Panicln(err)
+	}
+
+}
+
+func readCommandLineArgs() {
 	args := os.Args[1:] // skip first arg
 
 	for len(args) >= 1 {
@@ -82,8 +126,9 @@ func main() {
 
 		args = args[1:] // move to the next arg
 	}
+}
 
-	confirmAndSelfUpdate()
+func configureTracing() (context.Context, opentracing.Span) {
 	var ctx context.Context
 	var span opentracing.Span
 
@@ -120,16 +165,45 @@ func main() {
 		}()
 	}
 
-	g, err := gocui.NewGui(gocui.OutputNormal)
-	if err != nil {
-		log.Panicln(err)
-	}
-	defer g.Close()
+	return ctx, span
+}
 
-	g.Highlight = true
-	g.SelFgColor = gocui.ColorCyan
-	g.InputEsc = true
+func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidget, armClient *armclient.Client) {
+	go func() {
+		time.Sleep(time.Second * 1)
 
+		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+			Message:    "Updating API Version details",
+			InProgress: true,
+		})
+
+		armClient.PopulateResourceAPILookup(ctx)
+
+		done()
+
+		g.Update(func(gui *gocui.Gui) error {
+			g.SetCurrentView("listWidget")
+
+			// Create an empty tentant TreeNode. This by default expands
+			// to show the current tenants subscriptions
+			newContent, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
+				ItemType:  expanders.TentantItemType,
+				ID:        "AvailableSubscriptions",
+				ExpandURL: expanders.ExpandURLNotSupported,
+			})
+
+			if err != nil {
+				panic(err)
+			}
+
+			list.Navigate(newItems, newContent, "Subscriptions")
+
+			return nil
+		})
+	}()
+}
+
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclient.Client) *views.ListWidget {
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -145,7 +219,7 @@ func main() {
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions", g)
-	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g)
+	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g, client)
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
 
 	g.SetManager(status, content, list, notifications, commandPanel)
@@ -195,7 +269,7 @@ func main() {
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
 	keybindings.AddHandler(keybindings.NewItemLeftHandler(&editModeEnabled))
 
-	if err = keybindings.Bind(g); err != nil { // apply late binding for keys
+	if err := keybindings.Bind(g); err != nil { // apply late binding for keys
 		g.Close()
 
 		fmt.Println("\n \n" + err.Error())
@@ -210,63 +284,15 @@ func main() {
 	notifications.ConfirmDeleteKeyBinding = strings.Join(keyBindings["confirmdelete"], ",")
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
-	go func() {
-		time.Sleep(time.Second * 1)
+	return list
+}
 
-		status.Status("Fetching Subscriptions", true)
-		subRequest, data, err := getSubscriptions(ctx)
-		if err != nil {
-			g.Close()
-			log.Panicln(err)
-		}
-
-		g.Update(func(gui *gocui.Gui) error {
-			g.SetCurrentView("listWidget")
-
-			status.Status("Getting provider data", true)
-
-			armclient.PopulateResourceAPILookup(ctx)
-			status.Status("Done getting provider data", false)
-
-			newList := []*handlers.TreeNode{}
-			for _, sub := range subRequest.Subs {
-				newList = append(newList, &handlers.TreeNode{
-					Display:        sub.DisplayName,
-					Name:           sub.DisplayName,
-					ID:             sub.ID,
-					ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-					ItemType:       handlers.SubscriptionType,
-					SubscriptionID: sub.SubscriptionID,
-				})
-			}
-
-			var newContent string
-			var newContentType handlers.ExpanderResponseType
-			var newTitle string
-			if err != nil {
-				newContent = err.Error()
-				newContentType = handlers.ResponsePlainText
-				newTitle = "Error"
-			} else {
-				newContent = data
-				newContentType = handlers.ResponseJSON
-				newTitle = "Subscriptions response"
-			}
-
-			list.Navigate(newList, handlers.ExpanderResponse{Response: newContent, ResponseType: newContentType}, newTitle)
-
-			return nil
-		})
-
-		status.Status("Fetching Subscriptions: Completed", false)
-
-	}()
-
+func handleNavigateTo(list *views.ListWidget) {
 	if navigateToID != "" {
 		navigateToIDLower := strings.ToLower(navigateToID)
 		go func() {
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-			var lastNavigatedNode *handlers.TreeNode
+			var lastNavigatedNode *expanders.TreeNode
 
 			processNavigations := true
 
@@ -274,7 +300,7 @@ func main() {
 				nodeListInterface := <-navigatedChannel
 
 				if processNavigations {
-					nodeList := nodeListInterface.([]*handlers.TreeNode)
+					nodeList := nodeListInterface.([]*expanders.TreeNode)
 
 					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
 						processNavigations = false
@@ -304,29 +330,4 @@ func main() {
 			}
 		}()
 	}
-
-	span.Finish()
-
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Panicln(err)
-	}
-
-}
-
-func getSubscriptions(ctx context.Context) (armclient.SubResponse, string, error) {
-	span, ctx := tracing.StartSpanFromContext(ctx, "expand:subs")
-	defer span.Finish()
-
-	// Get Subscriptions
-	data, err := armclient.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
-	if err != nil {
-		return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
-	}
-
-	var subRequest armclient.SubResponse
-	err = json.Unmarshal([]byte(data), &subRequest)
-	if err != nil {
-		return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
-	}
-	return subRequest, data, nil
 }

@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 import (
 	"context"
@@ -24,8 +24,12 @@ var ItemWidgetHeight int
 // ItemWidgetWidth track width of item widget
 var ItemWidgetWidth int
 
+// Check interface
+var _ Expander = &MetricsExpander{}
+
 // MetricsExpander expands the data-plane aspects of the Microsoft.Insights RP
 type MetricsExpander struct {
+	client *armclient.Client
 }
 
 // Name returns the name of the expander
@@ -47,20 +51,20 @@ func (e *MetricsExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 
 	// We have a metric namespace lets lookup the metric definitions
 	if currentItem.ItemType == "metrics.metricdefinition" {
-		return expandMetricDefinition(ctx, currentItem)
+		return e.expandMetricDefinition(ctx, currentItem)
 	}
 
 	// We have a metric definition lets draw the graph
 	if currentItem.ItemType == "metrics.graph" {
-		return expandGraph(ctx, currentItem)
+		return e.expandGraph(ctx, currentItem)
 	}
 
 	// We're looking at a top level resource, lets see if it has a metric namespace
-	return expandMetricNamespace(ctx, currentItem)
+	return e.expandMetricNamespace(ctx, currentItem)
 }
 
-func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderResult {
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ID+
+func (e *MetricsExpander) expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := e.client.DoRequest(ctx, "GET", currentItem.ID+
 		"/providers/microsoft.insights/metricNamespaces?api-version=2017-12-01-preview")
 	if err != nil {
 		return ExpanderResult{
@@ -106,8 +110,8 @@ func expandMetricNamespace(ctx context.Context, currentItem *TreeNode) ExpanderR
 	}
 }
 
-func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) ExpanderResult {
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+func (e *MetricsExpander) expandMetricDefinition(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := e.client.DoRequest(ctx, "GET", currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -158,8 +162,8 @@ func expandMetricDefinition(ctx context.Context, currentItem *TreeNode) Expander
 	}
 }
 
-func expandGraph(ctx context.Context, currentItem *TreeNode) ExpanderResult {
-	data, err := armclient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+func (e *MetricsExpander) expandGraph(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := e.client.DoRequest(ctx, "GET", currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,

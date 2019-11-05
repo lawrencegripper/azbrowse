@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/stuartleeks/colorjson"
 	"github.com/stuartleeks/gocui"
 
@@ -24,7 +24,7 @@ type ItemWidget struct {
 	w, h        int
 	hideGuids   bool
 	content     string
-	contentType handlers.ExpanderResponseType
+	contentType expanders.ExpanderResponseType
 	view        *gocui.View
 	g           *gocui.Gui
 }
@@ -48,8 +48,8 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	v.Wrap = true
 	w.view = v
 	width, height := v.Size()
-	handlers.ItemWidgetHeight = height
-	handlers.ItemWidgetWidth = width
+	expanders.ItemWidgetHeight = height
+	expanders.ItemWidgetWidth = width
 	v.Clear()
 
 	if w.content == "" {
@@ -62,7 +62,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		}
 	}
 	switch w.contentType {
-	case handlers.ResponseJSON:
+	case expanders.ResponseJSON:
 		d := json.NewDecoder(strings.NewReader(w.content))
 		d.UseNumber()
 		var obj interface{}
@@ -86,7 +86,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		} else {
 			fmt.Fprint(v, string(s))
 		}
-	case handlers.ResponseYAML:
+	case expanders.ResponseYAML:
 		var buf bytes.Buffer
 		err = quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
 		if err != nil {
@@ -147,7 +147,7 @@ func (w *ItemWidget) PageUp() {
 }
 
 // SetContent displays the string in the itemview
-func (w *ItemWidget) SetContent(content string, contentType handlers.ExpanderResponseType, title string) {
+func (w *ItemWidget) SetContent(content string, contentType expanders.ExpanderResponseType, title string) {
 	w.g.Update(func(g *gocui.Gui) error {
 		w.content = content
 		w.contentType = contentType
@@ -166,7 +166,7 @@ func (w *ItemWidget) GetContent() string {
 }
 
 // GetContentType returns the current content type
-func (w *ItemWidget) GetContentType() handlers.ExpanderResponseType {
+func (w *ItemWidget) GetContentType() expanders.ExpanderResponseType {
 	return w.contentType
 }
 

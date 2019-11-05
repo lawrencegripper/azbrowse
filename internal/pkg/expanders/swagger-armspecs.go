@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 import (
 	"context"
@@ -15,12 +15,14 @@ var _ SwaggerAPISet = SwaggerAPISetARMResources{}
 // SwaggerAPISetARMResources holds the config for working with ARM resources as per the published Swagger specs
 type SwaggerAPISetARMResources struct {
 	resourceTypes []swagger.ResourceType
+	client        *armclient.Client
 }
 
 // NewSwaggerAPISetARMResources creates a new SwaggerAPISetARMResources
-func NewSwaggerAPISetARMResources() SwaggerAPISetARMResources {
+func NewSwaggerAPISetARMResources(client *armclient.Client) SwaggerAPISetARMResources {
 	c := SwaggerAPISetARMResources{}
 	c.resourceTypes = c.loadResourceTypes()
+	c.client = client
 	return c
 }
 
@@ -51,7 +53,7 @@ func (c SwaggerAPISetARMResources) GetResourceTypes() []swagger.ResourceType {
 func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	method := resourceType.Verb
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := c.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
 		return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
@@ -116,7 +118,7 @@ func (c SwaggerAPISetARMResources) Delete(ctx context.Context, item *TreeNode) (
 		return false, fmt.Errorf("Item cannot be deleted (No DeleteURL)")
 	}
 
-	_, err := armclient.DoRequest(context.Background(), "DELETE", item.DeleteURL)
+	_, err := c.client.DoRequest(context.Background(), "DELETE", item.DeleteURL)
 	if err != nil {
 		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
 		return false, err
@@ -136,7 +138,7 @@ func (c SwaggerAPISetARMResources) Update(ctx context.Context, item *TreeNode, c
 		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
 	}
 
-	data, err := armclient.DoRequestWithBody(ctx, "PUT", putURL, content)
+	data, err := c.client.DoRequestWithBody(ctx, "PUT", putURL, content)
 	if err != nil {
 		return fmt.Errorf("Error making PUT request: %s", err)
 	}

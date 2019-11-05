@@ -10,7 +10,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/handlers"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
@@ -336,7 +336,7 @@ func (h ListOpenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		if portalURL == "" {
 			portalURL = "https://portal.azure.com"
 		}
-		url := portalURL + "/#@" + armclient.GetTenantID() + "/resource/" + item.ID
+		url := portalURL + "/#@" + armclient.LegacyInstance.GetTenantID() + "/resource/" + item.ID
 		span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
 		err := open.Run(url)
 		if err != nil {
@@ -463,9 +463,9 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		fileExtension := ".txt"
 		contentType := h.Content.GetContentType()
 		switch contentType {
-		case handlers.ResponseJSON:
+		case expanders.ResponseJSON:
 			fileExtension = ".json"
-		case handlers.ResponseYAML:
+		case expanders.ResponseYAML:
 			fileExtension = ".yaml"
 		}
 
@@ -554,7 +554,7 @@ func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		}
 
 		apiSetID := item.Metadata["SwaggerAPISetID"]
-		apiSetPtr := handlers.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+		apiSetPtr := expanders.GetSwaggerResourceExpander(armclient.LegacyInstance).GetAPISet(apiSetID)
 		if apiSetPtr == nil {
 			return nil
 		}

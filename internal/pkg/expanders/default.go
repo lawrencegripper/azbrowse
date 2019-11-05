@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 import (
 	"context"
@@ -10,8 +10,13 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// Check interface
+var _ Expander = &DefaultExpander{}
+
 // DefaultExpander expands RGs under a subscription
-type DefaultExpander struct{}
+type DefaultExpander struct {
+	client *armclient.Client
+}
 
 // DefaultExpanderInstance provides an instance of the default expander for use
 var DefaultExpanderInstance DefaultExpander
@@ -33,12 +38,12 @@ func (e *DefaultExpander) DoesExpand(ctx context.Context, currentItem *TreeNode)
 func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
 
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
 			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
-			SourceDescription: "Resource Group Request",
+			SourceDescription: "Default Expander Request",
 		}
 	}
 
@@ -48,7 +53,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 		return ExpanderResult{
 			Err:               err,
 			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
-			SourceDescription: "Resource Group Request",
+			SourceDescription: "Default Expander Request",
 		}
 	}
 
@@ -60,11 +65,12 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 			Message:    "Updated resource status -> " + DrawStatus(resource.Properties.ProvisioningState),
 			Timeout:    time.Duration(time.Second * 3),
 		})
+		currentItem.StatusIndicator = newStatus
 	}
 
 	return ExpanderResult{
 		Err:               err,
 		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
-		SourceDescription: "Resource Group Request",
+		SourceDescription: "Default Expander Request",
 	}
 }

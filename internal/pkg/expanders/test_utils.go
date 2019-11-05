@@ -1,4 +1,4 @@
-package views
+package expanders
 
 import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"

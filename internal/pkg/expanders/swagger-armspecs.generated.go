@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 import (
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"

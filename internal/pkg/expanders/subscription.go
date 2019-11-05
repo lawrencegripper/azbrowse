@@ -1,4 +1,4 @@
-package handlers
+package expanders
 
 import (
 	"context"
@@ -7,8 +7,13 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
+// Check interface
+var _ Expander = &SubscriptionExpander{}
+
 // SubscriptionExpander expands RGs under a subscription
-type SubscriptionExpander struct{}
+type SubscriptionExpander struct {
+	client *armclient.Client
+}
 
 // Name returns the name of the expander
 func (e *SubscriptionExpander) Name() string {
@@ -28,12 +33,12 @@ func (e *SubscriptionExpander) DoesExpand(ctx context.Context, currentItem *Tree
 func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "GET"
 
-	data, err := armclient.DoRequest(ctx, method, currentItem.ExpandURL)
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	newItems := []*TreeNode{}
 
 	//    \/ It's not the usual ... look out
 	if err == nil {
-		var rgResponse armclient.ResourceGroupResponse
+		var rgResponse ResourceGroupResponse
 		err = json.Unmarshal([]byte(data), &rgResponse)
 		if err != nil {
 			panic(err)
@@ -62,4 +67,16 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 		SourceDescription: "Resource Group Request",
 		IsPrimaryResponse: true,
 	}
+}
+
+// ResourceGroupResponse ResourceGroup rest type
+type ResourceGroupResponse struct {
+	Groups []struct {
+		ID         string `json:"id"`
+		Name       string `json:"name"`
+		Location   string `json:"location"`
+		Properties struct {
+			ProvisioningState string `json:"provisioningState"`
+		} `json:"properties"`
+	} `json:"value"`
 }

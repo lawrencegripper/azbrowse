@@ -46,7 +46,6 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				widget.addStatusEvent(eventObj)
 			case <-timeout:
 				// Update the UI
-				continue
 			}
 
 			// Seeing as we're about to process and thats quite a bit of effort
