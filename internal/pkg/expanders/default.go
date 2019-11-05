@@ -65,6 +65,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 			Message:    "Updated resource status -> " + DrawStatus(resource.Properties.ProvisioningState),
 			Timeout:    time.Duration(time.Second * 3),
 		})
+		currentItem.StatusIndicator = newStatus
 	}
 
 	return ExpanderResult{

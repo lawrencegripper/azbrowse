@@ -25,6 +25,7 @@ require (
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
 	github.com/mattn/go-runewidth v0.0.3 // indirect
+	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
 	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
@@ -39,6 +40,7 @@ require (
 	github.com/valyala/fastjson v1.4.0
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/tools v0.0.0-20190405180640-052fc3cfdbc2 // indirect
+	gopkg.in/h2non/gock.v1 v1.0.15
 	gopkg.in/yaml.v2 v2.2.4
 	gotest.tools v2.2.0+incompatible
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20180531100431-4c381bd170b4

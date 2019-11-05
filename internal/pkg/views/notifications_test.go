@@ -91,7 +91,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
-	WaitForCompletedStatusEvent(t, statusEvents, 5)
+	eventing.WaitForCompletedStatusEvent(t, statusEvents, 5)
 
 	if count != 3 {
 		t.Error("Expected 3 delete's to be sent")
@@ -131,7 +131,7 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
-	WaitForFailureStatusEvent(t, statusEvents, 5)
+	eventing.WaitForFailureStatusEvent(t, statusEvents, 5)
 
 	if count != 1 {
 		t.Error("Expected 1 delete to be sent")
@@ -175,7 +175,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
 
 	// ConfirmDelete returns before it's finished
-	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)
+	failureStatus := eventing.WaitForFailureStatusEvent(t, statusEvents, 5)
 	if failureStatus.Message != "Delete already in progress. Please wait for completion." {
 		t.Errorf("Expected message 'Delete already in progress. Please wait for completion.' Got: %s", failureStatus.Message)
 	}
@@ -227,7 +227,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
-	failureStatus := WaitForFailureStatusEvent(t, statusEvents, 5)
+	failureStatus := eventing.WaitForFailureStatusEvent(t, statusEvents, 5)
 	if failureStatus.Message != "Delete already in progress. Please wait for completion." {
 		t.Errorf("Expected message 'Delete already in progress. Please wait for completion.' Got: %s", failureStatus.Message)
 	}
