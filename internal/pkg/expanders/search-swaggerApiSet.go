@@ -18,6 +18,17 @@ type searchListItem struct {
 	Name string `json:"name"`
 }
 
+type searchIndexResponse struct {
+	Fields []struct {
+		Name string `json:"name"`
+		Key  bool   `json:"key"`
+	} `json:"fields"`
+}
+
+type searchIndexDocumentList struct {
+	Value []map[string]interface{}
+}
+
 var _ SwaggerAPISet = SwaggerAPISetSearch{}
 
 // SwaggerAPISetSearch holds the config for working with an Azure Search Service
@@ -102,11 +113,25 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 		return APISetExpandResponse{}, err
 	}
 
+	currentItemTemplateURL := currentItem.SwaggerResourceType.Endpoint.TemplateURL
+
+	indexKey := ""
+	if currentItemTemplateURL == "/indexes('{indexName}')" {
+		indexKey, err = c.getIndexKey(data)
+		if err != nil {
+			return APISetExpandResponse{Response: data}, err
+		}
+	} else {
+		// propagate indexKey if set in metadata
+		indexKey = currentItem.Metadata["IndexKey"]
+	}
+
 	// expand if we have subresources. Also don't expand Docs as they are user-defined format
-	if currentItem.SwaggerResourceType.Endpoint.TemplateURL != "/indexes('{indexName}')/docs" && len(resourceType.SubResources) > 0 {
+	if len(resourceType.SubResources) > 0 {
 		if len(resourceType.SubResources) > 1 {
 			return APISetExpandResponse{}, fmt.Errorf("Only expecting a single SubResource type")
 		}
+
 		matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL)
 		templateValues := matchResult.Values
 		subResourceType := resourceType.SubResources[0]
@@ -115,19 +140,20 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 		newURLSegment := subResourceEndpoint.URLSegments[len(subResourceEndpoint.URLSegments)-1]
 		newTemplateName := newURLSegment.Name
 
-		// Get the response for the current node and parse names to build up nodes based on the subResource
-
-		var listResponse searchListResponse
-		err = json.Unmarshal([]byte(data), &listResponse)
+		var extraIDs []string
+		var err error
+		if currentItemTemplateURL == "/indexes('{indexName}')/docs" {
+			extraIDs, err = c.getKeys(data, indexKey)
+		} else {
+			extraIDs, err = c.getNames(data)
+		}
 		if err != nil {
-			err = fmt.Errorf("Error parsing response: %s", err)
 			return APISetExpandResponse{Response: data}, err
 		}
 
-		for _, item := range listResponse.Value {
+		for _, item := range extraIDs {
 
-			name := item.Name
-			templateValues[newTemplateName] = name
+			templateValues[newTemplateName] = item
 			subResourceURL, err := subResourceType.Endpoint.BuildURL(templateValues)
 			if err != nil {
 				return APISetExpandResponse{}, fmt.Errorf("Error building subresource URL: %s", err)
@@ -144,10 +170,13 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 			}
 			subResource := SubResource{
 				ID:           c.searchID + subResourceURL,
-				Name:         name,
+				Name:         item,
 				ResourceType: subResourceType,
 				ExpandURL:    subResourceURL,
 				DeleteURL:    deleteURL,
+				Metadata: map[string]string{
+					"IndexKey": indexKey,
+				},
 			}
 			subResources = append(subResources, subResource)
 		}
@@ -157,7 +186,64 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 		Response:     data,
 		ResponseType: ResponseJSON,
 		SubResources: subResources,
+		ChildMetadata: map[string]string{
+			"IndexKey": indexKey,
+		},
 	}, nil
+}
+
+func (c SwaggerAPISetSearch) getIndexKey(response string) (string, error) {
+
+	var indexResponse searchIndexResponse
+	err := json.Unmarshal([]byte(response), &indexResponse)
+	if err != nil {
+		err = fmt.Errorf("Error parsing index response: %s", err)
+		return "", err
+	}
+
+	for _, field := range indexResponse.Fields {
+		if field.Key {
+			return field.Name, nil
+		}
+	}
+
+	return "", fmt.Errorf("No key field found in index")
+}
+
+func (c SwaggerAPISetSearch) getNames(response string) ([]string, error) {
+
+	var listResponse searchListResponse
+	err := json.Unmarshal([]byte(response), &listResponse)
+	if err != nil {
+		err = fmt.Errorf("Error parsing response: %s", err)
+		return []string{}, err
+	}
+
+	names := []string{}
+	for _, item := range listResponse.Value {
+		name := item.Name
+		names = append(names, name)
+	}
+
+	return names, nil
+}
+
+func (c SwaggerAPISetSearch) getKeys(response string, keyName string) ([]string, error) {
+
+	var listResponse searchIndexDocumentList
+	err := json.Unmarshal([]byte(response), &listResponse)
+	if err != nil {
+		err = fmt.Errorf("Error parsing response: %s", err)
+		return []string{}, err
+	}
+
+	keys := []string{}
+	for _, item := range listResponse.Value {
+		key := item[keyName].(string)
+		keys = append(keys, key)
+	}
+
+	return keys, nil
 }
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete

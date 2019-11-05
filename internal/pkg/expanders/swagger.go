@@ -31,13 +31,15 @@ type SubResource struct {
 	ResourceType swagger.ResourceType
 	ExpandURL    string
 	DeleteURL    string
+	Metadata     map[string]string
 }
 
 // APISetExpandResponse returns the result of expanding a Resource
 type APISetExpandResponse struct {
-	Response     string
-	ResponseType ExpanderResponseType
-	SubResources []SubResource
+	Response      string
+	ResponseType  ExpanderResponseType
+	SubResources  []SubResource
+	ChildMetadata map[string]string
 }
 
 // SwaggerResourceExpander expands resource under an AppService
@@ -128,6 +130,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	data := ""
 	dataType := ResponsePlainText
 	newItems := []*TreeNode{}
+	childMetadata := map[string]string{}
 
 	if resourceType.FixedContent == "" {
 		// Get sub resources from config
@@ -145,6 +148,10 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 
 		if len(expandResult.SubResources) > 0 {
 			for _, subResource := range expandResult.SubResources {
+				metadata := map[string]string{
+					"SwaggerAPISetID": apiSet.ID(),
+				}
+				e.copyMetadata(metadata, subResource.Metadata)
 				newItems = append(newItems, &TreeNode{
 					Parentid:            currentItem.ID,
 					Namespace:           "swagger",
@@ -155,12 +162,11 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 					ItemType:            SubResourceType,
 					DeleteURL:           subResource.DeleteURL,
 					SwaggerResourceType: &subResource.ResourceType,
-					Metadata: map[string]string{
-						"SwaggerAPISetID": apiSet.ID(),
-					},
+					Metadata:            metadata,
 				})
 			}
 		}
+		childMetadata = expandResult.ChildMetadata
 	} else {
 		data = resourceType.FixedContent
 	}
@@ -208,6 +214,11 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 				}
 			}
 		}
+		metadata := map[string]string{
+			"SwaggerAPISetID": apiSet.ID(),
+		}
+		e.copyMetadata(metadata, childMetadata)
+
 		newItems = append(newItems, &TreeNode{
 			Parentid:            currentItem.ID,
 			ID:                  currentItem.ID + "/" + display,
@@ -218,9 +229,7 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 			ItemType:            SubResourceType,
 			DeleteURL:           deleteURL,
 			SwaggerResourceType: &loopChild,
-			Metadata: map[string]string{
-				"SwaggerAPISetID": apiSet.ID(),
-			},
+			Metadata:            metadata,
 		})
 	}
 
@@ -228,6 +237,12 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 		Nodes:             newItems,
 		Response:          ExpanderResponse{Response: data, ResponseType: dataType},
 		IsPrimaryResponse: true, // only returning items that we are the primary response for
+	}
+}
+
+func (e *SwaggerResourceExpander) copyMetadata(target map[string]string, source map[string]string) {
+	for key, value := range source {
+		target[key] = value
 	}
 }
 
