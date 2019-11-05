@@ -5,14 +5,17 @@ import (
 	"time"
 )
 
+// WaitForCompletedStatusEvent waits for a completed event
 func WaitForCompletedStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec int) StatusEvent {
 	return WaitForStatusEvent(t, statusEvents, waitForSec, false)
 }
 
+// WaitForFailureStatusEvent waits for failure event
 func WaitForFailureStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec int) StatusEvent {
 	return WaitForStatusEvent(t, statusEvents, waitForSec, true)
 }
 
+// WaitForStatusEvent lets you wait on a event
 func WaitForStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec int, expectError bool) StatusEvent {
 	for index := 0; index < waitForSec; index++ {
 		select {
@@ -29,7 +32,7 @@ func WaitForStatusEvent(t *testing.T, statusEvents chan interface{}, waitForSec 
 			if expectError && statusEvent.Failure {
 				return statusEvent
 			}
-			if statusEvent.InProgress == false {
+			if !statusEvent.InProgress {
 				return statusEvent
 			}
 		}

@@ -13,11 +13,6 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-const (
-	exampleResourceTypeContainerRepo = "Microsoft.ContainerRegistry/registries"
-	exampleResourceIDContainerRepo   = "/subscriptions/5774ad8f-0000-0000-0000-0447910568d3/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test"
-)
-
 func Test_DefaultExpander_ReturnsContentOnSuccessAndUpdatesStatus(t *testing.T) {
 	const testServer = "http://127.0.0.1"
 	const testPath = "/subscriptions/thing"
