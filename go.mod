@@ -20,6 +20,7 @@ require (
 	github.com/go-openapi/swag v0.18.0 // indirect
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
+	github.com/google/subcommands v1.0.1 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
