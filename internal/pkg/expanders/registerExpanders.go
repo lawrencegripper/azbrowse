@@ -7,11 +7,7 @@ import (
 var swaggerResourceExpander *SwaggerResourceExpander
 
 // GetSwaggerResourceExpander returns the (singleton) instance of SwaggerResourceExpander
-func GetSwaggerResourceExpander(client *armclient.Client) *SwaggerResourceExpander {
-	if swaggerResourceExpander == nil {
-		swaggerResourceExpander = NewSwaggerResourcesExpander()
-		swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources(client))
-	}
+func GetSwaggerResourceExpander() *SwaggerResourceExpander {
 	return swaggerResourceExpander
 }
 
@@ -23,6 +19,9 @@ var register []Expander
 // InitializeExpanders create instances of all the expanders
 // needed by the app
 func InitializeExpanders(client *armclient.Client) {
+	swaggerResourceExpander = NewSwaggerResourcesExpander()
+	swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources(client))
+
 	register = []Expander{
 		&TenantExpander{
 			client: client,
@@ -39,7 +38,7 @@ func InitializeExpanders(client *armclient.Client) {
 		&MetricsExpander{
 			client: client,
 		},
-		GetSwaggerResourceExpander(client),
+		swaggerResourceExpander,
 		&DeploymentsExpander{
 			client: client,
 		},
@@ -56,6 +55,9 @@ func InitializeExpanders(client *armclient.Client) {
 			client: client,
 		},
 		&AzureKubernetesServiceExpander{
+			client: client,
+		},
+		&AzureSearchServiceExpander{
 			client: client,
 		},
 	}

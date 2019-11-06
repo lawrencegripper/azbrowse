@@ -57,6 +57,39 @@ func TestMatch(t *testing.T) {
 			matchResult.Values)
 	}
 }
+func TestMatchEndingWithNamedSegment(t *testing.T) {
+
+	//should match
+	matchResult := getMatchResult(
+		"/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{name}",
+		"/subscriptions/random/resourceGroups/aaaaa/providers/Microsoft.Web/sites/azbrowsetest")
+
+	if !matchResult.IsMatch {
+		t.Error("Expected IsMatch to be true")
+	} else {
+		t.Log("verifying values")
+		verifyMap(
+			t,
+			map[string]string{
+				"subscriptionId":    "random",
+				"resourceGroupName": "aaaaa",
+				"name":              "azbrowsetest",
+			},
+			matchResult.Values)
+	}
+}
+func TestMatchEndingWithNamedSegmentIsNotTooGreedy(t *testing.T) {
+
+	//should match
+	matchResult := getMatchResult(
+		"/subscriptions/{subscriptionId}",
+		"/subscriptions/random/resourceGroups/aaaaa")
+
+	if matchResult.IsMatch {
+		t.Error("Shouldn't match")
+	}
+}
+
 func TestMatchDifferentCase(t *testing.T) {
 
 	//should match even though case differs on literal segments
@@ -95,6 +128,63 @@ func TestMatchWithQueryString(t *testing.T) {
 				"subscriptionId":    "random",
 				"resourceGroupName": "aaaaa",
 				"name":              "azbrowsetest",
+			},
+			matchResult.Values)
+	}
+}
+
+func TestBuildWithParameterisedName(t *testing.T) {
+	endpoint, err := GetEndpointInfoFromURL(
+		"/datasources('{name}')",
+		"")
+	if err != nil {
+		t.Errorf("Expected success but got error: %s", err)
+		return
+	}
+	url, err := endpoint.BuildURL(map[string]string{
+		"name": "wibble",
+	})
+	expectedURL := "/datasources('wibble')"
+	if err != nil {
+		t.Errorf("Expected success but got error: %s", err)
+		return
+	}
+	if url != expectedURL {
+		t.Errorf("Expected URL '%s' but got '%s", expectedURL, url)
+	}
+}
+func TestBuildArrayWithParameterisedName(t *testing.T) {
+	endpoint, err := GetEndpointInfoFromURL(
+		"/datasources('{name}')",
+		"")
+	if err != nil {
+		t.Errorf("Expected success but got error: %s", err)
+		return
+	}
+	url, err := endpoint.BuildURLFromArray([]string{"wibble"})
+	expectedURL := "/datasources('wibble')"
+	if err != nil {
+		t.Errorf("Expected success but got error: %s", err)
+		return
+	}
+	if url != expectedURL {
+		t.Errorf("Expected URL '%s' but got '%s", expectedURL, url)
+	}
+}
+func TestMatchWithParameterisedNameMatch(t *testing.T) {
+
+	matchResult := getMatchResult(
+		"/datasources('{name}')",
+		"/datasources('wibble')")
+
+	if !matchResult.IsMatch {
+		t.Error("Expected IsMatch to be true")
+	} else {
+		t.Log("verifying values")
+		verifyMap(
+			t,
+			map[string]string{
+				"name": "wibble",
 			},
 			matchResult.Values)
 	}

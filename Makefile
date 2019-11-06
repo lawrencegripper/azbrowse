@@ -31,8 +31,10 @@ swagger-update:
 swagger-codegen:
 	export GO111MODULE=on
 	go run ./cmd/swagger-codegen/ --output-file ./internal/pkg/expanders/swagger-armspecs.generated.go 
+	go run ./cmd/swagger-codegen/ 
 	# Format the generated code
 	gofmt -s -w internal/pkg/expanders/swagger-armspecs.generated.go
+	gofmt -s -w internal/pkg/expanders/search.generated.go
 	# Build the generated go files to check for any go build issues
 	go build internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go 
 	# Test the generated code initalizes

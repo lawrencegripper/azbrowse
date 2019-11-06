@@ -17,7 +17,9 @@ type EndpointSegment struct {
 	// holds a literal to match for fixed segments (e.g. /subscriptions/)
 	Match string
 	// holds the name of a templated segment (e.g. 'name' for /{name}/)
-	Name string
+	Name   string
+	Prefix string
+	Suffix string
 }
 
 // MatchResult holds information about an EndPointInfo match
@@ -32,22 +34,46 @@ type MatchResult struct {
 func GetEndpointInfoFromURL(templateURL string, apiVersion string) (EndpointInfo, error) {
 	// This is currently generating at runtime, but would be a build-time task that generated code :-)
 	originalTemplateURL := templateURL
+
 	templateURL = strings.TrimPrefix(templateURL, "/")
 	templateURL = strings.TrimSuffix(templateURL, "/")
+
 	templateURLSegments := strings.Split(templateURL, "/")
-	urlSegments := make([]EndpointSegment, len(templateURLSegments))
+	urlSegments := []EndpointSegment{}
 	for i, s := range templateURLSegments {
 		if strings.HasPrefix(s, "{") && strings.HasSuffix(s, "}") {
 			name := strings.TrimPrefix(strings.TrimSuffix(s, "}"), "{")
 			if name == "" {
 				return EndpointInfo{}, fmt.Errorf("Segment index %d is a named segment but is missing the name", i)
 			}
-			urlSegments[i] = EndpointSegment{
-				Name: name,
-			}
+			urlSegments = append(urlSegments, EndpointSegment{
+				Prefix: "/",
+				Name:   name,
+			})
 		} else {
-			urlSegments[i] = EndpointSegment{
-				Match: s,
+			// check for a `docs('{name}')` style match
+			parameterIndex := strings.Index(s, "('{")
+			if parameterIndex < 0 {
+				// Fixed value segment
+				urlSegments = append(urlSegments, EndpointSegment{
+					Prefix: "/",
+					Match:  s,
+				})
+			} else {
+				// If we have a segment such as `docs('{name}')` we expect the string to end with `}')`
+				if !strings.HasSuffix(s, "}')") {
+					return EndpointInfo{}, fmt.Errorf("Found parameterised segment but didn't find expected suffix")
+				}
+				fixedValue := s[:parameterIndex]
+				name := s[parameterIndex+3 : len(s)-3]
+				urlSegments = append(urlSegments, EndpointSegment{
+					Prefix: "/",
+					Match:  fixedValue,
+				}, EndpointSegment{
+					Prefix: "('",
+					Suffix: "')",
+					Name:   name,
+				})
 			}
 		}
 	}
@@ -71,34 +97,64 @@ func MustGetEndpointInfoFromURL(url string, apiVersion string) *EndpointInfo {
 // Match tests whether a URL matches the EndpointInfo (ignoring query string values)
 func (ei *EndpointInfo) Match(url string) MatchResult {
 
-	url = strings.TrimPrefix(url, "/")
+	remainingURLToMatch := url
 
 	// strip off querystring for matching
-	if i := strings.Index(url, "?"); i >= 0 {
-		url = url[:i]
+	if i := strings.Index(remainingURLToMatch, "?"); i >= 0 {
+		remainingURLToMatch = remainingURLToMatch[:i]
 	}
 
-	urlSegments := strings.Split(url, "/")
-	if len(urlSegments) == len(ei.URLSegments) {
-		isMatch := true
-		matches := make(map[string]string)
-		for i, segment := range ei.URLSegments {
-			if segment.Name == "" {
-				// literal match (ignore case)
-				if !strings.EqualFold(segment.Match, urlSegments[i]) {
-					isMatch = false
-					break
-				}
-			} else {
-				// capture name
-				matches[segment.Name] = urlSegments[i]
-			}
+	matches := make(map[string]string)
+	for i, segment := range ei.URLSegments {
+		if !strings.HasPrefix(remainingURLToMatch, segment.Prefix) {
+			return MatchResult{IsMatch: false}
 		}
-		if isMatch {
-			return MatchResult{
-				IsMatch: true,
-				Values:  matches,
+		remainingURLToMatch = remainingURLToMatch[len(segment.Prefix):]
+		if segment.Match != "" {
+			// literal match - check (case-insensitively) that the remainingURL starts with segment.Match
+			matchTest := remainingURLToMatch[:len(segment.Match)]
+			if strings.EqualFold(segment.Match, matchTest) {
+				remainingURLToMatch = remainingURLToMatch[len(segment.Match):]
+			} else {
+				return MatchResult{IsMatch: false}
 			}
+		} else {
+			// name match - match up to:
+			//  * segment.Suffix (if set)
+			//  * next Segment.Prefix (if there is a next segment)
+			//  * end of the string failing that!
+			matchTerminator := ""
+			additionalSkipAmount := 0
+			if segment.Suffix != "" {
+				matchTerminator = segment.Suffix
+				additionalSkipAmount = len(matchTerminator) // skip past the suffix if we match
+			} else {
+				if i+1 < len(ei.URLSegments) {
+					matchTerminator = ei.URLSegments[i+1].Prefix // don't skip the prefix as that will be handled on the next loop iteration
+				} else {
+					// Looks like match is the rest of the URL
+					if slashIndex := strings.Index(remainingURLToMatch, "/"); slashIndex >= 0 {
+						// tried to match the rest of the URL but it still has more segments to match on
+						return MatchResult{IsMatch: false}
+					}
+					matches[segment.Name] = remainingURLToMatch
+					remainingURLToMatch = ""
+					continue
+				}
+			}
+			terminatorIndex := strings.Index(remainingURLToMatch, matchTerminator)
+			if terminatorIndex < 0 {
+				return MatchResult{IsMatch: false}
+			}
+			matches[segment.Name] = remainingURLToMatch[:terminatorIndex]
+			remainingURLToMatch = remainingURLToMatch[terminatorIndex+additionalSkipAmount:]
+		}
+	}
+
+	if remainingURLToMatch == "" {
+		return MatchResult{
+			IsMatch: true,
+			Values:  matches,
 		}
 	}
 
@@ -112,15 +168,17 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 
 	url := ""
 	for _, segment := range ei.URLSegments {
+		segmentValue := ""
 		if segment.Match == "" {
 			value := values[segment.Name]
 			if value == "" {
 				return "", fmt.Errorf("No value was found with name '%s'", segment.Match)
 			}
-			url += "/" + value
+			segmentValue = value
 		} else {
-			url += "/" + segment.Match
+			segmentValue = segment.Match
 		}
+		url += segment.Prefix + segmentValue + segment.Suffix
 	}
 	if ei.APIVersion != "" {
 		url += "?api-version=" + ei.APIVersion
@@ -130,12 +188,10 @@ func (ei *EndpointInfo) BuildURL(values map[string]string) (string, error) {
 
 // GenerateValueArrayFromMap builds an ordered array of template match values from a templateValues map for use with BuildURLFromArray
 func (ei *EndpointInfo) GenerateValueArrayFromMap(templateValues map[string]string) []string {
-	valueArray := make([]string, len(templateValues))
-	valueArrayIndex := 0
+	valueArray := []string{}
 	for _, segment := range ei.URLSegments {
 		if segment.Name != "" {
-			valueArray[valueArrayIndex] = templateValues[segment.Name]
-			valueArrayIndex++
+			valueArray = append(valueArray, templateValues[segment.Name])
 		}
 	}
 	return valueArray
@@ -147,16 +203,17 @@ func (ei *EndpointInfo) BuildURLFromArray(values []string) (string, error) {
 	url := ""
 	valueIndex := 0
 	for _, segment := range ei.URLSegments {
+		segmentValue := ""
 		if segment.Match == "" {
 			if valueIndex >= len(values) {
 				return "", fmt.Errorf("Too few values")
 			}
-			value := values[valueIndex] // TODO - check array bounds!
-			url += "/" + value
+			segmentValue = values[valueIndex] // TODO - check array bounds!
 			valueIndex++
 		} else {
-			url += "/" + segment.Match
+			segmentValue = segment.Match
 		}
+		url += segment.Prefix + segmentValue + segment.Suffix
 	}
 	if ei.APIVersion != "" {
 		url += "?api-version=" + ei.APIVersion

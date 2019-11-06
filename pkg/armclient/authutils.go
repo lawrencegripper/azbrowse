@@ -2,6 +2,7 @@ package armclient
 
 import (
 	"encoding/json"
+	"fmt"
 	"os/exec"
 )
 
@@ -19,7 +20,7 @@ func aquireTokenFromAzCLI(clearCache bool) (AzCLIToken, error) {
 	if currentToken == nil || clearCache {
 		out, err := exec.Command("az", "account", "get-access-token", "--output", "json").Output()
 		if err != nil {
-			return AzCLIToken{}, err
+			return AzCLIToken{}, fmt.Errorf("%s (try running 'az account get-access-token' to get more details)", err)
 		}
 
 		var r AzCLIToken

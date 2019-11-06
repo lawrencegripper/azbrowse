@@ -112,7 +112,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 			Timeout:    time.Second * 15,
 		})
 
-		swaggerExpander := expanders.GetSwaggerResourceExpander(w.client)
+		swaggerExpander := expanders.GetSwaggerResourceExpander()
 
 		for _, i := range pending {
 			swaggerDeleted, err := swaggerExpander.Delete(context.Background(), i)
