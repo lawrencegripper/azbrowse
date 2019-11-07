@@ -258,6 +258,10 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 		return false, fmt.Errorf("Item cannot be deleted (No DeleteURL)")
 	}
 
+	if item.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs('{key}')" {
+		return c.deleteDoc(ctx, item)
+	}
+
 	url := c.searchEndpoint + item.DeleteURL
 	_, err := c.doRequest("DELETE", url)
 	if err != nil {
@@ -265,6 +269,47 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 		return false, err
 	}
 	return true, nil
+}
+func (c SwaggerAPISetSearch) deleteDoc(ctx context.Context, item *TreeNode) (bool, error) {
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return false, fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+
+	keyName := item.Metadata["IndexKey"]
+	key := matchResult.Values["key"]
+
+	doc := map[string]interface{}{
+		"@search.action": "delete",
+		keyName:          key,
+	}
+
+	var deleteBody struct {
+		Value []map[string]interface{} `json:"value"`
+	}
+
+	deleteBody.Value = []map[string]interface{}{doc}
+	deleteBodyBytes, err := json.Marshal(deleteBody)
+	if err != nil {
+		return false, fmt.Errorf("Error marshalling delete doc: %s", err) //nolint:misspell
+	}
+
+	url, err := item.SwaggerResourceType.DeleteEndpoint.BuildURL(matchResult.Values)
+	if err != nil {
+		return false, fmt.Errorf("Error building DELETE url: %s", err)
+	}
+
+	url = c.searchEndpoint + url
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+	_, err = c.doRequestWithBodyAndHeaders("POST", url, string(deleteBodyBytes), headers)
+
+	if err != nil {
+		return false, fmt.Errorf("Error from POST: %s", err)
+	}
+	return true, nil
+
 }
 
 // Update attempts to update the specified item with new content
@@ -318,7 +363,7 @@ func (c SwaggerAPISetSearch) getBodyForDocUpdate(ctx context.Context, item *Tree
 	updateBody.Value = []map[string]interface{}{doc}
 	updateBodyBytes, err := json.Marshal(updateBody)
 	if err != nil {
-		return "", fmt.Errorf("Error marshalling update doc: %s", err)
+		return "", fmt.Errorf("Error marshalling update doc: %s", err) //nolint:misspell
 	}
 
 	return string(updateBodyBytes), nil
