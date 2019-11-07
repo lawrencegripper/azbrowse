@@ -36,7 +36,7 @@ swagger-codegen:
 	gofmt -s -w internal/pkg/expanders/swagger-armspecs.generated.go
 	gofmt -s -w internal/pkg/expanders/search.generated.go
 	# Build the generated go files to check for any go build issues
-	go build internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go 
+	go build internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go internal/pkg/expanders/test_utils.go
 	# Test the generated code initalizes
 	go test -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
 
