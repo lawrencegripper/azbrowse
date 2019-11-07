@@ -269,19 +269,57 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 
 // Update attempts to update the specified item with new content
 func (c SwaggerAPISetSearch) Update(ctx context.Context, item *TreeNode, content string) error {
+	verb := "PUT"
+
+	if item.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs('{key}')" {
+		var err error
+		content, err = c.getBodyForDocUpdate(ctx, item, content)
+		if err != nil {
+			return fmt.Errorf("Error packaging doc update: %s", err)
+		}
+		verb = "POST"
+	}
+
 	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
 	if !matchResult.IsMatch {
 		return fmt.Errorf("item.ExpandURL didn't match current Endpoint")
 	}
 
-	url := c.searchEndpoint + item.ExpandURL
-	headers := map[string]string{
-		"Content-Type" : "application/json",
+	url, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+	if err != nil {
+		return fmt.Errorf("Error building PUT url: %s", err)
 	}
-	_, err := c.doRequestWithBodyAndHeaders("PUT", url, content, headers)
+
+	url = c.searchEndpoint + url
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+	_, err = c.doRequestWithBodyAndHeaders(verb, url, content, headers)
 
 	if err != nil {
-		return fmt.Errorf("Error from PUT: %s", err)
+		return fmt.Errorf("Error from %s: %s", verb, err)
 	}
 	return nil
+}
+
+func (c SwaggerAPISetSearch) getBodyForDocUpdate(ctx context.Context, item *TreeNode, content string) (string, error) {
+	var doc map[string]interface{}
+	err := json.Unmarshal([]byte(content), &doc)
+	if err != nil {
+		err = fmt.Errorf("Error parsing doc: %s", err)
+		return "", err
+	}
+
+	doc["@search.action"] = "upload"
+
+	var updateBody struct {
+		Value []map[string]interface{} `json:"value"`
+	}
+	updateBody.Value = []map[string]interface{}{doc}
+	updateBodyBytes, err := json.Marshal(updateBody)
+	if err != nil {
+		return "", fmt.Errorf("Error marshalling update doc: %s", err)
+	}
+
+	return string(updateBodyBytes), nil
 }
