@@ -130,7 +130,7 @@ func (e *AzureSearchServiceExpander) expandSearchRoot(ctx context.Context, curre
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: "TODO - what should go here?"},
+		Response:          ExpanderResponse{Response: ""},
 		SourceDescription: "AzureSearchServiceExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
