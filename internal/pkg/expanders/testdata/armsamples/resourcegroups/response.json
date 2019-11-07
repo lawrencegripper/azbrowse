@@ -1,0 +1,54 @@
+{
+    "value": [
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell",
+            "name": "cloudshell",
+            "location": "northeurope",
+            "properties": {
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/lgkubeflow1",
+            "name": "lgkubeflow1",
+            "location": "westeurope",
+            "properties": {
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope",
+            "name": "MC_lgkubeflow1_lgkubeflow1_westeurope",
+            "location": "westeurope",
+            "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/lgkubeflow1/providers/Microsoft.ContainerService/managedClusters/lgkubeflow1",
+            "tags": {},
+            "properties": {
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/NetworkWatcherRG",
+            "name": "NetworkWatcherRG",
+            "location": "northeurope",
+            "properties": {
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stable",
+            "name": "stable",
+            "location": "westeurope",
+            "properties": {
+                "provisioningState": "Succeeded"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stable_terraform_tests",
+            "name": "stable_terraform_tests",
+            "location": "eastus",
+            "properties": {
+                "provisioningState": "Succeeded"
+            }
+        }
+    ]
+}
