@@ -18,6 +18,10 @@ type DefaultExpander struct {
 	client *armclient.Client
 }
 
+func (e *DefaultExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // DefaultExpanderInstance provides an instance of the default expander for use
 var DefaultExpanderInstance DefaultExpander
 
@@ -73,4 +77,8 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 		SourceDescription: "Default Expander Request",
 	}
+}
+
+func (e *DefaultExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

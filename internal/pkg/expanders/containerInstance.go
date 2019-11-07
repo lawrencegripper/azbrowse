@@ -23,6 +23,10 @@ type ContainerInstanceExpander struct {
 	client *armclient.Client
 }
 
+func (e *ContainerInstanceExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *ContainerInstanceExpander) Name() string {
 	return "ContainerInstanceExpander"
@@ -216,4 +220,8 @@ type ContainerGroupResponse struct {
 		} `json:"volumes"`
 	} `json:"properties"`
 	Type string `json:"type"`
+}
+
+func (e *ContainerInstanceExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

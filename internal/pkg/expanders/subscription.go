@@ -17,51 +17,6 @@ type SubscriptionExpander struct {
 	client *armclient.Client
 }
 
-func (e *SubscriptionExpander) testCases() (bool, *[]expanderTestCase) {
-	return true, &[]expanderTestCase{
-		{
-			name: "ExpandSubscription->ResourceGroups",
-			nodeToExpand: &TreeNode{
-				Display:        "Thingy1",
-				Name:           "Thingy1",
-				ID:             "/subscriptions/00000000-0000-0000-0000-000000000000",
-				ExpandURL:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01",
-				ItemType:       SubscriptionType,
-				SubscriptionID: "00000000-0000-0000-0000-000000000000",
-			},
-			urlPath:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups",
-			responseFile: "./testdata/armsamples/resourcegroups/response.json",
-			statusCode:   200,
-			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
-				st.Expect(t, r.Err, nil)
-				st.Expect(t, len(r.Nodes), 6)
-
-				// Validate content
-				st.Expect(t, r.Nodes[0].Name, "cloudshell")
-				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell/resources?api-version=2017-05-10")
-			},
-		},
-		{
-			name: "ExpandSubscription->500StatusCode",
-			nodeToExpand: &TreeNode{
-				Display:        "Thingy1",
-				Name:           "Thingy1",
-				ID:             "/subscriptions/00000000-0000-0000-0000-000000000000",
-				ExpandURL:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01",
-				ItemType:       SubscriptionType,
-				SubscriptionID: "00000000-0000-0000-0000-000000000000",
-			},
-			urlPath:    "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups",
-			statusCode: 500,
-			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
-				if r.Err == nil {
-					t.Error("Failed expanding resource. Should have errored and didn't", result)
-				}
-			},
-		},
-	}
-}
-
 // Name returns the name of the expander
 func (e *SubscriptionExpander) Name() string {
 	return "SubscriptionExpander"
@@ -126,4 +81,53 @@ type ResourceGroupResponse struct {
 			ProvisioningState string `json:"provisioningState"`
 		} `json:"properties"`
 	} `json:"value"`
+}
+
+func (e *SubscriptionExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
+func (e *SubscriptionExpander) testCases() (bool, *[]expanderTestCase) {
+	return true, &[]expanderTestCase{
+		{
+			name: "Subscription->ResourceGroups",
+			nodeToExpand: &TreeNode{
+				Display:        "Thingy1",
+				Name:           "Thingy1",
+				ID:             "/subscriptions/00000000-0000-0000-0000-000000000000",
+				ExpandURL:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01",
+				ItemType:       SubscriptionType,
+				SubscriptionID: "00000000-0000-0000-0000-000000000000",
+			},
+			urlPath:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups",
+			responseFile: "./testdata/armsamples/resourcegroups/response.json",
+			statusCode:   200,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+				st.Expect(t, len(r.Nodes), 6)
+
+				// Validate content
+				st.Expect(t, r.Nodes[0].Name, "cloudshell")
+				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell/resources?api-version=2017-05-10")
+			},
+		},
+		{
+			name: "Subscription->500StatusCode",
+			nodeToExpand: &TreeNode{
+				Display:        "Thingy1",
+				Name:           "Thingy1",
+				ID:             "/subscriptions/00000000-0000-0000-0000-000000000000",
+				ExpandURL:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01",
+				ItemType:       SubscriptionType,
+				SubscriptionID: "00000000-0000-0000-0000-000000000000",
+			},
+			urlPath:    "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups",
+			statusCode: 500,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				if r.Err == nil {
+					t.Error("Failed expanding resource. Should have errored and didn't", r)
+				}
+			},
+		},
+	}
 }

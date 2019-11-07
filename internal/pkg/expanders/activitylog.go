@@ -15,6 +15,10 @@ type ActivityLogExpander struct {
 	client *armclient.Client
 }
 
+func (e *ActivityLogExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *ActivityLogExpander) Name() string {
 	return "ActivityLogExpander"
@@ -167,4 +171,8 @@ type ActivityLogResource struct {
 			Method          string `json:"method"`
 		} `json:"httpRequest,omitempty"`
 	} `json:"value"`
+}
+
+func (e *ActivityLogExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

@@ -2,6 +2,8 @@ package expanders
 
 import (
 	"context"
+
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // The storage API currently doesn't provide a way to list management policies for a storage account
@@ -15,6 +17,10 @@ var _ Expander = &StorageManagementPoliciesExpander{}
 
 // StorageManagementPoliciesExpander expands The default management policy under a storage account
 type StorageManagementPoliciesExpander struct{}
+
+func (e *StorageManagementPoliciesExpander) setClient(c *armclient.Client) {
+	// noop
+}
 
 // Name returns the name of the expander
 func (e *StorageManagementPoliciesExpander) Name() string {
@@ -85,4 +91,8 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 		Nodes:             newItems,
 		IsPrimaryResponse: isPrimaryResponse,
 	}
+}
+
+func (e *StorageManagementPoliciesExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

@@ -20,7 +20,6 @@ func dummyTokenFunc() func(clearCache bool) (armclient.AzCLIToken, error) {
 type expanderTestCase struct {
 	name                string
 	statusCode          int
-	expander            Expander
 	nodeToExpand        *TreeNode
 	urlPath             string
 	responseFile        string

@@ -22,6 +22,10 @@ type ResourceGroupResourceExpander struct {
 	client *armclient.Client
 }
 
+func (e *ResourceGroupResourceExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *ResourceGroupResourceExpander) Name() string {
 	return "ResourceGroupExpander"
@@ -208,4 +212,8 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		SourceDescription: "Resources Request",
 		IsPrimaryResponse: true,
 	}
+}
+
+func (e *ResourceGroupResourceExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }
