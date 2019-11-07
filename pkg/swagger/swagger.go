@@ -228,6 +228,10 @@ func getPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string)
 			path.Operations.Delete.Permitted = true
 			path.Operations.Delete.Endpoint = path.Endpoint
 		}
+		if override.DeletePath != "" {
+			path.Operations.Delete.Permitted = true
+			path.Operations.Delete.Endpoint = endpoints.MustGetEndpointInfoFromURL(override.DeletePath, path.Endpoint.APIVersion)
+		}
 		if swaggerPathItem.Patch != nil && getVerb != "patch" {
 			path.Operations.Patch.Permitted = true
 			path.Operations.Patch.Endpoint = path.Endpoint
@@ -239,6 +243,10 @@ func getPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string)
 		if swaggerPathItem.Put != nil && getVerb != "put" {
 			path.Operations.Put.Permitted = true
 			path.Operations.Put.Endpoint = path.Endpoint
+		}
+		if override.PutPath != "" {
+			path.Operations.Put.Permitted = true
+			path.Operations.Put.Endpoint = endpoints.MustGetEndpointInfoFromURL(override.PutPath, path.Endpoint.APIVersion)
 		}
 
 		paths[pathIndex] = path

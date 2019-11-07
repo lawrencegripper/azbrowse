@@ -112,8 +112,10 @@ func (ei *EndpointInfo) Match(url string) MatchResult {
 		remainingURLToMatch = remainingURLToMatch[len(segment.Prefix):]
 		if segment.Match != "" {
 			// literal match - check (case-insensitively) that the remainingURL starts with segment.Match
-			matchTest := remainingURLToMatch[:len(segment.Match)]
-			if strings.EqualFold(segment.Match, matchTest) {
+			if len(segment.Match) > len(remainingURLToMatch) {
+				return MatchResult{IsMatch: false}
+			}
+			if matchTest := remainingURLToMatch[:len(segment.Match)]; strings.EqualFold(segment.Match, matchTest) {
 				remainingURLToMatch = remainingURLToMatch[len(segment.Match):]
 			} else {
 				return MatchResult{IsMatch: false}

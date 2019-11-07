@@ -30,6 +30,10 @@ func NewContainerRegistryExpander(armclient *armclient.Client) *ContainerRegistr
 // Check interface
 var _ Expander = &ContainerRegistryExpander{}
 
+func (e *ContainerRegistryExpander) setClient(c *armclient.Client) {
+	e.armClient = c
+}
+
 // ContainerRegistryExpander expands Tthe data-plane aspects of a Container Registry
 type ContainerRegistryExpander struct {
 	client    *http.Client
@@ -607,4 +611,8 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 	accessToken := jsonResponse["access_token"].(string)
 
 	return accessToken, nil
+}
+
+func (e *ContainerRegistryExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

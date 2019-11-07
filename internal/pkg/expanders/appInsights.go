@@ -28,6 +28,10 @@ type AppInsightsExpander struct {
 	client *armclient.Client
 }
 
+func (e *AppInsightsExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *AppInsightsExpander) Name() string {
 	return "AppInsightsExpander"
@@ -177,4 +181,8 @@ func (e *AppInsightsExpander) expandAnalyticsItem(ctx context.Context, currentIt
 		Response:          ExpanderResponse{Response: data, ResponseType: ResponseJSON},
 		SourceDescription: "AppInsightsExpander request",
 	}
+}
+
+func (e *AppInsightsExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

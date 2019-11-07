@@ -1,0 +1,40 @@
+{
+    "value": [
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000",
+            "authorizationSource": "Legacy",
+            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Thingy1",
+            "state": "Enabled",
+            "subscriptionPolicies": {
+                "locationPlacementId": "Public_2014-09-01",
+                "quotaId": "MSDN_2014-09-01",
+                "spendingLimit": "On"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000",
+            "authorizationSource": "Legacy",
+            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Thingy2",
+            "state": "Enabled",
+            "subscriptionPolicies": {
+                "locationPlacementId": "Stuff_2014-09-01",
+                "quotaId": "Stuff_2014-09-01",
+                "spendingLimit": "Off"
+            }
+        },
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000",
+            "authorizationSource": "RoleBased",
+            "subscriptionId": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Thingy3",
+            "state": "Enabled",
+            "subscriptionPolicies": {
+                "locationPlacementId": "Stuff_2014-09-01",
+                "quotaId": "Stuff_2014-09-01",
+                "spendingLimit": "Off"
+            }
+        }
+    ]
+}
