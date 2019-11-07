@@ -32,6 +32,10 @@ type MetricsExpander struct {
 	client *armclient.Client
 }
 
+func (e *MetricsExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *MetricsExpander) Name() string {
 	return "MetricsExpander"
@@ -204,4 +208,8 @@ func (e *MetricsExpander) expandGraph(ctx context.Context, currentItem *TreeNode
 		IsPrimaryResponse: true,
 		SourceDescription: "MetricsExpander build graph",
 	}
+}
+
+func (e *MetricsExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

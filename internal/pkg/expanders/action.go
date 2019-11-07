@@ -13,6 +13,10 @@ type ActionExpander struct {
 	client *armclient.Client
 }
 
+func (e *ActionExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *ActionExpander) Name() string {
 	return "ActionExpander"
@@ -46,4 +50,8 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 		SourceDescription: "Resource Group Request",
 		IsPrimaryResponse: true,
 	}
+}
+
+func (e *ActionExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }
