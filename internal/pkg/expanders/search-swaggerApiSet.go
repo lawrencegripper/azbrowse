@@ -73,13 +73,19 @@ func (c SwaggerAPISetSearch) GetResourceTypes() []swagger.ResourceType {
 	return c.resourceTypes
 }
 
-func (c SwaggerAPISetSearch) doRequest(verb string, url string) (string, error) {
-	return c.doRequestWithBody(verb, url, "")
+// DoRequest makes a request against the search endpoint
+func (c SwaggerAPISetSearch) DoRequest(verb string, url string) (string, error) {
+	return c.DoRequestWithBody(verb, url, "")
 }
-func (c SwaggerAPISetSearch) doRequestWithBody(verb string, url string, body string) (string, error) {
-	return c.doRequestWithBodyAndHeaders(verb, url, body, map[string]string{})
+
+// DoRequestWithBody makes a request against the search endpoint
+func (c SwaggerAPISetSearch) DoRequestWithBody(verb string, url string, body string) (string, error) {
+	return c.DoRequestWithBodyAndHeaders(verb, url, body, map[string]string{})
 }
-func (c SwaggerAPISetSearch) doRequestWithBodyAndHeaders(verb string, url string, body string, headers map[string]string) (string, error) {
+
+// DoRequestWithBodyAndHeaders makes a request against the search endpoint
+func (c SwaggerAPISetSearch) DoRequestWithBodyAndHeaders(verb string, url string, body string, headers map[string]string) (string, error) {
+	url = c.searchEndpoint + url
 	request, err := http.NewRequest(verb, url, bytes.NewReader([]byte(body)))
 	if err != nil {
 		err = fmt.Errorf("Failed to create request" + err.Error() + url)
@@ -112,8 +118,8 @@ func (c SwaggerAPISetSearch) doRequestWithBodyAndHeaders(verb string, url string
 func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	subResources := []SubResource{}
-	url := c.searchEndpoint + currentItem.ExpandURL
-	data, err := c.doRequest("GET", url)
+	url := currentItem.ExpandURL
+	data, err := c.DoRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %s", err)
 		return APISetExpandResponse{}, err
@@ -262,8 +268,8 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 		return c.deleteDoc(ctx, item)
 	}
 
-	url := c.searchEndpoint + item.DeleteURL
-	_, err := c.doRequest("DELETE", url)
+	url := item.DeleteURL
+	_, err := c.DoRequest("DELETE", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
 		return false, err
@@ -299,11 +305,10 @@ func (c SwaggerAPISetSearch) deleteDoc(ctx context.Context, item *TreeNode) (boo
 		return false, fmt.Errorf("Error building DELETE url: %s", err)
 	}
 
-	url = c.searchEndpoint + url
 	headers := map[string]string{
 		"Content-Type": "application/json",
 	}
-	_, err = c.doRequestWithBodyAndHeaders("POST", url, string(deleteBodyBytes), headers)
+	_, err = c.DoRequestWithBodyAndHeaders("POST", url, string(deleteBodyBytes), headers)
 
 	if err != nil {
 		return false, fmt.Errorf("Error from POST: %s", err)
@@ -335,11 +340,10 @@ func (c SwaggerAPISetSearch) Update(ctx context.Context, item *TreeNode, content
 		return fmt.Errorf("Error building PUT url: %s", err)
 	}
 
-	url = c.searchEndpoint + url
 	headers := map[string]string{
 		"Content-Type": "application/json",
 	}
-	_, err = c.doRequestWithBodyAndHeaders(verb, url, content, headers)
+	_, err = c.DoRequestWithBodyAndHeaders(verb, url, content, headers)
 
 	if err != nil {
 		return fmt.Errorf("Error from %s: %s", verb, err)

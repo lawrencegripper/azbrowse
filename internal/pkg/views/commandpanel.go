@@ -15,6 +15,7 @@ type CommandPanelWidget struct {
 	visible          bool
 	gui              *gocui.Gui
 	panelContent     string
+	newPanelContent  string
 	prepopulate      string
 	previousViewName string
 }
@@ -101,6 +102,20 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 		// It is lets prepopulate it with content like `/` if it was launched from the filter handler
 		v.Write([]byte(w.prepopulate))     //nolint: errcheck
 		v.SetCursor(len(w.prepopulate), 0) //nolint: errcheck
+	} else if w.newPanelContent != "" {
+		// update panel contents
+		v.Clear()
+		if _, err := v.Write([]byte(w.newPanelContent)); err != nil {
+			panic("Failed to write to view")
+		}
+		if err := v.SetCursor(len(w.newPanelContent), 0); err != nil {
+			panic("Failed to set cursor position")
+		}
+		if err := v.SetOrigin(0, 0); err != nil {
+			panic("Failed to set view origin")
+		}
+		w.panelContent = w.newPanelContent
+		w.newPanelContent = ""
 	} else if w.panelContent != v.Buffer() {
 		// Has something been typed?
 		w.panelContent = v.Buffer()
@@ -129,10 +144,25 @@ func (w *CommandPanelWidget) panelChanged() {
 	// `/` -> Filter command
 	if strings.HasPrefix(content, "/") {
 		eventing.Publish("filter", content)
+	} else if strings.HasPrefix(content, "search-query:") {
+		if w.contentHasNewLine() {
+			content = strings.ReplaceAll(content, "\n", "")
+			eventing.Publish("azure-search-query", content)
+			// clear the newlines
+			w.newPanelContent = content
+			if err := w.Layout(w.gui); err != nil {
+				panic("Layout failed")
+			}
+			return // prevent falling through to hide panel
+		}
 	}
 
 	// Handle return by closing panel... events should handle dealing with whats needed
-	if strings.Count(content, "\n") > 1 { //Warning: By default gocui is adding a newline so we're checking for existence of 2
+	if w.contentHasNewLine() {
 		w.ToggleShowHide()
 	}
+}
+
+func (w *CommandPanelWidget) contentHasNewLine() bool {
+	return strings.Count(w.panelContent, "\n") > 1 //Warning: By default gocui is adding a newline so we're checking for existence of 2
 }
