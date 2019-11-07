@@ -12,11 +12,11 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-func Test_TenantExpander_ReturnsContentOnSuccess(t *testing.T) {
+func Test_SubscriptionExpander_ReturnsContentOnSuccess(t *testing.T) {
 	const testServer = "https://management.azure.com"
-	const testPath = "subscriptions"
+	const testPath = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups"
 
-	const responseFile = "./testdata/armsamples/subscriptions/response.json"
+	const responseFile = "./testdata/armsamples/resourcegroups/response.json"
 
 	dat, err := ioutil.ReadFile(responseFile)
 	if err != nil {
@@ -37,35 +37,38 @@ func Test_TenantExpander_ReturnsContentOnSuccess(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromClientAndTokenFunc(httpClient, dummyTokenFunc())
 
-	expander := TenantExpander{
+	expander := SubscriptionExpander{
 		client: client,
 	}
 
 	ctx := context.Background()
 
 	itemToExpand := &TreeNode{
-		ItemType:  TentantItemType,
-		ID:        "AvailableSubscriptions",
-		ExpandURL: ExpandURLNotSupported,
+		Display:        "Thingy1",
+		Name:           "Thingy1",
+		ID:             "/subscriptions/00000000-0000-0000-0000-000000000000",
+		ExpandURL:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01",
+		ItemType:       SubscriptionType,
+		SubscriptionID: "00000000-0000-0000-0000-000000000000",
 	}
 
 	result := expander.Expand(ctx, itemToExpand)
 
 	st.Expect(t, result.Err, nil)
-	st.Expect(t, len(result.Nodes), 3)
+	st.Expect(t, len(result.Nodes), 6)
 
 	// Validate content
-	st.Expect(t, result.Nodes[0].Display, "Thingy1")
-	st.Expect(t, result.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01")
+	st.Expect(t, result.Nodes[0].Name, "cloudshell")
+	st.Expect(t, result.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell/resources?api-version=2017-05-10")
 
 	// Verify that we don't have pending mocks
 	st.Expect(t, gock.IsDone(), true)
 
 }
 
-func Test_TenantExpander_ReturnsErrorOn500(t *testing.T) {
+func Test_SubscriptionExpander_ReturnsErrorOn500(t *testing.T) {
 	const testServer = "https://management.azure.com"
-	const testPath = "subscriptions"
+	const testPath = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups"
 
 	defer gock.Off()
 	gock.New(testServer).
@@ -78,14 +81,17 @@ func Test_TenantExpander_ReturnsErrorOn500(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromClientAndTokenFunc(httpClient, dummyTokenFunc())
 
-	expander := TenantExpander{
+	expander := SubscriptionExpander{
 		client: client,
 	}
 
 	itemToExpand := &TreeNode{
-		ItemType:  TentantItemType,
-		ID:        "AvailableSubscriptions",
-		ExpandURL: ExpandURLNotSupported,
+		Display:        "Thingy1",
+		Name:           "Thingy1",
+		ID:             "/subscriptions/00000000-0000-0000-0000-000000000000",
+		ExpandURL:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01",
+		ItemType:       SubscriptionType,
+		SubscriptionID: "00000000-0000-0000-0000-000000000000",
 	}
 
 	ctx := context.Background()
