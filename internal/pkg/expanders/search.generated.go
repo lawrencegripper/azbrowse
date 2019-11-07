@@ -66,8 +66,10 @@ func (e *AzureSearchServiceExpander) loadResourceTypes() []swagger.ResourceType 
 								}},
 							SubResources: []swagger.ResourceType{
 								{
-									Display:  "{key}",
-									Endpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs('{key}')", "2019-05-06"),
+									Display:        "{key}",
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs('{key}')", "2019-05-06"),
+									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/index", "2019-05-06"),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/indexes('{indexName}')/docs/index", "2019-05-06"),
 								}},
 						}},
 				}},

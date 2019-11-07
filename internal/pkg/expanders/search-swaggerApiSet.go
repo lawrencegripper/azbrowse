@@ -77,6 +77,9 @@ func (c SwaggerAPISetSearch) doRequest(verb string, url string) (string, error) 
 	return c.doRequestWithBody(verb, url, "")
 }
 func (c SwaggerAPISetSearch) doRequestWithBody(verb string, url string, body string) (string, error) {
+	return c.doRequestWithBodyAndHeaders(verb, url, body, map[string]string{})
+}
+func (c SwaggerAPISetSearch) doRequestWithBodyAndHeaders(verb string, url string, body string, headers map[string]string) (string, error) {
 	request, err := http.NewRequest(verb, url, bytes.NewReader([]byte(body)))
 	if err != nil {
 		err = fmt.Errorf("Failed to create request" + err.Error() + url)
@@ -84,6 +87,9 @@ func (c SwaggerAPISetSearch) doRequestWithBody(verb string, url string, body str
 	}
 
 	request.Header.Set("api-key", c.adminKey)
+	for name, value := range headers {
+		request.Header.Set(name, value)
+	}
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + url)
@@ -252,6 +258,10 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 		return false, fmt.Errorf("Item cannot be deleted (No DeleteURL)")
 	}
 
+	if item.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs('{key}')" {
+		return c.deleteDoc(ctx, item)
+	}
+
 	url := c.searchEndpoint + item.DeleteURL
 	_, err := c.doRequest("DELETE", url)
 	if err != nil {
@@ -260,8 +270,101 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 	}
 	return true, nil
 }
+func (c SwaggerAPISetSearch) deleteDoc(ctx context.Context, item *TreeNode) (bool, error) {
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return false, fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+
+	keyName := item.Metadata["IndexKey"]
+	key := matchResult.Values["key"]
+
+	doc := map[string]interface{}{
+		"@search.action": "delete",
+		keyName:          key,
+	}
+
+	var deleteBody struct {
+		Value []map[string]interface{} `json:"value"`
+	}
+
+	deleteBody.Value = []map[string]interface{}{doc}
+	deleteBodyBytes, err := json.Marshal(deleteBody)
+	if err != nil {
+		return false, fmt.Errorf("Error marshalling delete doc: %s", err) //nolint:misspell
+	}
+
+	url, err := item.SwaggerResourceType.DeleteEndpoint.BuildURL(matchResult.Values)
+	if err != nil {
+		return false, fmt.Errorf("Error building DELETE url: %s", err)
+	}
+
+	url = c.searchEndpoint + url
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+	_, err = c.doRequestWithBodyAndHeaders("POST", url, string(deleteBodyBytes), headers)
+
+	if err != nil {
+		return false, fmt.Errorf("Error from POST: %s", err)
+	}
+	return true, nil
+
+}
 
 // Update attempts to update the specified item with new content
 func (c SwaggerAPISetSearch) Update(ctx context.Context, item *TreeNode, content string) error {
-	return fmt.Errorf("Not Implemented")
+	verb := "PUT"
+
+	if item.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs('{key}')" {
+		var err error
+		content, err = c.getBodyForDocUpdate(ctx, item, content)
+		if err != nil {
+			return fmt.Errorf("Error packaging doc update: %s", err)
+		}
+		verb = "POST"
+	}
+
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+
+	url, err := item.SwaggerResourceType.PutEndpoint.BuildURL(matchResult.Values)
+	if err != nil {
+		return fmt.Errorf("Error building PUT url: %s", err)
+	}
+
+	url = c.searchEndpoint + url
+	headers := map[string]string{
+		"Content-Type": "application/json",
+	}
+	_, err = c.doRequestWithBodyAndHeaders(verb, url, content, headers)
+
+	if err != nil {
+		return fmt.Errorf("Error from %s: %s", verb, err)
+	}
+	return nil
+}
+
+func (c SwaggerAPISetSearch) getBodyForDocUpdate(ctx context.Context, item *TreeNode, content string) (string, error) {
+	var doc map[string]interface{}
+	err := json.Unmarshal([]byte(content), &doc)
+	if err != nil {
+		err = fmt.Errorf("Error parsing doc: %s", err)
+		return "", err
+	}
+
+	doc["@search.action"] = "upload"
+
+	var updateBody struct {
+		Value []map[string]interface{} `json:"value"`
+	}
+	updateBody.Value = []map[string]interface{}{doc}
+	updateBodyBytes, err := json.Marshal(updateBody)
+	if err != nil {
+		return "", fmt.Errorf("Error marshalling update doc: %s", err) //nolint:misspell
+	}
+
+	return string(updateBodyBytes), nil
 }

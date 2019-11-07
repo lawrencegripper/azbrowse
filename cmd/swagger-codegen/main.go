@@ -162,7 +162,14 @@ func getARMConfig() *swagger.Config {
 
 // getARMConfig returns the config for ARM Swagger processing
 func getAzureSearchDataPlaneConfig() *swagger.Config {
-	return &swagger.Config{}
+	return &swagger.Config{
+		Overrides: map[string]swagger.PathOverride{
+			"/indexes('{indexName}')/docs('{key}')": {
+				PutPath:    "/indexes('{indexName}')/docs/index", // update requires POST, but the APISet will handle that
+				DeletePath: "/indexes('{indexName}')/docs/index", // update requires POST, but the APISet will handle that
+			},
+		},
+	}
 }
 func loadAzureSearchDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
 	var paths []*swagger.Path
