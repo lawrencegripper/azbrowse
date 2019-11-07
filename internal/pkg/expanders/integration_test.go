@@ -16,6 +16,9 @@ func Test_Expanders(t *testing.T) {
 	InitializeExpanders(nil)
 	expanders := getRegisteredExpanders()
 
+	// Add special case of default expander
+	expanders = append(expanders, &DefaultExpander{})
+
 	for _, expander := range expanders {
 
 		hasTests, testCases := expander.testCases()
