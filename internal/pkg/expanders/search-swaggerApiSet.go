@@ -77,6 +77,9 @@ func (c SwaggerAPISetSearch) doRequest(verb string, url string) (string, error) 
 	return c.doRequestWithBody(verb, url, "")
 }
 func (c SwaggerAPISetSearch) doRequestWithBody(verb string, url string, body string) (string, error) {
+	return c.doRequestWithBodyAndHeaders(verb, url, body, map[string]string{})
+}
+func (c SwaggerAPISetSearch) doRequestWithBodyAndHeaders(verb string, url string, body string, headers map[string]string) (string, error) {
 	request, err := http.NewRequest(verb, url, bytes.NewReader([]byte(body)))
 	if err != nil {
 		err = fmt.Errorf("Failed to create request" + err.Error() + url)
@@ -84,6 +87,9 @@ func (c SwaggerAPISetSearch) doRequestWithBody(verb string, url string, body str
 	}
 
 	request.Header.Set("api-key", c.adminKey)
+	for name, value := range headers {
+		request.Header.Set(name, value)
+	}
 	response, err := c.httpClient.Do(request)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + url)
@@ -263,5 +269,19 @@ func (c SwaggerAPISetSearch) Delete(ctx context.Context, item *TreeNode) (bool, 
 
 // Update attempts to update the specified item with new content
 func (c SwaggerAPISetSearch) Update(ctx context.Context, item *TreeNode, content string) error {
-	return fmt.Errorf("Not Implemented")
+	matchResult := item.SwaggerResourceType.Endpoint.Match(item.ExpandURL)
+	if !matchResult.IsMatch {
+		return fmt.Errorf("item.ExpandURL didn't match current Endpoint")
+	}
+
+	url := c.searchEndpoint + item.ExpandURL
+	headers := map[string]string{
+		"Content-Type" : "application/json",
+	}
+	_, err := c.doRequestWithBodyAndHeaders("PUT", url, content, headers)
+
+	if err != nil {
+		return fmt.Errorf("Error from PUT: %s", err)
+	}
+	return nil
 }
