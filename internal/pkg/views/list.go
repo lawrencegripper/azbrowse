@@ -204,6 +204,9 @@ func (w *ListWidget) GoBack() {
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
+
+	eventing.Publish("list.navigated", w.items)
+
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example

@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"runtime"
 	"runtime/debug"
@@ -73,6 +74,8 @@ func main() {
 
 	// Close the span used to track startup times
 	span.Finish()
+
+	automatedFuzzer(list)
 
 	// Start the main loop of gocui to draw the UI
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -285,6 +288,29 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclie
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
 	return list
+}
+
+func automatedFuzzer(list *views.ListWidget) {
+	go func() {
+		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+		depthCount := 0
+		for {
+			nodeListInterface := <-navigatedChannel
+			nodeList := nodeListInterface.([]*expanders.TreeNode)
+			if len(nodeList) < 1 {
+				for index := 0; index < depthCount; index++ {
+					list.GoBack()
+				}
+				continue
+			}
+
+			if len(nodeList) > 0 {
+				list.ChangeSelection(rand.Intn(len(nodeList)))
+				list.ExpandCurrentSelection()
+				depthCount++
+			}
+		}
+	}()
 }
 
 func handleNavigateTo(list *views.ListWidget) {
