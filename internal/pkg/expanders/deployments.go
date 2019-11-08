@@ -16,6 +16,10 @@ type DeploymentsExpander struct {
 	client *armclient.Client
 }
 
+func (e *DeploymentsExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *DeploymentsExpander) Name() string {
 	return "DeploymentsExpander"
@@ -188,4 +192,8 @@ type DeploymentOperationsResponse struct {
 			} `json:"targetResource"`
 		} `json:"properties"`
 	} `json:"value"`
+}
+
+func (e *DeploymentsExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

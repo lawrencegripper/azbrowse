@@ -2,7 +2,9 @@ package expanders
 
 import (
 	"context"
+	"testing"
 
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
@@ -15,6 +17,10 @@ type Expander interface {
 	DoesExpand(ctx context.Context, currentNode *TreeNode) (bool, error)
 	Expand(ctx context.Context, currentNode *TreeNode) ExpanderResult
 	Name() string
+
+	// Used for testing the expanders
+	testCases() (bool, *[]expanderTestCase)
+	setClient(c *armclient.Client)
 }
 
 // ExpanderResponseType is used to indicate the text format of a response
@@ -88,3 +94,13 @@ const (
 	// ExpandURLNotSupported is used to identify items which don't support generic expansion
 	ExpandURLNotSupported = "notsupported"
 )
+
+type expanderTestCase struct {
+	name                string
+	statusCode          int
+	nodeToExpand        *TreeNode
+	urlPath             string
+	responseFile        string
+	configureGockFunc   *func(t *testing.T)
+	treeNodeCheckerFunc func(t *testing.T, r ExpanderResult)
+}

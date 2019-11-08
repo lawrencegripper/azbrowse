@@ -3,9 +3,13 @@ package expanders
 import (
 	"context"
 	"encoding/json"
+	"io/ioutil"
+	"strings"
+	"testing"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/nbio/st"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -16,6 +20,10 @@ var _ Expander = &DefaultExpander{}
 // DefaultExpander expands RGs under a subscription
 type DefaultExpander struct {
 	client *armclient.Client
+}
+
+func (e *DefaultExpander) setClient(c *armclient.Client) {
+	e.client = c
 }
 
 // DefaultExpanderInstance provides an instance of the default expander for use
@@ -72,5 +80,47 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 		Err:               err,
 		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 		SourceDescription: "Default Expander Request",
+	}
+}
+
+func (e *DefaultExpander) testCases() (bool, *[]expanderTestCase) {
+	const testPath = "subscriptions/thing"
+	itemToExpand := &TreeNode{
+		ExpandURL: "https://management.azure.com/" + testPath,
+	}
+	const testResponseFile = "./testdata/armsamples/resource/failingResource.json"
+
+	return true, &[]expanderTestCase{
+		{
+			name:         "Default->Resource",
+			nodeToExpand: itemToExpand,
+			urlPath:      testPath,
+			responseFile: testResponseFile,
+			statusCode:   200,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+				st.Expect(t, len(r.Nodes), 0)
+
+				dat, err := ioutil.ReadFile(testResponseFile)
+				if err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				st.Expect(t, strings.TrimSpace(r.Response.Response), string(dat))
+				st.Expect(t, itemToExpand.StatusIndicator, "⛈")
+			},
+		},
+		{
+			name:         "Default->500StatusCode",
+			nodeToExpand: itemToExpand,
+			urlPath:      testPath,
+			responseFile: testResponseFile,
+			statusCode:   500,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				if r.Err == nil {
+					t.Error("Failed expanding resource. Should have errored and didn't", r)
+				}
+			},
+		},
 	}
 }

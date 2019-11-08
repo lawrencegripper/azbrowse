@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"testing"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/nbio/st"
 )
 
 const (
@@ -20,6 +22,10 @@ var _ Expander = &TenantExpander{}
 // TenantExpander expands the subscriptions under a tenant
 type TenantExpander struct {
 	client *armclient.Client
+}
+
+func (e *TenantExpander) setClient(c *armclient.Client) {
+	e.client = c
 }
 
 // Name returns the name of the expander
@@ -116,4 +122,44 @@ type SubResponse struct {
 			SpendingLimit       string `json:"spendingLimit"`
 		} `json:"subscriptionPolicies"`
 	} `json:"value"`
+}
+
+func (e *TenantExpander) testCases() (bool, *[]expanderTestCase) {
+	treeNode := &TreeNode{
+		ItemType:  TentantItemType,
+		ID:        "AvailableSubscriptions",
+		ExpandURL: ExpandURLNotSupported,
+	}
+	return true, &[]expanderTestCase{
+		{
+			name:         "Tenant->Subs",
+			nodeToExpand: treeNode,
+			urlPath:      "subscriptions",
+			responseFile: "./testdata/armsamples/subscriptions/response.json",
+			statusCode:   200,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+				st.Expect(t, len(r.Nodes), 3)
+
+				// Validate content
+				st.Expect(t, r.Nodes[0].Display, "Thingy1")
+				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01")
+			},
+		},
+		{
+			name: "Tenant->Subs500Response",
+			nodeToExpand: &TreeNode{
+				ItemType:  TentantItemType,
+				ID:        "AvailableSubscriptions",
+				ExpandURL: ExpandURLNotSupported,
+			},
+			urlPath:    "subscriptions",
+			statusCode: 500,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				if r.Err == nil {
+					t.Error("Failed expanding resource. Should have errored and didn't", r)
+				}
+			},
+		},
+	}
 }

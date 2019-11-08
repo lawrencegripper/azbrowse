@@ -1,0 +1,14 @@
+{
+    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test",
+    "name": "test",
+    "type": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test",
+    "sku": {
+        "name": "",
+        "tier": ""
+    },
+    "kind": "",
+    "location": "WestEurope",
+    "properties": {
+        "provisioningState": "Failed"
+    }
+}
