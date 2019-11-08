@@ -2,6 +2,7 @@ package expanders
 
 import (
 	"context"
+	"testing"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
@@ -93,3 +94,13 @@ const (
 	// ExpandURLNotSupported is used to identify items which don't support generic expansion
 	ExpandURLNotSupported = "notsupported"
 )
+
+type expanderTestCase struct {
+	name                string
+	statusCode          int
+	nodeToExpand        *TreeNode
+	urlPath             string
+	responseFile        string
+	configureGockFunc   *func(t *testing.T)
+	treeNodeCheckerFunc func(t *testing.T, r ExpanderResult)
+}
