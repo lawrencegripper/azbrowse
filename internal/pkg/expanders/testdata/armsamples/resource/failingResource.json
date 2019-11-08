@@ -1,7 +1,7 @@
 {
-    "id": "/subscriptions/5774ad8f-0000-0000-0000-0447910568d3/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test",
+    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test",
     "name": "test",
-    "type": "/subscriptions/5774ad8f-0000-0000-0000-0447910568d3/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test",
+    "type": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/stable/providers/Microsoft.ContainerRegistry/registries/test",
     "sku": {
         "name": "",
         "tier": ""
