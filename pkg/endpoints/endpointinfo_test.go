@@ -90,6 +90,18 @@ func TestMatchEndingWithNamedSegmentIsNotTooGreedy(t *testing.T) {
 	}
 }
 
+func TestMatchEndingSegmentLongerThanTemplate(t *testing.T) {
+
+	//should match
+	matchResult := getMatchResult(
+		"/foo/wibble",
+		"/foo/bar")
+
+	if matchResult.IsMatch {
+		t.Error("Shouldn't match")
+	}
+}
+
 func TestMatchDifferentCase(t *testing.T) {
 
 	//should match even though case differs on literal segments

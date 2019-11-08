@@ -57,6 +57,10 @@ type AzureKubernetesServiceExpander struct {
 	client *armclient.Client
 }
 
+func (e *AzureKubernetesServiceExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *AzureKubernetesServiceExpander) Name() string {
 	return "AzureKubernetesServiceExpander"
@@ -356,4 +360,8 @@ func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, c
 	}
 
 	return kubeConfig, nil
+}
+
+func (e *AzureKubernetesServiceExpander) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
 }

@@ -134,6 +134,8 @@ type PathOverride struct {
 	Path        string // actual url to use
 	GetVerb     string // Verb to use for logical GET requests
 	RewritePath bool   // rewrite the path in generated code. Only advised to address case issues or inconsistent match segment names
+	PutPath     string // Force the PUT endpoint to be output or override it
+	DeletePath  string // Force the PUT endpoint to be output or override it
 }
 
 // AdditionalPath provides metadata for additional paths to inject into the generated hierarchy

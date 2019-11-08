@@ -23,6 +23,10 @@ type AzureSearchServiceExpander struct {
 	client *armclient.Client
 }
 
+func (e *AzureSearchServiceExpander) setClient(c *armclient.Client) {
+	e.client = c
+}
+
 // Name returns the name of the expander
 func (e *AzureSearchServiceExpander) Name() string {
 	return "AzureSearchServiceExpander"
@@ -130,7 +134,7 @@ func (e *AzureSearchServiceExpander) expandSearchRoot(ctx context.Context, curre
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: "TODO - what should go here?"},
+		Response:          ExpanderResponse{Response: ""},
 		SourceDescription: "AzureSearchServiceExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
@@ -216,5 +220,9 @@ func (e *AzureSearchServiceExpander) getSearchEndpoint(ctx context.Context, sear
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
 func (e AzureSearchServiceExpander) Delete(ctx context.Context, item *TreeNode) (bool, error) {
+	return false, nil
+}
+
+func (e *AzureSearchServiceExpander) testCases() (bool, *[]expanderTestCase) {
 	return false, nil
 }
