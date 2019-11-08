@@ -4,11 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"sync"
+	"testing"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/nbio/st"
+	"gopkg.in/h2non/gock.v1"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -215,5 +219,44 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 }
 
 func (e *ResourceGroupResourceExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
+	const expandURL = "subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell/resources"
+	itemToExpand := &TreeNode{
+		ExpandURL: "https://management.azure.com/" + expandURL,
+	}
+	const testResponseFile = "./testdata/armsamples/resourcegroups/resourcelist.json"
+
+	gockConfig := func(t *testing.T) {
+		dat, err := ioutil.ReadFile(testResponseFile)
+		if err != nil {
+			t.Error(err)
+			t.FailNow()
+		}
+		expectedJSONResponse := string(dat)
+		gock.New("https://management.azure.com/").
+			Get(expandURL).
+			Reply(200).
+			JSON(expectedJSONResponse)
+	}
+
+	return true, &[]expanderTestCase{
+		{
+			name:              "ResourceGroup->Resources",
+			statusCode:        200,
+			responseFile:      testResponseFile,
+			nodeToExpand:      itemToExpand,
+			urlPath:           expandURL,
+			configureGockFunc: &gockConfig,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+
+				// Logs and deployment always added to an RG
+				additionalItemsAddedToRG := 2
+
+				st.Expect(t, len(r.Nodes), 9+additionalItemsAddedToRG)
+
+				// Validate content
+				st.Expect(t, r.Nodes[2].Name, "kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959")
+			},
+		},
+	}
 }

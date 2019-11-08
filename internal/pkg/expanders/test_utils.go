@@ -23,5 +23,6 @@ type expanderTestCase struct {
 	nodeToExpand        *TreeNode
 	urlPath             string
 	responseFile        string
+	configureGockFunc   *func(t *testing.T)
 	treeNodeCheckerFunc func(t *testing.T, r ExpanderResult)
 }

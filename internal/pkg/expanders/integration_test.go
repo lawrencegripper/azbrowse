@@ -23,7 +23,7 @@ func Test_Expanders(t *testing.T) {
 
 		hasTests, testCases := expander.testCases()
 		if !hasTests {
-			t.Log("!!!! No tests defined for expander, there should be Name:" + expander.Name())
+			t.Log("!!!! No tests defined for expander, there should be. Provider Name:" + expander.Name())
 			continue
 		}
 
@@ -46,10 +46,15 @@ func Test_Expanders(t *testing.T) {
 				}
 
 				defer gock.Off()
-				gock.New(testServer).
-					Get(testPath).
-					Reply(tt.statusCode).
-					JSON(expectedJSONResponse)
+				if tt.configureGockFunc != nil {
+					setupGock := *tt.configureGockFunc
+					setupGock(t)
+				} else {
+					gock.New(testServer).
+						Get(testPath).
+						Reply(tt.statusCode).
+						JSON(expectedJSONResponse)
+				}
 
 				httpClient := &http.Client{Transport: &http.Transport{}}
 				gock.InterceptClient(httpClient)
