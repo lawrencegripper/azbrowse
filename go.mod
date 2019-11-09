@@ -35,6 +35,7 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
+	github.com/stretchr/testify v1.3.0
 	github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6
 	github.com/stuartleeks/gocui v0.4.1
 	github.com/valyala/fastjson v1.4.0
