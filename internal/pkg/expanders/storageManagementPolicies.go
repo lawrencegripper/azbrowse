@@ -86,7 +86,7 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: "TODO"},
+		Response:          ExpanderResponse{Response: ""},
 		SourceDescription: "StorageManagementPoliciesExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: isPrimaryResponse,

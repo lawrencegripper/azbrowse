@@ -13,11 +13,6 @@ import (
 
 const tmplText = `
 --> PRESS {{ index . "help" }} TO CLOSE THIS AND CONTINUE. YOU CAN OPEN IT AGAIN WITH {{ index . "help" }} AT ANY TIME. <--
-                             _       ___
-                            /_\   __| _ )_ _ _____ __ _____ ___
-                           / _ \ |_ / _ \ '_/ _ \ V  V (_-</ -_)
-                          /_/ \_\/__|___/_| \___/\_/\_//__/\___|
-                        Interactive CLI for browsing Azure resources
 # Navigation
  
 | Action                   | Key(s)
@@ -45,7 +40,8 @@ const tmplText = `
 | Save JSON to clipboard   | {{ index . "copy" }}
 | View actions for resource| {{ index . "listactions" }}
 | Edit Resource            | {{ index . "listupdate" }}
- 
+| Azure search query       | {{ index . "azuresearchquery" }}
+
 # Status Icons
 
 Deleting:  ☠   Failed:  ⛈   Updating:  ⟳   Resuming/Starting:  ⛅   Provisioning:  ⌛                                                                                                                                  
