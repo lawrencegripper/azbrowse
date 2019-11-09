@@ -169,7 +169,7 @@ func (e *AzureKubernetesServiceExpander) expandKubernetesAPIRoot(ctx context.Con
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: "TODO - what should go here?"},
+		Response:          ExpanderResponse{Response: ""},
 		SourceDescription: "AzureKubernetesServiceExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
