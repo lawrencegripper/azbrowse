@@ -189,6 +189,15 @@ func (e *MetricsExpander) expandGraph(ctx context.Context, currentItem *TreeNode
 			currentItem.Metadata["Units"]+"')")
 
 	graphData := []float64{}
+
+	// handle empty response
+	if len(metricResponse.Value) < 1 || len(metricResponse.Value[0].Timeseries) < 1 {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "MetricsExpander graphdata failed to deserialise",
+		}
+	}
+
 	for _, datapoint := range metricResponse.Value[0].Timeseries[0].Data {
 		value, success := datapoint[currentItem.Metadata["AggregationType"]].(float64)
 		if success {
