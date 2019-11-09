@@ -260,6 +260,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclie
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
+	keybindings.AddHandler(keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list))
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
