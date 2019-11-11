@@ -34,6 +34,8 @@ var DefaultKeys = map[string]interface{}{
 	"itempagedown":        gocui.KeyPgdn,
 	"itempageup":          gocui.KeyPgup,
 	"commandpanelopen":    gocui.KeyCtrlP,
+	"commandpaneldown":    gocui.KeyArrowDown,
+	"commandpanelup":      gocui.KeyArrowUp,
 	"filter":              rune("/"[0]),
 	"commandpanelclose":   gocui.KeyEsc,
 	"azuresearchquery":    gocui.KeyCtrlR,

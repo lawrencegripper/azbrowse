@@ -200,12 +200,17 @@ func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error
 ////////////////////////////////////////////////////////////////////
 type OpenCommandPanelHandler struct {
 	GlobalHandler
+	gui                *gocui.Gui
 	commandPanelWidget *views.CommandPanelWidget
+	list               *views.ListWidget
+	commands           []Command
 }
 
-func NewOpenCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *OpenCommandPanelHandler {
+func NewOpenCommandPanelHandler(gui *gocui.Gui, commandPanelWidget *views.CommandPanelWidget, commands []Command) *OpenCommandPanelHandler {
 	handler := &OpenCommandPanelHandler{
+		gui:                gui,
 		commandPanelWidget: commandPanelWidget,
+		commands:           commands,
 	}
 	handler.id = HandlerIDToggleOpenCommandPanel
 	return handler
@@ -213,8 +218,30 @@ func NewOpenCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *O
 
 func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.commandPanelWidget.ToggleShowHide()
+		options := []views.CommandPanelListOption{}
+		for _, command := range h.commands {
+			if command.IsEnabled() {
+				options = append(options, command)
+			}
+		}
+		h.commandPanelWidget.ShowWithText("Command Palette", "", &options, h.CommandPanelNotification)
 		return nil
+	}
+}
+
+func (h *OpenCommandPanelHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+	if state.EnterPressed {
+		h.commandPanelWidget.Hide()
+		for _, command := range h.commands {
+			if command.ID() == state.SelectedID {
+				// invoke via Update to allow Hide to restore preview view state
+				h.gui.Update(func(gui *gocui.Gui) error {
+					command.Invoke()
+					return nil
+				})
+				return
+			}
+		}
 	}
 }
 
@@ -224,11 +251,15 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 type CommandPanelFilterHandler struct {
 	GlobalHandler
 	commandPanelWidget *views.CommandPanelWidget
+	list               *views.ListWidget
 }
 
-func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
+var _ Command = &CommandPanelFilterHandler{}
+
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget, list *views.ListWidget) *CommandPanelFilterHandler {
 	handler := &CommandPanelFilterHandler{
 		commandPanelWidget: commandPanelWidget,
+		list:               list,
 	}
 	handler.id = HandlerIDFilter
 	return handler
@@ -236,9 +267,31 @@ func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) 
 
 func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.commandPanelWidget.ShowWithText("/")
+		h.Invoke()
 		return nil
+	}
+}
+func (h *CommandPanelFilterHandler) DisplayText() string {
+	return "filter (/)"
+}
+func (h *CommandPanelFilterHandler) IsEnabled() bool {
+	return true
+}
+func (h *CommandPanelFilterHandler) Invoke() {
+	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
+}
+func (h *CommandPanelFilterHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+	h.list.SetFilter(state.CurrentText)
+	if state.EnterPressed {
+		h.commandPanelWidget.Hide()
 	}
 }
 
 ////////////////////////////////////////////////////////////////////
+
+type Command interface {
+	ID() string
+	DisplayText() string
+	IsEnabled() bool
+	Invoke()
+}

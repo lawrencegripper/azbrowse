@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
@@ -616,6 +615,8 @@ type CommandPanelAzureSearchQueryHandler struct {
 	content            *views.ItemWidget
 }
 
+var _ Command = &CommandPanelAzureSearchQueryHandler{}
+
 func NewCommandPanelAzureSearchQueryHandler(commandPanelWidget *views.CommandPanelWidget, content *views.ItemWidget, list *views.ListWidget) *CommandPanelAzureSearchQueryHandler {
 	handler := &CommandPanelAzureSearchQueryHandler{
 		commandPanelWidget: commandPanelWidget,
@@ -624,35 +625,44 @@ func NewCommandPanelAzureSearchQueryHandler(commandPanelWidget *views.CommandPan
 	}
 	handler.id = HandlerIDAzureSearchQuery
 
-	go func() {
-		handler.processQueryEvents()
-	}()
-
 	return handler
 }
 
 func (h *CommandPanelAzureSearchQueryHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		currentItem := h.list.CurrentExpandedItem()
-		if currentItem != nil && currentItem.SwaggerResourceType != nil && currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs" {
-			h.commandPanelWidget.ShowWithText("search-query: search=")
+		if h.IsEnabled() {
+			h.Invoke()
 		}
 		return nil
 	}
 }
 
-func (h *CommandPanelAzureSearchQueryHandler) processQueryEvents() {
-	queryChannel := eventing.SubscribeToTopic("azure-search-query")
-	for {
-		queryStringInterface := <-queryChannel
-		queryString := strings.TrimSpace(strings.Replace(queryStringInterface.(string), "search-query: ", "", 1))
+func (h *CommandPanelAzureSearchQueryHandler) DisplayText() string {
+	return "Azure search query"
+}
 
+func (h *CommandPanelAzureSearchQueryHandler) IsEnabled() bool {
+	currentItem := h.list.CurrentExpandedItem()
+	if currentItem != nil && currentItem.SwaggerResourceType != nil && currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs" {
+		return true
+	}
+	return false
+}
+
+func (h *CommandPanelAzureSearchQueryHandler) Invoke() {
+	h.commandPanelWidget.ShowWithText("search query:", "search=", nil, h.CommandPanelNotification)
+}
+
+func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+
+	if state.EnterPressed {
+		queryString := state.CurrentText
 		currentItem := h.list.CurrentExpandedItem()
 
 		apiSetID := currentItem.Metadata["SwaggerAPISetID"]
 		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
 		if apiSetPtr == nil {
-			continue
+			return
 		}
 		apiSet := *apiSetPtr
 		searchApiSet := apiSet.(expanders.SwaggerAPISetSearch)
@@ -665,5 +675,4 @@ func (h *CommandPanelAzureSearchQueryHandler) processQueryEvents() {
 		}
 	}
 }
-
 ////////////////////////////////////////////////////////////////////

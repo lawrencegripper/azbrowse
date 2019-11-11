@@ -175,7 +175,15 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, settings.HideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", g)
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, settings.HideGuids, g, client)
-	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
+
+	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
+
+	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
+	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
+	commands := []keybindings.Command{
+		commandPanelFilterCommand,
+		commandPanelAzureSearchQueryCommand,
+	}
 
 	g.SetManager(status, content, list, notifications, commandPanel)
 	g.SetCurrentView("listWidget")
@@ -193,9 +201,10 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
-	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(commandPanel))
-	keybindings.AddHandler(keybindings.NewCommandPanelFilterHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(g, commandPanel, commands))
+	keybindings.AddHandler(commandPanelFilterCommand)
 	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelDownHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -215,7 +224,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
-	keybindings.AddHandler(keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list))
+	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
