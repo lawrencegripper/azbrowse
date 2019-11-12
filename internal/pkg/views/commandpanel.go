@@ -1,9 +1,9 @@
 package views
 
 import (
+	"fmt"
 	"strings"
 
-	// "github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/stuartleeks/gocui"
 )
 
@@ -35,6 +35,7 @@ type CommandPanelWidget struct {
 	filteredOptions     *[]CommandPanelListOption
 	selectedIndex       int
 	notificationHandler CommandPanelNotificationHandler
+	lastTopIndex        int
 }
 
 // NewCommandPanelWidget create new instance and start go routine for spinner
@@ -71,6 +72,7 @@ func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]Com
 	w.notificationHandler = handler
 	w.visible = true
 	w.selectedIndex = -1
+	w.lastTopIndex = 0
 }
 
 // MoveDown moves down a list item if options are displayed
@@ -92,6 +94,7 @@ func (w *CommandPanelWidget) MoveUp() {
 		}
 	}
 }
+
 // EnterPressed is used to communicate that the enter key was pressed but a handler received it
 func (w *CommandPanelWidget) EnterPressed() {
 	// the handler was added to invoke this method as Enter without any input failed to trigger the update
@@ -109,6 +112,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	inputViewName := w.name
 	optionsViewName := w.name + "Options"
+	listHeight := 10
 
 	// If we're not updating an existing view then
 	// set the content to the value from prepopulate
@@ -142,7 +146,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	var vList *gocui.View
 	if w.options != nil {
-		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+13)
+		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight)
 		if err != nil && err != gocui.ErrUnknownView {
 			return err
 		}
@@ -160,6 +164,8 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	if w.options != nil {
 		vList.Clear()
+		renderedItems := []string{}
+
 		for i, option := range *w.filteredOptions {
 			itemToShow := ""
 			if i == w.selectedIndex {
@@ -168,9 +174,35 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 				itemToShow = "  "
 			}
 			itemToShow += option.DisplayText() + "\n"
-
-			vList.Write([]byte(itemToShow))
+			renderedItems = append(renderedItems, itemToShow)
 		}
+		topIndex := w.lastTopIndex
+		bottomIndex := w.lastTopIndex + listHeight
+		if w.selectedIndex >= bottomIndex {
+			// need to adjust down
+			diff := w.selectedIndex - bottomIndex + 1
+			topIndex += diff
+			bottomIndex += diff
+		}
+		if w.selectedIndex >=0 && w.selectedIndex < topIndex {
+			// need to adjust up
+			diff := topIndex - w.selectedIndex
+			topIndex -= diff
+			bottomIndex -= diff
+		}
+		w.lastTopIndex = topIndex
+		if bottomIndex > len(renderedItems) {
+			bottomIndex = len(renderedItems) - 1
+		}
+
+		for index := topIndex; index < bottomIndex+1; index++ {
+			if index < len(renderedItems) {
+				item := renderedItems[index]
+				fmt.Fprint(vList, item)
+			}
+		}
+
+		// maxItemsCanShow := w.
 	}
 
 	// Is this a new view?
