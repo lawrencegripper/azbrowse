@@ -7,8 +7,8 @@ import (
 	"log"
 	"os"
 	"runtime/debug"
-	"strings"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -182,10 +182,17 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
 	copyCommand := keybindings.NewCopyHandler(content, status)
 	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
+	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
+	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
+	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
+
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
 		copyCommand,
 		commandPanelAzureSearchQueryCommand,
+		listActionsCommand,
+		listOpenCommand,
+		listUpdateCommand,
 	}
 	sort.Sort(keybindings.SortByDisplayText(commands))
 
@@ -219,12 +226,12 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(keybindings.NewListRefreshHandler(list))
 	keybindings.AddHandler(keybindings.NewListBackHandler(list))
 	keybindings.AddHandler(keybindings.NewListBackLegacyHandler(list))
-	keybindings.AddHandler(keybindings.NewListActionsHandler(list, ctx))
+	keybindings.AddHandler(listActionsCommand)
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
-	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
+	keybindings.AddHandler(listOpenCommand)
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
-	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content, g))
+	keybindings.AddHandler(listUpdateCommand)
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
