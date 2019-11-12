@@ -184,7 +184,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 			topIndex += diff
 			bottomIndex += diff
 		}
-		if w.selectedIndex >=0 && w.selectedIndex < topIndex {
+		if w.selectedIndex >= 0 && w.selectedIndex < topIndex {
 			// need to adjust up
 			diff := topIndex - w.selectedIndex
 			topIndex -= diff
