@@ -75,7 +75,7 @@ func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]Com
 
 // MoveDown moves down a list item if options are displayed
 func (w *CommandPanelWidget) MoveDown() {
-	if w.options != nil {
+	if w.filteredOptions != nil && len(*w.filteredOptions) > 0 {
 		w.selectedIndex += 1
 		if w.selectedIndex >= len(*w.filteredOptions) {
 			w.selectedIndex = len(*w.filteredOptions) - 1
@@ -85,12 +85,17 @@ func (w *CommandPanelWidget) MoveDown() {
 
 // MoveDown moves up a list item if options are displayed
 func (w *CommandPanelWidget) MoveUp() {
-	if w.options != nil {
-		w.selectedIndex += 1
+	if w.filteredOptions != nil && len(*w.filteredOptions) > 0 {
+		w.selectedIndex -= 1
 		if w.selectedIndex < 0 {
 			w.selectedIndex = 0
 		}
 	}
+}
+// EnterPressed is used to communicate that the enter key was pressed but a handler received it
+func (w *CommandPanelWidget) EnterPressed() {
+	// the handler was added to invoke this method as Enter without any input failed to trigger the update
+	w.panelChanged(w.panelContent + "\n\n") // ensure newlines to trigger EnterPressed logic
 }
 
 func (w *CommandPanelWidget) trackPreviousView() {
@@ -192,7 +197,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 		// Has something been typed?
 		w.panelContent = v.Buffer()
 		// Handle this change and take action
-		w.panelChanged(g)
+		w.panelChanged(w.panelContent)
 	}
 
 	_, err = w.gui.SetCurrentView(inputViewName)
@@ -204,15 +209,14 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 }
 
 // This is fired every time the content of the command panel has changed.
-func (w *CommandPanelWidget) panelChanged(g *gocui.Gui) {
-	content := w.panelContent
+func (w *CommandPanelWidget) panelChanged(content string) {
 
-	if len(content) < 1 {
+	if len(content) < 1 && w.selectedIndex < 0 {
 		return
 	}
 
 	state := CommandPanelNotification{
-		EnterPressed: w.contentHasNewLine(),
+		EnterPressed: w.contentHasNewLine(content),
 		CurrentText:  strings.ReplaceAll(content, "\n", ""),
 	}
 
@@ -225,13 +229,14 @@ func (w *CommandPanelWidget) panelChanged(g *gocui.Gui) {
 	if w.options != nil {
 		// apply filter, re-selecting the current item
 		selectedID := ""
-		if w.selectedIndex >= 0 {
+		if w.selectedIndex >= 0 && len(*w.filteredOptions) > 0 {
 			selectedID = (*w.filteredOptions)[w.selectedIndex].ID()
 		}
 		w.selectedIndex = -1
 		filterOptions := []CommandPanelListOption{}
+		loweredCurrentText := strings.ToLower(state.CurrentText)
 		for i, option := range *w.options {
-			if strings.Contains(strings.ToLower(option.DisplayText()), state.CurrentText) {
+			if strings.Contains(strings.ToLower(option.DisplayText()), loweredCurrentText) {
 				if option.ID() == selectedID {
 					w.selectedIndex = i
 				}
@@ -244,7 +249,7 @@ func (w *CommandPanelWidget) panelChanged(g *gocui.Gui) {
 
 	if state.EnterPressed {
 		if w.filteredOptions != nil {
-			if w.selectedIndex >= 0 {
+			if w.selectedIndex >= 0 && len(*w.filteredOptions) > 0 {
 				state.SelectedID = (*w.filteredOptions)[w.selectedIndex].ID()
 			} else if len(*w.filteredOptions) == 1 {
 				// no selected item but only one left - pretend it was selected
@@ -259,13 +264,13 @@ func (w *CommandPanelWidget) panelChanged(g *gocui.Gui) {
 		}
 	}
 
-	g.Update(func(gui *gocui.Gui) error {
+	w.gui.Update(func(gui *gocui.Gui) error {
 		w.notificationHandler(state)
 		return nil
 	})
 
 }
 
-func (w *CommandPanelWidget) contentHasNewLine() bool {
-	return strings.Count(w.panelContent, "\n") > 1 //Warning: By default gocui is adding a newline so we're checking for existence of 2
+func (w *CommandPanelWidget) contentHasNewLine(content string) bool {
+	return strings.Count(content, "\n") > 1 //Warning: By default gocui is adding a newline so we're checking for existence of 2
 }

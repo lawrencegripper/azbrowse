@@ -649,8 +649,9 @@ func (h *CommandPanelAzureSearchQueryHandler) IsEnabled() bool {
 	return false
 }
 
-func (h *CommandPanelAzureSearchQueryHandler) Invoke() {
+func (h *CommandPanelAzureSearchQueryHandler) Invoke() error {
 	h.commandPanelWidget.ShowWithText("search query:", "search=", nil, h.CommandPanelNotification)
+	return nil
 }
 
 func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state views.CommandPanelNotification) {

@@ -179,9 +179,11 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
 
 	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
+	copyCommand := keybindings.NewCopyHandler(content, status)
 	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
+		copyCommand,
 		commandPanelAzureSearchQueryCommand,
 	}
 
@@ -196,7 +198,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	// NOTE> Global handlers must be registered first to
 	//       ensure double key registration is prevented
 	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
-	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
+	keybindings.AddHandler(copyCommand)
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
@@ -205,6 +207,8 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(commandPanelFilterCommand)
 	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
 	keybindings.AddHandler(keybindings.NewCommandPanelDownHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelUpHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelEnterHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))

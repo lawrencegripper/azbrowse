@@ -37,6 +37,7 @@ const (
 	HandlerIDToggleCloseCommandPanel HandlerID = "commandpanelclose"   //nolint:golint
 	HandlerIDCommandPanelDown        HandlerID = "commandpaneldown"    //nolint:golint
 	HandlerIDCommandPanelUp          HandlerID = "commandpanelup"      //nolint:golint
+	HandlerIDCommandPanelEnter       HandlerID = "commandpanelenter"   //nolint:golint
 	HandlerIDFilter                  HandlerID = "filter"              //nolint:golint
 	HandlerIDAzureSearchQuery        HandlerID = "azuresearchquery"    //nolist:golint
 )

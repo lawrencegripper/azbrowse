@@ -58,8 +58,8 @@ type CommandPanelUpHandler struct {
 	commandPanelWidget *views.CommandPanelWidget
 }
 
-func NewCommandPanelUpHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelDownHandler {
-	handler := &CommandPanelDownHandler{
+func NewCommandPanelUpHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelUpHandler {
+	handler := &CommandPanelUpHandler{
 		commandPanelWidget: commandPanelWidget,
 	}
 	handler.id = HandlerIDCommandPanelUp
@@ -69,6 +69,29 @@ func NewCommandPanelUpHandler(commandPanelWidget *views.CommandPanelWidget) *Com
 func (h *CommandPanelUpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		h.commandPanelWidget.MoveUp()
+		return nil
+	}
+}
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+
+type CommandPanelEnterHandler struct {
+	CommandPanelHandler
+	commandPanelWidget *views.CommandPanelWidget
+}
+
+func NewCommandPanelEnterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelEnterHandler {
+	handler := &CommandPanelEnterHandler{
+		commandPanelWidget: commandPanelWidget,
+	}
+	handler.id = HandlerIDCommandPanelEnter
+	return handler
+}
+
+func (h *CommandPanelEnterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		h.commandPanelWidget.EnterPressed()
 		return nil
 	}
 }

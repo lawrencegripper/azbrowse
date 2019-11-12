@@ -37,6 +37,8 @@ type CopyHandler struct {
 	StatusBar *views.StatusbarWidget
 }
 
+var _ Command = &CopyHandler{}
+
 func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget) *CopyHandler {
 	handler := &CopyHandler{
 		Content:   content,
@@ -48,19 +50,31 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 
 func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		var err error
-		if wsl.IsWSL() {
-			err = wsl.TrySetClipboard(h.Content.GetContent())
-		} else {
-			err = clipboard.WriteAll(h.Content.GetContent())
-		}
-		if err != nil {
-			h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
-			return nil
-		}
-		h.StatusBar.Status("Current resource's JSON copied to clipboard", false)
+		return h.Invoke()
+	}
+}
+
+func (h *CopyHandler) DisplayText() string {
+	return "Copy content"
+}
+
+func (h *CopyHandler) IsEnabled() bool {
+	return true
+}
+
+func (h *CopyHandler) Invoke() error {
+	var err error
+	if wsl.IsWSL() {
+		err = wsl.TrySetClipboard(h.Content.GetContent())
+	} else {
+		err = clipboard.WriteAll(h.Content.GetContent())
+	}
+	if err != nil {
+		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 		return nil
 	}
+	h.StatusBar.Status("Current resource's content copied to clipboard", false)
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -277,8 +291,9 @@ func (h *CommandPanelFilterHandler) DisplayText() string {
 func (h *CommandPanelFilterHandler) IsEnabled() bool {
 	return true
 }
-func (h *CommandPanelFilterHandler) Invoke() {
+func (h *CommandPanelFilterHandler) Invoke() error {
 	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
+	return nil
 }
 func (h *CommandPanelFilterHandler) CommandPanelNotification(state views.CommandPanelNotification) {
 	h.list.SetFilter(state.CurrentText)
@@ -293,5 +308,5 @@ type Command interface {
 	ID() string
 	DisplayText() string
 	IsEnabled() bool
-	Invoke()
+	Invoke() error
 }
