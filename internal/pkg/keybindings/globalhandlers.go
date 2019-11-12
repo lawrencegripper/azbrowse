@@ -216,7 +216,6 @@ type OpenCommandPanelHandler struct {
 	GlobalHandler
 	gui                *gocui.Gui
 	commandPanelWidget *views.CommandPanelWidget
-	list               *views.ListWidget
 	commands           []Command
 }
 
@@ -250,8 +249,7 @@ func (h *OpenCommandPanelHandler) CommandPanelNotification(state views.CommandPa
 			if command.ID() == state.SelectedID {
 				// invoke via Update to allow Hide to restore preview view state
 				h.gui.Update(func(gui *gocui.Gui) error {
-					command.Invoke()
-					return nil
+					return command.Invoke()
 				})
 				return
 			}
@@ -281,8 +279,7 @@ func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget, 
 
 func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.Invoke()
-		return nil
+		return h.Invoke()
 	}
 }
 func (h *CommandPanelFilterHandler) DisplayText() string {
@@ -304,6 +301,7 @@ func (h *CommandPanelFilterHandler) CommandPanelNotification(state views.Command
 
 ////////////////////////////////////////////////////////////////////
 
+// Command represents a command that can be listed in the Command Palette
 type Command interface {
 	ID() string
 	DisplayText() string
@@ -311,6 +309,7 @@ type Command interface {
 	Invoke() error
 }
 
+// SortByDisplayText allows sorting an array of Commands by DisplayText
 type SortByDisplayText []Command
 
 func (s SortByDisplayText) Len() int {

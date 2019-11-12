@@ -7,16 +7,20 @@ import (
 	"github.com/stuartleeks/gocui"
 )
 
+// CommandPanelListOption represents a list item that can be displayed in the CommandPanel
 type CommandPanelListOption interface {
 	ID() string
 	DisplayText() string
 }
 
+// CommandPanelNotification holds the event state for a panel changed notification
 type CommandPanelNotification struct {
 	CurrentText  string
 	SelectedID   string
 	EnterPressed bool
 }
+
+// CommandPanelNotificationHandler is the function signature for a panel changed notification handler
 type CommandPanelNotificationHandler func(state CommandPanelNotification)
 
 // CommandPanelWidget controls the notifications windows in the top right
@@ -78,17 +82,17 @@ func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]Com
 // MoveDown moves down a list item if options are displayed
 func (w *CommandPanelWidget) MoveDown() {
 	if w.filteredOptions != nil && len(*w.filteredOptions) > 0 {
-		w.selectedIndex += 1
+		w.selectedIndex++
 		if w.selectedIndex >= len(*w.filteredOptions) {
 			w.selectedIndex = len(*w.filteredOptions) - 1
 		}
 	}
 }
 
-// MoveDown moves up a list item if options are displayed
+// MoveUp moves up a list item if options are displayed
 func (w *CommandPanelWidget) MoveUp() {
 	if w.filteredOptions != nil && len(*w.filteredOptions) > 0 {
-		w.selectedIndex -= 1
+		w.selectedIndex--
 		if w.selectedIndex < 0 {
 			w.selectedIndex = 0
 		}

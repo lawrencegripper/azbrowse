@@ -670,7 +670,7 @@ func NewCommandPanelAzureSearchQueryHandler(commandPanelWidget *views.CommandPan
 func (h *CommandPanelAzureSearchQueryHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		if h.IsEnabled() {
-			h.Invoke()
+			return h.Invoke()
 		}
 		return nil
 	}

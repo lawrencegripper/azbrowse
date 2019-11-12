@@ -49,6 +49,7 @@ func (w *ListWidget) itemCount() int {
 	return len(w.filteredItems)
 }
 
+// SetFilter sets the filter to be applied to list items
 func (w *ListWidget) SetFilter(filterString string) {
 	filteredItems := []*expanders.TreeNode{}
 	for _, item := range w.items {
