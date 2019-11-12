@@ -362,7 +362,12 @@ func (h *ListOpenHandler) Invoke() error {
 	}
 	url := portalURL + "/#@" + armclient.LegacyInstance.GetTenantID() + "/resource/" + item.ID
 	span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
-	err := open.Run(url)
+	var err error
+	if wsl.IsWSL() {
+		err = wsl.TryLaunchBrowser(url)
+	} else {
+		err = open.Run(url)
+	}
 	if err != nil {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: false,
