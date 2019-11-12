@@ -286,7 +286,7 @@ func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error
 	}
 }
 func (h *CommandPanelFilterHandler) DisplayText() string {
-	return "filter (/)"
+	return "Filter"
 }
 func (h *CommandPanelFilterHandler) IsEnabled() bool {
 	return true
@@ -309,4 +309,16 @@ type Command interface {
 	DisplayText() string
 	IsEnabled() bool
 	Invoke() error
+}
+
+type SortByDisplayText []Command
+
+func (s SortByDisplayText) Len() int {
+	return len(s)
+}
+func (s SortByDisplayText) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+func (s SortByDisplayText) Less(i, j int) bool {
+	return strings.Compare(s[i].DisplayText(), s[j].DisplayText()) < 0
 }

@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime/debug"
 	"strings"
+	"sort"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -186,6 +187,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 		copyCommand,
 		commandPanelAzureSearchQueryCommand,
 	}
+	sort.Sort(keybindings.SortByDisplayText(commands))
 
 	g.SetManager(status, content, list, notifications, commandPanel)
 	g.SetCurrentView("listWidget")
