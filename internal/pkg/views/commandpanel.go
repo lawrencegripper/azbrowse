@@ -265,7 +265,7 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 	if w.options != nil {
 		// apply filter, re-selecting the current item
 		selectedID := ""
-		if w.selectedIndex >= 0 && len(*w.filteredOptions) > 0 {
+		if w.selectedIndex >= 0 && w.selectedIndex < len(*w.filteredOptions) {
 			selectedID = (*w.filteredOptions)[w.selectedIndex].ID()
 		}
 		w.selectedIndex = -1
@@ -285,7 +285,7 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 
 	if state.EnterPressed {
 		if w.filteredOptions != nil {
-			if w.selectedIndex >= 0 && len(*w.filteredOptions) > 0 {
+			if w.selectedIndex >= 0 && w.selectedIndex < len(*w.filteredOptions) && len(*w.filteredOptions) > 0 {
 				state.SelectedID = (*w.filteredOptions)[w.selectedIndex].ID()
 			} else if len(*w.filteredOptions) == 1 {
 				// no selected item but only one left - pretend it was selected
