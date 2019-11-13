@@ -231,10 +231,34 @@ func NewOpenCommandPanelHandler(gui *gocui.Gui, commandPanelWidget *views.Comman
 
 func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
+		keyBindings := GetKeyBindingsAsStrings()
+
+		paletteWidth := h.commandPanelWidget.Width() - 4
 		options := []views.CommandPanelListOption{}
 		for _, command := range h.commands {
 			if command.IsEnabled() {
-				options = append(options, command)
+				commandID := command.ID()
+				commandDisplayText := command.DisplayText()
+
+				// ensure binding is in upper-case
+				binding := keyBindings[commandID]
+				for i, b := range binding {
+					binding[i] = strings.ToUpper(b)
+				}
+
+				// calculate padding to right-align shortcut
+				bindingString := fmt.Sprintf("%s", binding)
+				padAmount := paletteWidth - len(commandDisplayText) - len(bindingString)
+				if padAmount < 0 {
+					padAmount = 0 // TODO - we should also look at truncating the DisplayText
+				}
+
+				option := views.CommandPanelListOption{
+					ID:          commandID,
+					DisplayText: command.DisplayText() + strings.Repeat(" ", padAmount) + bindingString,
+				}
+
+				options = append(options, option)
 			}
 		}
 		h.commandPanelWidget.ShowWithText("Command Palette", "", &options, h.CommandPanelNotification)

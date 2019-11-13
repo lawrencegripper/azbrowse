@@ -8,9 +8,9 @@ import (
 )
 
 // CommandPanelListOption represents a list item that can be displayed in the CommandPanel
-type CommandPanelListOption interface {
-	ID() string
-	DisplayText() string
+type CommandPanelListOption struct {
+	ID          string
+	DisplayText string
 }
 
 // CommandPanelNotification holds the event state for a panel changed notification
@@ -99,6 +99,11 @@ func (w *CommandPanelWidget) MoveUp() {
 	}
 }
 
+// Width returns the width of the CommandPanel
+func (w *CommandPanelWidget) Width() int {
+	return w.w
+}
+
 // EnterPressed is used to communicate that the enter key was pressed but a handler received it
 func (w *CommandPanelWidget) EnterPressed() {
 	// the handler was added to invoke this method as Enter without any input failed to trigger the update
@@ -177,7 +182,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 			} else {
 				itemToShow = "  "
 			}
-			itemToShow += option.DisplayText() + "\n"
+			itemToShow += option.DisplayText + "\n"
 			renderedItems = append(renderedItems, itemToShow)
 		}
 		topIndex := w.lastTopIndex
@@ -266,14 +271,14 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 		// apply filter, re-selecting the current item
 		selectedID := ""
 		if w.selectedIndex >= 0 && w.selectedIndex < len(*w.filteredOptions) {
-			selectedID = (*w.filteredOptions)[w.selectedIndex].ID()
+			selectedID = (*w.filteredOptions)[w.selectedIndex].ID
 		}
 		w.selectedIndex = -1
 		filterOptions := []CommandPanelListOption{}
 		loweredCurrentText := strings.ToLower(state.CurrentText)
 		for i, option := range *w.options {
-			if strings.Contains(strings.ToLower(option.DisplayText()), loweredCurrentText) {
-				if option.ID() == selectedID {
+			if strings.Contains(strings.ToLower(option.DisplayText), loweredCurrentText) {
+				if option.ID == selectedID {
 					w.selectedIndex = i
 				}
 				filterOptions = append(filterOptions, option)
@@ -286,10 +291,10 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 	if state.EnterPressed {
 		if w.filteredOptions != nil {
 			if w.selectedIndex >= 0 && w.selectedIndex < len(*w.filteredOptions) && len(*w.filteredOptions) > 0 {
-				state.SelectedID = (*w.filteredOptions)[w.selectedIndex].ID()
+				state.SelectedID = (*w.filteredOptions)[w.selectedIndex].ID
 			} else if len(*w.filteredOptions) == 1 {
 				// no selected item but only one left - pretend it was selected
-				state.SelectedID = (*w.filteredOptions)[0].ID()
+				state.SelectedID = (*w.filteredOptions)[0].ID
 			}
 		}
 	}
