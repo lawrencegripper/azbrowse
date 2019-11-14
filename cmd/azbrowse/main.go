@@ -7,12 +7,10 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"runtime"
 	"runtime/debug"
 	"strings"
 	"time"
 
-	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
@@ -32,17 +30,22 @@ var (
 	goversion = "unknown"
 )
 
-var enableTracing bool
-var hideGuids bool
-var navigateToID string
+// Settings to enable different behavior
+type Settings struct {
+	EnableTracing bool
+	HideGuids     bool
+	NavigateToID  string
+}
 
 func main() {
-	readCommandLineArgs()
+	handleCommandAndArgs()
+}
 
+func run(settings *Settings) {
 	confirmAndSelfUpdate()
 
 	// Setup the root context and span for open tracing
-	ctx, span := configureTracing()
+	ctx, span := configureTracing(settings)
 
 	// Create an ARMClient instance for us to use
 	armClient := armclient.NewClientFromCLI()
@@ -63,14 +66,14 @@ func main() {
 
 	// Create the views we'll use to display information and
 	// bind up all the keys use to interact with the views
-	list := setupViewsAndKeybindings(ctx, g, armClient)
+	list := setupViewsAndKeybindings(ctx, g, settings, armClient)
 
 	// Start a go routine to populate the list with root of the nodes
 	startPopulatingList(ctx, g, list, armClient)
 
 	// Start a go routine to handling automated naviging to an item via the
 	// `--navigate` command
-	handleNavigateTo(list)
+	handleNavigateTo(list, settings)
 
 	// Close the span used to track startup times
 	span.Finish()
@@ -81,61 +84,13 @@ func main() {
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		log.Panicln(err)
 	}
-
 }
 
-func readCommandLineArgs() {
-	args := os.Args[1:] // skip first arg
-
-	for len(args) >= 1 {
-		arg := args[0]
-		handled := false
-
-		if strings.Contains(arg, "version") {
-			fmt.Println(version)
-			fmt.Println(commit)
-			fmt.Println(date)
-			fmt.Println(goversion)
-			fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
-			os.Exit(0)
-		}
-
-		if strings.Contains(arg, "debug") {
-			enableTracing = true
-			tracing.EnableDebug()
-			config.SetDebuggingEnabled(true)
-			handled = true
-		}
-		if strings.Contains(arg, "demo") {
-			hideGuids = true
-			handled = true
-		}
-
-		if strings.Contains(arg, "navigate") {
-			if len(args) >= 2 {
-				navigateToID = args[1] // capture the next arg
-				args = args[1:]        // move past the the captured arg
-				handled = true
-			}
-		}
-
-		if !handled {
-			// unhandled arg
-			fmt.Println("Usage:")
-			fmt.Println("\tazbrowse [debug] [demo] [navigate <id to navigate to>]")
-			fmt.Println()
-			os.Exit(-1)
-		}
-
-		args = args[1:] // move to the next arg
-	}
-}
-
-func configureTracing() (context.Context, opentracing.Span) {
+func configureTracing(settings *Settings) (context.Context, opentracing.Span) {
 	var ctx context.Context
 	var span opentracing.Span
 
-	if enableTracing {
+	if settings.EnableTracing {
 		startTraceDashboardForSpan := tracing.StartTracing()
 
 		rootCtx := context.Background()
@@ -206,7 +161,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 	}()
 }
 
-func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclient.Client) *views.ListWidget {
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Settings, client *armclient.Client) *views.ListWidget {
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -219,10 +174,10 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclie
 	leftColumnWidth := 45
 
 	// Create the views used
-	status := views.NewStatusbarWidget(1, maxY-2, maxX, hideGuids, g)
-	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, hideGuids, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, enableTracing, "Subscriptions", g)
-	notifications := views.NewNotificationWidget(maxX-45, 1, 45, hideGuids, g, client)
+	status := views.NewStatusbarWidget(1, maxY-2, maxX, settings.HideGuids, g)
+	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, settings.HideGuids, "")
+	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", g)
+	notifications := views.NewNotificationWidget(maxX-45, 1, 45, settings.HideGuids, g, client)
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
 
 	g.SetManager(status, content, list, notifications, commandPanel)
@@ -263,6 +218,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, client *armclie
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
+	keybindings.AddHandler(keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list))
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
@@ -313,9 +269,9 @@ func automatedFuzzer(list *views.ListWidget) {
 	}()
 }
 
-func handleNavigateTo(list *views.ListWidget) {
-	if navigateToID != "" {
-		navigateToIDLower := strings.ToLower(navigateToID)
+func handleNavigateTo(list *views.ListWidget, settings *Settings) {
+	if settings.NavigateToID != "" {
+		navigateToIDLower := strings.ToLower(settings.NavigateToID)
 		go func() {
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 			var lastNavigatedNode *expanders.TreeNode
@@ -338,7 +294,7 @@ func handleNavigateTo(list *views.ListWidget) {
 							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
 							// additional check is that the lengths match, or the next char in target is a '/'
 							nodeIDLower := strings.ToLower(node.ID)
-							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(navigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
+							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(settings.NavigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
 								list.ChangeSelection(nodeIndex)
 								lastNavigatedNode = node
 								list.ExpandCurrentSelection()
