@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
@@ -602,6 +603,66 @@ func (h ListClearFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
 		h.List.ClearFilter()
 		return nil
+	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type CommandPanelAzureSearchQueryHandler struct {
+	ListHandler
+	commandPanelWidget *views.CommandPanelWidget
+	list               *views.ListWidget
+	content            *views.ItemWidget
+}
+
+func NewCommandPanelAzureSearchQueryHandler(commandPanelWidget *views.CommandPanelWidget, content *views.ItemWidget, list *views.ListWidget) *CommandPanelAzureSearchQueryHandler {
+	handler := &CommandPanelAzureSearchQueryHandler{
+		commandPanelWidget: commandPanelWidget,
+		content:            content,
+		list:               list,
+	}
+	handler.id = HandlerIDAzureSearchQuery
+
+	go func() {
+		handler.processQueryEvents()
+	}()
+
+	return handler
+}
+
+func (h *CommandPanelAzureSearchQueryHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		currentItem := h.list.CurrentExpandedItem()
+		if currentItem != nil && currentItem.SwaggerResourceType != nil && currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs" {
+			h.commandPanelWidget.ShowWithText("search-query: search=")
+		}
+		return nil
+	}
+}
+
+func (h *CommandPanelAzureSearchQueryHandler) processQueryEvents() {
+	queryChannel := eventing.SubscribeToTopic("azure-search-query")
+	for {
+		queryStringInterface := <-queryChannel
+		queryString := strings.TrimSpace(strings.Replace(queryStringInterface.(string), "search-query: ", "", 1))
+
+		currentItem := h.list.CurrentExpandedItem()
+
+		apiSetID := currentItem.Metadata["SwaggerAPISetID"]
+		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+		if apiSetPtr == nil {
+			continue
+		}
+		apiSet := *apiSetPtr
+		searchApiSet := apiSet.(expanders.SwaggerAPISetSearch)
+
+		data, err := searchApiSet.DoRequest("GET", currentItem.ExpandURL+"&"+queryString)
+		if err != nil {
+			h.content.SetContent(fmt.Sprintf("%s", err), expanders.ResponseJSON, queryString)
+		} else {
+			h.content.SetContent(data, expanders.ResponseJSON, queryString)
+		}
 	}
 }
 

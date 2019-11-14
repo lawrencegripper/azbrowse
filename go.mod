@@ -12,7 +12,7 @@ require (
 	github.com/cskr/pubsub v1.0.1
 	github.com/fatih/color v1.7.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
-	github.com/go-openapi/analysis v0.18.0
+	github.com/go-openapi/analysis v0.18.0 // indirect
 	github.com/go-openapi/errors v0.18.0 // indirect
 	github.com/go-openapi/loads v0.18.0
 	github.com/go-openapi/spec v0.18.0
@@ -20,7 +20,6 @@ require (
 	github.com/go-openapi/swag v0.18.0 // indirect
 	github.com/gogo/protobuf v1.2.0 // indirect
 	github.com/google/go-cmp v0.3.1 // indirect
-	github.com/gorilla/context v1.1.1 // indirect
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
 	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
@@ -31,10 +30,10 @@ require (
 	github.com/opentracing/opentracing-go v1.0.2
 	github.com/rhysd/go-github-selfupdate v1.1.0
 	github.com/satori/go.uuid v1.2.0
-	github.com/schollz/closestmatch v2.1.0+incompatible
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
+	github.com/stretchr/testify v1.3.0
 	github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6
 	github.com/stuartleeks/gocui v0.4.1
 	github.com/valyala/fastjson v1.4.0
