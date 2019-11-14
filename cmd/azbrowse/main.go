@@ -32,9 +32,11 @@ var (
 
 // Settings to enable different behavior
 type Settings struct {
-	EnableTracing bool
-	HideGuids     bool
-	NavigateToID  string
+	EnableTracing         bool
+	HideGuids             bool
+	NavigateToID          string
+	FuzzerEnabled         bool
+	FuzzerDurationMinutes int
 }
 
 func main() {
@@ -78,7 +80,9 @@ func run(settings *Settings) {
 	// Close the span used to track startup times
 	span.Finish()
 
-	automatedFuzzer(list)
+	if settings.FuzzerEnabled {
+		automatedFuzzer(list, settings, g)
+	}
 
 	// Start the main loop of gocui to draw the UI
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -246,12 +250,18 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	return list
 }
 
-func automatedFuzzer(list *views.ListWidget) {
+func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui) {
+	startTime := time.Now()
+	endTime := startTime.Add(time.Duration(settings.FuzzerDurationMinutes) * time.Minute)
 	go func() {
 		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 		depthCount := 0
 		for {
 			nodeListInterface := <-navigatedChannel
+			if time.Now().After(endTime) {
+				gui.Close()
+				os.Exit(0)
+			}
 			nodeList := nodeListInterface.([]*expanders.TreeNode)
 			if len(nodeList) < 1 {
 				for index := 0; index < depthCount; index++ {
