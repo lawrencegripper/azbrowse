@@ -38,28 +38,6 @@ type ListWidget struct {
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, g *gocui.Gui) *ListWidget {
 	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, g: g}
-	go func() {
-		filterChannel := eventing.SubscribeToTopic("filter")
-		for {
-			filterStringInterface := <-filterChannel
-			filterString := strings.ToLower(strings.TrimSpace(strings.Replace(filterStringInterface.(string), "/", "", 1)))
-
-			filteredItems := []*expanders.TreeNode{}
-			for _, item := range listWidget.items {
-				if strings.Contains(strings.ToLower(item.Display), filterString) {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-
-			listWidget.selected = 0
-			listWidget.filterString = filterString
-			listWidget.filteredItems = filteredItems
-
-			g.Update(func(gui *gocui.Gui) error {
-				return nil
-			})
-		}
-	}()
 	return listWidget
 }
 
@@ -69,6 +47,24 @@ func (w *ListWidget) itemCount() int {
 	}
 
 	return len(w.filteredItems)
+}
+
+// SetFilter sets the filter to be applied to list items
+func (w *ListWidget) SetFilter(filterString string) {
+	filteredItems := []*expanders.TreeNode{}
+	for _, item := range w.items {
+		if strings.Contains(strings.ToLower(item.Display), filterString) {
+			filteredItems = append(filteredItems, item)
+		}
+	}
+
+	w.selected = 0
+	w.filterString = filterString
+	w.filteredItems = filteredItems
+
+	w.g.Update(func(gui *gocui.Gui) error {
+		return nil
+	})
 }
 
 // ClearFilter clears a filter if applied
@@ -214,7 +210,6 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	currentItem := w.CurrentItem()
-	w.ClearFilter()
 
 	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 
