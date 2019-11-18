@@ -17,7 +17,7 @@ type Expander interface {
 	DoesExpand(ctx context.Context, currentNode *TreeNode) (bool, error)
 	Expand(ctx context.Context, currentNode *TreeNode) ExpanderResult
 	Name() string
-  Delete(context context.Context, item *TreeNode) (bool, error)	
+	Delete(context context.Context, item *TreeNode) (bool, error)
 
 	// Used for testing the expanders
 	testCases() (bool, *[]expanderTestCase)

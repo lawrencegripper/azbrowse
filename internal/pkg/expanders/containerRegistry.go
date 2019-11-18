@@ -113,6 +113,19 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 	}
 }
 
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (e *ContainerRegistryExpander) Delete(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	switch currentItem.ItemType {
+	case "containerRegistry.repository":
+		return e.deleteRepository(ctx, currentItem)
+	case "containerRegistry.repository.tag":
+		return e.deleteRepositoryTag(ctx, currentItem)
+	case "containerRegistry.repository.manifest":
+		return e.deleteRepositoryManifest(ctx, currentItem)
+	}
+	return false, nil
+}
+
 func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	registryID := currentItem.Metadata["RegistryID"]
 
@@ -141,6 +154,7 @@ func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, curr
 				Display:   item,
 				ItemType:  "containerRegistry.repository",
 				ExpandURL: ExpandURLNotSupported,
+				DeleteURL: currentItem.ID + "/" + item,
 				Metadata: map[string]string{
 					"loginServer": loginServer,
 					"repository":  item,
@@ -178,7 +192,7 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 		}
 	}
 
-	responseBuf, err := e.doRequest(ctx, fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
+	responseBuf, err := e.doRequest(ctx, "GET", fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -199,6 +213,21 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
 	}
+}
+func (e *ContainerRegistryExpander) deleteRepository(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+
+	accessToken, err := e.getRegistryToken(ctx, loginServer, fmt.Sprintf("repository:%s:delete", repository))
+	if err != nil {
+		return false, err
+	}
+
+	_, err = e.doRequest(ctx, "DELETE", fmt.Sprintf("https://%s/acr/v1/%s", loginServer, repository), accessToken)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func (e *ContainerRegistryExpander) expandRepositoryTags(ctx context.Context, currentItem *TreeNode) ExpanderResult {
@@ -229,7 +258,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 		}
 	}
 
-	responseBuf, err := e.doRequest(ctx, fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
+	responseBuf, err := e.doRequest(ctx, "GET", fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
@@ -260,6 +289,22 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 		IsPrimaryResponse: true,
 	}
 }
+func (e *ContainerRegistryExpander) deleteRepositoryTag(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+	tag := currentItem.Metadata["tag"]
+
+	accessToken, err := e.getRegistryToken(ctx, loginServer, fmt.Sprintf("repository:%s:delete", repository))
+	if err != nil {
+		return false, err
+	}
+
+	_, err = e.doRequest(ctx, "DELETE", fmt.Sprintf("https://%s/acr/v1/%s/_tags/%s", loginServer, repository, tag), accessToken)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 func (e *ContainerRegistryExpander) expandRepositoryManifests(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	loginServer := currentItem.Metadata["loginServer"]
@@ -284,12 +329,30 @@ func (e *ContainerRegistryExpander) expandRepositoryManifest(ctx context.Context
 	return e.expandNode(
 		ctx,
 		currentItem,
-		fmt.Sprintf("https://%s/acr/v1/%s/_manifests/%s", loginServer, repository, digest),
+		fmt.Sprintf("https://%s/v2/%s/manifests/%s", loginServer, repository, digest),
 		fmt.Sprintf("repository:%s:metadata_read", repository),
 		"manifest.tags",
 		"",
 		e.getCreateTagNodeFunc(loginServer, repository),
 		nil)
+}
+func (e *ContainerRegistryExpander) deleteRepositoryManifest(ctx context.Context, currentItem *TreeNode) (bool, error) {
+
+	loginServer := currentItem.Metadata["loginServer"]
+	repository := currentItem.Metadata["repository"]
+	digest := currentItem.Metadata["digest"]
+
+	accessToken, err := e.getRegistryToken(ctx, loginServer, fmt.Sprintf("repository:%s:delete", repository))
+	if err != nil {
+		return false, err
+	}
+
+	_, err = e.doRequest(ctx, "DELETE", fmt.Sprintf("https://%s/v2/%s/manifests/%s", loginServer, repository, digest), accessToken)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+
 }
 
 type createItemNode func(currentItem *TreeNode, item string) *TreeNode
@@ -304,6 +367,7 @@ func (e *ContainerRegistryExpander) getCreateManifestNodeFunc(loginServer string
 			Display:   item,
 			ItemType:  "containerRegistry.repository.manifest",
 			ExpandURL: ExpandURLNotSupported,
+			DeleteURL: currentItem.ID + "/" + item,
 			Metadata: map[string]string{
 				"loginServer": loginServer,
 				"repository":  repository,
@@ -323,6 +387,7 @@ func (e *ContainerRegistryExpander) getCreateTagNodeFunc(loginServer string, rep
 			Display:   item,
 			ItemType:  "containerRegistry.repository.tag",
 			ExpandURL: ExpandURLNotSupported,
+			DeleteURL: currentItem.ID + "/" + item,
 			Metadata: map[string]string{
 				"loginServer": loginServer,
 				"repository":  repository,
@@ -441,7 +506,7 @@ func (e *ContainerRegistryExpander) getItemsForURL(ctx context.Context, url stri
 	span, ctx := tracing.StartSpanFromContext(ctx, "getItemsForURL(containerregistry):"+url, tracing.SetTag("url", url))
 	defer span.Finish()
 
-	responseBuf, err := e.doRequest(ctx, url, accessToken)
+	responseBuf, err := e.doRequest(ctx, "GET", url, accessToken)
 	if err != nil {
 		return "", []string{}, err
 	}
@@ -483,11 +548,11 @@ func (e *ContainerRegistryExpander) getItemsForURL(ctx context.Context, url stri
 	return response, itemsResult, nil
 }
 
-func (e *ContainerRegistryExpander) doRequest(ctx context.Context, url string, accessToken string) ([]byte, error) {
+func (e *ContainerRegistryExpander) doRequest(ctx context.Context, verb string, url string, accessToken string) ([]byte, error) {
 	span, _ := tracing.StartSpanFromContext(ctx, "doRequest(containerregistry):"+url, tracing.SetTag("url", url))
 	defer span.Finish()
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(verb, url, nil)
 	if err != nil {
 		return []byte{}, fmt.Errorf("Failed to create request: %s", err)
 	}
@@ -498,7 +563,7 @@ func (e *ContainerRegistryExpander) doRequest(ctx context.Context, url string, a
 		return []byte{}, fmt.Errorf("Request failed: %s", err)
 	}
 
-	if response.StatusCode != 200 {
+	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		return []byte{}, fmt.Errorf("DoRequest failed %v for '%s'", response.StatusCode, url)
 	}
 
