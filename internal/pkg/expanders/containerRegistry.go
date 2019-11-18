@@ -36,6 +36,7 @@ func (e *ContainerRegistryExpander) setClient(c *armclient.Client) {
 
 // ContainerRegistryExpander expands Tthe data-plane aspects of a Container Registry
 type ContainerRegistryExpander struct {
+	ExpanderBase
 	client    *http.Client
 	armClient *armclient.Client
 }

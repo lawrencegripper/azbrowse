@@ -20,6 +20,7 @@ var _ Expander = &ContainerInstanceExpander{}
 
 // ContainerInstanceExpander expands the data-plane aspects of a Container Instance
 type ContainerInstanceExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

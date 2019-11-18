@@ -10,6 +10,7 @@ import (
 
 // ActionExpander handles actions
 type ActionExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

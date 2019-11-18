@@ -17,10 +17,19 @@ type Expander interface {
 	DoesExpand(ctx context.Context, currentNode *TreeNode) (bool, error)
 	Expand(ctx context.Context, currentNode *TreeNode) ExpanderResult
 	Name() string
+  Delete(context context.Context, item *TreeNode) (bool, error)	
 
 	// Used for testing the expanders
 	testCases() (bool, *[]expanderTestCase)
 	setClient(c *armclient.Client)
+}
+
+// ExpanderBase provides nil implementations of Expander methods to avoid duplicating code
+type ExpanderBase struct{}
+
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (e *ExpanderBase) Delete(context context.Context, item *TreeNode) (bool, error) {
+	return false, nil
 }
 
 // ExpanderResponseType is used to indicate the text format of a response

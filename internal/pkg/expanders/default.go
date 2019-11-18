@@ -19,6 +19,7 @@ var _ Expander = &DefaultExpander{}
 
 // DefaultExpander expands RGs under a subscription
 type DefaultExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

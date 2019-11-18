@@ -45,6 +45,7 @@ type APISetExpandResponse struct {
 
 // SwaggerResourceExpander expands resource under an AppService
 type SwaggerResourceExpander struct {
+	ExpanderBase
 	apiSets map[string]*SwaggerAPISet
 }
 

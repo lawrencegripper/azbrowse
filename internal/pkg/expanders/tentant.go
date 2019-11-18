@@ -21,6 +21,7 @@ var _ Expander = &TenantExpander{}
 
 // TenantExpander expands the subscriptions under a tenant
 type TenantExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 
