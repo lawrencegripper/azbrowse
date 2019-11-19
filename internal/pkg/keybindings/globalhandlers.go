@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/atotto/clipboard"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/stuartleeks/gocui"
 )
 
@@ -63,13 +61,7 @@ func (h *CopyHandler) IsEnabled() bool {
 }
 
 func (h *CopyHandler) Invoke() error {
-	var err error
-	if wsl.IsWSL() {
-		err = wsl.TrySetClipboard(h.Content.GetContent())
-	} else {
-		err = clipboard.WriteAll(h.Content.GetContent())
-	}
-	if err != nil {
+	if err := copyToClipboard(h.Content.GetContent()); err != nil {
 		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 		return nil
 	}
