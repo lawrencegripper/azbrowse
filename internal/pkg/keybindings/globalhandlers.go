@@ -1,6 +1,8 @@
 package keybindings
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -64,10 +66,23 @@ func (h *CopyHandler) IsEnabled() bool {
 
 func (h *CopyHandler) Invoke() error {
 	var err error
+	content := h.Content.GetContent()
+	if !json.Valid([]byte(content)) {
+		h.StatusBar.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+		return fmt.Errorf("Resource content is not valid JSON: %s", content)
+	}
+
+	var formattedJSON bytes.Buffer
+	err = json.Indent(&formattedJSON, []byte(content), "", "  ")
+	if err != nil {
+		h.StatusBar.Status(fmt.Sprintf("Error formatting JSON for editor: %s", err), false)
+		return err
+	}
+
 	if wsl.IsWSL() {
-		err = wsl.TrySetClipboard(h.Content.GetContent())
+		err = wsl.TrySetClipboard(formattedJSON.String())
 	} else {
-		err = clipboard.WriteAll(h.Content.GetContent())
+		err = clipboard.WriteAll(formattedJSON.String())
 	}
 	if err != nil {
 		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)

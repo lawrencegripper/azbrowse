@@ -1,7 +1,9 @@
 package keybindings
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -527,8 +529,19 @@ func (h *ListUpdateHandler) Invoke() error {
 	defer os.Remove(tmpFile.Name()) //nolint: errcheck
 
 	originalJSON := h.Content.GetContent()
+	if !json.Valid([]byte(originalJSON)) {
+		h.status.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+		return fmt.Errorf("Resource content is not valid JSON: %s", originalJSON)
+	}
 
-	_, err = tmpFile.WriteString(originalJSON)
+	var formattedJSON bytes.Buffer
+	err = json.Indent(&formattedJSON, []byte(originalJSON), "", "  ")
+	if err != nil {
+		h.status.Status(fmt.Sprintf("Error formatting JSON for editor: %s", err), false)
+		return err
+	}
+
+	_, err = tmpFile.WriteString(formattedJSON.String())
 	if err != nil {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: false,
