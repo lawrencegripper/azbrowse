@@ -27,7 +27,7 @@ type Client struct {
 	client   *http.Client
 	tenantID string
 
-	aquireToken TokenFunc
+	acquireToken TokenFunc
 }
 
 // LegacyInstance is a singleton ARMClient used while migrating to the
@@ -37,16 +37,16 @@ var LegacyInstance = NewClientFromCLI()
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
 func NewClientFromCLI() *Client {
 	return &Client{
-		aquireToken: aquireTokenFromAzCLI,
-		client:      &http.Client{},
+		acquireToken: aquireTokenFromAzCLI,
+		client:       &http.Client{},
 	}
 }
 
 // NewClientFromClientAndTokenFunc create a client for testing using custom token func and httpclient
 func NewClientFromClientAndTokenFunc(client *http.Client, tokenFunc TokenFunc) *Client {
 	return &Client{
-		aquireToken: tokenFunc,
-		client:      client,
+		acquireToken: tokenFunc,
+		client:       client,
 	}
 }
 
@@ -59,7 +59,7 @@ func (c *Client) SetClient(newClient *http.Client) {
 // SetAquireToken lets you override the token func for testing
 // or other purposes
 func (c *Client) SetAquireToken(aquireFunc func(clearCache bool) (AzCLIToken, error)) {
-	c.aquireToken = aquireFunc
+	c.acquireToken = aquireFunc
 }
 
 // GetTenantID gets the current tenandid from AzCli
@@ -69,7 +69,7 @@ func (c *Client) GetTenantID() string {
 
 // GetToken gets the cached cli token
 func (c *Client) GetToken() (AzCLIToken, error) {
-	return c.aquireToken(false)
+	return c.acquireToken(false)
 }
 
 // RequestResult used with async channel
@@ -111,7 +111,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 		return "", errors.New("Failed to create request for body: " + err.Error())
 	}
 
-	cliToken, err := c.aquireToken(false)
+	cliToken, err := c.acquireToken(false)
 	if err != nil {
 		return "", errors.New("Failed to acquire auth token: " + err.Error())
 	}
@@ -127,7 +127,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 	if response != nil && response.StatusCode == 401 {
 		// This might be because the token we've cached has expired.
 		// Get a new token forcing it to clear cache
-		cliToken, err := c.aquireToken(true)
+		cliToken, err := c.acquireToken(true)
 		if err != nil {
 			return "", errors.New("Failed to acquire auth token: " + err.Error())
 		}
