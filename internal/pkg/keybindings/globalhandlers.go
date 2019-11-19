@@ -247,7 +247,10 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 				}
 
 				// calculate padding to right-align shortcut
-				bindingString := fmt.Sprintf("%s", binding)
+				bindingString := ""
+				if len(binding) > 0 {
+					bindingString = fmt.Sprintf("%s", binding)
+				}
 				padAmount := paletteWidth - len(commandDisplayText) - len(bindingString)
 				if padAmount < 0 {
 					padAmount = 0 // TODO - we should also look at truncating the DisplayText
