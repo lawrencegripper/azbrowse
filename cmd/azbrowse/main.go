@@ -185,6 +185,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
 	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
 	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
+	listCopyItemIDCommand := keybindings.NewListCopyItemIDHandler(list, status)
 
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
@@ -193,6 +194,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 		listActionsCommand,
 		listOpenCommand,
 		listUpdateCommand,
+		listCopyItemIDCommand,
 	}
 	sort.Sort(keybindings.SortByDisplayText(commands))
 
@@ -238,6 +240,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
 	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
+	keybindings.AddHandler(listCopyItemIDCommand)
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))

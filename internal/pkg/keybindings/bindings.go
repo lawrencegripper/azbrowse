@@ -58,8 +58,8 @@ func GetKeyBindingsAsStrings() map[string][]string {
 		stringValues := []string{}
 		for _, v := range values {
 			if v != nil {
-			stringValues = append(stringValues, keyToString(v))
-		}
+				stringValues = append(stringValues, keyToString(v))
+			}
 		}
 		keyBindings[k] = stringValues
 	}
