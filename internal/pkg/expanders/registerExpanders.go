@@ -5,10 +5,16 @@ import (
 )
 
 var swaggerResourceExpander *SwaggerResourceExpander
+var defaultExpander *DefaultExpander
 
 // GetSwaggerResourceExpander returns the (singleton) instance of SwaggerResourceExpander
 func GetSwaggerResourceExpander() *SwaggerResourceExpander {
 	return swaggerResourceExpander
+}
+
+// GetDefaultExpander returns the (singleton) instance of DefaultExpander
+func GetDefaultExpander() *DefaultExpander {
+	return defaultExpander
 }
 
 // register tracks all the current handlers
@@ -21,6 +27,10 @@ var register []Expander
 func InitializeExpanders(client *armclient.Client) {
 	swaggerResourceExpander = NewSwaggerResourcesExpander()
 	swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources(client))
+
+	defaultExpander = &DefaultExpander{
+		client: client,
+	}
 
 	register = []Expander{
 		&TenantExpander{

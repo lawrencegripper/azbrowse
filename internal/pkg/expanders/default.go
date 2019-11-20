@@ -26,9 +26,6 @@ func (e *DefaultExpander) setClient(c *armclient.Client) {
 	e.client = c
 }
 
-// DefaultExpanderInstance provides an instance of the default expander for use
-var DefaultExpanderInstance DefaultExpander
-
 // Name returns the name of the expander
 func (e *DefaultExpander) Name() string {
 	return "GenericExpander"
