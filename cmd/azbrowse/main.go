@@ -282,17 +282,24 @@ func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui)
 		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 		depthCount := 0
 		for {
-			nodeListInterface := <-navigatedChannel
+			navigateStateInterface := <-navigatedChannel
 			if time.Now().After(endTime) {
 				gui.Close()
 				os.Exit(0)
 			}
-			nodeList := nodeListInterface.([]*expanders.TreeNode)
+			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
+			nodeList := navigateState.NewNodes
 			if len(nodeList) < 1 {
 				for index := 0; index < depthCount; index++ {
 					list.GoBack()
 				}
-				continue
+				if navigateState.Success {
+					continue
+				} else {
+					// Avoid getting stuck in a loop where we don't have any nodes to iterate
+					// if navigation wasn't successful and we've looped then pick from the existing list nodes
+					nodeList = list.GetNodes()
+				}
 			}
 
 			if len(nodeList) > 0 {
@@ -314,10 +321,16 @@ func handleNavigateTo(list *views.ListWidget, settings *Settings) {
 			processNavigations := true
 
 			for {
-				nodeListInterface := <-navigatedChannel
+				navigateStateInterface := <-navigatedChannel
 
 				if processNavigations {
-					nodeList := nodeListInterface.([]*expanders.TreeNode)
+					navigateState := navigateStateInterface.(views.ListNavigatedEventState)
+					if !navigateState.Success {
+						// we got as far as we could - now stop!
+						processNavigations = false
+						continue
+					}
+					nodeList := navigateState.NewNodes
 
 					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
 						processNavigations = false
