@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/atotto/clipboard"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
@@ -66,23 +67,33 @@ func (h *CopyHandler) IsEnabled() bool {
 
 func (h *CopyHandler) Invoke() error {
 	var err error
+	contentType := h.Content.GetContentType()
 	content := h.Content.GetContent()
-	if !json.Valid([]byte(content)) {
-		h.StatusBar.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
-		return fmt.Errorf("Resource content is not valid JSON: %s", content)
-	}
 
-	var formattedJSON bytes.Buffer
-	err = json.Indent(&formattedJSON, []byte(content), "", "  ")
-	if err != nil {
-		h.StatusBar.Status(fmt.Sprintf("Error formatting JSON for editor: %s", err), false)
-		return err
+	var formattedContent string
+	switch contentType {
+	case expanders.ResponseJSON:
+		if !json.Valid([]byte(content)) {
+			h.StatusBar.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+			return fmt.Errorf("Resource content is not valid JSON: %s", content)
+		}
+
+		var formattedBuf bytes.Buffer
+		err = json.Indent(&formattedBuf, []byte(content), "", "  ")
+		if err != nil {
+			h.StatusBar.Status(fmt.Sprintf("Error formatting JSON for editor: %s", err), false)
+			return err
+		}
+
+		formattedContent = formattedBuf.String()
+	case expanders.ResponseYAML:
+		formattedContent = content // TODO: add YAML formatter
 	}
 
 	if wsl.IsWSL() {
-		err = wsl.TrySetClipboard(formattedJSON.String())
+		err = wsl.TrySetClipboard(formattedContent)
 	} else {
-		err = clipboard.WriteAll(formattedJSON.String())
+		err = clipboard.WriteAll(formattedContent)
 	}
 	if err != nil {
 		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
