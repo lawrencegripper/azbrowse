@@ -25,6 +25,9 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	}
 
 	currentExpandedItem := list.CurrentExpandedItem()
+	if currentExpandedItem == nil {
+		return nil
+	}
 	if currentExpandedItem.ItemType == expanders.ResourceType {
 		namespace = currentExpandedItem.Namespace
 		armType = currentExpandedItem.ArmType

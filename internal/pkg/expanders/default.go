@@ -19,15 +19,13 @@ var _ Expander = &DefaultExpander{}
 
 // DefaultExpander expands RGs under a subscription
 type DefaultExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 
 func (e *DefaultExpander) setClient(c *armclient.Client) {
 	e.client = c
 }
-
-// DefaultExpanderInstance provides an instance of the default expander for use
-var DefaultExpanderInstance DefaultExpander
 
 // Name returns the name of the expander
 func (e *DefaultExpander) Name() string {

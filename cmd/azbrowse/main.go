@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime/debug"
+	"sort"
 	"strings"
 	"time"
 
@@ -182,7 +183,27 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, settings.HideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", g)
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, settings.HideGuids, g, client)
-	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
+
+	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
+
+	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
+	copyCommand := keybindings.NewCopyHandler(content, status)
+	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
+	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
+	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
+	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
+	listCopyItemIDCommand := keybindings.NewListCopyItemIDHandler(list, status)
+
+	commands := []keybindings.Command{
+		commandPanelFilterCommand,
+		copyCommand,
+		commandPanelAzureSearchQueryCommand,
+		listActionsCommand,
+		listOpenCommand,
+		listUpdateCommand,
+		listCopyItemIDCommand,
+	}
+	sort.Sort(keybindings.SortByDisplayText(commands))
 
 	g.SetManager(status, content, list, notifications, commandPanel)
 	g.SetCurrentView("listWidget")
@@ -195,14 +216,17 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	// NOTE> Global handlers must be registered first to
 	//       ensure double key registration is prevented
 	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
-	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
+	keybindings.AddHandler(copyCommand)
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
-	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(commandPanel))
-	keybindings.AddHandler(keybindings.NewCommandPanelFilterHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(g, commandPanel, commands))
+	keybindings.AddHandler(commandPanelFilterCommand)
 	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelDownHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelUpHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelEnterHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -211,18 +235,19 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(keybindings.NewListRefreshHandler(list))
 	keybindings.AddHandler(keybindings.NewListBackHandler(list))
 	keybindings.AddHandler(keybindings.NewListBackLegacyHandler(list))
-	keybindings.AddHandler(keybindings.NewListActionsHandler(list, ctx))
+	keybindings.AddHandler(listActionsCommand)
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
-	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
+	keybindings.AddHandler(listOpenCommand)
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
-	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content, g))
+	keybindings.AddHandler(listUpdateCommand)
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
-	keybindings.AddHandler(keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list))
+	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
+	keybindings.AddHandler(listCopyItemIDCommand)
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))

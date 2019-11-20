@@ -25,6 +25,7 @@ var _ Expander = &AppInsightsExpander{}
 
 // AppInsightsExpander expands aspects of App Insights that don't naturally flow from the api spec
 type AppInsightsExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

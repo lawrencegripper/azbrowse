@@ -23,6 +23,7 @@ var _ Expander = &ResourceGroupResourceExpander{}
 
 // ResourceGroupResourceExpander expands resource under an RG
 type ResourceGroupResourceExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

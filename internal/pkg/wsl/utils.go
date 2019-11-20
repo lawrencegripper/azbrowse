@@ -41,7 +41,19 @@ func TrySetClipboard(text string) error {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		return fmt.Errorf("Error running wslpath: %s", stderr.String())
+		return fmt.Errorf("Error running clip.exe: %s", stderr.String())
+	}
+	return nil
+}
+
+// TryLaunchBrowser attempts to launch the browser to the specified URL
+func TryLaunchBrowser(url string) error {
+	cmd := exec.Command("explorer.exe", url)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		return fmt.Errorf("Error running launching URL: %s", stderr.String())
 	}
 	return nil
 }

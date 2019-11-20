@@ -29,12 +29,16 @@ const (
 	HandlerIDListEnd                 HandlerID = "listend"             //nolint:golint
 	HandlerIDListHome                HandlerID = "listhome"            //nolint:golint
 	HandlerIDListClearFilter         HandlerID = "listclearfilter"     //nolint:golint
+	HandlerIDListCopyItemID          HandlerID = "listcopyitemid"      //nolint:golint
 	HandlerIDConfirmDelete           HandlerID = "confirmdelete"       //nolint:golint
 	HandlerIDClearPendingDeletes     HandlerID = "clearpendingdeletes" //nolint:golint
 	HandlerIDItemPageDown            HandlerID = "itempagedown"        //nolint:golint
 	HandlerIDItemPageUp              HandlerID = "itempageup"          //nolint:golint
 	HandlerIDToggleOpenCommandPanel  HandlerID = "commandpanelopen"    //nolint:golint
 	HandlerIDToggleCloseCommandPanel HandlerID = "commandpanelclose"   //nolint:golint
+	HandlerIDCommandPanelDown        HandlerID = "commandpaneldown"    //nolint:golint
+	HandlerIDCommandPanelUp          HandlerID = "commandpanelup"      //nolint:golint
+	HandlerIDCommandPanelEnter       HandlerID = "commandpanelenter"   //nolint:golint
 	HandlerIDFilter                  HandlerID = "filter"              //nolint:golint
 	HandlerIDAzureSearchQuery        HandlerID = "azuresearchquery"    //nolist:golint
 )
