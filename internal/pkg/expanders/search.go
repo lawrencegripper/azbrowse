@@ -20,6 +20,7 @@ type adminKeysResponse struct {
 
 // AzureSearchServiceExpander expands the kubernetes aspects of AKS
 type AzureSearchServiceExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

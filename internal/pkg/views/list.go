@@ -214,12 +214,9 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 
 	newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
-	if err != nil {
-		// Shouldn't be possible
-		panic(err)
+	if err == nil { // expander emits status event on error
+		w.Navigate(newItems, newContent, newTitle)
 	}
-
-	w.Navigate(newItems, newContent, newTitle)
 }
 
 // Navigate updates the currently selected list nodes, title and details content

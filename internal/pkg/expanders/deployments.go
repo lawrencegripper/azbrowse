@@ -13,6 +13,7 @@ var _ Expander = &DeploymentsExpander{}
 
 // DeploymentsExpander expands RGs under a subscription
 type DeploymentsExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

@@ -57,7 +57,9 @@ func GetKeyBindingsAsStrings() map[string][]string {
 	for k, values := range keys {
 		stringValues := []string{}
 		for _, v := range values {
-			stringValues = append(stringValues, keyToString(v))
+			if v != nil {
+				stringValues = append(stringValues, keyToString(v))
+			}
 		}
 		keyBindings[k] = stringValues
 	}
@@ -84,6 +86,9 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 	}
 
 	for _, key := range keys {
+		if key == nil {
+			continue
+		}
 		if err := checkKeyNotAlreadyInUse(hnd.Widget(), hnd.ID(), key); err != nil {
 			return err
 		}
@@ -196,12 +201,12 @@ func cleanValue(str string) string {
 }
 
 func keyToString(key interface{}) string {
-	switch key.(type) { //nolint: gosimple
+	switch t := key.(type) { //nolint: gosimple
 	case gocui.Key:
 		return GocuiKeyToStr[key.(gocui.Key)]
 	case rune:
 		return string(key.(rune))
 	default:
-		panic("Unhandled key type\n")
+		panic(fmt.Sprintf("Unhandled key type: %v\n", t))
 	}
 }

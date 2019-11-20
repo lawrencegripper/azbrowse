@@ -29,6 +29,7 @@ const (
 	HandlerIDListEnd                 HandlerID = "listend"             //nolint:golint
 	HandlerIDListHome                HandlerID = "listhome"            //nolint:golint
 	HandlerIDListClearFilter         HandlerID = "listclearfilter"     //nolint:golint
+	HandlerIDListCopyItemID          HandlerID = "listcopyitemid"      //nolint:golint
 	HandlerIDConfirmDelete           HandlerID = "confirmdelete"       //nolint:golint
 	HandlerIDClearPendingDeletes     HandlerID = "clearpendingdeletes" //nolint:golint
 	HandlerIDItemPageDown            HandlerID = "itempagedown"        //nolint:golint
