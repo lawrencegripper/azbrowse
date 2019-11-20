@@ -25,7 +25,7 @@ func handleRunCmd(settings *Settings, demo *bool, debug *bool, navigateResource 
 		settings.NavigateToID = *navigateResource
 	}
 
-	if fuzzerDurationMinutes != nil {
+	if fuzzerDurationMinutes != nil && *fuzzerDurationMinutes > 0 {
 		settings.FuzzerEnabled = true
 		settings.FuzzerDurationMinutes = *fuzzerDurationMinutes
 	}
@@ -56,7 +56,7 @@ func handleCommandAndArgs() {
 	runDemo := runCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
 	runDebug := runCmd.Bool("debug", false, "run in debug mode")
 	runNavigate := runCmd.String("navigate", "", "navigate to resource")
-	runFuzzer := runCmd.Int("fuzzer", 15, "run fuzzer (optionally specify the duration in minutes)")
+	runFuzzer := runCmd.Int("fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 
 	if len(os.Args) < 2 {
 		if err := runCmd.Parse(os.Args[1:]); err != nil {
