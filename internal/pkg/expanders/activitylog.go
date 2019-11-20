@@ -12,6 +12,7 @@ import (
 
 // ActivityLogExpander expands activity logs under an RG
 type ActivityLogExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

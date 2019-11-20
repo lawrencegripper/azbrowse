@@ -112,11 +112,14 @@ func (w *NotificationWidget) ConfirmDelete() {
 			Timeout:    time.Second * 15,
 		})
 
-		swaggerExpander := expanders.GetSwaggerResourceExpander()
-
 		for _, i := range pending {
-			swaggerDeleted, err := swaggerExpander.Delete(context.Background(), i)
-			if err == nil && !swaggerDeleted {
+			var err error
+			fallback := true
+			if i.Expander != nil {
+				deleted, err := i.Expander.Delete(context.Background(), i)
+				fallback = (err == nil && !deleted)
+			}
+			if fallback {
 				// fallback to ARM request to delete
 				_, err = w.client.DoRequest(context.Background(), "DELETE", i.DeleteURL)
 			}
