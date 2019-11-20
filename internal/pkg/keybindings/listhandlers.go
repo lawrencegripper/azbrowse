@@ -748,7 +748,7 @@ func (h ListCopyItemIDHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 }
 
 func (h *ListCopyItemIDHandler) DisplayText() string {
-	return "Copy current item ID"
+	return "Copy current resource ID"
 }
 func (h *ListCopyItemIDHandler) IsEnabled() bool {
 	return h.List.CurrentExpandedItem() != nil
@@ -757,10 +757,10 @@ func (h *ListCopyItemIDHandler) Invoke() error {
 	item := h.List.CurrentExpandedItem()
 	if item != nil {
 		if err := copyToClipboard(item.ID); err != nil {
-			h.StatusBar.Status(fmt.Sprintf("Failed to copy ID to clipboard: %s", err.Error()), false)
+			h.StatusBar.Status(fmt.Sprintf("Failed to copy resource ID to clipboard: %s", err.Error()), false)
 			return nil
 		}
-		h.StatusBar.Status("Current item ID copied to clipboard", false)
+		h.StatusBar.Status("Current resource ID copied to clipboard", false)
 		return nil
 	}
 	return nil
