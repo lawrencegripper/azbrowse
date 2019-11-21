@@ -1,7 +1,9 @@
 package keybindings
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -504,13 +506,32 @@ func (h *ListUpdateHandler) Invoke() error {
 		return err
 	}
 
+	var formattedContent string
 	fileExtension := ".txt"
 	contentType := h.Content.GetContentType()
+	content := h.Content.GetContent()
+
 	switch contentType {
 	case expanders.ResponseJSON:
 		fileExtension = ".json"
+
+		if !json.Valid([]byte(content)) {
+			h.status.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+			return fmt.Errorf("Resource content is not valid JSON: %s", content)
+		}
+
+		var formattedBuf bytes.Buffer
+		err = json.Indent(&formattedBuf, []byte(content), "", "  ")
+		if err != nil {
+			h.status.Status(fmt.Sprintf("Error formatting JSON for editor: %s", err), false)
+			return err
+		}
+
+		formattedContent = formattedBuf.String()
 	case expanders.ResponseYAML:
 		fileExtension = ".yaml"
+
+		formattedContent = content // TODO: add YAML formatter
 	}
 
 	tempDir := editorConfig.TempDir
@@ -526,9 +547,7 @@ func (h *ListUpdateHandler) Invoke() error {
 	// Remember to clean up the file afterwards
 	defer os.Remove(tmpFile.Name()) //nolint: errcheck
 
-	originalJSON := h.Content.GetContent()
-
-	_, err = tmpFile.WriteString(originalJSON)
+	_, err = tmpFile.WriteString(formattedContent)
 	if err != nil {
 		eventing.SendStatusEvent(eventing.StatusEvent{
 			InProgress: false,
@@ -588,7 +607,7 @@ func (h *ListUpdateHandler) Invoke() error {
 	}
 
 	updatedJSON := string(updatedJSONBytes)
-	if updatedJSON == originalJSON {
+	if updatedJSON == formattedContent {
 		h.status.Status("No changes to JSON - no further action.", false)
 		return nil
 	}
