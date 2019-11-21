@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
@@ -30,18 +31,11 @@ var (
 	goversion = "unknown"
 )
 
-// Settings to enable different behavior
-type Settings struct {
-	EnableTracing bool
-	HideGuids     bool
-	NavigateToID  string
-}
-
 func main() {
 	handleCommandAndArgs()
 }
 
-func run(settings *Settings) {
+func run(settings *config.Settings) {
 	confirmAndSelfUpdate()
 
 	// Setup the root context and span for open tracing
@@ -84,7 +78,7 @@ func run(settings *Settings) {
 	}
 }
 
-func configureTracing(settings *Settings) (context.Context, opentracing.Span) {
+func configureTracing(settings *config.Settings) (context.Context, opentracing.Span) {
 	var ctx context.Context
 	var span opentracing.Span
 
@@ -159,7 +153,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 	}()
 }
 
-func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Settings, client *armclient.Client) *views.ListWidget {
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *config.Settings, client *armclient.Client) *views.ListWidget {
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -275,7 +269,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	return list
 }
 
-func handleNavigateTo(list *views.ListWidget, settings *Settings) {
+func handleNavigateTo(list *views.ListWidget, settings *config.Settings) {
 	if settings.NavigateToID != "" {
 		navigateToIDLower := strings.ToLower(settings.NavigateToID)
 		go func() {
