@@ -140,3 +140,8 @@ func (w *StatusbarWidget) Status(message string, loading bool) func() {
 	})
 	return done
 }
+
+// SetHideGuids sets the HideGuids option
+func (w *StatusbarWidget) SetHideGuids(value bool) {
+	w.hideGuids = value
+}

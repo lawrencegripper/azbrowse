@@ -42,6 +42,7 @@ const (
 	HandlerIDCommandPanelEnter       HandlerID = "commandpanelenter"     //nolint:golint
 	HandlerIDFilter                  HandlerID = "filter"                //nolint:golint
 	HandlerIDAzureSearchQuery        HandlerID = "azuresearchquery"      //nolist:golint
+	HandlerIDToggleDemoMode          HandlerID = "toggledemomode"        //nolist:golint
 )
 
 // KeyHandler is an interface that all key handlers must implement
