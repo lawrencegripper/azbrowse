@@ -14,6 +14,7 @@ var _ Expander = &SubscriptionExpander{}
 
 // SubscriptionExpander expands RGs under a subscription
 type SubscriptionExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

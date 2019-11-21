@@ -741,3 +741,48 @@ func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state vie
 }
 
 ////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ListCopyItemIDHandler struct {
+	ListHandler
+	List      *views.ListWidget
+	StatusBar *views.StatusbarWidget
+}
+
+var _ Command = &ListCopyItemIDHandler{}
+
+func NewListCopyItemIDHandler(list *views.ListWidget, statusBar *views.StatusbarWidget) *ListCopyItemIDHandler {
+	handler := &ListCopyItemIDHandler{
+		List:      list,
+		StatusBar: statusBar,
+	}
+	handler.id = HandlerIDListCopyItemID
+	return handler
+}
+
+func (h ListCopyItemIDHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		return h.Invoke()
+	}
+}
+
+func (h *ListCopyItemIDHandler) DisplayText() string {
+	return "Copy current resource ID"
+}
+func (h *ListCopyItemIDHandler) IsEnabled() bool {
+	return h.List.CurrentExpandedItem() != nil
+}
+func (h *ListCopyItemIDHandler) Invoke() error {
+	item := h.List.CurrentExpandedItem()
+	if item != nil {
+		if err := copyToClipboard(item.ID); err != nil {
+			h.StatusBar.Status(fmt.Sprintf("Failed to copy resource ID to clipboard: %s", err.Error()), false)
+			return nil
+		}
+		h.StatusBar.Status("Current resource ID copied to clipboard", false)
+		return nil
+	}
+	return nil
+}
+
+////////////////////////////////////////////////////////////////////

@@ -6,11 +6,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/atotto/clipboard"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/stuartleeks/gocui"
 )
 
@@ -90,12 +88,7 @@ func (h *CopyHandler) Invoke() error {
 		formattedContent = content // TODO: add YAML formatter
 	}
 
-	if wsl.IsWSL() {
-		err = wsl.TrySetClipboard(formattedContent)
-	} else {
-		err = clipboard.WriteAll(formattedContent)
-	}
-	if err != nil {
+	if err := copyToClipboard(formattedContent); err != nil {
 		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 		return nil
 	}
@@ -273,7 +266,10 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 				}
 
 				// calculate padding to right-align shortcut
-				bindingString := fmt.Sprintf("%s", binding)
+				bindingString := ""
+				if len(binding) > 0 {
+					bindingString = fmt.Sprintf("%s", binding)
+				}
 				padAmount := paletteWidth - len(commandDisplayText) - len(bindingString)
 				if padAmount < 0 {
 					padAmount = 0 // TODO - we should also look at truncating the DisplayText
