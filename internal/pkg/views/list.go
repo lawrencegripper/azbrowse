@@ -35,31 +35,15 @@ type ListWidget struct {
 	lastTopIndex         int
 }
 
+// ListNavigatedEventState captures the state when raising a `list.navigated` event
+type ListNavigatedEventState struct {
+	Success  bool                  // True if this was a successful navigation
+	NewNodes []*expanders.TreeNode // If Success==true this contains the new nodes
+}
+
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, g *gocui.Gui) *ListWidget {
 	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, g: g}
-	go func() {
-		filterChannel := eventing.SubscribeToTopic("filter")
-		for {
-			filterStringInterface := <-filterChannel
-			filterString := strings.ToLower(strings.TrimSpace(strings.Replace(filterStringInterface.(string), "/", "", 1)))
-
-			filteredItems := []*expanders.TreeNode{}
-			for _, item := range listWidget.items {
-				if strings.Contains(strings.ToLower(item.Display), filterString) {
-					filteredItems = append(filteredItems, item)
-				}
-			}
-
-			listWidget.selected = 0
-			listWidget.filterString = filterString
-			listWidget.filteredItems = filteredItems
-
-			g.Update(func(gui *gocui.Gui) error {
-				return nil
-			})
-		}
-	}()
 	return listWidget
 }
 
@@ -69,6 +53,24 @@ func (w *ListWidget) itemCount() int {
 	}
 
 	return len(w.filteredItems)
+}
+
+// SetFilter sets the filter to be applied to list items
+func (w *ListWidget) SetFilter(filterString string) {
+	filteredItems := []*expanders.TreeNode{}
+	for _, item := range w.items {
+		if strings.Contains(strings.ToLower(item.Display), filterString) {
+			filteredItems = append(filteredItems, item)
+		}
+	}
+
+	w.selected = 0
+	w.filterString = filterString
+	w.filteredItems = filteredItems
+
+	w.g.Update(func(gui *gocui.Gui) error {
+		return nil
+	})
 }
 
 // ClearFilter clears a filter if applied
@@ -196,6 +198,7 @@ func (w *ListWidget) GoBack() {
 	}
 	previousPage := w.navStack.Pop()
 	if previousPage == nil {
+		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
 		return
 	}
 	w.contentView.SetContent(previousPage.Data, previousPage.DataType, "Response")
@@ -205,7 +208,7 @@ func (w *ListWidget) GoBack() {
 	w.selected = previousPage.Selection
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
 
-	eventing.Publish("list.navigated", w.items)
+	eventing.Publish("list.navigated", ListNavigatedEventState{Success: true, NewNodes: w.items})
 
 }
 
@@ -217,21 +220,25 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	}
 
 	currentItem := w.CurrentItem()
-	w.ClearFilter()
 
 	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 
 	newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
-	if err != nil {
-		// Shouldn't be possible
-		panic(err)
+	if err != nil { // Don't need to display error as expander emits status event on error
+		// Set parameters to trigger non-successful `list.navigated` event
+		newItems = []*expanders.TreeNode{}
+		newContent = nil
+		newTitle = ""
 	}
-
 	w.Navigate(newItems, newContent, newTitle)
 }
 
 // Navigate updates the currently selected list nodes, title and details content
 func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.ExpanderResponse, title string) {
+
+	if len(nodes) == 0 && content == nil && title == "" {
+		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
+	}
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
 		w.SetNodes(nodes)
@@ -242,7 +249,12 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 		w.title = w.title + ">" + currentItem.Name
 	}
 
-	eventing.Publish("list.navigated", nodes)
+	eventing.Publish("list.navigated", ListNavigatedEventState{Success: true, NewNodes: nodes})
+}
+
+// GetNodes returns the currently listed nodes
+func (w *ListWidget) GetNodes() []*expanders.TreeNode {
+	return w.items
 }
 
 // SetNodes allows others to set the list nodes

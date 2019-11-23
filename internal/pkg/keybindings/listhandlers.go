@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
@@ -29,6 +28,8 @@ type ListActionsHandler struct {
 	Context context.Context
 }
 
+var _ Command = &ListActionsHandler{}
+
 func NewListActionsHandler(list *views.ListWidget, context context.Context) *ListActionsHandler {
 	handler := &ListActionsHandler{
 		Context: context,
@@ -40,8 +41,17 @@ func NewListActionsHandler(list *views.ListWidget, context context.Context) *Lis
 
 func (h ListActionsHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		return views.LoadActionsView(h.Context, h.List)
+		return h.Invoke()
 	}
+}
+func (h *ListActionsHandler) DisplayText() string {
+	return "Show Actions"
+}
+func (h *ListActionsHandler) IsEnabled() bool {
+	return h.List.CurrentExpandedItem() != nil
+}
+func (h *ListActionsHandler) Invoke() error {
+	return views.LoadActionsView(h.Context, h.List)
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -321,6 +331,8 @@ type ListOpenHandler struct {
 	Context context.Context
 }
 
+var _ Command = &ListOpenHandler{}
+
 func NewListOpenHandler(list *views.ListWidget, context context.Context) *ListOpenHandler {
 	handler := &ListOpenHandler{
 		List:    list,
@@ -332,26 +344,41 @@ func NewListOpenHandler(list *views.ListWidget, context context.Context) *ListOp
 
 func (h ListOpenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		item := h.List.CurrentItem()
-		portalURL := os.Getenv("AZURE_PORTAL_URL")
-		if portalURL == "" {
-			portalURL = "https://portal.azure.com"
-		}
-		url := portalURL + "/#@" + armclient.LegacyInstance.GetTenantID() + "/resource/" + item.ID
-		span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
-		err := open.Run(url)
-		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
-				InProgress: false,
-				Failure:    true,
-				Message:    "Failed opening resources in browser: " + err.Error(),
-				Timeout:    time.Duration(time.Second * 4),
-			})
-			return nil
-		}
-		span.Finish()
+		return h.Invoke()
+	}
+}
+
+func (h *ListOpenHandler) DisplayText() string {
+	return "Open in Portal"
+}
+func (h *ListOpenHandler) IsEnabled() bool {
+	return true // TODO - filter to Azure resource nodes
+}
+func (h *ListOpenHandler) Invoke() error {
+	item := h.List.CurrentItem()
+	portalURL := os.Getenv("AZURE_PORTAL_URL")
+	if portalURL == "" {
+		portalURL = "https://portal.azure.com"
+	}
+	url := portalURL + "/#@" + armclient.LegacyInstance.GetTenantID() + "/resource/" + item.ID
+	span, _ := tracing.StartSpanFromContext(h.Context, "openportal:url")
+	var err error
+	if wsl.IsWSL() {
+		err = wsl.TryLaunchBrowser(url)
+	} else {
+		err = open.Run(url)
+	}
+	if err != nil {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Failed opening resources in browser: " + err.Error(),
+			Timeout:    time.Duration(time.Second * 4),
+		})
 		return nil
 	}
+	span.Finish()
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -415,6 +442,8 @@ type ListUpdateHandler struct {
 	Gui     *gocui.Gui
 }
 
+var _ Command = &ListUpdateHandler{}
+
 func NewListUpdateHandler(list *views.ListWidget, statusbar *views.StatusbarWidget, ctx context.Context, content *views.ItemWidget, gui *gocui.Gui) *ListUpdateHandler {
 	handler := &ListUpdateHandler{
 		List:    list,
@@ -447,129 +476,143 @@ func (h ListUpdateHandler) getEditorConfig() (config.EditorConfig, error) {
 
 func (h ListUpdateHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		item := h.List.CurrentExpandedItem()
-		if item == nil ||
-			item.SwaggerResourceType == nil ||
-			item.SwaggerResourceType.PutEndpoint == nil ||
-			item.Metadata == nil ||
-			item.Metadata["SwaggerAPISetID"] == "" {
-			return nil
-		}
-
-		editorConfig, err := h.getEditorConfig()
-		if err != nil {
-			return err
-		}
-
-		fileExtension := ".txt"
-		contentType := h.Content.GetContentType()
-		switch contentType {
-		case expanders.ResponseJSON:
-			fileExtension = ".json"
-		case expanders.ResponseYAML:
-			fileExtension = ".yaml"
-		}
-
-		tempDir := editorConfig.TempDir
-		if tempDir == "" {
-			tempDir = os.TempDir() // fall back to Temp dir as default
-		}
-		tmpFile, err := ioutil.TempFile(tempDir, "azbrowse-*"+fileExtension)
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
-			return err
-		}
-
-		// Remember to clean up the file afterwards
-		defer os.Remove(tmpFile.Name()) //nolint: errcheck
-
-		originalJSON := h.Content.GetContent()
-
-		_, err = tmpFile.WriteString(originalJSON)
-		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
-				InProgress: false,
-				Failure:    true,
-				Message:    "Failed saving file for editing: " + err.Error(),
-				Timeout:    time.Duration(time.Second * 4),
-			})
-			return nil
-		}
-		err = tmpFile.Close()
-		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
-				InProgress: false,
-				Failure:    true,
-				Message:    "Failed closing file: " + err.Error(),
-				Timeout:    time.Duration(time.Second * 4),
-			})
-			return nil
-		}
-
-		h.status.Status("Opening JSON in editor...", false)
-		editorTmpFile := tmpFile.Name()
-		// check if we should perform path translation for WSL (Windows Subsytem for Linux)
-		if editorConfig.TranslateFilePathForWSL {
-			editorTmpFile, err = wsl.TranslateToWindowsPath(editorTmpFile)
-			if err != nil {
-				return err
-			}
-		}
-
-		if editorConfig.RevertToStandardBuffer {
-			// Close termbox to revert to normal buffer
-			termbox.Close()
-		}
-
-		editorErr := openEditor(editorConfig.Command, editorTmpFile)
-		if editorConfig.RevertToStandardBuffer {
-			// Init termbox to switch back to alternate buffer and Flush content
-			err = termbox.Init()
-			if err != nil {
-				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
-			}
-			err = h.Gui.Flush()
-			if err != nil {
-				return fmt.Errorf("Failed to reinitialise termbox: %v", err)
-			}
-		}
-		if editorErr != nil {
-			h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr), false)
-			return nil
-		}
-
-		updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Cannot open edited file: %s", err), false)
-			return nil
-		}
-
-		updatedJSON := string(updatedJSONBytes)
-		if updatedJSON == originalJSON {
-			h.status.Status("No changes to JSON - no further action.", false)
-			return nil
-		}
-		if updatedJSON == "" {
-			h.status.Status("Updated JSON empty - no further action.", false)
-			return nil
-		}
-
-		apiSetID := item.Metadata["SwaggerAPISetID"]
-		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
-		if apiSetPtr == nil {
-			return nil
-		}
-		apiSet := *apiSetPtr
-
-		err = apiSet.Update(h.Context, item, updatedJSON)
-		if err != nil {
-			h.status.Status(fmt.Sprintf("Error updating: %s", err), false)
-			return nil
-		}
-
-		h.status.Status("Done", false)
+		return h.Invoke()
+	}
+}
+func (h *ListUpdateHandler) DisplayText() string {
+	return "Update current item"
+}
+func (h *ListUpdateHandler) IsEnabled() bool {
+	item := h.List.CurrentExpandedItem()
+	if item == nil ||
+		item.SwaggerResourceType == nil ||
+		item.SwaggerResourceType.PutEndpoint == nil ||
+		item.Metadata == nil ||
+		item.Metadata["SwaggerAPISetID"] == "" {
+		return false
+	}
+	return true
+}
+func (h *ListUpdateHandler) Invoke() error {
+	item := h.List.CurrentExpandedItem()
+	if !h.IsEnabled() {
 		return nil
 	}
+
+	editorConfig, err := h.getEditorConfig()
+	if err != nil {
+		return err
+	}
+
+	fileExtension := ".txt"
+	contentType := h.Content.GetContentType()
+	switch contentType {
+	case expanders.ResponseJSON:
+		fileExtension = ".json"
+	case expanders.ResponseYAML:
+		fileExtension = ".yaml"
+	}
+
+	tempDir := editorConfig.TempDir
+	if tempDir == "" {
+		tempDir = os.TempDir() // fall back to Temp dir as default
+	}
+	tmpFile, err := ioutil.TempFile(tempDir, "azbrowse-*"+fileExtension)
+	if err != nil {
+		h.status.Status(fmt.Sprintf("Cannot create temporary file: %s", err), false)
+		return err
+	}
+
+	// Remember to clean up the file afterwards
+	defer os.Remove(tmpFile.Name()) //nolint: errcheck
+
+	originalJSON := h.Content.GetContent()
+
+	_, err = tmpFile.WriteString(originalJSON)
+	if err != nil {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Failed saving file for editing: " + err.Error(),
+			Timeout:    time.Duration(time.Second * 4),
+		})
+		return nil
+	}
+	err = tmpFile.Close()
+	if err != nil {
+		eventing.SendStatusEvent(eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Failed closing file: " + err.Error(),
+			Timeout:    time.Duration(time.Second * 4),
+		})
+		return nil
+	}
+
+	h.status.Status("Opening JSON in editor...", false)
+	editorTmpFile := tmpFile.Name()
+	// check if we should perform path translation for WSL (Windows Subsytem for Linux)
+	if editorConfig.TranslateFilePathForWSL {
+		editorTmpFile, err = wsl.TranslateToWindowsPath(editorTmpFile)
+		if err != nil {
+			return err
+		}
+	}
+
+	if editorConfig.RevertToStandardBuffer {
+		// Close termbox to revert to normal buffer
+		termbox.Close()
+	}
+
+	editorErr := openEditor(editorConfig.Command, editorTmpFile)
+	if editorConfig.RevertToStandardBuffer {
+		// Init termbox to switch back to alternate buffer and Flush content
+		err = termbox.Init()
+		if err != nil {
+			return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+		}
+		err = h.Gui.Flush()
+		if err != nil {
+			return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+		}
+	}
+	if editorErr != nil {
+		h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr), false)
+		return nil
+	}
+
+	updatedJSONBytes, err := ioutil.ReadFile(tmpFile.Name())
+	if err != nil {
+		h.status.Status(fmt.Sprintf("Cannot open edited file: %s", err), false)
+		return nil
+	}
+
+	updatedJSON := string(updatedJSONBytes)
+	if updatedJSON == originalJSON {
+		h.status.Status("No changes to JSON - no further action.", false)
+		return nil
+	}
+	if updatedJSON == "" {
+		h.status.Status("Updated JSON empty - no further action.", false)
+		return nil
+	}
+
+	apiSetID := item.Metadata["SwaggerAPISetID"]
+	apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
+	if apiSetPtr == nil {
+		return nil
+	}
+	apiSet := *apiSetPtr
+
+	err = apiSet.Update(h.Context, item, updatedJSON)
+	if err != nil {
+		h.status.Status(fmt.Sprintf("Error updating: %s", err), false)
+		return nil
+	}
+
+	h.status.Status("Done", false)
+	return nil
+
 }
 
 func openEditor(command config.CommandConfig, filename string) error {
@@ -616,6 +659,8 @@ type CommandPanelAzureSearchQueryHandler struct {
 	content            *views.ItemWidget
 }
 
+var _ Command = &CommandPanelAzureSearchQueryHandler{}
+
 func NewCommandPanelAzureSearchQueryHandler(commandPanelWidget *views.CommandPanelWidget, content *views.ItemWidget, list *views.ListWidget) *CommandPanelAzureSearchQueryHandler {
 	handler := &CommandPanelAzureSearchQueryHandler{
 		commandPanelWidget: commandPanelWidget,
@@ -624,35 +669,45 @@ func NewCommandPanelAzureSearchQueryHandler(commandPanelWidget *views.CommandPan
 	}
 	handler.id = HandlerIDAzureSearchQuery
 
-	go func() {
-		handler.processQueryEvents()
-	}()
-
 	return handler
 }
 
 func (h *CommandPanelAzureSearchQueryHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		currentItem := h.list.CurrentExpandedItem()
-		if currentItem != nil && currentItem.SwaggerResourceType != nil && currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs" {
-			h.commandPanelWidget.ShowWithText("search-query: search=")
+		if h.IsEnabled() {
+			return h.Invoke()
 		}
 		return nil
 	}
 }
 
-func (h *CommandPanelAzureSearchQueryHandler) processQueryEvents() {
-	queryChannel := eventing.SubscribeToTopic("azure-search-query")
-	for {
-		queryStringInterface := <-queryChannel
-		queryString := strings.TrimSpace(strings.Replace(queryStringInterface.(string), "search-query: ", "", 1))
+func (h *CommandPanelAzureSearchQueryHandler) DisplayText() string {
+	return "Azure search query"
+}
 
+func (h *CommandPanelAzureSearchQueryHandler) IsEnabled() bool {
+	currentItem := h.list.CurrentExpandedItem()
+	if currentItem != nil && currentItem.SwaggerResourceType != nil && currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/indexes('{indexName}')/docs" {
+		return true
+	}
+	return false
+}
+
+func (h *CommandPanelAzureSearchQueryHandler) Invoke() error {
+	h.commandPanelWidget.ShowWithText("search query:", "search=", nil, h.CommandPanelNotification)
+	return nil
+}
+
+func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+
+	if state.EnterPressed {
+		queryString := state.CurrentText
 		currentItem := h.list.CurrentExpandedItem()
 
 		apiSetID := currentItem.Metadata["SwaggerAPISetID"]
 		apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
 		if apiSetPtr == nil {
-			continue
+			return
 		}
 		apiSet := *apiSetPtr
 		searchApiSet := apiSet.(expanders.SwaggerAPISetSearch)
@@ -664,6 +719,51 @@ func (h *CommandPanelAzureSearchQueryHandler) processQueryEvents() {
 			h.content.SetContent(data, expanders.ResponseJSON, queryString)
 		}
 	}
+}
+
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+type ListCopyItemIDHandler struct {
+	ListHandler
+	List      *views.ListWidget
+	StatusBar *views.StatusbarWidget
+}
+
+var _ Command = &ListCopyItemIDHandler{}
+
+func NewListCopyItemIDHandler(list *views.ListWidget, statusBar *views.StatusbarWidget) *ListCopyItemIDHandler {
+	handler := &ListCopyItemIDHandler{
+		List:      list,
+		StatusBar: statusBar,
+	}
+	handler.id = HandlerIDListCopyItemID
+	return handler
+}
+
+func (h ListCopyItemIDHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
+	return func(g *gocui.Gui, v *gocui.View) error {
+		return h.Invoke()
+	}
+}
+
+func (h *ListCopyItemIDHandler) DisplayText() string {
+	return "Copy current resource ID"
+}
+func (h *ListCopyItemIDHandler) IsEnabled() bool {
+	return h.List.CurrentExpandedItem() != nil
+}
+func (h *ListCopyItemIDHandler) Invoke() error {
+	item := h.List.CurrentExpandedItem()
+	if item != nil {
+		if err := copyToClipboard(item.ID); err != nil {
+			h.StatusBar.Status(fmt.Sprintf("Failed to copy resource ID to clipboard: %s", err.Error()), false)
+			return nil
+		}
+		h.StatusBar.Status("Current resource ID copied to clipboard", false)
+		return nil
+	}
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////

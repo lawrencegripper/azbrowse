@@ -54,6 +54,7 @@ var _ Expander = &AzureKubernetesServiceExpander{}
 
 // AzureKubernetesServiceExpander expands the kubernetes aspects of AKS
 type AzureKubernetesServiceExpander struct {
+	ExpanderBase
 	client *armclient.Client
 }
 

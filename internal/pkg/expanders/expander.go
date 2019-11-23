@@ -108,9 +108,9 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 	}
 
 	// Use the default handler to get the resource JSON for display
-	defaultExpanderWorksOnThisItem, _ := DefaultExpanderInstance.DoesExpand(ctx, currentItem)
+	defaultExpanderWorksOnThisItem, _ := GetDefaultExpander().DoesExpand(ctx, currentItem)
 	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
-		result := DefaultExpanderInstance.Expand(ctx, currentItem)
+		result := GetDefaultExpander().Expand(ctx, currentItem)
 		if result.Err != nil {
 			eventing.SendStatusEvent(eventing.StatusEvent{
 				InProgress: true,

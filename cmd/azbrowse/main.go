@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"os"
 	"runtime/debug"
+	"sort"
 	"strings"
 	"time"
 
@@ -182,7 +183,27 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, settings.HideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", g)
 	notifications := views.NewNotificationWidget(maxX-45, 1, 45, settings.HideGuids, g, client)
-	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+8, 5, maxX-leftColumnWidth-20, g)
+
+	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
+
+	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
+	copyCommand := keybindings.NewCopyHandler(content, status)
+	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
+	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
+	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
+	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
+	listCopyItemIDCommand := keybindings.NewListCopyItemIDHandler(list, status)
+
+	commands := []keybindings.Command{
+		commandPanelFilterCommand,
+		copyCommand,
+		commandPanelAzureSearchQueryCommand,
+		listActionsCommand,
+		listOpenCommand,
+		listUpdateCommand,
+		listCopyItemIDCommand,
+	}
+	sort.Sort(keybindings.SortByDisplayText(commands))
 
 	g.SetManager(status, content, list, notifications, commandPanel)
 	g.SetCurrentView("listWidget")
@@ -195,14 +216,17 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	// NOTE> Global handlers must be registered first to
 	//       ensure double key registration is prevented
 	keybindings.AddHandler(keybindings.NewFullscreenHandler(list, content, &isFullscreen))
-	keybindings.AddHandler(keybindings.NewCopyHandler(content, status))
+	keybindings.AddHandler(copyCommand)
 	keybindings.AddHandler(keybindings.NewHelpHandler(&showHelp))
 	keybindings.AddHandler(keybindings.NewQuitHandler())
 	keybindings.AddHandler(keybindings.NewConfirmDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
-	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(commandPanel))
-	keybindings.AddHandler(keybindings.NewCommandPanelFilterHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(g, commandPanel, commands))
+	keybindings.AddHandler(commandPanelFilterCommand)
 	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelDownHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelUpHandler(commandPanel))
+	keybindings.AddHandler(keybindings.NewCommandPanelEnterHandler(commandPanel))
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -211,18 +235,19 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	keybindings.AddHandler(keybindings.NewListRefreshHandler(list))
 	keybindings.AddHandler(keybindings.NewListBackHandler(list))
 	keybindings.AddHandler(keybindings.NewListBackLegacyHandler(list))
-	keybindings.AddHandler(keybindings.NewListActionsHandler(list, ctx))
+	keybindings.AddHandler(listActionsCommand)
 	keybindings.AddHandler(keybindings.NewListRightHandler(list, &editModeEnabled))
 	keybindings.AddHandler(keybindings.NewListEditHandler(list, &editModeEnabled))
-	keybindings.AddHandler(keybindings.NewListOpenHandler(list, ctx))
+	keybindings.AddHandler(listOpenCommand)
 	keybindings.AddHandler(keybindings.NewListDeleteHandler(list, notifications))
-	keybindings.AddHandler(keybindings.NewListUpdateHandler(list, status, ctx, content, g))
+	keybindings.AddHandler(listUpdateCommand)
 	keybindings.AddHandler(keybindings.NewListPageDownHandler(list))
 	keybindings.AddHandler(keybindings.NewListPageUpHandler(list))
 	keybindings.AddHandler(keybindings.NewListEndHandler(list))
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
-	keybindings.AddHandler(keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list))
+	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
+	keybindings.AddHandler(listCopyItemIDCommand)
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
@@ -257,17 +282,24 @@ func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui)
 		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 		depthCount := 0
 		for {
-			nodeListInterface := <-navigatedChannel
+			navigateStateInterface := <-navigatedChannel
 			if time.Now().After(endTime) {
 				gui.Close()
 				os.Exit(0)
 			}
-			nodeList := nodeListInterface.([]*expanders.TreeNode)
+			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
+			nodeList := navigateState.NewNodes
 			if len(nodeList) < 1 {
 				for index := 0; index < depthCount; index++ {
 					list.GoBack()
 				}
-				continue
+				if navigateState.Success {
+					continue
+				} else {
+					// Avoid getting stuck in a loop where we don't have any nodes to iterate
+					// if navigation wasn't successful and we've looped then pick from the existing list nodes
+					nodeList = list.GetNodes()
+				}
 			}
 
 			if len(nodeList) > 0 {
@@ -289,10 +321,16 @@ func handleNavigateTo(list *views.ListWidget, settings *Settings) {
 			processNavigations := true
 
 			for {
-				nodeListInterface := <-navigatedChannel
+				navigateStateInterface := <-navigatedChannel
 
 				if processNavigations {
-					nodeList := nodeListInterface.([]*expanders.TreeNode)
+					navigateState := navigateStateInterface.(views.ListNavigatedEventState)
+					if !navigateState.Success {
+						// we got as far as we could - now stop!
+						processNavigations = false
+						continue
+					}
+					nodeList := navigateState.NewNodes
 
 					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
 						processNavigations = false

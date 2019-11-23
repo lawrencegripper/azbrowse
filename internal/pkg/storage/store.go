@@ -6,18 +6,29 @@ import (
 	"github.com/boltdb/bolt"
 	"log"
 	"os/user"
+	"time"
 )
 
 var db *bolt.DB
 
 func init() {
-	fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
+	fmt.Println("Loading db ...")
 	dbLocation := "/root/.azbrowse.db"
 	user, err := user.Current()
 	if err == nil {
 		dbLocation = user.HomeDir + "/.azbrowse.db"
 	}
+
+	suppressWaitingMessage := false
+	go func() {
+		time.Sleep(2 * time.Second)
+		if !suppressWaitingMessage {
+			fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
+		}
+	}()
+
 	dbCreate, err := bolt.Open(dbLocation, 0600, nil)
+	suppressWaitingMessage = true
 	if err != nil {
 		log.Fatal(err)
 	}

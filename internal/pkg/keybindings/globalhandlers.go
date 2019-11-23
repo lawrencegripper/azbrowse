@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/atotto/clipboard"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/stuartleeks/gocui"
 )
 
@@ -37,6 +35,8 @@ type CopyHandler struct {
 	StatusBar *views.StatusbarWidget
 }
 
+var _ Command = &CopyHandler{}
+
 func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget) *CopyHandler {
 	handler := &CopyHandler{
 		Content:   content,
@@ -48,19 +48,25 @@ func NewCopyHandler(content *views.ItemWidget, statusbar *views.StatusbarWidget)
 
 func (h CopyHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		var err error
-		if wsl.IsWSL() {
-			err = wsl.TrySetClipboard(h.Content.GetContent())
-		} else {
-			err = clipboard.WriteAll(h.Content.GetContent())
-		}
-		if err != nil {
-			h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
-			return nil
-		}
-		h.StatusBar.Status("Current resource's JSON copied to clipboard", false)
+		return h.Invoke()
+	}
+}
+
+func (h *CopyHandler) DisplayText() string {
+	return "Copy content"
+}
+
+func (h *CopyHandler) IsEnabled() bool {
+	return true
+}
+
+func (h *CopyHandler) Invoke() error {
+	if err := copyToClipboard(h.Content.GetContent()); err != nil {
+		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 		return nil
 	}
+	h.StatusBar.Status("Current resource's content copied to clipboard", false)
+	return nil
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -200,12 +206,16 @@ func (h *ClearPendingDeleteHandler) Fn() func(g *gocui.Gui, v *gocui.View) error
 ////////////////////////////////////////////////////////////////////
 type OpenCommandPanelHandler struct {
 	GlobalHandler
+	gui                *gocui.Gui
 	commandPanelWidget *views.CommandPanelWidget
+	commands           []Command
 }
 
-func NewOpenCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *OpenCommandPanelHandler {
+func NewOpenCommandPanelHandler(gui *gocui.Gui, commandPanelWidget *views.CommandPanelWidget, commands []Command) *OpenCommandPanelHandler {
 	handler := &OpenCommandPanelHandler{
+		gui:                gui,
 		commandPanelWidget: commandPanelWidget,
+		commands:           commands,
 	}
 	handler.id = HandlerIDToggleOpenCommandPanel
 	return handler
@@ -213,8 +223,56 @@ func NewOpenCommandPanelHandler(commandPanelWidget *views.CommandPanelWidget) *O
 
 func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.commandPanelWidget.ToggleShowHide()
+		keyBindings := GetKeyBindingsAsStrings()
+
+		paletteWidth := h.commandPanelWidget.Width() - 4
+		options := []views.CommandPanelListOption{}
+		for _, command := range h.commands {
+			if command.IsEnabled() {
+				commandID := command.ID()
+				commandDisplayText := command.DisplayText()
+
+				// ensure binding is in upper-case
+				binding := keyBindings[commandID]
+				for i, b := range binding {
+					binding[i] = strings.ToUpper(b)
+				}
+
+				// calculate padding to right-align shortcut
+				bindingString := ""
+				if len(binding) > 0 {
+					bindingString = fmt.Sprintf("%s", binding)
+				}
+				padAmount := paletteWidth - len(commandDisplayText) - len(bindingString)
+				if padAmount < 0 {
+					padAmount = 0 // TODO - we should also look at truncating the DisplayText
+				}
+
+				option := views.CommandPanelListOption{
+					ID:          commandID,
+					DisplayText: command.DisplayText() + strings.Repeat(" ", padAmount) + bindingString,
+				}
+
+				options = append(options, option)
+			}
+		}
+		h.commandPanelWidget.ShowWithText("Command Palette", "", &options, h.CommandPanelNotification)
 		return nil
+	}
+}
+
+func (h *OpenCommandPanelHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+	if state.EnterPressed {
+		h.commandPanelWidget.Hide()
+		for _, command := range h.commands {
+			if command.ID() == state.SelectedID {
+				// invoke via Update to allow Hide to restore preview view state
+				h.gui.Update(func(gui *gocui.Gui) error {
+					return command.Invoke()
+				})
+				return
+			}
+		}
 	}
 }
 
@@ -224,11 +282,15 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 type CommandPanelFilterHandler struct {
 	GlobalHandler
 	commandPanelWidget *views.CommandPanelWidget
+	list               *views.ListWidget
 }
 
-func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
+var _ Command = &CommandPanelFilterHandler{}
+
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget, list *views.ListWidget) *CommandPanelFilterHandler {
 	handler := &CommandPanelFilterHandler{
 		commandPanelWidget: commandPanelWidget,
+		list:               list,
 	}
 	handler.id = HandlerIDFilter
 	return handler
@@ -236,8 +298,23 @@ func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) 
 
 func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	return func(g *gocui.Gui, v *gocui.View) error {
-		h.commandPanelWidget.ShowWithText("/")
-		return nil
+		return h.Invoke()
+	}
+}
+func (h *CommandPanelFilterHandler) DisplayText() string {
+	return "Filter"
+}
+func (h *CommandPanelFilterHandler) IsEnabled() bool {
+	return true
+}
+func (h *CommandPanelFilterHandler) Invoke() error {
+	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
+	return nil
+}
+func (h *CommandPanelFilterHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+	h.list.SetFilter(state.CurrentText)
+	if state.EnterPressed {
+		h.commandPanelWidget.Hide()
 	}
 }
 

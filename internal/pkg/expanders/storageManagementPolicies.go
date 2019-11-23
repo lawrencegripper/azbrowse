@@ -16,7 +16,9 @@ import (
 var _ Expander = &StorageManagementPoliciesExpander{}
 
 // StorageManagementPoliciesExpander expands The default management policy under a storage account
-type StorageManagementPoliciesExpander struct{}
+type StorageManagementPoliciesExpander struct {
+	ExpanderBase
+}
 
 func (e *StorageManagementPoliciesExpander) setClient(c *armclient.Client) {
 	// noop
