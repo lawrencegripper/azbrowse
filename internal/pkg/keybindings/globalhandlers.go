@@ -1,9 +1,12 @@
 package keybindings
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/stuartleeks/gocui"
@@ -61,7 +64,31 @@ func (h *CopyHandler) IsEnabled() bool {
 }
 
 func (h *CopyHandler) Invoke() error {
-	if err := copyToClipboard(h.Content.GetContent()); err != nil {
+	var err error
+	contentType := h.Content.GetContentType()
+	content := h.Content.GetContent()
+
+	var formattedContent string
+	switch contentType {
+	case expanders.ResponseJSON:
+		if !json.Valid([]byte(content)) {
+			h.StatusBar.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+			return fmt.Errorf("Resource content is not valid JSON: %s", content)
+		}
+
+		var formattedBuf bytes.Buffer
+		err = json.Indent(&formattedBuf, []byte(content), "", "  ")
+		if err != nil {
+			h.StatusBar.Status(fmt.Sprintf("Error formatting JSON for editor: %s", err), false)
+			return err
+		}
+
+		formattedContent = formattedBuf.String()
+	case expanders.ResponseYAML:
+		formattedContent = content // TODO: add YAML formatter
+	}
+
+	if err := copyToClipboard(formattedContent); err != nil {
 		h.StatusBar.Status(fmt.Sprintf("Failed to copy to clipboard: %s", err.Error()), false)
 		return nil
 	}
