@@ -37,9 +37,9 @@ type ListWidget struct {
 
 // ListNavigatedEventState captures the state when raising a `list.navigated` event
 type ListNavigatedEventState struct {
-	Success        bool                  // True if this was a successful navigation
-	NewNodes       []*expanders.TreeNode // If Success==true this contains the new nodes
-	ExpandedItemID string                // This is the ID of the item expanded.
+	Success      bool                  // True if this was a successful navigation
+	NewNodes     []*expanders.TreeNode // If Success==true this contains the new nodes
+	ParentNodeID string                // This is the ID of the item expanded.
 }
 
 // NewListWidget creates a new instance
@@ -210,9 +210,9 @@ func (w *ListWidget) GoBack() {
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
 
 	eventing.Publish("list.navigated", ListNavigatedEventState{
-		Success:        true,
-		NewNodes:       w.items,
-		ExpandedItemID: previousPage.ExpandedNodeItem.ID,
+		Success:      true,
+		NewNodes:     w.items,
+		ParentNodeID: w.expandedNodeItem.Parentid,
 	})
 }
 
@@ -256,15 +256,15 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 
 	if w.expandedNodeItem != nil {
 		eventing.Publish("list.navigated", ListNavigatedEventState{
-			Success:        true,
-			NewNodes:       nodes,
-			ExpandedItemID: w.expandedNodeItem.ID,
+			Success:      true,
+			NewNodes:     nodes,
+			ParentNodeID: w.expandedNodeItem.ID,
 		})
 	} else {
 		eventing.Publish("list.navigated", ListNavigatedEventState{
-			Success:        true,
-			NewNodes:       nodes,
-			ExpandedItemID: "root",
+			Success:      true,
+			NewNodes:     nodes,
+			ParentNodeID: "root",
 		})
 	}
 }
@@ -304,8 +304,8 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 // ChangeSelection updates the selected item
 func (w *ListWidget) ChangeSelection(i int) {
 	if i >= w.itemCount() {
-		panic("invalid changeSelection out of range")
-		// i = w.itemCount() - 1
+		// panic("invalid changeSelection out of range")
+		i = w.itemCount() - 1
 	} else if i < 0 {
 		i = 0
 	}

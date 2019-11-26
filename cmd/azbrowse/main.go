@@ -310,13 +310,13 @@ func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui)
 
 			stack = append(stack, &navigateState)
 
-			state, exists := stateMap[navigateState.ExpandedItemID]
+			state, exists := stateMap[navigateState.ParentNodeID]
 			if !exists {
 				state = &fuzzState{
 					current: 0,
 					max:     len(nodeList),
 				}
-				stateMap[navigateState.ExpandedItemID] = state
+				stateMap[navigateState.ParentNodeID] = state
 			}
 
 			if state.current >= state.max {
