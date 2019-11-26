@@ -80,8 +80,8 @@ func run(settings *Settings) {
 	// Close the span used to track startup times
 	span.Finish()
 
-	// settings.FuzzerEnabled = true
-	// settings.FuzzerDurationMinutes = 100
+	settings.FuzzerEnabled = true
+	settings.FuzzerDurationMinutes = 100
 
 	if settings.FuzzerEnabled {
 		automatedFuzzer(list, settings, g)
@@ -319,7 +319,7 @@ func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui)
 				stateMap[navigateState.ExpandedItemID] = state
 			}
 
-			if state.current > state.max {
+			if state.current >= state.max {
 				// Pop stack
 				if len(stack) > 1 {
 					stack = stack[:len(stack)-1]

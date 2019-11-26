@@ -212,7 +212,7 @@ func (w *ListWidget) GoBack() {
 	eventing.Publish("list.navigated", ListNavigatedEventState{
 		Success:        true,
 		NewNodes:       w.items,
-		ExpandedItemID: w.expandedNodeItem.ID,
+		ExpandedItemID: previousPage.ExpandedNodeItem.ID,
 	})
 }
 
@@ -245,8 +245,8 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 	}
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
-		w.SetNodes(nodes)
 		w.expandedNodeItem = currentItem
+		w.SetNodes(nodes)
 	}
 
 	w.contentView.SetContent(content.Response, content.ResponseType, title)
@@ -304,7 +304,8 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 // ChangeSelection updates the selected item
 func (w *ListWidget) ChangeSelection(i int) {
 	if i >= w.itemCount() {
-		i = w.itemCount() - 1
+		panic("invalid changeSelection out of range")
+		// i = w.itemCount() - 1
 	} else if i < 0 {
 		i = 0
 	}
