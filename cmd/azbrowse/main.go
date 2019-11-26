@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"regexp"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -17,6 +18,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/nbio/st"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/stuartleeks/gocui"
@@ -79,9 +81,6 @@ func run(settings *Settings) {
 
 	// Close the span used to track startup times
 	span.Finish()
-
-	settings.FuzzerEnabled = true
-	settings.FuzzerDurationMinutes = 100
 
 	if settings.FuzzerEnabled {
 		automatedFuzzer(list, settings, g)
@@ -277,21 +276,74 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	return list
 }
 
+// ErrorReporter Tracks errors during fuzzing
+type ErrorReporter struct {
+}
+
+// Errorf adds an error found while fuzzing
+func (e *ErrorReporter) Errorf(format string, args ...interface{}) {
+	fmt.Printf(format, args...)
+	os.Exit(5)
+}
+
 func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui) {
+
 	type fuzzState struct {
 		current int
 		max     int
 	}
 
-	// shouldSkip := func(currentNode *expanders.TreeNode) (shouldSkip bool) {
-	// 	return strings.Contains(currentNode.Display, "Activity Log")
-	// }
+	min := func(a, b int) int {
+		if a < b {
+			return a
+		}
+		return b
+	}
+
+	testFunc := func(currentNode *expanders.TreeNode, nodes []*expanders.TreeNode) {
+		if r := regexp.MustCompile(".*/providers/Microsoft.ContainerRegistry/registries/.*/"); r.MatchString(currentNode.ID) {
+			st.Expect(&ErrorReporter{}, len(nodes), 5)
+		}
+	}
+
+	shouldSkip := func(currentNode *expanders.TreeNode, itemId string) (shouldSkip bool, maxToExpand int) {
+		///
+		/// Limit walking of things that have LOTS of nodes
+		/// so we don't get stuck
+		///
+
+		// Only expand 3 items under container repositories
+		if r := regexp.MustCompile(".*/<repositories>/.*/.*"); r.MatchString(itemId) {
+			return false, 3
+		}
+
+		// Only expand 3 items under activity log
+		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/<activitylog>"); r.MatchString(itemId) {
+			return false, 3
+		}
+
+		// Only expand 3 items under deployments
+		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/providers/Microsoft.Resources/deployments"); r.MatchString(itemId) {
+			return false, 3
+		}
+
+		return false, -1
+	}
 
 	stateMap := map[string]*fuzzState{}
 
 	startTime := time.Now()
 	endTime := startTime.Add(time.Duration(settings.FuzzerDurationMinutes) * time.Minute)
 	go func() {
+		// If used with `-navigate` wait for navigation to finish before fuzzing
+		if settings.NavigateToID != "" {
+			for {
+				if !processNavigations {
+					list.ExpandCurrentSelection()
+					break
+				}
+			}
+		}
 		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 
 		stack := []*views.ListNavigatedEventState{}
@@ -303,7 +355,7 @@ func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui)
 			}
 
 			navigateStateInterface := <-navigatedChannel
-			<-time.After(100 * time.Millisecond)
+			<-time.After(200 * time.Millisecond)
 
 			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
 			nodeList := navigateState.NewNodes
@@ -330,37 +382,54 @@ func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui)
 				continue
 			}
 
-			// currentItem := list.GetNodes()[state.current]
-			// if shouldSkip(currentItem) {
-			// 	// Skip the current item and expand
-			// 	state.current++
-			// 	if state.current > state.max {
-			// 		// Pop stack
-			// 		stack = stack[:len(stack)-1]
+			currentItem := list.GetNodes()[state.current]
+			skipItem, maxItem := shouldSkip(currentItem, navigateState.ParentNodeID)
+			if maxItem != -1 {
+				state.max = min(maxItem, state.max)
+			}
 
-			// 		// Navigate back
-			// 		list.GoBack()
-			// 		continue
-			// 	}
-			// 	list.ChangeSelection(state.current)
-			// 	list.ExpandCurrentSelection()
-			// } else {
-			list.ChangeSelection(state.current)
-			list.ExpandCurrentSelection()
-			state.current++
-			// }
+			var resultNodes []*expanders.TreeNode
+			if skipItem {
+				// Skip the current item and expand
+				state.current++
+
+				// If skip takes us to the end of the available items nav back up stack
+				if state.current >= state.max {
+					// Pop stack
+					stack = stack[:len(stack)-1]
+
+					// Navigate back
+					list.GoBack()
+					continue
+				}
+
+				list.ChangeSelection(state.current)
+				list.ExpandCurrentSelection()
+
+				resultNodes = list.GetNodes()
+			} else {
+				list.ChangeSelection(state.current)
+				list.ExpandCurrentSelection()
+				state.current++
+
+				resultNodes = list.GetNodes()
+			}
+
+			testFunc(currentItem, resultNodes)
 		}
 	}()
 }
 
+var processNavigations bool
+
 func handleNavigateTo(list *views.ListWidget, settings *Settings) {
 	if settings.NavigateToID != "" {
+		processNavigations = true
+
 		navigateToIDLower := strings.ToLower(settings.NavigateToID)
 		go func() {
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 			var lastNavigatedNode *expanders.TreeNode
-
-			processNavigations := true
 
 			for {
 				navigateStateInterface := <-navigatedChannel
