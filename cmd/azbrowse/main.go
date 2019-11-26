@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"runtime/debug"
 	"sort"
@@ -80,6 +79,9 @@ func run(settings *Settings) {
 
 	// Close the span used to track startup times
 	span.Finish()
+
+	// settings.FuzzerEnabled = true
+	// settings.FuzzerDurationMinutes = 100
 
 	if settings.FuzzerEnabled {
 		automatedFuzzer(list, settings, g)
@@ -276,37 +278,77 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 }
 
 func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui) {
+	type fuzzState struct {
+		current int
+		max     int
+	}
+
+	// shouldSkip := func(currentNode *expanders.TreeNode) (shouldSkip bool) {
+	// 	return strings.Contains(currentNode.Display, "Activity Log")
+	// }
+
+	stateMap := map[string]*fuzzState{}
+
 	startTime := time.Now()
 	endTime := startTime.Add(time.Duration(settings.FuzzerDurationMinutes) * time.Minute)
 	go func() {
 		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-		depthCount := 0
+
+		stack := []*views.ListNavigatedEventState{}
+
 		for {
-			navigateStateInterface := <-navigatedChannel
 			if time.Now().After(endTime) {
 				gui.Close()
 				os.Exit(0)
 			}
+
+			navigateStateInterface := <-navigatedChannel
+			<-time.After(100 * time.Millisecond)
+
 			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
 			nodeList := navigateState.NewNodes
-			if len(nodeList) < 1 {
-				for index := 0; index < depthCount; index++ {
-					list.GoBack()
+
+			stack = append(stack, &navigateState)
+
+			state, exists := stateMap[navigateState.ExpandedItemID]
+			if !exists {
+				state = &fuzzState{
+					current: 0,
+					max:     len(nodeList),
 				}
-				if navigateState.Success {
-					continue
-				} else {
-					// Avoid getting stuck in a loop where we don't have any nodes to iterate
-					// if navigation wasn't successful and we've looped then pick from the existing list nodes
-					nodeList = list.GetNodes()
-				}
+				stateMap[navigateState.ExpandedItemID] = state
 			}
 
-			if len(nodeList) > 0 {
-				list.ChangeSelection(rand.Intn(len(nodeList)))
-				list.ExpandCurrentSelection()
-				depthCount++
+			if state.current > state.max {
+				// Pop stack
+				if len(stack) > 1 {
+					stack = stack[:len(stack)-1]
+				}
+
+				// Navigate back
+				list.GoBack()
+				continue
 			}
+
+			// currentItem := list.GetNodes()[state.current]
+			// if shouldSkip(currentItem) {
+			// 	// Skip the current item and expand
+			// 	state.current++
+			// 	if state.current > state.max {
+			// 		// Pop stack
+			// 		stack = stack[:len(stack)-1]
+
+			// 		// Navigate back
+			// 		list.GoBack()
+			// 		continue
+			// 	}
+			// 	list.ChangeSelection(state.current)
+			// 	list.ExpandCurrentSelection()
+			// } else {
+			list.ChangeSelection(state.current)
+			list.ExpandCurrentSelection()
+			state.current++
+			// }
 		}
 	}()
 }

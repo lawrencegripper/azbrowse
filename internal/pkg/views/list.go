@@ -37,8 +37,9 @@ type ListWidget struct {
 
 // ListNavigatedEventState captures the state when raising a `list.navigated` event
 type ListNavigatedEventState struct {
-	Success  bool                  // True if this was a successful navigation
-	NewNodes []*expanders.TreeNode // If Success==true this contains the new nodes
+	Success        bool                  // True if this was a successful navigation
+	NewNodes       []*expanders.TreeNode // If Success==true this contains the new nodes
+	ExpandedItemID string                // This is the ID of the item expanded.
 }
 
 // NewListWidget creates a new instance
@@ -208,8 +209,11 @@ func (w *ListWidget) GoBack() {
 	w.selected = previousPage.Selection
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
 
-	eventing.Publish("list.navigated", ListNavigatedEventState{Success: true, NewNodes: w.items})
-
+	eventing.Publish("list.navigated", ListNavigatedEventState{
+		Success:        true,
+		NewNodes:       w.items,
+		ExpandedItemID: w.expandedNodeItem.ID,
+	})
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
@@ -242,14 +246,27 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
 		w.SetNodes(nodes)
+		w.expandedNodeItem = currentItem
 	}
-	w.expandedNodeItem = currentItem
+
 	w.contentView.SetContent(content.Response, content.ResponseType, title)
 	if currentItem != nil {
 		w.title = w.title + ">" + currentItem.Name
 	}
 
-	eventing.Publish("list.navigated", ListNavigatedEventState{Success: true, NewNodes: nodes})
+	if w.expandedNodeItem != nil {
+		eventing.Publish("list.navigated", ListNavigatedEventState{
+			Success:        true,
+			NewNodes:       nodes,
+			ExpandedItemID: w.expandedNodeItem.ID,
+		})
+	} else {
+		eventing.Publish("list.navigated", ListNavigatedEventState{
+			Success:        true,
+			NewNodes:       nodes,
+			ExpandedItemID: "root",
+		})
+	}
 }
 
 // GetNodes returns the currently listed nodes
