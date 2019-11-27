@@ -123,7 +123,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
-	response, err := c.client.Do(req)
+	response, err := c.client.Do(req.WithContext(ctx))
 	if response != nil && response.StatusCode == 401 {
 		// This might be because the token we've cached has expired.
 		// Get a new token forcing it to clear cache
@@ -134,7 +134,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 		c.tenantID = cliToken.Tenant
 
 		// Retry the request now we have a valid token
-		response, err = c.client.Do(req) //nolint:staticcheck
+		response, err = c.client.Do(req.WithContext(ctx)) //nolint:staticcheck
 	}
 	if err != nil {
 		return "", errors.New("Request failed: " + err.Error())

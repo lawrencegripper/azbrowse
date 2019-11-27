@@ -112,16 +112,22 @@ func (w *NotificationWidget) ConfirmDelete() {
 			Timeout:    time.Second * 15,
 		})
 
+		// Deleting resources is an async operation so this timeout only
+		// applies to issuing 'n' deletion requests. Rather than the time
+		// the cloud takes to actually delete the resources.
+		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		defer cancel()
+
 		for _, i := range pending {
 			var err error
 			fallback := true
 			if i.Expander != nil {
-				deleted, err := i.Expander.Delete(context.Background(), i)
+				deleted, err := i.Expander.Delete(ctx, i)
 				fallback = (err == nil && !deleted)
 			}
 			if fallback {
 				// fallback to ARM request to delete
-				_, err = w.client.DoRequest(context.Background(), "DELETE", i.DeleteURL)
+				_, err = w.client.DoRequest(ctx, "DELETE", i.DeleteURL)
 			}
 			if err != nil {
 				event.Failure = true
