@@ -6,19 +6,19 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"runtime/debug"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/automation"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"github.com/nbio/st"
 
 	opentracing "github.com/opentracing/opentracing-go"
 	"github.com/stuartleeks/gocui"
@@ -32,20 +32,11 @@ var (
 	goversion = "unknown"
 )
 
-// Settings to enable different behavior
-type Settings struct {
-	EnableTracing         bool
-	HideGuids             bool
-	NavigateToID          string
-	FuzzerEnabled         bool
-	FuzzerDurationMinutes int
-}
-
 func main() {
 	handleCommandAndArgs()
 }
 
-func run(settings *Settings) {
+func run(settings *config.Settings) {
 	confirmAndSelfUpdate()
 
 	// Setup the root context and span for open tracing
@@ -77,14 +68,16 @@ func run(settings *Settings) {
 
 	// Start a go routine to handling automated naviging to an item via the
 	// `--navigate` command
-	handleNavigateTo(list, settings)
+	if settings.NavigateToID != "" {
+		automation.NavigateTo(list, settings.NavigateToID)
+	}
+
+	if settings.FuzzerEnabled {
+		automation.StartAutomatedFuzzer(list, settings, g)
+	}
 
 	// Close the span used to track startup times
 	span.Finish()
-
-	if settings.FuzzerEnabled {
-		automatedFuzzer(list, settings, g)
-	}
 
 	// Start the main loop of gocui to draw the UI
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
@@ -92,7 +85,7 @@ func run(settings *Settings) {
 	}
 }
 
-func configureTracing(settings *Settings) (context.Context, opentracing.Span) {
+func configureTracing(settings *config.Settings) (context.Context, opentracing.Span) {
 	var ctx context.Context
 	var span opentracing.Span
 
@@ -167,7 +160,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 	}()
 }
 
-func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Settings, client *armclient.Client) *views.ListWidget {
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *config.Settings, client *armclient.Client) *views.ListWidget {
 	maxX, maxY := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -274,201 +267,4 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *Setti
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
 	return list
-}
-
-// ErrorReporter Tracks errors during fuzzing
-type ErrorReporter struct {
-}
-
-// Errorf adds an error found while fuzzing
-func (e *ErrorReporter) Errorf(format string, args ...interface{}) {
-	fmt.Printf(format, args...)
-	os.Exit(5)
-}
-
-func automatedFuzzer(list *views.ListWidget, settings *Settings, gui *gocui.Gui) {
-
-	type fuzzState struct {
-		current int
-		max     int
-	}
-
-	min := func(a, b int) int {
-		if a < b {
-			return a
-		}
-		return b
-	}
-
-	testFunc := func(currentNode *expanders.TreeNode, nodes []*expanders.TreeNode) {
-		if r := regexp.MustCompile(".*/providers/Microsoft.ContainerRegistry/registries/.*/"); r.MatchString(currentNode.ID) {
-			st.Expect(&ErrorReporter{}, len(nodes), 5)
-		}
-	}
-
-	shouldSkip := func(currentNode *expanders.TreeNode, itemId string) (shouldSkip bool, maxToExpand int) {
-		///
-		/// Limit walking of things that have LOTS of nodes
-		/// so we don't get stuck
-		///
-
-		// Only expand 3 items under container repositories
-		if r := regexp.MustCompile(".*/<repositories>/.*/.*"); r.MatchString(itemId) {
-			return false, 3
-		}
-
-		// Only expand 3 items under activity log
-		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/<activitylog>"); r.MatchString(itemId) {
-			return false, 3
-		}
-
-		// Only expand 3 items under deployments
-		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/providers/Microsoft.Resources/deployments"); r.MatchString(itemId) {
-			return false, 3
-		}
-
-		return false, -1
-	}
-
-	stateMap := map[string]*fuzzState{}
-
-	startTime := time.Now()
-	endTime := startTime.Add(time.Duration(settings.FuzzerDurationMinutes) * time.Minute)
-	go func() {
-		// If used with `-navigate` wait for navigation to finish before fuzzing
-		if settings.NavigateToID != "" {
-			for {
-				if !processNavigations {
-					list.ExpandCurrentSelection()
-					break
-				}
-			}
-		}
-		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-
-		stack := []*views.ListNavigatedEventState{}
-
-		for {
-			if time.Now().After(endTime) {
-				gui.Close()
-				os.Exit(0)
-			}
-
-			navigateStateInterface := <-navigatedChannel
-			<-time.After(200 * time.Millisecond)
-
-			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
-			nodeList := navigateState.NewNodes
-
-			stack = append(stack, &navigateState)
-
-			state, exists := stateMap[navigateState.ParentNodeID]
-			if !exists {
-				state = &fuzzState{
-					current: 0,
-					max:     len(nodeList),
-				}
-				stateMap[navigateState.ParentNodeID] = state
-			}
-
-			if state.current >= state.max {
-				// Pop stack
-				if len(stack) > 1 {
-					stack = stack[:len(stack)-1]
-				}
-
-				// Navigate back
-				list.GoBack()
-				continue
-			}
-
-			currentItem := list.GetNodes()[state.current]
-			skipItem, maxItem := shouldSkip(currentItem, navigateState.ParentNodeID)
-			if maxItem != -1 {
-				state.max = min(maxItem, state.max)
-			}
-
-			var resultNodes []*expanders.TreeNode
-			if skipItem {
-				// Skip the current item and expand
-				state.current++
-
-				// If skip takes us to the end of the available items nav back up stack
-				if state.current >= state.max {
-					// Pop stack
-					stack = stack[:len(stack)-1]
-
-					// Navigate back
-					list.GoBack()
-					continue
-				}
-
-				list.ChangeSelection(state.current)
-				list.ExpandCurrentSelection()
-
-				resultNodes = list.GetNodes()
-			} else {
-				list.ChangeSelection(state.current)
-				list.ExpandCurrentSelection()
-				state.current++
-
-				resultNodes = list.GetNodes()
-			}
-
-			testFunc(currentItem, resultNodes)
-		}
-	}()
-}
-
-var processNavigations bool
-
-func handleNavigateTo(list *views.ListWidget, settings *Settings) {
-	if settings.NavigateToID != "" {
-		processNavigations = true
-
-		navigateToIDLower := strings.ToLower(settings.NavigateToID)
-		go func() {
-			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-			var lastNavigatedNode *expanders.TreeNode
-
-			for {
-				navigateStateInterface := <-navigatedChannel
-
-				if processNavigations {
-					navigateState := navigateStateInterface.(views.ListNavigatedEventState)
-					if !navigateState.Success {
-						// we got as far as we could - now stop!
-						processNavigations = false
-						continue
-					}
-					nodeList := navigateState.NewNodes
-
-					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
-						processNavigations = false
-					} else {
-
-						gotNode := false
-						for nodeIndex, node := range nodeList {
-							// use prefix matching
-							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
-							// additional check is that the lengths match, or the next char in target is a '/'
-							nodeIDLower := strings.ToLower(node.ID)
-							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(settings.NavigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
-								list.ChangeSelection(nodeIndex)
-								lastNavigatedNode = node
-								list.ExpandCurrentSelection()
-								gotNode = true
-								break
-							}
-						}
-
-						if !gotNode {
-							// we got as far as we could - now stop!
-							processNavigations = false
-						}
-					}
-				}
-			}
-		}()
-	}
 }

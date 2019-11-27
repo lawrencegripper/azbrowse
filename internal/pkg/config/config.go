@@ -7,6 +7,15 @@ import (
 	"os/user"
 )
 
+// Settings to enable different behavior on startup
+type Settings struct {
+	EnableTracing         bool
+	HideGuids             bool
+	NavigateToID          string
+	FuzzerEnabled         bool
+	FuzzerDurationMinutes int
+}
+
 // Config represents the user configuration options
 type Config struct {
 	KeyBindings map[string]interface{} `json:"keyBindings,omitempty"`
