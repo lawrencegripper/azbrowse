@@ -79,8 +79,20 @@ func run(settings *config.Settings) {
 	// Close the span used to track startup times
 	span.Finish()
 
+	// recover from panic if one occurred leaving terminal usable
+	defer func() {
+		if r := recover(); r != nil {
+			g.Close()
+			fmt.Printf("\n\nA crash occurred: %s \n", r)
+			debug.PrintStack()
+			fmt.Println("Please visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug.")
+			os.Exit(1)
+		}
+	}()
+
 	// Start the main loop of gocui to draw the UI
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		g.Close()
 		log.Panicln(err)
 	}
 }
