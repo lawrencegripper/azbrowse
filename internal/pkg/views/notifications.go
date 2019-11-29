@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -101,6 +102,9 @@ func (w *NotificationWidget) ConfirmDelete() {
 	w.deleteMutex.Unlock()
 
 	go func() {
+		// recover from panic, if one occurrs, and leave terminal usable
+		defer errorhandling.RecoveryWithCleainup()
+
 		// unlock and mark delete as not in progress
 		defer func() {
 			w.deleteInProgress = false

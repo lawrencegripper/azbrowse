@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
@@ -53,7 +54,18 @@ func run(settings *config.Settings) {
 	if err != nil {
 		log.Panicln(err)
 	}
+
+	// Give error handling the Gui instance so it can cleanup
+	// when a panic occurs
+	errorhandling.RegisterGuiInstance(g)
+
+	// recover from normal exit of the program
 	defer g.Close()
+
+	// recover from panic, if one occurrs, and leave terminal usable
+	defer errorhandling.RecoveryWithCleainup()
+
+	// Configure the gui instance
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorCyan
 	g.InputEsc = true
@@ -120,6 +132,8 @@ func configureTracing(settings *config.Settings) (context.Context, opentracing.S
 
 func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidget, armClient *armclient.Client) {
 	go func() {
+		defer errorhandling.RecoveryWithCleainup()
+
 		time.Sleep(time.Second * 1)
 
 		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
@@ -278,6 +292,9 @@ func handleNavigateTo(list *views.ListWidget, settings *config.Settings) {
 	if settings.NavigateToID != "" {
 		navigateToIDLower := strings.ToLower(settings.NavigateToID)
 		go func() {
+			// recover from panic, if one occurrs, and leave terminal usable
+			defer errorhandling.RecoveryWithCleainup()
+
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 			var lastNavigatedNode *expanders.TreeNode
 
