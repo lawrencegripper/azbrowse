@@ -97,6 +97,8 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 		queryDoneChan <- stateMap
 		span.SetTag("stateMap", stateMap)
+
+		panic("ooh")
 	}()
 
 	// Add deployment item
