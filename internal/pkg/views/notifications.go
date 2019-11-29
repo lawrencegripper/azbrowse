@@ -173,7 +173,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 }
 
 // NewNotificationWidget create new instance and start go routine for spinner
-func NewNotificationWidget(x, y, w int, hideGuids bool, g *gocui.Gui, client *armclient.Client) *NotificationWidget {
+func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) *NotificationWidget {
 	widget := &NotificationWidget{
 		name:           "notificationWidget",
 		x:              x,

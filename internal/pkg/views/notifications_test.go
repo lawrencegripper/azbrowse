@@ -25,7 +25,7 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 	}
 	defer g.Close()
 
-	notView := NewNotificationWidget(0, 0, 47, false, g, nil)
+	notView := NewNotificationWidget(0, 0, 47, g, nil)
 	g.SetManager(notView)
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "s1", DeleteURL: "http://delete/s1"})
@@ -84,7 +84,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 		t.FailNow()
 	}
 	defer g.Close()
-	notView := NewNotificationWidget(0, 0, 45, false, g, client)
+	notView := NewNotificationWidget(0, 0, 45, g, client)
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
@@ -126,7 +126,7 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 		t.FailNow()
 	}
 	defer g.Close()
-	notView := NewNotificationWidget(0, 0, 45, false, g, client)
+	notView := NewNotificationWidget(0, 0, 45, g, client)
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
@@ -169,7 +169,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 		t.FailNow()
 	}
 	defer g.Close()
-	notView := NewNotificationWidget(0, 0, 45, false, g, client)
+	notView := NewNotificationWidget(0, 0, 45, g, client)
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
 	notView.ConfirmDelete()
@@ -217,7 +217,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 		t.FailNow()
 	}
 	defer g.Close()
-	notView := NewNotificationWidget(0, 0, 45, false, g, client)
+	notView := NewNotificationWidget(0, 0, 45, g, client)
 
 	notView.AddPendingDelete(&expanders.TreeNode{
 		DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1",

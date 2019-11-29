@@ -222,3 +222,8 @@ func configureYAMLHighlighting() {
 	)
 	styles.Register(style)
 }
+
+// SetHideGuids sets the HideGuids option
+func (w *ItemWidget) SetHideGuids(value bool) {
+	w.hideGuids = value
+}
