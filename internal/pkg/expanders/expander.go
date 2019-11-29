@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
@@ -46,6 +47,9 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 		// Fire each handler in parallel
 		hCurrent := h // capture current iteration variable
 		go func() {
+			// recover from panic, if one occurrs, and leave terminal usable
+			defer errorhandling.RecoveryWithCleainup()
+
 			completedExpands <- expanderAndResponse{
 				Expander:       hCurrent,
 				ExpanderResult: hCurrent.Expand(ctx, currentItem),

@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
@@ -82,6 +83,9 @@ type RequestResult struct {
 func (c *Client) DoRequestAsync(ctx context.Context, method, path string) chan RequestResult {
 	requestResultChan := make(chan RequestResult)
 	go func() {
+		// recover from panic, if one occurrs, and leave terminal usable
+		defer errorhandling.RecoveryWithCleainup()
+
 		data, err := c.DoRequestWithBody(ctx, method, path, "")
 		requestResultChan <- RequestResult{
 			Error:  err,

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	opentracing "github.com/opentracing/opentracing-go"
 	"sourcegraph.com/sourcegraph/appdash"
 	appdashot "sourcegraph.com/sourcegraph/appdash/opentracing"
@@ -52,6 +53,9 @@ func StartTracing() func(opentracing.Span) string {
 		tapp.Store = store
 		tapp.Queryer = store
 		go func() {
+			// recover from panic, if one occurrs, and leave terminal usable
+			defer errorhandling.RecoveryWithCleainup()
+
 			log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", appdashPort), tapp))
 		}()
 		traces, err := tapp.Queryer.Traces(appdash.TracesOpts{})
