@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/stuartleeks/gocui"
@@ -38,6 +39,9 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 	newEvents := eventing.SubscribeToStatusEvents()
 	// Start loop for showing loading in statusbar
 	go func() {
+		// recover from panic, if one occurrs, and leave terminal usable
+		defer errorhandling.RecoveryWithCleainup()
+
 		for {
 			// Wait for a second to see if we have any new messages
 			timeout := time.After(time.Second)
