@@ -13,6 +13,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/automation"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
@@ -54,7 +55,18 @@ func run(settings *config.Settings) {
 	if err != nil {
 		log.Panicln(err)
 	}
+
+	// Give error handling the Gui instance so it can cleanup
+	// when a panic occurs
+	errorhandling.RegisterGuiInstance(g)
+
+	// recover from normal exit of the program
 	defer g.Close()
+
+	// recover from panic, if one occurrs, and leave terminal usable
+	defer errorhandling.RecoveryWithCleainup()
+
+	// Configure the gui instance
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorCyan
 	g.InputEsc = true
@@ -79,20 +91,8 @@ func run(settings *config.Settings) {
 	// Close the span used to track startup times
 	span.Finish()
 
-	// recover from panic if one occurred leaving terminal usable
-	defer func() {
-		if r := recover(); r != nil {
-			g.Close()
-			fmt.Printf("\n\nA crash occurred: %s \n", r)
-			debug.PrintStack()
-			fmt.Println("Please visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug.")
-			os.Exit(1)
-		}
-	}()
-
 	// Start the main loop of gocui to draw the UI
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		g.Close()
 		log.Panicln(err)
 	}
 }
@@ -139,6 +139,8 @@ func configureTracing(settings *config.Settings) (context.Context, opentracing.S
 
 func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidget, armClient *armclient.Client) {
 	go func() {
+		defer errorhandling.RecoveryWithCleainup()
+
 		time.Sleep(time.Second * 1)
 
 		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
@@ -188,17 +190,21 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	status := views.NewStatusbarWidget(1, maxY-2, maxX, settings.HideGuids, g)
 	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, settings.HideGuids, "")
 	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", g)
-	notifications := views.NewNotificationWidget(maxX-45, 1, 45, settings.HideGuids, g, client)
+	notifications := views.NewNotificationWidget(maxX-45, 1, 45, g, client)
 
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
 
-	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
 	copyCommand := keybindings.NewCopyHandler(content, status)
+	toggleDemoModeCommand := keybindings.NewToggleDemoModeHandler(settings, list, status, content)
+
+	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
 	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
+
 	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
 	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
 	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
 	listCopyItemIDCommand := keybindings.NewListCopyItemIDHandler(list, status)
+	listDebugCopyItemDataCommand := keybindings.NewListDebugCopyItemDataHandler(list, status)
 
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
@@ -208,6 +214,10 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 		listOpenCommand,
 		listUpdateCommand,
 		listCopyItemIDCommand,
+		toggleDemoModeCommand,
+	}
+	if settings.EnableTracing {
+		commands = append(commands, listDebugCopyItemDataCommand)
 	}
 	sort.Sort(keybindings.SortByDisplayText(commands))
 
@@ -233,6 +243,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	keybindings.AddHandler(keybindings.NewCommandPanelDownHandler(commandPanel))
 	keybindings.AddHandler(keybindings.NewCommandPanelUpHandler(commandPanel))
 	keybindings.AddHandler(keybindings.NewCommandPanelEnterHandler(commandPanel))
+	keybindings.AddHandler(toggleDemoModeCommand)
 
 	// List handlers
 	keybindings.AddHandler(keybindings.NewListDownHandler(list))
@@ -254,6 +265,9 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
 	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
 	keybindings.AddHandler(listCopyItemIDCommand)
+	if settings.EnableTracing {
+		keybindings.AddHandler(listDebugCopyItemDataCommand)
+	}
 
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))

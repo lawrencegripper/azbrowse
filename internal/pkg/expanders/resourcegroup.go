@@ -12,6 +12,7 @@ import (
 	"github.com/nbio/st"
 	"gopkg.in/h2non/gock.v1"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -54,6 +55,9 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	queryDoneChan := make(chan map[string]string)
 	// Refactor this into DoResourceGraphQueryAync
 	go func() {
+		// recover from panic, if one occurrs, and leave terminal usable
+		defer errorhandling.RecoveryWithCleainup()
+
 		// Use resource graph to enrich response
 		query := "where resourceGroup=='" + currentItem.Name + "' | project name, id, sku, kind, location, tags, properties.provisioningState"
 		queryData, err := e.client.DoResourceGraphQuery(ctx, currentItem.SubscriptionID, query)
