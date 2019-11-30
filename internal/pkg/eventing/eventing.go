@@ -82,6 +82,8 @@ func Publish(topic string, event interface{}) {
 }
 
 // SubscribeToTopic creates a channel which will receive event in that topic
+// WARNING: Subscribers MUST process events QUICKLY when received or the event sender will BLOCK
+// this results in the UI locking up.
 func SubscribeToTopic(topic string) chan interface{} {
 	return pubSub.Sub(topic)
 }
