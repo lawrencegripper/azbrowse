@@ -103,7 +103,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 
 	go func() {
 		// recover from panic, if one occurrs, and leave terminal usable
-		defer errorhandling.RecoveryWithCleainup()
+		defer errorhandling.RecoveryWithCleanup()
 
 		// unlock and mark delete as not in progress
 		defer func() {

@@ -84,7 +84,7 @@ func (c *Client) DoRequestAsync(ctx context.Context, method, path string) chan R
 	requestResultChan := make(chan RequestResult)
 	go func() {
 		// recover from panic, if one occurrs, and leave terminal usable
-		defer errorhandling.RecoveryWithCleainup()
+		defer errorhandling.RecoveryWithCleanup()
 
 		data, err := c.DoRequestWithBody(ctx, method, path, "")
 		requestResultChan <- RequestResult{
