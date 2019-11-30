@@ -45,3 +45,9 @@ debug:
 
 run: checks install
 	azbrowse
+
+fuzz: checks install
+	azbrowse -fuzzer 5
+
+fuzz-from: checks install
+	azbrowse -fuzzer 5 -navigate ${node_id}
