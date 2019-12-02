@@ -76,6 +76,10 @@ You can then start `azbrowse` in docker by mounting in your `$HOME` directory so
 docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrencegripper/azbrowse
 ```
 
+## Docs
+
+See the [docs](docs/README.md) for getting started guides, configuration docs, ...
+
 ## Plans
 
 [Issues on the repository track plans](https://github.com/lawrencegripper/azbrowse/issues), I'd love help so feel free to comment on an issue you'd like to work on and we'll go from there.
