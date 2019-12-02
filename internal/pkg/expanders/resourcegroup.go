@@ -56,7 +56,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	// Refactor this into DoResourceGraphQueryAync
 	go func() {
 		// recover from panic, if one occurrs, and leave terminal usable
-		defer errorhandling.RecoveryWithCleainup()
+		defer errorhandling.RecoveryWithCleanup()
 
 		// Use resource graph to enrich response
 		query := "where resourceGroup=='" + currentItem.Name + "' | project name, id, sku, kind, location, tags, properties.provisioningState"

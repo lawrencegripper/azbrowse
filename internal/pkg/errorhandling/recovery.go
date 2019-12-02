@@ -17,11 +17,11 @@ func RegisterGuiInstance(g *gocui.Gui) {
 	gui = g
 }
 
-// RecoveryWithCleainup cleans up a go routine panic
+// RecoveryWithCleanup cleans up a go routine panic
 // ensuring the terminal is left usable
 // Example: (required on all go routines)
-//  `defer errorhandling.RecoveryWithCleainup(recover())`
-func RecoveryWithCleainup() {
+//  `defer errorhandling.RecoveryWithCleanup(recover())`
+func RecoveryWithCleanup() {
 	if r := recover(); r != nil {
 		gui.Close()
 		fmt.Printf(style.Warning("\n\nSorry a crash occurred\n Error: %s \n"), r)

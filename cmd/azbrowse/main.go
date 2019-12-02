@@ -63,7 +63,7 @@ func run(settings *config.Settings) {
 	defer g.Close()
 
 	// recover from panic, if one occurrs, and leave terminal usable
-	defer errorhandling.RecoveryWithCleainup()
+	defer errorhandling.RecoveryWithCleanup()
 
 	// Configure the gui instance
 	g.Highlight = true
@@ -132,7 +132,7 @@ func configureTracing(settings *config.Settings) (context.Context, opentracing.S
 
 func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidget, armClient *armclient.Client) {
 	go func() {
-		defer errorhandling.RecoveryWithCleainup()
+		defer errorhandling.RecoveryWithCleanup()
 
 		time.Sleep(time.Second * 1)
 
@@ -293,7 +293,7 @@ func handleNavigateTo(list *views.ListWidget, settings *config.Settings) {
 		navigateToIDLower := strings.ToLower(settings.NavigateToID)
 		go func() {
 			// recover from panic, if one occurrs, and leave terminal usable
-			defer errorhandling.RecoveryWithCleainup()
+			defer errorhandling.RecoveryWithCleanup()
 
 			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 			var lastNavigatedNode *expanders.TreeNode

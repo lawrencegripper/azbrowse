@@ -54,7 +54,7 @@ func StartTracing() func(opentracing.Span) string {
 		tapp.Queryer = store
 		go func() {
 			// recover from panic, if one occurrs, and leave terminal usable
-			defer errorhandling.RecoveryWithCleainup()
+			defer errorhandling.RecoveryWithCleanup()
 
 			log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", appdashPort), tapp))
 		}()

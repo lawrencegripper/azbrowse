@@ -40,7 +40,7 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 	// Start loop for showing loading in statusbar
 	go func() {
 		// recover from panic, if one occurrs, and leave terminal usable
-		defer errorhandling.RecoveryWithCleainup()
+		defer errorhandling.RecoveryWithCleanup()
 
 		for {
 			// Wait for a second to see if we have any new messages
