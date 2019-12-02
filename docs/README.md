@@ -1,4 +1,4 @@
-# Az browse Docs
+# Azbrowse Docs
 
 This folder contains various docs to help you get up-and-running with azbrowse.
 
