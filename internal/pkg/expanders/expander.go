@@ -48,7 +48,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 		hCurrent := h // capture current iteration variable
 		go func() {
 			// recover from panic, if one occurrs, and leave terminal usable
-			defer errorhandling.RecoveryWithCleainup()
+			defer errorhandling.RecoveryWithCleanup()
 
 			completedExpands <- expanderAndResponse{
 				Expander:       hCurrent,

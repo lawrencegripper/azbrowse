@@ -100,7 +100,7 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 	endTime := startTime.Add(time.Duration(settings.FuzzerDurationMinutes) * time.Minute)
 	go func() {
 		// recover from panic, if one occurrs, and leave terminal usable
-		defer errorhandling.RecoveryWithCleainup()
+		defer errorhandling.RecoveryWithCleanup()
 
 		var navigatedChannel chan interface{}
 

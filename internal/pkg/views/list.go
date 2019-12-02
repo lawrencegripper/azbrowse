@@ -313,7 +313,6 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 // ChangeSelection updates the selected item
 func (w *ListWidget) ChangeSelection(i int) {
 	if i >= w.itemCount() {
-		// panic("invalid changeSelection out of range")
 		i = w.itemCount() - 1
 	} else if i < 0 {
 		i = 0
