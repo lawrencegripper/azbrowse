@@ -10,7 +10,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
-func handleRunCmd(settings *Settings, demo *bool, debug *bool, navigateResource *string) int {
+func handleRunCmd(settings *config.Settings, demo *bool, debug *bool, navigateResource *string) int {
 	if demo != nil && *demo {
 		settings.HideGuids = true
 	}
@@ -29,7 +29,7 @@ func handleRunCmd(settings *Settings, demo *bool, debug *bool, navigateResource 
 	return 0
 }
 
-func handleVersionCmd(settings *Settings) int {
+func handleVersionCmd(settings *config.Settings) int {
 	fmt.Println(version)
 	fmt.Println(commit)
 	fmt.Println(date)
@@ -44,7 +44,7 @@ func usage() int {
 }
 
 func handleCommandAndArgs() {
-	settings := Settings{}
+	settings := config.Settings{}
 
 	// Root command
 	runCmd := flag.NewFlagSet("run", flag.ExitOnError)
