@@ -1,16 +1,86 @@
 # Contributing
 
-The aim of this doc is to capture some of the patterns for working with azbrowse to add new providers or other features.
+## Developing
+
+### Environment Setup
+
+> Note: Golang 1.12 is recommended.
+
+First, clone this repository. `azbrowse` is written in [Go][golang] and so you will want to set up your Go development environment first. If this is your first time, the [offical install guide][installguide] is probably a good place to start. Make sure you have `GOPATH/bin` in your `PATH`, using the instructions [here][gopath] as guidance on doing that.
+
+In addition to installing [Go][golang], there are a couple of tool dependencies you'll need. These are:
+
+- [Golang CI linter][golangcilinter]
+- [Dep; Go dependency management tool][golang]
+
+You can install these yourself following the instructions on their github pages, or you can run...
+
+ ``` bash
+ make setup
+ ```
+
+ This runs the script `scripts/install_dev_tools.sh`, which will install these tools for you.
+
+## Building
+
+With your Go development environment set up, use `make` to build `azbrowse`.
+
+Take a look at the `Makefile` yourself, but the main rules are:
+
+### Run Tests and Build
+
+``` bash
+make build
+```
+
+Running integration tests (requires a full terminal)
+
+``` bash
+make integration
+```
+
+### Install Local Development Build
+
+``` bash
+make install
+```
+
+## Debugging
+
+Running `azbrowse --debug` will start an in-memory collector for the `opentracing` and a GUI to browse this at http://localhost:8700. You can use this to look at tracing information output by `azbrowse` as it runs.
+
+![tracing ui](docs/images/trace.png)
+
+## Automated builds
+
+The `CircleCI` build runs the `golang` build, unit tests and linting.
+The `AzureDevOps` build run the integration tests under `XTerm`.
+
+### Running locally
+
+``` bash
+make integration && make ci-docker
+```
+
+To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` environment variable defined, so running it as follows may be easier:
+
+```bash
+TRAVIS_BUILD_NUMBER=0.1 make ci-docker
+```
+
+## Patterns
+
+The aim of this section of the doc is to capture some of the patterns for working with azbrowse to add new providers or other features.
 
 If using [Visual Studio Code](https://code.visualstudio.com) and you have the Remote Development extension (+Docker) installed then you can take advantage of the devcontainer support to have a development environment set up ready for you to use.
 
-## Expanders
+### Expanders
 
 The hierarchical drill-down from Subscription -> Resource Group -> Resource -> ... is driven by Expanders. These are registered in `registerExpanders.go` and when the list widget expands a node it calls each expander asking if they have any nodes to provide. Multiple expanders can return nodes for any given parent node, but only one expander should mark the response as the primary response.
 
 Each node has an ID and IDs should be unique (to support the `--navigate` command), and typically are the resource ID for the resource in Azure (this allows the `open in portal` action to function)
 
-## APISets
+### APISets
 
 The `SwaggerResourceExpander` is used to drill down within resources. It works against `SwaggerAPISet`s which provide the swagger metadata as well as encapsulating access to the the endpoints identified in the metadata.
 
@@ -22,7 +92,7 @@ The pattern for the container Service API Set is similar: a Kubernetes API node 
 
 Issuing `PUT`/`DELETE` requests requires the same authentication as `GET` requests so the `SwaggerResourceExpander` also forwards these to the relevant API Set. (The metadata for the node contains the name of the API Set that returned it)
 
-## Key bindings
+### Key bindings
 
 Key bindings are initialised in the `setupViewsAndKeybindings` function in `main.go`. Each binding is registered via the `keybindings.AddHandler` function and subsequently bound through the `keybindings.Bind` function.
 
