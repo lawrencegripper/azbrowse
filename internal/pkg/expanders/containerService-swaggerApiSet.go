@@ -74,10 +74,11 @@ func (c SwaggerAPISetContainerService) GetResourceTypes() []swagger.ResourceType
 	return c.resourceTypes
 }
 
-func (c SwaggerAPISetContainerService) doRequest(verb string, url string) (string, error) {
-	return c.doRequestWithBody(verb, url, "")
+func (c SwaggerAPISetContainerService) doRequest(ctx context.Context, verb string, url string) (string, error) {
+	return c.doRequestWithBody(ctx, verb, url, "")
 }
-func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string, body string) (string, error) {
+
+func (c SwaggerAPISetContainerService) doRequestWithBody(ctx context.Context, verb string, url string, body string) (string, error) {
 	request, err := http.NewRequest(verb, url, bytes.NewReader([]byte(body)))
 	if err != nil {
 		err = fmt.Errorf("Failed to create request" + err.Error() + url)
@@ -86,7 +87,7 @@ func (c SwaggerAPISetContainerService) doRequestWithBody(verb string, url string
 
 	request.Header.Set("Content-Type", "application/yaml")
 	request.Header.Set("Accept", "application/yaml")
-	response, err := c.httpClient.Do(request)
+	response, err := c.httpClient.Do(request.WithContext(ctx))
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + url)
 		return "", err
@@ -112,7 +113,7 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 
 			logURL := c.serverURL + currentItem.ExpandURL
 			containerURL := logURL[:len(logURL)-3]
-			data, err := c.doRequest("GET", containerURL)
+			data, err := c.doRequest(ctx, "GET", containerURL)
 			if err != nil {
 				err = fmt.Errorf("Failed to make request: %s", err)
 				return APISetExpandResponse{}, err
@@ -155,7 +156,7 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 
 	subResources := []SubResource{}
 	url := c.serverURL + currentItem.ExpandURL
-	data, err := c.doRequest("GET", url)
+	data, err := c.doRequest(ctx, "GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %s", err)
 		return APISetExpandResponse{}, err
@@ -218,7 +219,7 @@ func (c SwaggerAPISetContainerService) Delete(ctx context.Context, item *TreeNod
 	}
 
 	url := c.serverURL + item.DeleteURL
-	_, err := c.doRequest("DELETE", url)
+	_, err := c.doRequest(ctx, "DELETE", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to delete: %s (%s)", err.Error(), item.DeleteURL)
 		return false, err
@@ -237,7 +238,7 @@ func (c SwaggerAPISetContainerService) Update(ctx context.Context, item *TreeNod
 	if err != nil {
 		return fmt.Errorf("Failed to build PUT URL '%s': %s", item.SwaggerResourceType.PutEndpoint.TemplateURL, err)
 	}
-	_, err = c.doRequestWithBody("PUT", putURL, content)
+	_, err = c.doRequestWithBody(ctx, "PUT", putURL, content)
 	if err != nil {
 		return fmt.Errorf("Error making PUT request: %s", err)
 	}

@@ -558,7 +558,7 @@ func (e *ContainerRegistryExpander) doRequest(ctx context.Context, verb string, 
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
 
-	response, err := e.client.Do(req)
+	response, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return []byte{}, fmt.Errorf("Request failed: %s", err)
 	}
@@ -605,7 +605,7 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 	if err != nil {
 		return "", fmt.Errorf("Failed to create request to validate loginserver/v2: %s", err)
 	}
-	response, err := e.client.Do(req)
+	response, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return "", fmt.Errorf("Error validating loginserver/v2 endpoint: %s", err)
 	}
@@ -627,7 +627,7 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	response, err = e.client.Do(req)
+	response, err = e.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return "", fmt.Errorf("Error making accesstoken request: %s", err)
 	}
@@ -656,7 +656,7 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	response, err = e.client.Do(req)
+	response, err = e.client.Do(req.WithContext(ctx))
 	if err != nil {
 		return "", fmt.Errorf("Error making refreshtoken request: %s", err)
 	}
