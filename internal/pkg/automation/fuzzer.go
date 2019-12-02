@@ -127,6 +127,7 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 		for {
 			if time.Now().After(endTime) {
 				gui.Close()
+				fmt.Println("Fuzzer completed with no panics")
 				os.Exit(0)
 			}
 

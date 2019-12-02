@@ -40,6 +40,8 @@ type ListNavigatedEventState struct {
 	Success      bool                  // True if this was a successful navigation
 	NewNodes     []*expanders.TreeNode // If Success==true this contains the new nodes
 	ParentNodeID string                // This is the ID of the item expanded.
+	NodeID       string                // The current nodes id
+	IsBack       bool                  // Was this a navigation back?
 }
 
 // NewListWidget creates a new instance
@@ -192,6 +194,8 @@ func (w *ListWidget) Refresh() {
 
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
+	eventing.Publish("list.prenavigate", "GOBACK")
+
 	if w.filterString != "" {
 		// initial Back action is to clear filter, subsequent Back actions are normal
 		w.ClearFilter()
@@ -213,6 +217,7 @@ func (w *ListWidget) GoBack() {
 		Success:      true,
 		NewNodes:     w.items,
 		ParentNodeID: w.expandedNodeItem.Parentid,
+		IsBack:       true,
 	})
 }
 
@@ -226,6 +231,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 	currentItem := w.CurrentItem()
 
 	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
+
+	eventing.Publish("list.prenavigate", currentItem.ID)
 
 	newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
 	if err != nil { // Don't need to display error as expander emits status event on error
@@ -259,12 +266,14 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 			Success:      true,
 			NewNodes:     nodes,
 			ParentNodeID: w.expandedNodeItem.ID,
+			NodeID:       currentItem.ID,
 		})
 	} else {
 		eventing.Publish("list.navigated", ListNavigatedEventState{
 			Success:      true,
 			NewNodes:     nodes,
 			ParentNodeID: "root",
+			NodeID:       "root",
 		})
 	}
 }
