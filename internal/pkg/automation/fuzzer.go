@@ -32,6 +32,18 @@ func (e *ErrorReporter) Errorf(format string, args ...interface{}) {
 	log.Panicf(intro+format, args...)
 }
 
+func assertNavigationCorrect(expandedItem *expanders.TreeNode, resultingNodes []*expanders.TreeNode) {
+
+	itemIDSegmentLength := len(strings.Split(expandedItem.ID, "/"))
+
+	// Assert container registry handled correctly
+	if r := regexp.MustCompile(".*/Microsoft.ContainerRegistry/registries/.*"); r.MatchString(expandedItem.ID) && itemIDSegmentLength == 9 {
+		st.Expect(testName("containerRegistry_root_assertExpandHas5Nodes"), len(resultingNodes), 5)
+	}
+
+	// Add more tests here...
+}
+
 // StartAutomatedFuzzer will start walking the tree of nodes
 // logging out information and running tests while walking the tree
 func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui *gocui.Gui) {
@@ -48,17 +60,8 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 		return b
 	}
 
-	testFunc := func(currentNode *expanders.TreeNode, nodes []*expanders.TreeNode) {
-
-		itemIDSegmentLength := len(strings.Split(currentNode.ID, "/"))
-
-		// Only expand limitted set under container repositories
-		if r := regexp.MustCompile(".*/Microsoft.ContainerRegistry/registries/.*"); r.MatchString(currentNode.ID) && itemIDSegmentLength == 9 {
-			st.Expect(testName("containerRegistry_root_assertExpandHas5Nodes"), len(nodes), 5)
-		}
-	}
-
 	shouldSkipActivityProvider := false
+	shouldSkipMetricsProvider := false
 	shouldSkip := func(currentNode *expanders.TreeNode, itemID string) (shouldSkip bool, maxToExpand int) {
 		///
 		/// Limit walking of things that have LOTS of nodes
@@ -88,7 +91,10 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 
 		// Only expand limitted set under metrics
 		if strings.HasSuffix(itemID, "providers/microsoft.insights/metricdefinitions") {
-			return false, 1
+			defer func() {
+				shouldSkipMetricsProvider = true
+			}()
+			return shouldSkipMetricsProvider, 1
 		}
 
 		return false, -1
@@ -122,8 +128,6 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 			navigatedChannel = eventing.SubscribeToTopic("list.navigated")
 		}
 
-		stack := []*views.ListNavigatedEventState{}
-
 		for {
 			if time.Now().After(endTime) {
 				gui.Close()
@@ -132,7 +136,6 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 			}
 
 			navigateStateInterface := <-navigatedChannel
-			<-time.After(1 * time.Second)
 
 			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
 
@@ -144,8 +147,8 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 
 			nodeList := navigateState.NewNodes
 
-			stack = append(stack, &navigateState)
-
+			// Create or Retrieve the current status of the fuzzer for this
+			// level in the tree
 			state, exists := stateMap[navigateState.ParentNodeID]
 			if !exists {
 				state = &fuzzState{
@@ -155,52 +158,55 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 				stateMap[navigateState.ParentNodeID] = state
 			}
 
+			// Fuzzing completed on this level
 			if state.current >= state.max {
-
-				// Pop stack
-				if len(stack) > 1 {
-					stack = stack[:len(stack)-1]
-				}
-
 				// Navigate back
 				list.GoBack()
 				continue
 			}
 
+			// Get the current item to decide if we should skip or limit how many
+			// children to expand
 			currentItem := list.GetNodes()[state.current]
 			skipItem, maxItem := shouldSkip(currentItem, navigateState.ParentNodeID)
 			if maxItem != -1 {
 				state.max = min(maxItem, state.max)
 			}
 
+			// Store the resulting nodes so we can assert tests about expandedItem -> resultingNodes
+			// behaved as expected
 			var resultNodes []*expanders.TreeNode
+
 			if skipItem {
 				// Skip the current item and expand
 				state.current++
 
 				// If skip takes us to the end of the available items nav back up stack
 				if state.current >= state.max {
-					// Pop stack
-					stack = stack[:len(stack)-1]
-
 					// Navigate back
 					list.GoBack()
 					continue
 				}
 
+				// Move to next item
 				list.ChangeSelection(state.current)
+
+				// Expand it
 				list.ExpandCurrentSelection()
 
 				resultNodes = list.GetNodes()
 			} else {
+				// Move to current item
 				list.ChangeSelection(state.current)
+				// Expand it
 				list.ExpandCurrentSelection()
 				state.current++
 
 				resultNodes = list.GetNodes()
 			}
 
-			testFunc(currentItem, resultNodes)
+			// Assert things about the navigation based on the current item and the result nodes
+			assertNavigationCorrect(currentItem, resultNodes)
 		}
 	}()
 }
