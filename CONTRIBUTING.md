@@ -29,3 +29,83 @@ Key bindings are initialised in the `setupViewsAndKeybindings` function in `main
 Handlers implement the `KeyHandler` interface which specifies an ID, an implementation to invoke, the widget that the binding is scoped to, and the default key.
 
 The `ID` and `DefaultKey` functions are both provided by `KeyHandlerBase`. `ID` simply returns the `id` property, and `DefaultKey` performs a lookup in `DefaultKeys` using the ID.
+
+## Testing
+
+### Mocked Tests 
+
+Each `expander` implements a set of `testcases` which mock out the `armclient` responses and assert that the `expander` behaves correct. 
+
+For a good example see the [`default` expanders](https://github.com/lawrencegripper/azbrowse/blob/8b307d3/internal/pkg/expanders/default.go#L84) test set. 
+
+Below is an annotated version of the code for example. 
+
+```golang
+    const testPath = "subscriptions/thing"
+
+    // Build an example item which your `expander` should handle
+	itemToExpand := &TreeNode{
+		ExpandURL: "https://management.azure.com/" + testPath,
+    }
+    
+    // Provide the body of the response you want the ARM client to give when 
+    // it's called. 
+	const testResponseFile = "./testdata/armsamples/resource/failingResource.json"
+
+	return true, &[]expanderTestCase{
+		{
+            // This case asserts that the `expander` returns correctly with the `statusIndicator` set correctly
+			name:         "Default->Resource",
+			nodeToExpand: itemToExpand,
+			urlPath:      testPath,
+			responseFile: testResponseFile,
+            statusCode:   200, // Define Status code the ARM client mock should return when called
+            // This function is used to assert the expander result is what you expected \/ 
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+				st.Expect(t, len(r.Nodes), 0)
+
+				dat, err := ioutil.ReadFile(testResponseFile)
+				if err != nil {
+					t.Error(err)
+					t.FailNow()
+				}
+				st.Expect(t, strings.TrimSpace(r.Response.Response), string(dat))
+				st.Expect(t, itemToExpand.StatusIndicator, "⛈")
+			},
+		},
+		{
+            // This test case asserts that the `expander` returns an error when the ARM client Mock returns a 500 status code. 
+			name:         "Default->500StatusCode",
+			nodeToExpand: itemToExpand,
+			urlPath:      testPath,
+			responseFile: testResponseFile,
+			statusCode:   500,
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				if r.Err == nil {
+					t.Error("Failed expanding resource. Should have errored and didn't", r)
+				}
+			},
+		},
+	}
+```
+
+### Integration testing/Fuzzing
+
+> WARNING: The fuzzer is EXPERIMENTAL and will talk all subscriptions you have access to and call nodes. Please ensure you use with caution so as not to effect production environments.
+
+In many circumstances the ARM endpoints may return results which can't be predicted from the documentation. 
+
+The only way to test these cases is against a live subscription. `azbrowse` features a [`fuzzer`](https://github.com/lawrencegripper/azbrowse/blob/8b307d3/internal/pkg/automation/fuzzer.go#L30) which will do an automated walk of a subscription. 
+
+You can use the [`shouldSkip` func](https://github.com/lawrencegripper/azbrowse/blob/8b307d3/internal/pkg/automation/fuzzer.go#L51) to limit the number of child nodes walked under a resource or skip a resource. This is useful on items which have unbounded numbers of children like `Activity Log` or `Deployments`. 
+
+You should add assertions about how your items will be handled to [`testFunc`](https://github.com/lawrencegripper/azbrowse/blob/8b307d3/internal/pkg/automation/fuzzer.go#L44) so during the fuzzing checks are made on the results. 
+
+To launch the fuzzer use `azbrowse -fuzzer 1` where `1` is the number of mins to walk the node tree from. 
+
+When working on a particular area you can use the `fuzzer` with the `-navigate` command and it will jump to a node specified then start walking the node tree.
+
+The `make` file provides shortcuts `make fuzz` and `make fuzz-from node_id=/subscriptions/SOMESUB/resourceGroups/lk-scratch/providers/Microsoft.Web/sites/SOMESITE` to build and then fuzz easily. 
+
+In future the intention is to have a test subscription and run the fuzzer during PR builds against a known set of resources defined in the subscription. 

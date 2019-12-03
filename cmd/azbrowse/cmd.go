@@ -10,7 +10,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
-func handleRunCmd(settings *config.Settings, demo *bool, debug *bool, navigateResource *string) int {
+func handleRunCmd(settings *config.Settings, demo *bool, debug *bool, navigateResource *string, fuzzerDurationMinutes *int) int {
 	if demo != nil && *demo {
 		settings.HideGuids = true
 	}
@@ -23,6 +23,11 @@ func handleRunCmd(settings *config.Settings, demo *bool, debug *bool, navigateRe
 
 	if navigateResource != nil && len(*navigateResource) > 0 {
 		settings.NavigateToID = *navigateResource
+	}
+
+	if fuzzerDurationMinutes != nil && *fuzzerDurationMinutes > 0 {
+		settings.FuzzerEnabled = true
+		settings.FuzzerDurationMinutes = *fuzzerDurationMinutes
 	}
 
 	run(settings)
@@ -51,6 +56,7 @@ func handleCommandAndArgs() {
 	runDemo := runCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
 	runDebug := runCmd.Bool("debug", false, "run in debug mode")
 	runNavigate := runCmd.String("navigate", "", "navigate to resource")
+	runFuzzer := runCmd.Int("fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 
 	if len(os.Args) < 2 {
 		if err := runCmd.Parse(os.Args[1:]); err != nil {
@@ -78,7 +84,7 @@ func handleCommandAndArgs() {
 		os.Exit(handleVersionCmd(&settings))
 	}
 	if runCmd.Parsed() {
-		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate))
+		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate, runFuzzer))
 	}
 
 	// Default

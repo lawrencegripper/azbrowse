@@ -35,6 +35,15 @@ type ListWidget struct {
 	lastTopIndex         int
 }
 
+// ListNavigatedEventState captures the state when raising a `list.navigated` event
+type ListNavigatedEventState struct {
+	Success      bool                  // True if this was a successful navigation
+	NewNodes     []*expanders.TreeNode // If Success==true this contains the new nodes
+	ParentNodeID string                // This is the ID of the item expanded.
+	NodeID       string                // The current nodes id
+	IsBack       bool                  // Was this a navigation back?
+}
+
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, g *gocui.Gui) *ListWidget {
 	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, g: g}
@@ -185,6 +194,8 @@ func (w *ListWidget) Refresh() {
 
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
+	eventing.Publish("list.prenavigate", "GOBACK")
+
 	if w.filterString != "" {
 		// initial Back action is to clear filter, subsequent Back actions are normal
 		w.ClearFilter()
@@ -192,6 +203,7 @@ func (w *ListWidget) GoBack() {
 	}
 	previousPage := w.navStack.Pop()
 	if previousPage == nil {
+		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
 		return
 	}
 	w.contentView.SetContent(previousPage.Data, previousPage.DataType, "Response")
@@ -200,6 +212,13 @@ func (w *ListWidget) GoBack() {
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
+
+	eventing.Publish("list.navigated", ListNavigatedEventState{
+		Success:      true,
+		NewNodes:     w.items,
+		ParentNodeID: w.expandedNodeItem.Parentid,
+		IsBack:       true,
+	})
 }
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
@@ -213,25 +232,55 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
 
+	eventing.Publish("list.prenavigate", currentItem.ID)
+
 	newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
-	if err == nil { // expander emits status event on error
-		w.Navigate(newItems, newContent, newTitle)
+	if err != nil { // Don't need to display error as expander emits status event on error
+		// Set parameters to trigger non-successful `list.navigated` event
+		newItems = []*expanders.TreeNode{}
+		newContent = nil
+		newTitle = ""
 	}
+	w.Navigate(newItems, newContent, newTitle)
 }
 
 // Navigate updates the currently selected list nodes, title and details content
 func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.ExpanderResponse, title string) {
+
+	if len(nodes) == 0 && content == nil && title == "" {
+		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
+	}
 	currentItem := w.CurrentItem()
 	if len(nodes) > 0 {
+		w.expandedNodeItem = currentItem
 		w.SetNodes(nodes)
 	}
-	w.expandedNodeItem = currentItem
+
 	w.contentView.SetContent(content.Response, content.ResponseType, title)
 	if currentItem != nil {
 		w.title = w.title + ">" + currentItem.Name
 	}
 
-	eventing.Publish("list.navigated", nodes)
+	if w.expandedNodeItem != nil {
+		eventing.Publish("list.navigated", ListNavigatedEventState{
+			Success:      true,
+			NewNodes:     nodes,
+			ParentNodeID: w.expandedNodeItem.ID,
+			NodeID:       currentItem.ID,
+		})
+	} else {
+		eventing.Publish("list.navigated", ListNavigatedEventState{
+			Success:      true,
+			NewNodes:     nodes,
+			ParentNodeID: "root",
+			NodeID:       "root",
+		})
+	}
+}
+
+// GetNodes returns the currently listed nodes
+func (w *ListWidget) GetNodes() []*expanders.TreeNode {
+	return w.items
 }
 
 // SetNodes allows others to set the list nodes

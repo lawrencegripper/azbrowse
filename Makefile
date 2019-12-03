@@ -5,7 +5,7 @@ setup:
 	./scripts/install_ci_tools.sh
 
 test:
-	GO111MODULE=on go test -v -short ./...
+	GO111MODULE=on go test -p 1 -v -count=1 -short ./...
 
 integration:
 	GO111MODULE=on go test -v -count=1 ./...
@@ -45,3 +45,9 @@ debug:
 
 run: checks install
 	azbrowse
+
+fuzz: checks install
+	azbrowse -fuzzer 5
+
+fuzz-from: checks install
+	azbrowse -fuzzer 5 -navigate ${node_id}

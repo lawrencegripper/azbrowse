@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/automation"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -57,7 +58,7 @@ func run(settings *config.Settings) {
 
 	// Give error handling the Gui instance so it can cleanup
 	// when a panic occurs
-	errorhandling.RegisterGuiInstance(g)
+	errorhandling.RegisterGuiAndStartHistoryTracking(ctx, g)
 
 	// recover from normal exit of the program
 	defer g.Close()
@@ -79,7 +80,13 @@ func run(settings *config.Settings) {
 
 	// Start a go routine to handling automated naviging to an item via the
 	// `--navigate` command
-	handleNavigateTo(list, settings)
+	if settings.NavigateToID != "" {
+		automation.NavigateTo(list, settings.NavigateToID)
+	}
+
+	if settings.FuzzerEnabled {
+		automation.StartAutomatedFuzzer(list, settings, g)
+	}
 
 	// Close the span used to track startup times
 	span.Finish()
@@ -286,52 +293,4 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
 	return list
-}
-
-func handleNavigateTo(list *views.ListWidget, settings *config.Settings) {
-	if settings.NavigateToID != "" {
-		navigateToIDLower := strings.ToLower(settings.NavigateToID)
-		go func() {
-			// recover from panic, if one occurrs, and leave terminal usable
-			defer errorhandling.RecoveryWithCleanup()
-
-			navigatedChannel := eventing.SubscribeToTopic("list.navigated")
-			var lastNavigatedNode *expanders.TreeNode
-
-			processNavigations := true
-
-			for {
-				nodeListInterface := <-navigatedChannel
-
-				if processNavigations {
-					nodeList := nodeListInterface.([]*expanders.TreeNode)
-
-					if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
-						processNavigations = false
-					} else {
-
-						gotNode := false
-						for nodeIndex, node := range nodeList {
-							// use prefix matching
-							// but need additional checks as target of /foo/bar would be matched by  /foo/bar  and /foo/ba
-							// additional check is that the lengths match, or the next char in target is a '/'
-							nodeIDLower := strings.ToLower(node.ID)
-							if strings.HasPrefix(navigateToIDLower, nodeIDLower) && (len(settings.NavigateToID) == len(nodeIDLower) || navigateToIDLower[len(nodeIDLower)] == '/') {
-								list.ChangeSelection(nodeIndex)
-								lastNavigatedNode = node
-								list.ExpandCurrentSelection()
-								gotNode = true
-								break
-							}
-						}
-
-						if !gotNode {
-							// we got as far as we could - now stop!
-							processNavigations = false
-						}
-					}
-				}
-			}
-		}()
-	}
 }
