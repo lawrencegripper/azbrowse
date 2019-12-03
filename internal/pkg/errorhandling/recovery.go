@@ -18,10 +18,15 @@ var preNavChannel chan interface{}
 var exitFunc func()
 var guiClose func()
 var ctx context.Context
+var started = false
 
-// RegisterGuiInstance track the gui instance we can use
+// RegisterGuiAndStartHistoryTracking track the gui instance we can use
 // to cleanup
-func RegisterGuiInstance(ctx context.Context, g *gocui.Gui) {
+func RegisterGuiAndStartHistoryTracking(ctx context.Context, g *gocui.Gui) {
+	if started {
+		panic("Already started")
+	}
+	started = true
 	history = []string{}
 
 	// exit and guidClose used to allow overriding during testing
@@ -32,9 +37,10 @@ func RegisterGuiInstance(ctx context.Context, g *gocui.Gui) {
 		os.Exit(1)
 	}
 
+	preNavChannel = eventing.SubscribeToTopic("list.prenavigate")
+
 	// Track current view tree for crash logs
 	go func() {
-		preNavChannel = eventing.SubscribeToTopic("list.prenavigate")
 		for {
 			// Stop the routine if the context is cancelled
 			select {
@@ -43,23 +49,23 @@ func RegisterGuiInstance(ctx context.Context, g *gocui.Gui) {
 				eventing.Unsubscribe(preNavChannel)
 				// Clear the array
 				history = []string{}
+				// Clear context
+				ctx = nil
+				started = false
 				return // returning not to leak the goroutine
-			default:
-				// Carry on working
+			case navigateStateInterface := <-preNavChannel:
+				navigateState, ok := navigateStateInterface.(string)
+				if !ok {
+					continue
+				}
+
+				if navigateState == "GOBACK" && len(history) > 0 {
+					history = history[:len(history)-1]
+				} else {
+					history = append(history, navigateState)
+				}
 			}
 
-			// Subscribe to navigation events
-			navigateStateInterface := <-preNavChannel
-			navigateState, ok := navigateStateInterface.(string)
-			if !ok {
-				continue
-			}
-
-			if navigateState == "GOBACK" && len(history) > 0 {
-				history = history[:len(history)-1]
-			} else {
-				history = append(history, navigateState)
-			}
 		}
 	}()
 }
