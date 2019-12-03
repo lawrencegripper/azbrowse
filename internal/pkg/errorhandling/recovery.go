@@ -12,7 +12,6 @@ import (
 	"github.com/stuartleeks/gocui"
 )
 
-var gui *gocui.Gui
 var history = []string{}
 
 var exitFunc func()
@@ -21,8 +20,6 @@ var guiClose func()
 // RegisterGuiInstance track the gui instance we can use
 // to cleanup
 func RegisterGuiInstance(g *gocui.Gui) {
-	gui = g
-
 	// exit and guidClose used to allow overriding during testing
 	guiClose = func() {
 		g.Close()
@@ -60,7 +57,7 @@ func RecoveryWithCleanup() {
 		guiClose()
 		fmt.Printf(style.Warning("\n\nSorry a crash occurred\n Error: %s \n"), r)
 		fmt.Printf("\n\nPlease visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug.\n")
-		fmt.Print("When raising please provide the details below in the issue.")
+		fmt.Print("When raising please provide the details below in the issue. \nNote `Navigation Tree` may contain sensitive information, please review before posting.")
 		fmt.Printf(style.Subtle("\n\nStack Trace: \n%s\n"), debug.Stack())
 
 		navTreeBuilder := strings.Builder{}
