@@ -17,7 +17,6 @@ var history = []string{}
 var preNavChannel chan interface{}
 var exitFunc func()
 var guiClose func()
-var ctx context.Context
 var started = false
 
 // RegisterGuiAndStartHistoryTracking track the gui instance we can use
@@ -42,7 +41,7 @@ func RegisterGuiAndStartHistoryTracking(ctx context.Context, g *gocui.Gui) {
 	// Track current view tree for crash logs
 	go func() {
 		for {
-			// Stop the routine if the context is cancelled
+			// Stop the routine if the context is canceled
 			select {
 			case <-ctx.Done():
 				// Unsubscribe from the topic
