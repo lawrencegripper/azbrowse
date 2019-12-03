@@ -2,10 +2,9 @@ package errorhandling
 
 import (
 	"fmt"
+	"os"
 	"strings"
 
-	// "strings"
-	"os"
 	"runtime/debug"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -16,18 +15,32 @@ import (
 var gui *gocui.Gui
 var history = []string{}
 
+var exitFunc func()
+var guiClose func()
+
 // RegisterGuiInstance track the gui instance we can use
 // to cleanup
 func RegisterGuiInstance(g *gocui.Gui) {
 	gui = g
 
+	// exit and guidClose used to allow overriding during testing
+	guiClose = func() {
+		g.Close()
+	}
+	exitFunc = func() {
+		os.Exit(1)
+	}
+
 	// Track current view tree for crash logs
 	go func() {
+		navigatedChannel := eventing.SubscribeToTopic("list.prenavigate")
 		for {
 			// Subscribe to navigation events
-			navigatedChannel := eventing.SubscribeToTopic("list.prenavigate")
 			navigateStateInterface := <-navigatedChannel
-			navigateState := navigateStateInterface.(string)
+			navigateState, ok := navigateStateInterface.(string)
+			if !ok {
+				continue
+			}
 
 			if navigateState == "GOBACK" && len(history) > 0 {
 				history = history[:len(history)-1]
@@ -44,7 +57,7 @@ func RegisterGuiInstance(g *gocui.Gui) {
 //  `defer errorhandling.RecoveryWithCleanup(recover())`
 func RecoveryWithCleanup() {
 	if r := recover(); r != nil {
-		gui.Close()
+		guiClose()
 		fmt.Printf(style.Warning("\n\nSorry a crash occurred\n Error: %s \n"), r)
 		fmt.Printf("\n\nPlease visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug.\n")
 		fmt.Print("When raising please provide the details below in the issue.")
@@ -65,7 +78,6 @@ func RecoveryWithCleanup() {
 		}
 
 		fmt.Println()
-		// debug.PrintStack()
-		os.Exit(1)
+		exitFunc()
 	}
 }
