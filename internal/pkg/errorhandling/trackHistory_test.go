@@ -1,6 +1,7 @@
 package errorhandling
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -9,8 +10,12 @@ import (
 )
 
 func TestRecoveryWithCleanup_tracksHistory_basic(t *testing.T) {
+	// Clean up and stop `recovery` tracking history when we're done with the test
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// Don't need to pass a goui gui as not used for history
-	RegisterGuiInstance(nil)
+	RegisterGuiInstance(ctx, nil)
 
 	<-time.After(800 * time.Millisecond)
 
@@ -18,14 +23,17 @@ func TestRecoveryWithCleanup_tracksHistory_basic(t *testing.T) {
 	eventing.Publish("list.prenavigate", "item2")
 	eventing.Publish("list.prenavigate", "item3")
 
-	<-time.After(800 * time.Millisecond)
+	<-time.After(1200 * time.Millisecond)
 
 	st.Assert(t, history, []string{"item1", "item2", "item3"})
 }
 
 func TestRecoveryWithCleanup_tracksHistory_withBack(t *testing.T) {
+	// Clean up and stop `recovery` tracking history when we're done with the test
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	// Don't need to pass a goui gui as not used for history
-	RegisterGuiInstance(nil)
+	RegisterGuiInstance(ctx, nil)
 
 	<-time.After(800 * time.Millisecond)
 
@@ -43,8 +51,12 @@ func TestRecoveryWithCleanup_tracksHistory_withBack(t *testing.T) {
 }
 
 func TestRecoveryWithCleanup_tracksHistory_tooManyBacks(t *testing.T) {
+	// Clean up and stop `recovery` tracking history when we're done with the test
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// Don't need to pass a goui gui as not used for history
-	RegisterGuiInstance(nil)
+	RegisterGuiInstance(ctx, nil)
 
 	<-time.After(800 * time.Millisecond)
 
@@ -59,8 +71,13 @@ func TestRecoveryWithCleanup_tracksHistory_tooManyBacks(t *testing.T) {
 }
 
 func TestRecoveryWithCleanup_tracksHistory_invalidType(t *testing.T) {
+	// Clean up and stop `recovery` tracking history when we're done with the test
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	// Don't need to pass a goui gui as not used for history
-	RegisterGuiInstance(nil)
+	RegisterGuiInstance(ctx, nil)
+	defer eventing.Unsubscribe(preNavChannel)
 
 	<-time.After(800 * time.Millisecond)
 

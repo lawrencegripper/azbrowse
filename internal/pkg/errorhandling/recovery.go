@@ -1,6 +1,7 @@
 package errorhandling
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strings"
@@ -13,13 +14,16 @@ import (
 )
 
 var history = []string{}
-
+var preNavChannel chan interface{}
 var exitFunc func()
 var guiClose func()
+var ctx context.Context
 
 // RegisterGuiInstance track the gui instance we can use
 // to cleanup
-func RegisterGuiInstance(g *gocui.Gui) {
+func RegisterGuiInstance(ctx context.Context, g *gocui.Gui) {
+	history = []string{}
+
 	// exit and guidClose used to allow overriding during testing
 	guiClose = func() {
 		g.Close()
@@ -30,10 +34,22 @@ func RegisterGuiInstance(g *gocui.Gui) {
 
 	// Track current view tree for crash logs
 	go func() {
-		navigatedChannel := eventing.SubscribeToTopic("list.prenavigate")
+		preNavChannel = eventing.SubscribeToTopic("list.prenavigate")
 		for {
+			// Stop the routine if the context is cancelled
+			select {
+			case <-ctx.Done():
+				// Unsubscribe from the topic
+				eventing.Unsubscribe(preNavChannel)
+				// Clear the array
+				history = []string{}
+				return // returning not to leak the goroutine
+			default:
+				// Carry on working
+			}
+
 			// Subscribe to navigation events
-			navigateStateInterface := <-navigatedChannel
+			navigateStateInterface := <-preNavChannel
 			navigateState, ok := navigateStateInterface.(string)
 			if !ok {
 				continue

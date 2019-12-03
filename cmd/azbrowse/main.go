@@ -58,7 +58,7 @@ func run(settings *config.Settings) {
 
 	// Give error handling the Gui instance so it can cleanup
 	// when a panic occurs
-	errorhandling.RegisterGuiInstance(g)
+	errorhandling.RegisterGuiInstance(ctx, g)
 
 	// recover from normal exit of the program
 	defer g.Close()
