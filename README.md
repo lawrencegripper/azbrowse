@@ -257,7 +257,7 @@ The file should be formated like so:
 
 The `command` has two parts, `executable` and `args`. The filename to edit is automatically appended to the `args`. In the example above you can see the `--wait` argument specified which instructs the VS Code executable to not exit until the file is closed. This is important as it is how azbrowse determines that you have finished editing the file and it should perform the `PUT` request.
 
-The `translateFilePathForWSL` property controls whether the path should be converted from a Linux path to a Windows path using the `wslpath` command. This is useful when running azbrwose under [WSL](https://docs.microsoft.com/en-us/windows/wsl/about) and a Windows editor as it converts the temp file path to one that the Windows application can understand.
+The `translateFilePathForWSL` property controls whether the path should be converted from a Linux path to a Windows path using the `wslpath` command. This is useful when running azbrowse under [WSL](https://docs.microsoft.com/en-us/windows/wsl/about) and a Windows editor as it converts the temp file path to one that the Windows application can understand.
 
 The `tempDir` property lets you control where the temporary JSON files are written should you have a requirement to not put them in the OS temp location.
 
