@@ -17,6 +17,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/keybindings"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -42,6 +43,9 @@ func run(settings *config.Settings) {
 
 	// Setup the root context and span for open tracing
 	ctx, span := configureTracing(settings)
+
+	// Load the db
+	storage.LoadDB()
 
 	// Create an ARMClient instance for us to use
 	armClient := armclient.NewClientFromCLI()

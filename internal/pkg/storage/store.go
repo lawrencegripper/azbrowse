@@ -11,7 +11,8 @@ import (
 
 var db *bolt.DB
 
-func init() {
+// LoadDB initializes and loads the DB instance
+func LoadDB() {
 	fmt.Println("Loading db ...")
 	dbLocation := "/root/.azbrowse.db"
 	user, err := user.Current()
