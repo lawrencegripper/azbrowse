@@ -48,7 +48,8 @@ func run(settings *config.Settings) {
 	storage.LoadDB()
 
 	// Create an ARMClient instance for us to use
-	armClient := armclient.NewClientFromCLI()
+	armClient := armclient.NewClientFromCLI(settings.TenantID)
+	armclient.LegacyInstance = *armClient
 
 	// Initialize the expanders which will let the user walk the tree of
 	// resources in Azure
