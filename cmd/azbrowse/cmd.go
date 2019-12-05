@@ -43,9 +43,9 @@ func handleVersionCmd(settings *config.Settings) int {
 	return 0
 }
 
-func usage() int {
-	flag.PrintDefaults()
-	return 1
+func usageAndExit() {
+	flag.Usage()
+	os.Exit(1)
 }
 
 func handleCommandAndArgs() {
@@ -53,33 +53,58 @@ func handleCommandAndArgs() {
 
 	// Root command
 	runCmd := flag.NewFlagSet("run", flag.ExitOnError)
+	// Root flags
 	runDemo := runCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
 	runDebug := runCmd.Bool("debug", false, "run in debug mode")
 	runNavigate := runCmd.String("navigate", "", "navigate to resource")
 	runFuzzer := runCmd.Int("fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
+	// Root usage
+	runCmd.Usage = func() {
+		// Usage
+		fmt.Fprintf(os.Stderr, "Usage:  azbrowse [OPTIONS] COMMAND\n")
 
+		// Description
+		fmt.Fprintf(os.Stderr, "\nA terminal browser for Microsoft Azure.\n")
+
+		// Flags
+		fmt.Fprintf(os.Stderr, "\nOptions:\n")
+		runCmd.PrintDefaults()
+
+		// Global Flags
+		fmt.Fprintf(os.Stderr, "\nGlobal Options:\n")
+		fmt.Fprintf(os.Stderr, "  -h, --help    Print help information\n")
+
+		fmt.Fprintf(os.Stderr, "\nCommands:\n")
+		fmt.Fprintf(os.Stderr, "  version       Print version information\n")
+	}
+
+	// Version command
+	versionCmd := flag.NewFlagSet("version", flag.ExitOnError)
+	// Version usage
+	versionCmd.Usage = runCmd.Usage
+
+	// Handle root command
 	if len(os.Args) < 2 {
 		if err := runCmd.Parse(os.Args[1:]); err != nil {
-			os.Exit(usage())
+			usageAndExit()
 		}
 	}
 
-	// Subcommands and flags
-	versionCmd := flag.NewFlagSet("version", flag.ExitOnError)
-
+	// Handle subcommands
 	if len(os.Args) >= 2 {
 		switch os.Args[1] {
 		case "version":
 			if err := versionCmd.Parse(os.Args[2:]); err != nil {
-				os.Exit(usage())
+				usageAndExit()
 			}
-		default:
+		default: // default to root command
 			if err := runCmd.Parse(os.Args[1:]); err != nil {
-				os.Exit(usage())
+				usageAndExit()
 			}
 		}
 	}
 
+	// Detect which command was parsed and invoke  handler
 	if versionCmd.Parsed() {
 		os.Exit(handleVersionCmd(&settings))
 	}
@@ -87,6 +112,6 @@ func handleCommandAndArgs() {
 		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate, runFuzzer))
 	}
 
-	// Default
-	os.Exit(usage())
+	// If no command was parsed, fallback to usage
+	usageAndExit()
 }
