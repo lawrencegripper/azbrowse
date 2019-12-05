@@ -64,7 +64,7 @@ func handleCommandAndArgs() {
 		fmt.Fprintf(os.Stderr, "Usage:  azbrowse [OPTIONS] COMMAND\n")
 
 		// Description
-		fmt.Fprintf(os.Stderr, "\nA terminal browzer for Microsoft Azure.\n")
+		fmt.Fprintf(os.Stderr, "\nA terminal browser for Microsoft Azure.\n")
 
 		// Flags
 		fmt.Fprintf(os.Stderr, "\nOptions:\n")
