@@ -75,14 +75,23 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 					if err != nil {
 						panic(err)
 					}
+					// Build up paths for all files in the folder to allow proper sorting
+					folderPaths := []swagger.Path{}
 					for _, swaggerFileInfo := range swaggerFileInfos {
 						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
 							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
 							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
-							paths, err = swagger.MergeSwaggerDoc(paths, config, doc, true, "")
+							filePaths, err := swagger.GetPathsFromSwagger(doc, config, "")
 							if err != nil {
 								panic(err)
 							}
+							folderPaths = append(folderPaths, filePaths...)
+						}
+					}
+					if len(folderPaths) > 0 {
+						paths, err = swagger.MergeSwaggerPaths(paths, config, folderPaths, true, "")
+						if err != nil {
+							panic(err)
 						}
 					}
 				}
