@@ -617,4 +617,30 @@ var successfullyReplaceSecretsTestData = []struct {
 		}
 		`,
 	},
+	{
+		desc: "sshkey/4096",
+		input: `
+		{
+			"publicKeyField": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDHUuJ+3W+Vjdu7bW6DQCpr8nUanXR2239Tpt2V5KVIe/uR6E/+U0cpvUrvYKrciYZVlR+tFXz46gEAad6d8JQ5wP7iPhHt8Tdc2zpXXawycOaxVzJEX24xA/YPYQJmZnqtipIH0nzL5y7lLQMkXAuJu0omUYHeTZt0mafs3QrKiFXTqKar1hrUvcCrOyoRlbK0F+1qSQotV/2Gv5pC3/rkMP4ZvCd20U3gmjKUpgWwoB8yqNH9ISCAjjzslwKTXnWJEW8V2FOx8GbqN33wTWXc0+VZ8g59l2vde1CchV2twDtr8CeMatOrSLHCcNnCHW7Et9CuCTwC5Hm65x2eaVajwLez1dFRizhNTfWN4e2s0RexGQW34jvUyd8jTGH2Fny3Vv/apoQiZXNvC8lvLtR8S4doIBD/NEPZnBtwPVA6t7X4EvPIJM4Tty+3PUx0Wx7yvA8HrrknnWzwPcIFjmjcv70Ly3etWo1CcYMw2eK8C7XUmfsYKSbd3qQKQlj1Axb/+muIvAuED/Q87qG4MPnzfTzVpxA5JUtx9Qjhx1nCL2sY47QXwva3HFgH3fdg2sqDoDIcUx6lxkz32g4q0B6PdZxXSCLSooVRjDEAmlDJ1uRdGWwa7D3+Us+RWVh65rKST2/hz610b8CiFh7HTdt9sgs0MEDwP1xxD7sYCR3EAw== ben@BENTOWER",
+		}
+		`,
+		expected: `
+		{
+			"publicKeyField": "SSH-PUBLIC-KEY-HIDDEN",
+		}
+		`,
+	},
+	{
+		desc: "sshkey/2048",
+		input: `
+		{
+			"publicKeyField": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAKPZbZejaPKhO5VXesh0+F8QOV6vUIm9VISnoJpHofsysEZiVEhjP82i5SnLCUIT5E94/6GUd2lM9uqW7WP/XTVqNesqufRVfn77etSzpsNmn0odSGu9ESE3/ZILgIcw91wdsD5K49nhjO4rddE+x9Ugn8yGvz+QRRBK8cdZFHOCyGHIh9ottx+hXl8sA4utYB2YExYK2/izRY8N9yxH71aM5hfXFM0tNBpc2TPydUCbubo59f0rAtdetuSmyvn61vVxQlDOp/BG8HvLaUfUX+aaldY6BfXoBAKftpwHaZA1foDnyED+IzuiePc1HrbGapqpszLMLCrHMnQZ1Re2b ben@BENTOWER",
+		}
+		`,
+		expected: `
+		{
+			"publicKeyField": "SSH-PUBLIC-KEY-HIDDEN",
+		}
+		`,
+	},
 }

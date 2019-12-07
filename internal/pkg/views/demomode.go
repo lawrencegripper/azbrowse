@@ -64,7 +64,7 @@ func stripSecretVals(s string) string {
 	anyPasswordRegex := regexp.MustCompile(`(".*[pP]assword":\s*").+?(?:\\"|[^"])*(")`)
 	s = anyPasswordRegex.ReplaceAllString(s, "${1}HIDDEN-PASSWORD${2}")
 
-	sshRegex := regexp.MustCompile(`ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3} ([^@]+@[^@]+)`)
+	sshRegex := regexp.MustCompile(`ssh-rsa AAAA[0-9A-Za-z+/]+[=]{0,3}[ ]?(?:[^@]+@[^@"]+)?`)
 	s = sshRegex.ReplaceAllString(s, "SSH-PUBLIC-KEY-HIDDEN")
 
 	// begin type-specific implementations
