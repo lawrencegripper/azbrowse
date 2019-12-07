@@ -33,12 +33,15 @@ type Client struct {
 
 // LegacyInstance is a singleton ARMClient used while migrating to the
 // injected client
-var LegacyInstance = NewClientFromCLI()
+var LegacyInstance Client
 
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
-func NewClientFromCLI() *Client {
+func NewClientFromCLI(tenantID string) *Client {
+	aquireToken := func(clearCache bool) (AzCLIToken, error) {
+		return aquireTokenFromAzCLI(clearCache, tenantID)
+	}
 	return &Client{
-		acquireToken: aquireTokenFromAzCLI,
+		acquireToken: aquireToken,
 		client:       &http.Client{},
 	}
 }

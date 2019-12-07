@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"strings"
 )
 
 // AzCLIToken contains token info from az cli
@@ -16,9 +17,21 @@ type AzCLIToken struct {
 
 var currentToken *AzCLIToken
 
-func aquireTokenFromAzCLI(clearCache bool) (AzCLIToken, error) {
+func aquireTokenFromAzCLI(clearCache bool, tenantID string) (AzCLIToken, error) {
 	if currentToken == nil || clearCache {
-		out, err := exec.Command("az", "account", "get-access-token", "--output", "json").Output()
+		args := []string{"account", "get-access-token", "--output", "json"}
+
+		if tenantID != "" {
+			query := fmt.Sprintf("[?tenantId=='%s'].id| [0] ", tenantID)
+			out, err := exec.Command("az", "account", "list", "--output", "tsv", "--query", query).Output()
+			if err != nil {
+				return AzCLIToken{}, fmt.Errorf("Error looking up subscription from tenant: %s", err)
+			}
+			subscription := strings.TrimSpace(string(out))
+			args = append(args, "--subscription", subscription)
+		}
+
+		out, err := exec.Command("az", args...).Output()
 		if err != nil {
 			return AzCLIToken{}, fmt.Errorf("%s (try running 'az account get-access-token' to get more details)", err)
 		}

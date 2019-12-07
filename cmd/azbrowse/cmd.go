@@ -10,7 +10,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
-func handleRunCmd(settings *config.Settings, demo *bool, debug *bool, navigateResource *string, fuzzerDurationMinutes *int) int {
+func handleRunCmd(
+	settings *config.Settings,
+	demo *bool,
+	debug *bool,
+	navigateResource *string,
+	fuzzerDurationMinutes *int,
+	tenantID *string) int {
+
 	if demo != nil && *demo {
 		settings.HideGuids = true
 	}
@@ -28,6 +35,10 @@ func handleRunCmd(settings *config.Settings, demo *bool, debug *bool, navigateRe
 	if fuzzerDurationMinutes != nil && *fuzzerDurationMinutes > 0 {
 		settings.FuzzerEnabled = true
 		settings.FuzzerDurationMinutes = *fuzzerDurationMinutes
+	}
+
+	if tenantID != nil {
+		settings.TenantID = *tenantID
 	}
 
 	run(settings)
@@ -58,6 +69,8 @@ func handleCommandAndArgs() {
 	runDebug := runCmd.Bool("debug", false, "run in debug mode")
 	runNavigate := runCmd.String("navigate", "", "navigate to resource")
 	runFuzzer := runCmd.Int("fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
+	runTenantID := runCmd.String("tenant-id", "", "(optional) specify the tenant id to get an access token for (see `az")
+
 	// Root usage
 	runCmd.Usage = func() {
 		// Usage
@@ -109,7 +122,7 @@ func handleCommandAndArgs() {
 		os.Exit(handleVersionCmd(&settings))
 	}
 	if runCmd.Parsed() {
-		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate, runFuzzer))
+		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate, runFuzzer, runTenantID))
 	}
 
 	// If no command was parsed, fallback to usage
