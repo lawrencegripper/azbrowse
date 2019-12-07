@@ -14,6 +14,7 @@ type Settings struct {
 	NavigateToID          string
 	FuzzerEnabled         bool
 	FuzzerDurationMinutes int
+	TenantID              string // the tenant ID to get an access token for from `az account get-access-token`
 }
 
 // Config represents the user configuration options
