@@ -30,7 +30,6 @@ swagger-update:
 	
 swagger-codegen:
 	export GO111MODULE=on
-	go run ./cmd/swagger-codegen/ --output-file ./internal/pkg/expanders/swagger-armspecs.generated.go 
 	go run ./cmd/swagger-codegen/ 
 	# Format the generated code
 	gofmt -s -w internal/pkg/expanders/swagger-armspecs.generated.go

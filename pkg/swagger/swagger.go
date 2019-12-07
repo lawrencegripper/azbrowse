@@ -13,12 +13,17 @@ import (
 
 // MergeSwaggerDoc merges api endpoints from the specified swagger doc into the Paths array
 func MergeSwaggerDoc(currentPaths []*Path, config *Config, doc *loads.Document, validateCapturedSegments bool, pathPrefix string) ([]*Path, error) {
-	allPaths, err := getPathsFromSwagger(doc, config, pathPrefix)
+	allPaths, err := GetPathsFromSwagger(doc, config, pathPrefix)
 	if err != nil {
 		empty := []*Path{}
 		return empty, err // TODO add context to errors!
 	}
-	allPaths, err = addConfigPaths(allPaths, config)
+	return MergeSwaggerPaths(currentPaths, config, allPaths, validateCapturedSegments, pathPrefix)
+}
+
+// MergeSwaggerPaths merges api endpoints into the currentPaths array
+func MergeSwaggerPaths(currentPaths []*Path, config *Config, newPaths []Path, validateCapturedSegments bool, pathPrefix string) ([]*Path, error) {
+	allPaths, err := addConfigPaths(newPaths, config)
 	if err != nil {
 		empty := []*Path{}
 		return empty, err
@@ -159,7 +164,8 @@ func addConfigPaths(paths []Path, config *Config) ([]Path, error) {
 	return paths, nil
 }
 
-func getPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string) ([]Path, error) {
+// GetPathsFromSwagger returns the mapped Paths from the document
+func GetPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string) ([]Path, error) {
 
 	swaggerVersion := doc.Spec().Info.Version
 	if config.SuppressAPIVersion {
