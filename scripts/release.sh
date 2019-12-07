@@ -7,7 +7,7 @@ if [ -z "$BUILD_NUMBER" ]; then
     exit 1
 fi 
 
-git tag -f v1.1.$BUILD_NUMBER
+git tag -f v1.2.$BUILD_NUMBER
 export GOVERSION=$(go version)
 export GO111MODULE=on
 
