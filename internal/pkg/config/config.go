@@ -15,6 +15,7 @@ type Settings struct {
 	FuzzerEnabled         bool
 	FuzzerDurationMinutes int
 	TenantID              string // the tenant ID to get an access token for from `az account get-access-token`
+	ShouldRender          bool
 }
 
 // Config represents the user configuration options

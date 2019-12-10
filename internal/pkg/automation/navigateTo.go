@@ -27,12 +27,14 @@ func NavigateTo(list *views.ListWidget, itemID string) {
 				if !navigateState.Success {
 					// we got as far as we could - now stop!
 					processNavigations = false
+					list.SetShouldRender(true)
 					continue
 				}
 				nodeList := navigateState.NewNodes
 
 				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
 					processNavigations = false
+					list.SetShouldRender(true)
 				} else {
 
 					gotNode := false
@@ -53,6 +55,7 @@ func NavigateTo(list *views.ListWidget, itemID string) {
 					if !gotNode {
 						// we got as far as we could - now stop!
 						processNavigations = false
+						list.SetShouldRender(true)
 					}
 				}
 			}

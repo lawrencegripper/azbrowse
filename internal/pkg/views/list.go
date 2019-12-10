@@ -33,6 +33,7 @@ type ListWidget struct {
 	FullscreenKeyBinding string
 	ActionKeyBinding     string
 	lastTopIndex         int
+	shouldRender         bool
 }
 
 // ListNavigatedEventState captures the state when raising a `list.navigated` event
@@ -45,8 +46,8 @@ type ListNavigatedEventState struct {
 }
 
 // NewListWidget creates a new instance
-func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, g *gocui.Gui) *ListWidget {
-	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, g: g}
+func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, shouldRender bool, g *gocui.Gui) *ListWidget {
+	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, shouldRender: shouldRender, g: g}
 	return listWidget
 }
 
@@ -109,71 +110,73 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	v.Clear()
 	w.view = v
 
-	if w.itemCount() < 1 {
-		return nil
-	}
-
-	linesUsedCount := 0
-	renderedItems := make([]string, 0, w.itemCount())
-
-	renderedItems = append(renderedItems, style.Separator("  ---\n"))
-
-	for i, s := range w.itemsToShow() {
-		var itemToShow string
-		if i == w.selected {
-			itemToShow = "▶ "
-		} else {
-			itemToShow = "  "
+	if w.shouldRender {
+		if w.itemCount() < 1 {
+			return nil
 		}
 
-		itemToShow = itemToShow + highlightText(s.Display, w.filterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
+		linesUsedCount := 0
+		renderedItems := make([]string, 0, w.itemCount())
 
-		linesUsedCount = linesUsedCount + strings.Count(itemToShow, "\n")
-		renderedItems = append(renderedItems, itemToShow)
-	}
+		renderedItems = append(renderedItems, style.Separator("  ---\n"))
 
-	linesPerItem := linesUsedCount / w.itemCount()
-	maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
+		for i, s := range w.itemsToShow() {
+			var itemToShow string
+			if i == w.selected {
+				itemToShow = "▶ "
+			} else {
+				itemToShow = "  "
+			}
 
-	topIndex := w.lastTopIndex
-	bottomIndex := w.lastTopIndex + maxItemsCanShow
+			itemToShow = itemToShow + highlightText(s.Display, w.filterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
-	if w.selected >= bottomIndex {
-		// need to adjust down
-		diff := w.selected - bottomIndex + 1
-		topIndex += diff
-		bottomIndex += diff
-	}
-	if w.selected < topIndex {
-		// need to adjust up
-		diff := topIndex - w.selected
-		topIndex -= diff
-		bottomIndex -= diff
-	}
-	w.lastTopIndex = topIndex
-	if bottomIndex > len(renderedItems) {
-		bottomIndex = len(renderedItems) - 1
-	}
-
-	for index := topIndex; index < bottomIndex+1; index++ {
-		if index < len(renderedItems) {
-			item := renderedItems[index]
-			fmt.Fprint(v, item)
+			linesUsedCount += strings.Count(itemToShow, "\n")
+			renderedItems = append(renderedItems, itemToShow)
 		}
-	}
 
-	// If the title is getting too long trim things
-	// down from the front
-	title := w.title
-	if w.filterString != "" {
-		title += "[filter=" + w.filterString + "]"
-	}
-	if len(title) > w.w {
-		trimLength := len(title) - w.w + 5 // Add five for spacing and elipsis
-		title = ".." + title[trimLength:]
-	}
+		linesPerItem := linesUsedCount / w.itemCount()
+		maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
 
-	w.view.Title = title
+		topIndex := w.lastTopIndex
+		bottomIndex := w.lastTopIndex + maxItemsCanShow
+
+		if w.selected >= bottomIndex {
+			// need to adjust down
+			diff := w.selected - bottomIndex + 1
+			topIndex += diff
+			bottomIndex += diff
+		}
+		if w.selected < topIndex {
+			// need to adjust up
+			diff := topIndex - w.selected
+			topIndex -= diff
+			bottomIndex -= diff
+		}
+		w.lastTopIndex = topIndex
+		if bottomIndex > len(renderedItems) {
+			bottomIndex = len(renderedItems) - 1
+		}
+
+		for index := topIndex; index < bottomIndex+1; index++ {
+			if index < len(renderedItems) {
+				item := renderedItems[index]
+				fmt.Fprint(v, item)
+			}
+		}
+
+		// If the title is getting too long trim things
+		// down from the front
+		title := w.title
+		if w.filterString != "" {
+			title += "[filter=" + w.filterString + "]"
+		}
+		if len(title) > w.w {
+			trimLength := len(title) - w.w + 5 // Add five for spacing and elipsis
+			title = ".." + title[trimLength:]
+		}
+
+		w.view.Title = title
+	}
 
 	return nil
 }
@@ -387,4 +390,10 @@ func (w *ListWidget) MoveUp() {
 // MoveDown moves the selection down one item
 func (w *ListWidget) MoveDown() {
 	w.ChangeSelection(w.CurrentSelection() + 1)
+}
+
+// SetShouldRender sets the shouldRender value for the list and the current item
+func (w *ListWidget) SetShouldRender(val bool) {
+	w.shouldRender = val
+	w.contentView.SetShouldRender(val)
 }
