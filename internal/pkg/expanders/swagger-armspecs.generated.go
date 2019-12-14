@@ -1262,14 +1262,14 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{parentResourcePath}/{resourceType}/{resourceName}/providers/Microsoft.Authorization/roleAssignments", "2015-07-01"),
 		},
 		{
-			Display:  "{roleDefinitionId}",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{roleDefinitionId}", "2015-07-01"),
-		},
-		{
 			Display:        "{roleAssignmentId}",
 			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{roleAssignmentId}", "2015-07-01"),
 			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/{roleAssignmentId}", "2015-07-01"),
 			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/{roleAssignmentId}", "2015-07-01"),
+		},
+		{
+			Display:  "{roleDefinitionId}",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{roleDefinitionId}", "2015-07-01"),
 		},
 		{
 			Display:  "roleAssignments",

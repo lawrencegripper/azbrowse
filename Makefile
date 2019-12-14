@@ -52,15 +52,14 @@ fuzz-from: checks install
 	azbrowse -fuzzer 5 -navigate ${node_id}
 
 devcontainer:
-ifdef DEVCONTAINER
-	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
-endif
-
 	# Build the devcontainer
 	docker build -f ./.devcontainer/Dockerfile ./.devcontainer -t devcontainer
 
 # Used for locally running integration tests
 devcontainer-integration: devcontainer
+ifdef DEVCONTAINER
+	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
+endif
 	@docker run -v ${PWD}:${PWD} \
 		--entrypoint /bin/bash \
 		--workdir ${PWD} \
@@ -68,9 +67,13 @@ devcontainer-integration: devcontainer
 		-f ${PWD}/scripts/ci_integration_tests.sh
 
 # Used by the build to create, test and publish
-devcontainer-release: 
-	# Note command mirrors required envs from host into container
+devcontainer-release: devcontainer
+ifdef DEVCONTAINER
+	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
+endif
+	# Note command mirrors required envs from host into container. Using '@' to avoid showing values in CI output.
 	@docker run -v ${PWD}:${PWD} \
+		-v /var/run/docker.sock:/var/run/docker.sock \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e CIRCLECI=${CIRCLECI} \
 		-e CIRCLE_PR_NUMBER=${CIRCLE_PR_NUMBER} \

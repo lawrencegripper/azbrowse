@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -e
+
 cd `dirname $0`
 
 echo ""
@@ -27,6 +28,7 @@ fi
 
 # Set version for release (picked up later by goreleaser)
 git tag -f v1.2.$BUILD_NUMBER
+
 export GOVERSION=$(go version)
 
 echo "->Move to root directory"
@@ -36,10 +38,12 @@ echo "->Use make build to codegen, lint and check"
 make build
 
 if [[ $(git diff --stat) != '' ]]; then
-  echo "Ditry GIT: Failing as swagger-generated caused changes, please run `make swagger-update` and `make swagger-generate` and commit changes for build to pass"
+  echo "--> Ditry GIT: Failing as swagger-generated caused changes, please run 'make swagger-update' and 'make swagger-generate' and commit changes for build to pass"
+  git status
+  sleep 1
   exit 1
 else
-  echo '`swagger-gen` ran and no changes detected in code: Success'
+  echo "'swagger-gen' ran and no changes detected in code: Success"
 fi
 
 echo "->Run go releaser"
