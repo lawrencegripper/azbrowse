@@ -11,13 +11,30 @@
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
-		"-u", "1000"
+		"-u",
+		"1000"
 	],
 	// Use 'settings' to set *default* container specific settings.json values on container create. 
 	// You can edit these settings after create using File > Preferences > Settings > Remote.
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",
-		"go.gopath": "/go"
+		"go.gopath": "/go",
+		"go.useLanguageServer": true,
+		"[go]": {
+			"editor.snippetSuggestions": "none",
+			"editor.formatOnSave": true,
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": true,
+			}
+		},
+		"gopls": {
+			"usePlaceholders": true, // add parameter placeholders when completing a function
+			// Experimental settings
+			"completeUnimported": true, // autocomplete unimported packages
+			"watchFileChanges": true, // watch file changes outside of the editor
+			"deepCompletion": true, // enable deep completion
+		},
+		"files.eol": "\n", // formatting only supports LF line endings		
 	},
 	// Uncomment the next line if you want to publish any ports.
 	// "appPort": [],
