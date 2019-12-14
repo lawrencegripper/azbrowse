@@ -48,7 +48,6 @@ RUN apt-get update \
         golang.org/x/tools/cmd/goimports \
         golang.org/x/lint/golint \
         golang.org/x/tools/cmd/gopls \
-        github.com/alecthomas/gometalinter \
         honnef.co/go/tools/... \
         github.com/golangci/golangci-lint/cmd/golangci-lint \
         github.com/mgechev/revive \
@@ -71,6 +70,4 @@ RUN apt-get update \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /var/lib/apt/lists/* \
-    && go get -u github.com/alecthomas/gometalinter \
-    && gometalinter --install
+    && rm -rf /var/lib/apt/lists/*
