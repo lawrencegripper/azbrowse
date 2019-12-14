@@ -59,6 +59,7 @@ endif
 	# Build the devcontainer
 	docker build -f ./.devcontainer/Dockerfile ./.devcontainer -t devcontainer
 
+# Used for locally running integration tests
 devcontainer-integration: devcontainer
 	docker run -v ${PWD}:${PWD} \
 		--entrypoint /bin/bash \
@@ -66,8 +67,9 @@ devcontainer-integration: devcontainer
 		-t devcontainer \
 		-f ${PWD}/scripts/ci_integration_tests.sh
 
+# Used by the build to create, test and publish
 devcontainer-release: 
-	# Command runs the devcontainer and passes in required envs from host
+	# Note command mirrors required envs from host into container
 	docker run -v ${PWD}:${PWD} \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e CIRCLECI=${CIRCLECI} \
@@ -79,4 +81,4 @@ devcontainer-release:
 		--entrypoint /bin/bash \
 		--workdir ${PWD} \
 		-t devcontainer \
-		-f ${PWD}/scripts/ci_release.sh
+		-c "${PWD}/scripts/ci_integration_tests.sh && ${PWD}/scripts/ci_release.sh"
