@@ -50,3 +50,33 @@ fuzz: checks install
 
 fuzz-from: checks install
 	azbrowse -fuzzer 5 -navigate ${node_id}
+
+devcontainer:
+ifdef DEVCONTAINER
+	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
+endif
+
+	# Build the devcontainer
+	docker build -f ./.devcontainer/Dockerfile ./.devcontainer -t devcontainer
+
+devcontainer-integration: devcontainer
+	docker run -v ${PWD}:${PWD} \
+		--entrypoint /bin/bash \
+		--workdir ${PWD} \
+		-t devcontainer \
+		-f ${PWD}/scripts/ci_integration_tests.sh
+
+devcontainer-release: 
+	# Command runs the devcontainer and passes in required envs from host
+	docker run -v ${PWD}:${PWD} \
+		-e BUILD_NUMBER=${BUILD_NUMBER} \
+		-e CIRCLECI=${CIRCLECI} \
+		-e CIRCLE_PR_NUMBER=${CIRCLE_PR_NUMBER} \
+		-e CIRCLE_BRANCH=${CIRCLE_BRANCH} \
+		-e GITHUB_TOKEN=${GITHUB_TOKEN} \
+		-e DOCKER_USERNAME=${DOCKER_USERNAME} \
+		-e DOCKER_PASSWORD=${DOCKER_PASSWORD} \
+		--entrypoint /bin/bash \
+		--workdir ${PWD} \
+		-t devcontainer \
+		-f ${PWD}/scripts/ci_release.sh

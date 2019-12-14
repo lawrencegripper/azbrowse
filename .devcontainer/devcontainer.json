@@ -11,8 +11,23 @@
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
-		"-u",
-		"1000"
+
+		// Mount go mod cache
+		"-v", "azbrowse-gomodcache:/go/pkg",
+		// Cache vscode exentsions installs and homedir
+		"-v", "azbrowse-vscodecache:/root/.vscode-server",
+		// Keep command history 
+		"-v", "azbrowse-bashhistory:/root/commandhistory",
+		// Mount docker socket for docker builds
+		"-v", "/var/run/docker.sock:/var/run/docker.sock",
+		// Use host network
+		"--network=host",
+		// Mount ssh 
+		"-v", "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh",
+		// Mount azure, git and docker config
+		"-v", "${env:HOME}${env:USERPROFILE}/.azure:/root/.azure",
+		"-v", "${env:HOME}${env:USERPROFILE}/.gitconfig:/root/.gitconfig", // Required due to volume mount used for .vscode-server
+		"-v", "${env:HOME}${env:USERPROFILE}/.docker/config.json:/root/.docker/config.json"
 	],
 	// Use 'settings' to set *default* container specific settings.json values on container create. 
 	// You can edit these settings after create using File > Preferences > Settings > Remote.
