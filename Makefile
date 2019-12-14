@@ -61,7 +61,7 @@ endif
 
 # Used for locally running integration tests
 devcontainer-integration: devcontainer
-	docker run -v ${PWD}:${PWD} \
+	@docker run -v ${PWD}:${PWD} \
 		--entrypoint /bin/bash \
 		--workdir ${PWD} \
 		-t devcontainer \
@@ -70,7 +70,7 @@ devcontainer-integration: devcontainer
 # Used by the build to create, test and publish
 devcontainer-release: 
 	# Note command mirrors required envs from host into container
-	docker run -v ${PWD}:${PWD} \
+	@docker run -v ${PWD}:${PWD} \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
 		-e CIRCLECI=${CIRCLECI} \
 		-e CIRCLE_PR_NUMBER=${CIRCLE_PR_NUMBER} \

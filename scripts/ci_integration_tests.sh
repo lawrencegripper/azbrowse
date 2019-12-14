@@ -1,7 +1,14 @@
 #!/bin/bash
 set -e
 
-Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS
+echo ""
+echo "-------> INTEGRATION TESTS"
+echo ""
+
+echo "Starting Xvfb"
+
+Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &
+XVFB_PROC=$!
 sleep 1
 export DISPLAY=:99
 
@@ -24,4 +31,8 @@ else
   echo "Tests FAILED"
   go version
   exit 1
-fi
+fi 
+
+kill $XVFB_PROC
+
+echo "S"

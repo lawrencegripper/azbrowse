@@ -76,6 +76,12 @@ RUN apt-get update \
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1 \
     && echo "if [ -f \"$HOME/.bash-git-prompt/gitprompt.sh\" ]; then GIT_PROMPT_ONLY_IN_REPO=1 && source $HOME/.bash-git-prompt/gitprompt.sh; fi" >> "/root/.bashrc"
 
+# Save command line history 
+RUN echo "export HISTFILE=/root/commandhistory/.bash_history" >> "/root/.bashrc" \
+    && echo "export PROMPT_COMMAND='history -a'" >> "/root/.bashrc" \
+    && mkdir -p /root/commandhistory \
+    && touch /root/commandhistory/.bash_history
+
 # Alow config for xvfb
 ARG RESOLUTION="1920x1080x24"
 ENV XVFB_RES="${RESOLUTION}"

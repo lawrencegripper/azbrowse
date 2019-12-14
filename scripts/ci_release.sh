@@ -2,6 +2,9 @@
 set -e
 cd `dirname $0`
 
+echo ""
+echo "-------> RELEASE PROCESS"
+echo ""
 # Fail if build number not set
 if [ -z "$BUILD_NUMBER" ]; then
     echo "Envvar 'BUILD_NUMBER' must be set for this script to work correctly. When building locally for debugging/testing this script is not needed use 'go build' instead."
