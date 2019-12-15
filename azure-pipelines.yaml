@@ -3,6 +3,12 @@ pool:
 
 steps:
 - script: sudo -E make devcontainer-release
-  displayName: 'Build, Test and *Publish *(only on master in circleci)'
+  displayName: 'Build, Test and *Publish *(only on master)'
   env:
     BUILD_NUMBER: $(Build.BuildId)
+    DOCKER_USERNAME: $(DOCKER_USERNAME)
+    DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+    GITHUB_TOKEN: $(GITHUB_TOKEN)
+    IS_CI: 1
+    PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+    BRANCH: $(Build.SourceBranchName)

@@ -12,17 +12,17 @@ if [ -z "$BUILD_NUMBER" ]; then
     exit 1
 fi 
 
-# If running inside CircleCI login to docker
-if [ -z ${CIRCLECI} ]; then
+# If running inside CI login to docker
+if [ -z ${IS_CI} ]; then
   echo "Not running in circle, skipping cirlce setup"
 else 
   echo "Publishing"
-  if [ -z $CIRCLE_PR_NUMBER ] && [[ $CIRCLE_BRANCH == "master" ]]; then
+  if [ -z $PR_NUMBER ] && [[ $BRANCH == "master" ]]; then
     export PUBLISH=true
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     echo "On master setting PUBLISH=true"
   else 
-    echo "Skipping publish as is from PR: $CIRCLE_PR_NUMBER or not master BRANCH: $CIRCLE_BRANCH"
+    echo "Skipping publish as is from PR: $PR_NUMBER or not master BRANCH: $BRANCH"
   fi
 fi
 

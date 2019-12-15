@@ -22,9 +22,6 @@ install:
 checks:
 	GO111MODULE=on golangci-lint run
 
-ci-docker:
-	docker run -it -e BUILD_NUMBER=999-localci -v /var/run/docker.sock:/var/run/docker.sock -v $(CURDIR):/go/src/github.com/lawrencegripper/azbrowse golang:1.11.5 bash -f /go/src/github.com/lawrencegripper/azbrowse/scripts/ci.sh
-
 swagger-update:
 	./scripts/update-swagger.sh
 	
@@ -75,9 +72,9 @@ endif
 	@docker run -v ${PWD}:${PWD} \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-e BUILD_NUMBER=${BUILD_NUMBER} \
-		-e CIRCLECI=${CIRCLECI} \
-		-e CIRCLE_PR_NUMBER=${CIRCLE_PR_NUMBER} \
-		-e CIRCLE_BRANCH=${CIRCLE_BRANCH} \
+		-e IS_CI=${IS_CI} \
+		-e PR_NUMBER=${PR_NUMBER} \
+		-e BRANCH=${BRANCH} \
 		-e GITHUB_TOKEN=${GITHUB_TOKEN} \
 		-e DOCKER_USERNAME=${DOCKER_USERNAME} \
 		-e DOCKER_PASSWORD=${DOCKER_PASSWORD} \

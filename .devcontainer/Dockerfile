@@ -41,7 +41,7 @@ RUN apt-get update \
     #
     # --> GolangCI-lint
     && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
-    # --> xvfb for integration testing (gocui requires a valid tty which isn't available in Circleci)
+    # --> xvfb for integration testing (gocui requires a valid tty which isn't available in ci)
     && apt-get install --no-install-recommends -y xvfb libgl1-mesa-dri \
     # --> xterm for integration testing
     && apt-get install -y xterm \
