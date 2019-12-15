@@ -57,6 +57,9 @@ devcontainer:
 	# Build the devcontainer
 	docker build -f ./.devcontainer/Dockerfile ./.devcontainer --cache-from $(DEV_CONTAINER_TAG) -t $(DEV_CONTAINER_TAG)
 
+devcontainer-push:
+	docker push $(DEV_CONTAINER_TAG)
+
 # Used for locally running integration tests
 devcontainer-integration: devcontainer
 ifdef DEVCONTAINER
