@@ -25,22 +25,11 @@ RUN apt-get update \
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
     && apt-get -y install git iproute2 procps lsb-release \
     #
-    # Install Go tools
-    #
-    # --> Delve for debugging
-    && go get github.com/go-delve/delve/cmd/dlv@v1.3.2 \
-    # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.2.1 \
-    # --> Go symbols and outline for go to symbol support and test support 
-    && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
-    #
     # Install Azure CLI
     && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     #
-    # Install Build Tools 
+    # Install Integration testing Tools 
     #
-    # --> GolangCI-lint
-    && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
     # --> xvfb for integration testing (gocui requires a valid tty which isn't available in ci)
     && apt-get install --no-install-recommends -y xvfb libgl1-mesa-dri \
     # --> xterm for integration testing
@@ -48,28 +37,12 @@ RUN apt-get update \
     # 
     # Install Release Tools
     #
-    # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh \
-    # --> Docker and RPM used by releaser
-    && bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-18.06.3-ce.tgz && tar --strip-components=1 -xvzf docker-18.06.3-ce.tgz -C /usr/local/bin" \
+    # --> RPM used by goreleaser
     && apt install -y rpm \
-    #
-    # Create a non-root user to use if preferred - see https://aka.ms/vscode-remote/containers/non-root-user.
-    && groupadd --gid $USER_GID $USERNAME \
-    && useradd -s /bin/bash --uid $USER_UID --gid $USER_GID -m $USERNAME \
-    #
-    # [Optional] Add sudo support
-    && apt-get install -y sudo \
-    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
-    && chmod 0440 /etc/sudoers.d/$USERNAME \
-    #
-    # Change GOPATH ownership
-    && chown -R $USERNAME /go \
     #
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
-    && rm -rf /go/src/ && rm -rf /go/pkg \
     && rm -rf /var/lib/apt/lists/*
 
 # Save command line history 
@@ -90,3 +63,20 @@ ARG XARGS=""
 ENV XVFB_ARGS="${XARGS}"
 
 ENV DEVCONTAINER="TRUE"
+
+# Install docker used by go releaser
+RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz && tar --strip-components=1 -xvzf docker-19.03.5.tgz -C /usr/local/bin"
+
+# Install Go tools
+RUN \
+    # --> Delve for debugging
+    go get github.com/go-delve/delve/cmd/dlv@v1.3.2 \
+    # --> Go language server
+    && go get golang.org/x/tools/gopls@v0.2.1 \
+    # --> Go symbols and outline for go to symbol support and test support 
+    && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
+    # --> GolangCI-lint
+    && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
+    # --> Go releaser 
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.123.3"\
+    && rm -rf /go/src/ && rm -rf /go/pkg

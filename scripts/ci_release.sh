@@ -53,4 +53,6 @@ if [ -z ${PUBLISH} ]; then
 else 
   echo "Publishing"
   goreleaser
+  echo "Pushing update to devcontainer image to speed up next build"
+  docker push "$DEV_CONTAINER_TAG"
 fi
