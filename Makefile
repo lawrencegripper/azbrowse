@@ -77,16 +77,17 @@ endif
 	@echo "Using tag: $(DEV_CONTAINER_TAG)"
 	# Note command mirrors required envs from host into container. Using '@' to avoid showing values in CI output.
 	@docker run -v ${PWD}:${PWD} \
-		-v /var/run/docker.sock:/var/run/docker.sock \
-		-e BUILD_NUMBER=${BUILD_NUMBER} \
-		-e IS_CI=${IS_CI} \
-		-e PR_NUMBER=${PR_NUMBER} \
-		-e BRANCH=${BRANCH} \
-		-e GITHUB_TOKEN=${GITHUB_TOKEN} \
-		-e DOCKER_USERNAME=${DOCKER_USERNAME} \
-		-e DOCKER_PASSWORD=${DOCKER_PASSWORD} \
+		-e BUILD_NUMBER="${BUILD_NUMBER}" \
+		-e IS_CI="${IS_CI}" \
+		-e PR_NUMBER="${PR_NUMBER}" \
+		-e BRANCH="${BRANCH}" \
+		-e GITHUB_TOKEN="${GITHUB_TOKEN}" \
+		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
+		-e DOCKER_PASSWORD="${DOCKER_PASSWORD}" \
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
+		-v /var/run/docker.sock:/var/run/docker.sock \
 		--entrypoint /bin/bash \
-		--workdir ${PWD} \
+		--workdir "${PWD}" \
 		-t $(DEV_CONTAINER_TAG) \
 		-c "${PWD}/scripts/ci_integration_tests.sh && ${PWD}/scripts/ci_release.sh"
+		
