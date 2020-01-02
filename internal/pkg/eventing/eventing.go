@@ -22,8 +22,20 @@ type StatusEvent struct {
 	Timeout    time.Duration
 	createdAt  time.Time
 	InProgress bool
+	IsToast    bool
 	Failure    bool
 	id         uuid.UUID
+}
+
+// Icon returns an icon representing the event
+func (s *StatusEvent) Icon() string {
+	if s.InProgress {
+		return "⏳"
+	} else if s.Failure {
+		return "☠"
+	} else {
+		return "✓"
+	}
 }
 
 // ID returns the status message ID
@@ -48,8 +60,12 @@ func (s *StatusEvent) Update() {
 
 // SendStatusEvent sends status events
 func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
-	s.id = uuid.NewV4()
-	s.createdAt = time.Now()
+	if s.id == [16]byte{} {
+		s.id = uuid.NewV4()
+	}
+	if s.createdAt.IsZero() {
+		s.createdAt = time.Now()
+	}
 
 	// set default timeout
 	if s.Timeout == time.Duration(0) {
