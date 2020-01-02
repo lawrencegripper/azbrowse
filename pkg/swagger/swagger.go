@@ -117,7 +117,7 @@ type pathArraySortByCondensedPath []Path
 
 func (a pathArraySortByCondensedPath) Len() int { return len(a) }
 func (a pathArraySortByCondensedPath) Less(i, j int) bool {
-	return strings.Compare(a[i].CondensedEndpointPath, a[j].CondensedEndpointPath) < 0
+	return strings.Compare(a[i].Endpoint.TemplateURL, a[j].Endpoint.TemplateURL) < 0
 }
 func (a pathArraySortByCondensedPath) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
