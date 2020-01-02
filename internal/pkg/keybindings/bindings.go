@@ -82,7 +82,13 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 	if k, ok := overrides[hnd.ID()]; ok {
 		keys = k
 	} else {
-		keys = []interface{}{hnd.DefaultKey()}
+		defaultKey := hnd.DefaultKey()
+		switch defaultKey := defaultKey.(type) {
+		case []interface{}:
+			keys = defaultKey // already an array
+		default:
+			keys = []interface{}{defaultKey} // not an array so wrap
+		}
 	}
 
 	for _, key := range keys {
@@ -202,10 +208,17 @@ func cleanValue(str string) string {
 
 func keyToString(key interface{}) string {
 	switch t := key.(type) { //nolint: gosimple
+	case []interface{}:
+		keyStrings := []string{}
+		keys := key.([]interface{})
+		for _, k := range keys {
+			keyStrings = append(keyStrings, keyToString(k))
+		}
+		return strings.Join(keyStrings, ", ")
 	case gocui.Key:
 		return GocuiKeyToStr[key.(gocui.Key)]
 	case rune:
-		return string(key.(rune))
+		return strings.ToUpper(string(key.(rune)))
 	default:
 		panic(fmt.Sprintf("Unhandled key type: %v\n", t))
 	}
