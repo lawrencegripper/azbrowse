@@ -74,6 +74,10 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 
 	doneFunc := func() {
 		s.InProgress = false
+		if s.IsToast {
+			// Hide completed toast after a few secs
+			s.Timeout = time.Duration(time.Second * 5)
+		}
 		s.Update()
 	}
 

@@ -25,6 +25,7 @@ type NotificationWidget struct {
 	x, y                          int
 	w                             int
 	pendingDeletes                []*expanders.TreeNode
+	toastNotifications            map[string]eventing.StatusEvent
 	deleteMutex                   sync.Mutex // ensure delete occurs only once
 	deleteInProgress              bool
 	gui                           *gocui.Gui
@@ -181,26 +182,68 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 // NewNotificationWidget create new instance and start go routine for spinner
 func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) *NotificationWidget {
 	widget := &NotificationWidget{
-		name:           "notificationWidget",
-		x:              x,
-		y:              y,
-		w:              w,
-		gui:            g,
-		pendingDeletes: []*expanders.TreeNode{},
-		client:         client,
+		name:               "notificationWidget",
+		x:                  x,
+		y:                  y,
+		w:                  w,
+		gui:                g,
+		pendingDeletes:     []*expanders.TreeNode{},
+		toastNotifications: map[string]eventing.StatusEvent{},
+		client:             client,
 	}
+
+	newEvents := eventing.SubscribeToStatusEvents()
+	// Start loop for showing loading in statusbar
+	go func() {
+		// recover from panic, if one occurrs, and leave terminal usable
+		defer errorhandling.RecoveryWithCleanup()
+
+		for {
+			// Wait for a second to see if we have any new messages
+			timeout := time.After(time.Second)
+			select {
+			case eventObjRaw := <-newEvents:
+				eventObj := eventObjRaw.(eventing.StatusEvent)
+				if eventObj.IsToast {
+					widget.toastNotifications[eventObj.ID()] = eventObj
+				}
+			case <-timeout:
+				// Update the UI
+			}
+			for ID, toast := range widget.toastNotifications {
+				if !toast.HasExpired() {
+					delete(widget.toastNotifications, ID)
+				}
+			}
+		}
+	}()
+
+	eventing.SendStatusEvent(eventing.StatusEvent{
+		Message:    "bob doing things",
+		InProgress: true,
+		IsToast:    true,
+		Timeout:    time.Second * 10,
+	})
+
 	return widget
 }
 
 // Layout draws the widget in the gocui view
 func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 	// Don't draw anything if no pending deletes
-	if len(w.pendingDeletes) < 1 {
+	if len(w.pendingDeletes) < 1 && len(w.toastNotifications) < 1 {
 		g.DeleteView(w.name)
 		return nil
 	}
 
-	height := len(w.pendingDeletes)*1 + 7
+	height := len(w.pendingDeletes) + len(w.toastNotifications)
+	if len(w.pendingDeletes) > 0 {
+		// Add padding for extra lines
+		height = height + 7
+	}
+	if len(w.toastNotifications) > 0 {
+		height = height + 3
+	}
 
 	v, err := g.SetView(w.name, w.x, w.y, w.x+w.w, height)
 	if err != nil && err != gocui.ErrUnknownView {
@@ -216,15 +259,26 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 
 func (w *NotificationWidget) layoutInternal(v io.Writer) error {
 	pending := w.pendingDeletes
+	toasts := w.toastNotifications
 
-	fmt.Fprintln(v, style.Title("Pending Deletes:"))
-	for _, i := range pending {
-		fmt.Fprintln(v, " - "+i.Name)
+	if len(toasts) > 0 {
+		fmt.Fprintln(v, style.Title("Notifications:"))
+		for _, i := range toasts {
+			fmt.Fprintln(v, i.Icon()+" "+i.Message)
+		}
+		fmt.Fprintln(v, "")
 	}
-	fmt.Fprintln(v, "")
-	fmt.Fprintln(v, "Do you want to delete these items?")
-	fmt.Fprintln(v, style.Warning("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE"))
-	fmt.Fprintln(v, style.Highlight("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CANCEL"))
+
+	if len(pending) > 0 {
+		fmt.Fprintln(v, style.Title("Pending Deletes:"))
+		for _, i := range pending {
+			fmt.Fprintln(v, " - "+i.Name)
+		}
+		fmt.Fprintln(v, "")
+		fmt.Fprintln(v, "Do you want to delete these items?")
+		fmt.Fprintln(v, style.Warning("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE"))
+		fmt.Fprintln(v, style.Highlight("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CANCEL"))
+	}
 
 	return nil
 }
