@@ -53,24 +53,32 @@ Running `azbrowse --debug` will start an in-memory collector for the `opentracin
 
 ## Automated builds
 
-The `CircleCI` build runs the `golang` build, unit tests and linting.
-The `AzureDevOps` build run the integration tests under `XTerm`.
+The `AzureDevOps` build runs `golang` build, unit tests and linting then runs integration tests under `XTerm`.
 
-### Running locally
+To check `golang` build, unit tests and linting pass run `make build` before pushing.
+
+### Running integration tests/release locally
+
+The CI process re-uses the `devcontainer` used for developing the solution locally so you can reproduce build errors locally.
+
+Integration tests in docker:
 
 ``` bash
-make integration && make ci-docker
+make devcontainer-integration
 ```
 
-To run the full Travis-CI locally, you need to have the `TRAVIS_BUILD_NUMBER` environment variable defined, so running it as follows may be easier:
+To run the full CI locally, you need to have the `BUILD_NUMBER` environment variable defined, so running it as follows may be easier:
 
 ```bash
-TRAVIS_BUILD_NUMBER=0.1 make ci-docker
+export BUILD_NUMBER=99999
+make devcontainer-release
 ```
+
+If you would like to do a publish step of the assets set `IS_CI=1`, `BUILD_NUMBER`, `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `BRANCH=master` and `GITHUB_TOKEN` then run `make devcontainer-release`
 
 ## Patterns
 
-The aim of this section of the doc is to capture some of the patterns for working with azbrowse to add new providers or other features.
+The aim of this section of the doc is to capture some of the patterns for working with `azbrowse` to add new providers or other features.
 
 If using [Visual Studio Code](https://code.visualstudio.com) and you have the Remote Development extension (+Docker) installed then you can take advantage of the devcontainer support to have a development environment set up ready for you to use.
 

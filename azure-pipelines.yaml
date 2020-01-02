@@ -1,31 +1,14 @@
 pool:
-  vmImage: 'Ubuntu 16.04'
-
-variables:
-  GOBIN:  '$(GOPATH)/bin' # Go binaries path
-  GOROOT: '/usr/local/go1.12' # Go installation path
-  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
-  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
+  vmImage: 'Ubuntu 18.04'
 
 steps:
-- task: GoTool@0
-  inputs:
-    version: '1.12' 
-    #goPath: # Optional
-    #goBin: # Optional
-- script: |
-    mkdir -p '$(GOBIN)'
-    mkdir -p '$(GOPATH)/pkg'
-    mkdir -p '$(GOPATH)/bin'
-    mkdir -p '$(modulePath)'
-    mkdir -p '/home/vsts/go/bin'
-    shopt -s extglob
-    shopt -s dotglob
-    mv !(gopath) '$(modulePath)'
-    echo '##vso[task.prependpath]$(GOBIN)'
-    echo '##vso[task.prependpath]$(GOROOT)/bin'
-  displayName: 'Set up the Go workspace'
-
-- script: sudo -E scripts/install_ci_integration_tools.sh && ./scripts/ci_integration_tests.sh
-  workingDirectory: '$(modulePath)'
-  displayName: 'Run integration tests in XTerm'
+- script: sudo -E make devcontainer-release
+  displayName: 'Build, Test and *Publish *(only on master)'
+  env:
+    BUILD_NUMBER: $(Build.BuildId)
+    DOCKER_USERNAME: $(DOCKER_USERNAME)
+    DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+    GITHUB_TOKEN: $(GITHUB_TOKEN)
+    IS_CI: 1
+    PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+    BRANCH: $(Build.SourceBranchName)
