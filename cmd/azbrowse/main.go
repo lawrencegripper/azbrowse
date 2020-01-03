@@ -47,8 +47,14 @@ func run(settings *config.Settings) {
 	// Load the db
 	storage.LoadDB()
 
+	// Start tracking async responses from ARM
+	responseProcessor, err := views.StartWatchingAsyncARMRequests(ctx)
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	// Create an ARMClient instance for us to use
-	armClient := armclient.NewClientFromCLI(settings.TenantID)
+	armClient := armclient.NewClientFromCLI(settings.TenantID, responseProcessor)
 	armclient.LegacyInstance = *armClient
 
 	// Initialize the expanders which will let the user walk the tree of

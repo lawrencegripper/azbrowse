@@ -23,10 +23,14 @@ const (
 // TokenFunc is the interface to meet for functions which retrieve tokens for the ARMClient
 type TokenFunc func(clearCache bool) (AzCLIToken, error)
 
+// ResponseProcessor can be used to handle additional actions once a response is received
+type ResponseProcessor func(response *http.Response, responseBody string)
+
 // Client is used to talk to the ARM API's in Azure
 type Client struct {
-	client   *http.Client
-	tenantID string
+	client             *http.Client
+	tenantID           string
+	responseProcessors []ResponseProcessor
 
 	acquireToken TokenFunc
 }
@@ -36,13 +40,14 @@ type Client struct {
 var LegacyInstance Client
 
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
-func NewClientFromCLI(tenantID string) *Client {
+func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) *Client {
 	aquireToken := func(clearCache bool) (AzCLIToken, error) {
 		return aquireTokenFromAzCLI(clearCache, tenantID)
 	}
 	return &Client{
-		acquireToken: aquireToken,
-		client:       &http.Client{},
+		responseProcessors: responseProcessors,
+		acquireToken:       aquireToken,
+		client:             &http.Client{},
 	}
 }
 
@@ -103,6 +108,23 @@ func (c *Client) DoRequest(ctx context.Context, method, path string) (string, er
 	return c.DoRequestWithBody(ctx, method, path, "")
 }
 
+// DoRawRequest makes a raw request with ARM authentication headers set
+func (c *Client) DoRawRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
+	cliToken, err := c.acquireToken(false)
+	if err != nil {
+		return nil, errors.New("Failed to acquire auth token: " + err.Error())
+	}
+	c.tenantID = cliToken.Tenant
+
+	req.Header.Set("Authorization", cliToken.TokenType+" "+cliToken.AccessToken)
+	req.Header.Set("User-Agent", userAgentStr)
+	req.Header.Set("x-ms-client-request-id", newUUID())
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+
+	return c.client.Do(req.WithContext(ctx))
+}
+
 // DoRequestWithBody makes an ARM rest request
 func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body string) (string, error) {
 	span, _ := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
@@ -118,19 +140,8 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 		return "", errors.New("Failed to create request for body: " + err.Error())
 	}
 
-	cliToken, err := c.acquireToken(false)
-	if err != nil {
-		return "", errors.New("Failed to acquire auth token: " + err.Error())
-	}
-	c.tenantID = cliToken.Tenant
+	response, err := c.DoRawRequest(ctx, req)
 
-	req.Header.Set("Authorization", cliToken.TokenType+" "+cliToken.AccessToken)
-	req.Header.Set("User-Agent", userAgentStr)
-	req.Header.Set("x-ms-client-request-id", newUUID())
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-
-	response, err := c.client.Do(req.WithContext(ctx))
 	if response != nil && response.StatusCode == 401 {
 		// This might be because the token we've cached has expired.
 		// Get a new token forcing it to clear cache
@@ -160,6 +171,11 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 
 	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
+
+	// Call the response Processors
+	for _, responseProcessor := range c.responseProcessors {
+		responseProcessor(response, string(buf))
+	}
 
 	if err != nil {
 		wrappedError := errors.New("Request failed: " + err.Error() + " ResponseErr:" + responseErr.Error())

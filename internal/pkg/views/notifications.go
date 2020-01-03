@@ -218,12 +218,14 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 		}
 	}()
 
-	eventing.SendStatusEvent(eventing.StatusEvent{
+	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
 		Message:    "bob doing things",
 		InProgress: true,
 		IsToast:    true,
-		Timeout:    time.Second * 10,
+		Timeout:    time.Second * 45,
 	})
+
+	done()
 
 	return widget
 }
