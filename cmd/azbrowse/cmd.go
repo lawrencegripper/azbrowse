@@ -30,6 +30,7 @@ func handleRunCmd(
 
 	if navigateResource != nil && len(*navigateResource) > 0 {
 		settings.NavigateToID = *navigateResource
+		settings.ShouldRender = false
 	}
 
 	if fuzzerDurationMinutes != nil && *fuzzerDurationMinutes > 0 {
@@ -60,7 +61,9 @@ func usageAndExit() {
 }
 
 func handleCommandAndArgs() {
-	settings := config.Settings{}
+	settings := config.Settings{
+		ShouldRender: true,
+	}
 
 	// Root command
 	runCmd := flag.NewFlagSet("run", flag.ExitOnError)

@@ -20,20 +20,21 @@ import (
 
 // ItemWidget is response for showing the text response from the Rest requests
 type ItemWidget struct {
-	x, y        int
-	w, h        int
-	hideGuids   bool
-	content     string
-	contentType expanders.ExpanderResponseType
-	view        *gocui.View
-	g           *gocui.Gui
+	x, y         int
+	w, h         int
+	hideGuids    bool
+	content      string
+	contentType  expanders.ExpanderResponseType
+	view         *gocui.View
+	shouldRender bool
+	g            *gocui.Gui
 }
 
 // NewItemWidget creates a new instance of ItemWidget
-func NewItemWidget(x, y, w, h int, hideGuids bool, content string) *ItemWidget {
+func NewItemWidget(x, y, w, h int, hideGuids bool, shouldRender bool, content string) *ItemWidget {
 	configureYAMLHighlighting()
 
-	return &ItemWidget{x: x, y: y, w: w, h: h, hideGuids: hideGuids, content: content}
+	return &ItemWidget{x: x, y: y, w: w, h: h, hideGuids: hideGuids, shouldRender: shouldRender, content: content}
 }
 
 // Layout draws the widget in the gocui view
@@ -52,50 +53,52 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	expanders.ItemWidgetWidth = width
 	v.Clear()
 
-	if w.content == "" {
-		return nil
-	}
-
-	if w.hideGuids {
-		if w.hideGuids {
-			w.content = stripSecretVals(w.content)
-		}
-	}
-	switch w.contentType {
-	case expanders.ResponseJSON:
-		d := json.NewDecoder(strings.NewReader(w.content))
-		d.UseNumber()
-		var obj interface{}
-		err = d.Decode(&obj)
-		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
-				InProgress: false,
-				Failure:    true,
-				Message:    "Failed to display as JSON: " + err.Error(),
-				Timeout:    time.Duration(time.Second * 4),
-			})
-			fmt.Fprint(v, w.content)
+	if w.shouldRender {
+		if w.content == "" {
 			return nil
 		}
 
-		f := colorjson.NewFormatter()
-		f.Indent = 2
-		s, err := f.Marshal(obj)
-		if err != nil {
-			fmt.Fprint(v, w.content)
-		} else {
-			fmt.Fprint(v, string(s))
+		if w.hideGuids {
+			if w.hideGuids {
+				w.content = stripSecretVals(w.content)
+			}
 		}
-	case expanders.ResponseYAML:
-		var buf bytes.Buffer
-		err = quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
-		if err != nil {
+		switch w.contentType {
+		case expanders.ResponseJSON:
+			d := json.NewDecoder(strings.NewReader(w.content))
+			d.UseNumber()
+			var obj interface{}
+			err = d.Decode(&obj)
+			if err != nil {
+				eventing.SendStatusEvent(eventing.StatusEvent{
+					InProgress: false,
+					Failure:    true,
+					Message:    "Failed to display as JSON: " + err.Error(),
+					Timeout:    time.Duration(time.Second * 4),
+				})
+				fmt.Fprint(v, w.content)
+				return nil
+			}
+
+			f := colorjson.NewFormatter()
+			f.Indent = 2
+			s, err := f.Marshal(obj)
+			if err != nil {
+				fmt.Fprint(v, w.content)
+			} else {
+				fmt.Fprint(v, string(s))
+			}
+		case expanders.ResponseYAML:
+			var buf bytes.Buffer
+			err = quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
+			if err != nil {
+				fmt.Fprint(v, w.content)
+			} else {
+				fmt.Fprint(v, buf.String())
+			}
+		default:
 			fmt.Fprint(v, w.content)
-		} else {
-			fmt.Fprint(v, buf.String())
 		}
-	default:
-		fmt.Fprint(v, w.content)
 	}
 
 	return nil
@@ -168,6 +171,11 @@ func (w *ItemWidget) GetContent() string {
 // GetContentType returns the current content type
 func (w *ItemWidget) GetContentType() expanders.ExpanderResponseType {
 	return w.contentType
+}
+
+// SetShouldRender set the shouldRender value of this item
+func (w *ItemWidget) SetShouldRender(val bool) {
+	w.shouldRender = val
 }
 
 func configureYAMLHighlighting() {
