@@ -371,7 +371,7 @@ func (h *ListOpenHandler) Invoke() error {
 		err = open.Run(url)
 	}
 	if err != nil {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
 			Failure:    true,
 			Message:    "Failed opening resources in browser: " + err.Error(),
@@ -549,7 +549,7 @@ func (h *ListUpdateHandler) Invoke() error {
 
 	_, err = tmpFile.WriteString(formattedContent)
 	if err != nil {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
 			Failure:    true,
 			Message:    "Failed saving file for editing: " + err.Error(),
@@ -559,7 +559,7 @@ func (h *ListUpdateHandler) Invoke() error {
 	}
 	err = tmpFile.Close()
 	if err != nil {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
 			Failure:    true,
 			Message:    "Failed closing file: " + err.Error(),

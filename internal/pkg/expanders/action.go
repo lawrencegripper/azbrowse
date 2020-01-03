@@ -36,7 +36,7 @@ func (e *ActionExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) 
 func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	method := "POST"
 
-	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 		InProgress: true,
 		Message:    "Action:" + currentItem.Name + " @ " + currentItem.ID,
 		Timeout:    time.Duration(time.Second * 45),

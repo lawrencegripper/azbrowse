@@ -154,7 +154,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 
 		time.Sleep(time.Second * 1)
 
-		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+		_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 			Message:    "Updating API Version details",
 			InProgress: true,
 		})

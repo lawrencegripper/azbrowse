@@ -48,7 +48,7 @@ func TestStatusEvent_Update_shouldntSetCreatedAtOrID(t *testing.T) {
 	id := uuid.NewV4()
 
 	// Create already initialized event to simulate an update scenario
-	s := StatusEvent{
+	s := &StatusEvent{
 		createdAt: createdAt,
 		id:        id,
 	}

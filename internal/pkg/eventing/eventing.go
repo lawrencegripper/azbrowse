@@ -55,11 +55,11 @@ func (s *StatusEvent) HasExpired() bool {
 
 // Update sends and update to the status event
 func (s *StatusEvent) Update() {
-	SendStatusEvent(*s)
+	SendStatusEvent(s)
 }
 
 // SendStatusEvent sends status events
-func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
+func SendStatusEvent(s *StatusEvent) (*StatusEvent, func()) {
 	if s.id == [16]byte{} {
 		s.id = uuid.NewV4()
 	}

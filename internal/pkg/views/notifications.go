@@ -25,7 +25,7 @@ type NotificationWidget struct {
 	x, y                          int
 	w                             int
 	pendingDeletes                []*expanders.TreeNode
-	toastNotifications            map[string]eventing.StatusEvent
+	toastNotifications            map[string]*eventing.StatusEvent
 	deleteMutex                   sync.Mutex // ensure delete occurs only once
 	deleteInProgress              bool
 	gui                           *gocui.Gui
@@ -36,7 +36,7 @@ type NotificationWidget struct {
 // delete once confirmed
 func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 	if w.deleteInProgress {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			Failure: true,
 			Message: "Delete already in progress. Please wait for completion.",
 			Timeout: time.Second * 5,
@@ -45,7 +45,7 @@ func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 	}
 
 	if item.DeleteURL == "" {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			Failure: true,
 			Message: "Item `" + item.Name + "` doesn't support delete",
 			Timeout: time.Second * 5,
@@ -57,7 +57,7 @@ func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 	// current terminal size
 	_, yMax := w.gui.Size()
 	if len(w.pendingDeletes) > (yMax - 12) {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			Failure: true,
 			Message: "Can't add `" + item.Name + "` run out of space to draw the `Pending delete` list!",
 			Timeout: time.Second * 5,
@@ -70,7 +70,7 @@ func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 
 	for _, i := range w.pendingDeletes {
 		if i.DeleteURL == item.DeleteURL {
-			eventing.SendStatusEvent(eventing.StatusEvent{
+			eventing.SendStatusEvent(&eventing.StatusEvent{
 				Failure: true,
 				Message: "Item already `" + item.Name + "` in pending delete list",
 				Timeout: time.Second * 5,
@@ -85,7 +85,7 @@ func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 // ConfirmDelete delete all queued/pending deletes
 func (w *NotificationWidget) ConfirmDelete() {
 	if w.deleteInProgress {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			Failure: true,
 			Message: "Delete already in progress. Please wait for completion.",
 			Timeout: time.Second * 5,
@@ -111,7 +111,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 			w.deleteInProgress = false
 		}()
 
-		event, _ := eventing.SendStatusEvent(eventing.StatusEvent{
+		event, _ := eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Starting to delete items",
 			Timeout:    time.Second * 15,
@@ -165,7 +165,7 @@ func (w *NotificationWidget) ClearPendingDeletes() {
 	w.deleteMutex.Lock()
 	w.gui.Update(func(g *gocui.Gui) error {
 
-		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+		_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Clearing pending deletes",
 			Timeout:    time.Second * 2,
@@ -188,7 +188,7 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 		w:                  w,
 		gui:                g,
 		pendingDeletes:     []*expanders.TreeNode{},
-		toastNotifications: map[string]eventing.StatusEvent{},
+		toastNotifications: map[string]*eventing.StatusEvent{},
 		client:             client,
 	}
 
@@ -203,7 +203,7 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 			timeout := time.After(time.Second)
 			select {
 			case eventObjRaw := <-newEvents:
-				eventObj := eventObjRaw.(eventing.StatusEvent)
+				eventObj := eventObjRaw.(*eventing.StatusEvent)
 				if eventObj.IsToast {
 					widget.toastNotifications[eventObj.ID()] = eventObj
 				}
@@ -218,7 +218,7 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 		}
 	}()
 
-	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 		Message:    "bob doing things",
 		InProgress: true,
 		IsToast:    true,
