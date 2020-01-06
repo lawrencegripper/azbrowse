@@ -45,6 +45,8 @@ RUN apt-get update \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
+ENV GIT_PROMPT_START='\033[1;36mazb-devcon>\033[0m\033[0;33m\w\a\033[0m'
+
 # Save command line history 
 RUN echo "export HISTFILE=/root/commandhistory/.bash_history" >> "/root/.bashrc" \
     && echo "export PROMPT_COMMAND='history -a'" >> "/root/.bashrc" \

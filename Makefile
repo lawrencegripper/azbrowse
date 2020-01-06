@@ -37,6 +37,11 @@ build: swagger-codegen test checks
 debug:
 	GO111MODULE=on go build ./cmd/azbrowse &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
 
+## dcterminal 
+##		Starts an interactive terminal running inside the devcontainer
+dcterminal:
+	docker exec -it -w /workspaces/azbrowse azbdev /bin/bash 
+
 ## fmt: 
 ##		Format code
 fmt:
