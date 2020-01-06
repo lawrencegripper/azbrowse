@@ -58,6 +58,16 @@ func (s *StatusEvent) Update() {
 	SendStatusEvent(s)
 }
 
+// Done marks the status event as done
+func (s *StatusEvent) Done() {
+	s.InProgress = false
+	if s.IsToast {
+		// Hide completed toast after a few secs
+		s.Timeout = time.Duration(time.Second * 5)
+	}
+	s.Update()
+}
+
 // SendStatusEvent sends status events
 func SendStatusEvent(s *StatusEvent) (*StatusEvent, func()) {
 	if s.id == [16]byte{} {
@@ -73,12 +83,7 @@ func SendStatusEvent(s *StatusEvent) (*StatusEvent, func()) {
 	}
 
 	doneFunc := func() {
-		s.InProgress = false
-		if s.IsToast {
-			// Hide completed toast after a few secs
-			s.Timeout = time.Duration(time.Second * 5)
-		}
-		s.Update()
+		s.Done()
 	}
 
 	Publish("statusEvent", s)
