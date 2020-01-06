@@ -59,9 +59,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		}
 
 		if w.hideGuids {
-			if w.hideGuids {
-				w.content = stripSecretVals(w.content)
-			}
+			w.content = stripSecretVals(w.content)
 		}
 		switch w.contentType {
 		case expanders.ResponseJSON:
