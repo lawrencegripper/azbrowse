@@ -123,13 +123,12 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		w.currentMessage.Message = stripSecretVals(w.currentMessage.Message)
 	}
 
-	if w.currentMessage.InProgress {
+	if w.currentMessage.InProgress || w.currentMessage.Failure {
 		fmt.Fprint(v, style.Loading(w.currentMessage.Icon()+"  "+w.currentMessage.Message))
-	} else if w.currentMessage.Failure {
-		fmt.Fprint(v, style.Loading(w.currentMessage.Icon()+" "+w.currentMessage.Message))
 	} else {
 		fmt.Fprint(v, style.Completed(w.currentMessage.Icon()+" "+w.currentMessage.Message))
 	}
+
 	fmt.Fprint(v, w.messageAddition)
 
 	return nil
