@@ -2,7 +2,15 @@ pool:
   vmImage: 'Ubuntu 18.04'
 
 steps:
-- script: sudo -E make devcontainer-release
+- script: |
+    # WAT? Yeah if the build doesn't have access to the variable it sets it to a litaral of the variable name with dollar sign and all
+    # this then causes make to fail so we find these and unset them. So GITHUB_TOKEN='$GITHUB_TOKEN' if we don't remove it. 
+    if [[ "$REASON" = "PullRequest" ]]; then
+      echo "Pull request so removing secret values which aren't set anyway but hey ho"
+      unset GITHUB_TOKEN
+      unset DOCKER_PASSWORD
+    fi
+    sudo -E make devcontainer-release
   displayName: 'Build, Test and *Publish *(only on master)'
   env:
     BUILD_NUMBER: $(Build.BuildId)
@@ -11,4 +19,5 @@ steps:
     GITHUB_TOKEN: $(GITHUB_TOKEN)
     IS_CI: 1
     PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+    REASON: $(Build.Reason)
     BRANCH: $(Build.SourceBranchName)
