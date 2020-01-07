@@ -4,6 +4,7 @@
         "--fast"
     ],
     "go.useLanguageServer": true,
+    "go.useGoProxyToCheckForToolUpdates": false,
     "go.inferGopath": false,
     "go.delveConfig": {
         "dlvLoadConfig": {
