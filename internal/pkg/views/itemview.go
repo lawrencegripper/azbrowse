@@ -187,31 +187,31 @@ func configureYAMLHighlighting() {
 		chroma.Rules{
 			"root": {
 				chroma.Include("whitespace"),
-				{`#.*`, chroma.Comment, nil},                         //nolint:govet
-				{`!![^\s]+`, chroma.CommentPreproc, nil},             //nolint:govet
-				{`&[^\s]+`, chroma.CommentPreproc, nil},              //nolint:govet
-				{`\*[^\s]+`, chroma.CommentPreproc, nil},             //nolint:govet
-				{`^%include\s+[^\n\r]+`, chroma.CommentPreproc, nil}, //nolint:govet
-				{`([>|+-]\s+)(\s+)((?:(?:.*?$)(?:[\n\r]*?)?)*)`, chroma.ByGroups(chroma.StringDoc, chroma.StringDoc, chroma.StringDoc), nil}, //nolint:govet
-				chroma.Include("value"),                //nolint:govet
-				{`[?:,\[\]]`, chroma.Punctuation, nil}, //nolint:govet
-				{`.`, chroma.Text, nil},                //nolint:govet
+				{Pattern: `#.*`, Type: chroma.Comment, Mutator: nil},
+				{Pattern: `!![^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
+				{Pattern: `&[^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
+				{Pattern: `\*[^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
+				{Pattern: `^%include\s+[^\n\r]+`, Type: chroma.CommentPreproc, Mutator: nil},
+				{Pattern: `([>|+-]\s+)(\s+)((?:(?:.*?$)(?:[\n\r]*?)?)*)`, Type: chroma.ByGroups(chroma.StringDoc, chroma.StringDoc, chroma.StringDoc), Mutator: nil},
+				chroma.Include("value"),
+				{Pattern: `[?:,\[\]]`, Type: chroma.Punctuation, Mutator: nil},
+				{Pattern: `.`, Type: chroma.Text, Mutator: nil},
 			},
 			"value": {
-				{chroma.Words(``, `\b`, "true", "false", "null"), chroma.KeywordConstant, nil},                       //nolint:govet
-				{`"(?:\\.|[^"])*"`, chroma.StringDouble, nil},                                                        //nolint:govet
-				{`'(?:\\.|[^'])*'`, chroma.StringSingle, nil},                                                        //nolint:govet
-				{`\d\d\d\d-\d\d-\d\d([T ]\d\d:\d\d:\d\d(\.\d+)?(Z|\s+[-+]\d+)?)?`, chroma.LiteralDate, nil},          //nolint:govet
-				{`\b[+\-]?(0x[\da-f]+|0o[0-7]+|(\d+\.?\d*|\.?\d+)(e[\+\-]?\d+)?|\.inf|\.nan)\b`, chroma.Number, nil}, //nolint:govet
-				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)(\d+\.?\d*|\.?\d+)(\s)`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.Number, chroma.Whitespace), nil}, //nolint:govet
-				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)(true)\b`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), nil},                    //nolint:govet
-				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)(false)\b`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), nil},                   //nolint:govet
-				{`\b([\w]+)([ \t]*)([:]+)([ \t]*)([\w\./\-_]+)\b`, chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.StringDouble), nil},                     //nolint:govet
-				// {`\b(?:[\w]+)(?:[:\b]+)(?:[\w+])\b`, ByGroups(KeywordReserved, Punctuation, StringDouble), nil},
-				{`\b[\w]+\b`, chroma.Text, nil}, //nolint:govet
+				{Pattern: chroma.Words(``, `\b`, "true", "false", "null"), Type: chroma.KeywordConstant, Mutator: nil},
+				{Pattern: `"(?:\\.|[^"])*"`, Type: chroma.StringDouble, Mutator: nil},
+				{Pattern: `'(?:\\.|[^'])*'`, Type: chroma.StringSingle, Mutator: nil},
+				{Pattern: `\d\d\d\d-\d\d-\d\d([T ]\d\d:\d\d:\d\d(\.\d+)?(Z|\s+[-+]\d+)?)?`, Type: chroma.LiteralDate, Mutator: nil},
+				{Pattern: `\b[+\-]?(0x[\da-f]+|0o[0-7]+|(\d+\.?\d*|\.?\d+)(e[\+\-]?\d+)?|\.inf|\.nan)\b`, Type: chroma.Number, Mutator: nil},
+				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(\d+\.?\d*|\.?\d+)(\s)`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.Number, chroma.Whitespace), Mutator: nil},
+				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(true)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), Mutator: nil},
+				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(false)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), Mutator: nil},
+				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)([\w\./\-_]+)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.StringDouble), Mutator: nil},
+				// {Pattern: `\b(?:[\w]+)(?:[:\b]+)(?:[\w+])\b`, Type: ByGroups(KeywordReserved, Punctuation, StringDouble), Mutator: nil},
+				{Pattern: `\b[\w]+\b`, Type: chroma.Text, Mutator: nil},
 			},
 			"whitespace": {
-				{`\s+`, chroma.Whitespace, nil}, //nolint:govet
+				{Pattern: `\s+`, Type: chroma.Whitespace, Mutator: nil},
 			},
 		},
 	)
