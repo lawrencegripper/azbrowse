@@ -104,6 +104,10 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 func (w *StatusbarWidget) addStatusEvent(eventObj interface{}) {
 	// See if we have any new events
 	event := eventObj.(*eventing.StatusEvent)
+	if event.IsToast {
+		// Leave toast notifications for the notifications panel
+		return
+	}
 	w.messages[event.ID()] = event
 	// Favor the most recent message
 	w.currentMessage = event
