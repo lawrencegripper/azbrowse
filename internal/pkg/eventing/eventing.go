@@ -43,6 +43,12 @@ func (s *StatusEvent) ID() string {
 	return s.id.String()
 }
 
+// SetTimeout sets the timeout for a message, starting from now
+func (s *StatusEvent) SetTimeout(t time.Duration) {
+	s.createdAt = time.Now()
+	s.Timeout = t
+}
+
 // CreatedAt returns the time of the message creation
 func (s *StatusEvent) CreatedAt() time.Time {
 	return s.createdAt
@@ -50,7 +56,7 @@ func (s *StatusEvent) CreatedAt() time.Time {
 
 // HasExpired returns true if the message has expired
 func (s *StatusEvent) HasExpired() bool {
-	return s.createdAt.Add(s.Timeout).After(time.Now())
+	return s.createdAt.Add(s.Timeout).Before(time.Now())
 }
 
 // Update sends and update to the status event

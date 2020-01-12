@@ -15,22 +15,22 @@ func TestStatusEvent_HasExpired(t *testing.T) {
 		hasExpired bool
 	}{
 		{
-			name: "non-expired event",
+			name: "expired event",
 			fields: StatusEvent{
 				Message:   "bob",
 				createdAt: time.Now().Add(time.Second * 45 * -1), // 45 secs ago
 				Timeout:   time.Second * 15,
 			},
-			hasExpired: false,
+			hasExpired: true,
 		},
 		{
-			name: "expired event",
+			name: "non-expired event",
 			fields: StatusEvent{
 				Message:   "bob",
 				createdAt: time.Now().Add(time.Second * 10 * -1), // 10 secs ago
 				Timeout:   time.Second * 15,
 			},
-			hasExpired: true,
+			hasExpired: false,
 		},
 	}
 	for _, tt := range tests {
@@ -81,12 +81,13 @@ func TestStatusEvent_End2End_Expired(t *testing.T) {
 	eventObj := eventRaw.(*StatusEvent)
 
 	if eventObj.HasExpired() {
-		t.Log("Event succesfully expired")
+		t.Log("Event successfully expired")
 	} else {
 		t.Error("Event didn't expire")
 	}
 }
 
+// Todo: Maybe squish into above as table driven test
 func TestStatusEvent_End2End_Valid(t *testing.T) {
 	newEvents := SubscribeToStatusEvents()
 	defer Unsubscribe(newEvents)
