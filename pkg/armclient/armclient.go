@@ -24,7 +24,7 @@ const (
 type TokenFunc func(clearCache bool) (AzCLIToken, error)
 
 // ResponseProcessor can be used to handle additional actions once a response is received
-type ResponseProcessor func(response *http.Response, responseBody string)
+type ResponseProcessor func(requestPath string, response *http.Response, responseBody string)
 
 // Client is used to talk to the ARM API's in Azure
 type Client struct {
@@ -174,7 +174,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 
 	// Call the response Processors
 	for _, responseProcessor := range c.responseProcessors {
-		responseProcessor(response, string(buf))
+		responseProcessor(path, response, string(buf))
 	}
 
 	if err != nil {
