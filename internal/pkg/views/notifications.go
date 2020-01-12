@@ -154,6 +154,7 @@ func (w *NotificationWidget) ConfirmDelete() {
 
 		event.Message = "Delete request sent"
 		event.InProgress = false
+		event.SetTimeout(time.Second * 2)
 		event.Update()
 
 		w.pendingDeletes = []*expanders.TreeNode{}
@@ -211,21 +212,16 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 				// Update the UI
 			}
 			for ID, toast := range widget.toastNotifications {
-				if !toast.HasExpired() {
+				if toast.HasExpired() {
 					delete(widget.toastNotifications, ID)
 				}
 			}
+
+			g.Update(func(gui *gocui.Gui) error {
+				return nil
+			})
 		}
 	}()
-
-	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
-		Message:    "bob doing things",
-		InProgress: true,
-		IsToast:    true,
-		Timeout:    time.Second * 45,
-	})
-
-	done()
 
 	return widget
 }

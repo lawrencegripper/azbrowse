@@ -2,9 +2,9 @@ package views
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -16,15 +16,14 @@ import (
 type response struct {
 	httpResponse *http.Response
 	body         string
+	requestPath  string
 }
 
 type pollItem struct {
-	requestURI string
-	pollURI    string
-	title      string
-	status     string
-	event      *eventing.StatusEvent
-	retryCount int
+	pollURI string
+	title   string
+	status  string
+	event   *eventing.StatusEvent
 }
 
 // StartWatchingAsyncARMRequests is used to start watching for any async response
@@ -60,11 +59,21 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 					}
 				}
 
+				parsedURL, err := url.Parse(request.requestPath)
+				if err != nil {
+					log.Panicf("Failed to parse url %s", request.requestPath)
+				}
+
+				resource := request.requestPath
+				pathSegments := strings.Split(parsedURL.Path, "/")
+				if len(pathSegments) >= 2 {
+					resource = strings.Join(pathSegments[len(pathSegments)-2:], "/")
+				}
+
 				item := pollItem{
-					pollURI:    strings.Join(pollLocation, ""),
-					requestURI: request.httpResponse.Request.RequestURI,
-					title:      request.httpResponse.Request.Method + " " + request.httpResponse.Request.RequestURI,
-					status:     "unknown",
+					pollURI: strings.Join(pollLocation, ""),
+					title:   request.httpResponse.Request.Method + " " + resource,
+					status:  "unknown",
 					event: &eventing.StatusEvent{
 						Message:    "Tracing async event to completion",
 						Timeout:    time.Minute * 15,
@@ -74,7 +83,7 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				}
 
 				eventing.SendStatusEvent(item.event)
-				inflightRequests[request.httpResponse.Request.RequestURI] = item
+				inflightRequests[request.requestPath] = item
 			}
 		}
 	}()
@@ -87,13 +96,15 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 			case <-ctx.Done():
 				// returning not to leak the goroutine
 				return
-			case <-time.After(time.Second * 5):
-				// Update items to see if any have changed
+			default:
+				// Continue
 			}
 
 			for ID, pollItem := range inflightRequests {
-				pollItem.retryCount = pollItem.retryCount + 1
-
+				_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
+					Message: "Polling async completion " + pollItem.pollURI,
+					Timeout: time.Second * 5,
+				})
 				req, err := http.NewRequest("GET", pollItem.pollURI, nil)
 				if err != nil {
 					panic(err)
@@ -102,29 +113,33 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				if err != nil {
 					panic(err)
 				}
+				done()
 
 				if response.StatusCode == 200 {
 					// completed
 					pollItem.event.InProgress = false
-					pollItem.event.Message = pollItem.title + "COMPLETED"
+					pollItem.event.Message = pollItem.title + " COMPLETED"
+					pollItem.event.SetTimeout(time.Second * 5)
 					eventing.SendStatusEvent(pollItem.event)
+
 					delete(inflightRequests, ID)
 				}
 
 				if isAsyncResponse(response) {
 					// continue processing
-					pollItem.event.Message = pollItem.title + fmt.Sprintf(" poll#:%v", pollItem.retryCount)
+					pollItem.event.Message = pollItem.title
 					eventing.SendStatusEvent(pollItem.event)
 				}
 
-				// Get status from the body here...
-
+				// Pause between each poll item so as not to make huge volume of requests.
+				<-time.After(time.Second * 5)
 			}
 		}
 	}()
 
-	return func(httpResponse *http.Response, responseBody string) {
+	return func(requestPath string, httpResponse *http.Response, responseBody string) {
 		requestChan <- response{
+			requestPath:  requestPath,
 			httpResponse: httpResponse,
 			body:         responseBody,
 		}
