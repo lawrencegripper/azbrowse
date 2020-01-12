@@ -20,16 +20,12 @@ func LoadDB() {
 		dbLocation = user.HomeDir + "/.azbrowse.db"
 	}
 
-	suppressWaitingMessage := false
-	go func() {
-		time.Sleep(2 * time.Second)
-		if !suppressWaitingMessage {
-			fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
-		}
-	}()
+	waitingMessageTimer := time.AfterFunc(2*time.Second, func() {
+		fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
+	})
 
 	dbCreate, err := bolt.Open(dbLocation, 0600, nil)
-	suppressWaitingMessage = true
+	waitingMessageTimer.Stop()
 	if err != nil {
 		log.Fatal(err)
 	}
