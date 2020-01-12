@@ -65,3 +65,43 @@ func TestStatusEvent_Update_shouldntSetCreatedAtOrID(t *testing.T) {
 	}
 
 }
+
+func TestStatusEvent_End2End_Expired(t *testing.T) {
+	newEvents := SubscribeToStatusEvents()
+	defer Unsubscribe(newEvents)
+
+	SendStatusEvent(&StatusEvent{
+		Message: "bob",
+		Timeout: time.Second * 5,
+	})
+
+	<-time.After(time.Second * 6)
+
+	eventRaw := <-newEvents
+	eventObj := eventRaw.(*StatusEvent)
+
+	if eventObj.HasExpired() {
+		t.Log("Event succesfully expired")
+	} else {
+		t.Error("Event didn't expire")
+	}
+}
+
+func TestStatusEvent_End2End_Valid(t *testing.T) {
+	newEvents := SubscribeToStatusEvents()
+	defer Unsubscribe(newEvents)
+
+	SendStatusEvent(&StatusEvent{
+		Message: "bob",
+		Timeout: time.Second * 10,
+	})
+
+	<-time.After(time.Second * 5)
+
+	eventRaw := <-newEvents
+	eventObj := eventRaw.(*StatusEvent)
+
+	if eventObj.HasExpired() {
+		t.Error("Event shouldn't have expired")
+	}
+}
