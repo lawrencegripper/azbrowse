@@ -96,7 +96,7 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 			case <-ctx.Done():
 				// returning not to leak the goroutine
 				return
-			default:
+			case <-time.After(time.Second * 1):
 				// Continue
 			}
 
