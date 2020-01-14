@@ -102,8 +102,9 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 
 			for ID, pollItem := range inflightRequests {
 				_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
-					Message: "Polling async completion " + pollItem.pollURI,
-					Timeout: time.Second * 5,
+					Message:    "Polling async completion " + pollItem.pollURI,
+					Timeout:    time.Second * 5,
+					InProgress: true,
 				})
 				req, err := http.NewRequest("GET", pollItem.pollURI, nil)
 				if err != nil {
@@ -113,7 +114,6 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				if err != nil {
 					panic(err)
 				}
-				done()
 
 				if response.StatusCode == 200 {
 					// completed
@@ -132,7 +132,8 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				}
 
 				// Pause between each poll item so as not to make huge volume of requests.
-				<-time.After(time.Second * 5)
+				<-time.After(time.Second * 2)
+				done()
 			}
 		}
 	}()

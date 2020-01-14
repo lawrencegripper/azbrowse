@@ -20,9 +20,10 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 	newItems := []*TreeNode{}
 
 	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
-		InProgress: true,
 		Message:    "Opening: " + currentItem.ID,
+		InProgress: true,
 	})
+	defer done()
 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()

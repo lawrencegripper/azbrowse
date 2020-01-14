@@ -2,7 +2,6 @@ package expanders
 
 import (
 	"context"
-	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -39,7 +38,6 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 		InProgress: true,
 		Message:    "Action:" + currentItem.Name + " @ " + currentItem.ID,
-		Timeout:    time.Duration(time.Second * 45),
 	})
 	defer done()
 
