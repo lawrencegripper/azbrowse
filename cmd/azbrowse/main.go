@@ -47,8 +47,14 @@ func run(settings *config.Settings) {
 	// Load the db
 	storage.LoadDB()
 
+	// Start tracking async responses from ARM
+	responseProcessor, err := views.StartWatchingAsyncARMRequests(ctx)
+	if err != nil {
+		log.Panicln(err)
+	}
+
 	// Create an ARMClient instance for us to use
-	armClient := armclient.NewClientFromCLI(settings.TenantID)
+	armClient := armclient.NewClientFromCLI(settings.TenantID, responseProcessor)
 	armclient.LegacyInstance = *armClient
 
 	// Initialize the expanders which will let the user walk the tree of
@@ -148,7 +154,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 
 		time.Sleep(time.Second * 1)
 
-		_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+		_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 			Message:    "Updating API Version details",
 			InProgress: true,
 		})

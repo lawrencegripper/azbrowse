@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -14,7 +15,11 @@ import (
 
 // LoadActionsView Shows available actions for the current resource
 func LoadActionsView(ctx context.Context, list *ListWidget) error {
-	list.statusView.Status("Getting available Actions", true)
+	statusEvent, _ := eventing.SendStatusEvent(&eventing.StatusEvent{
+		Message:    "Getting available actions",
+		InProgress: true,
+	})
+	defer statusEvent.Done()
 
 	var namespace string
 	var armType string
@@ -74,7 +79,6 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 	if len(items) > 1 {
 		list.SetNodes(items)
 	}
-	list.statusView.Status("Fetched available Actions", false)
 
 	return nil
 }

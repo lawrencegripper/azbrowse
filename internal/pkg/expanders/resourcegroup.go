@@ -64,7 +64,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		span.SetTag("queryResponse", queryData)
 		span.SetTag("queryError", err)
 		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
+			eventing.SendStatusEvent(&eventing.StatusEvent{
 				InProgress: false,
 				Failure:    true,
 				Message:    "Getting query response: " + query + " " + err.Error(),
@@ -74,7 +74,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 		queryValue, err := fastJSONParser.Parse(string(queryData))
 		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
+			eventing.SendStatusEvent(&eventing.StatusEvent{
 				InProgress: false,
 				Failure:    true,
 				Message:    "Parsing query response: " + query,
@@ -187,7 +187,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	for _, rg := range resourceResponse.Resources {
 		resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
 		if err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
+			eventing.SendStatusEvent(&eventing.StatusEvent{
 				Failure: true,
 				Message: "Failed to get resouceVersion for the Type:" + rg.Type,
 				Timeout: time.Duration(time.Second * 5),

@@ -17,7 +17,7 @@ func ColorJSON(content string) string {
 	var obj interface{}
 	err := d.Decode(&obj)
 	if err != nil {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
 			Failure:    true,
 			Message:    "Failed to display as JSON: " + err.Error(),

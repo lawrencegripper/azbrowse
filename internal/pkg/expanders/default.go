@@ -66,7 +66,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	// Update the existing state as we have more up-to-date info
 	newStatus := DrawStatus(resource.Properties.ProvisioningState)
 	if newStatus != currentItem.StatusIndicator {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: true,
 			Message:    "Updated resource status -> " + DrawStatus(resource.Properties.ProvisioningState),
 			Timeout:    time.Duration(time.Second * 3),

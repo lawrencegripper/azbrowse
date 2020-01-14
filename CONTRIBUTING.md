@@ -4,28 +4,24 @@
 
 ### Environment Setup
 
-> Note: Golang 1.12 is recommended.
+The repository has a pre-configured `devcontainer` which can be used with VSCode to setup and run a fully configured build environment. 
 
-First, clone this repository. `azbrowse` is written in [Go][golang] and so you will want to set up your Go development environment first. If this is your first time, the [offical install guide][installguide] is probably a good place to start. Make sure you have `GOPATH/bin` in your `PATH`, using the instructions [here][gopath] as guidance on doing that.
 
-In addition to installing [Go][golang], there are a couple of tool dependencies you'll need. These are:
+1. Install [Remote Extensions Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
+2. Clone the Repo and open in VSCode 
+4. `CTRL`+`Shift`+`P` -> `Reopen in container` (or `cmd` on mac / however you get to your command panel in VSCode)
 
-- [Golang CI linter][golangcilinter]
-- [Dep; Go dependency management tool][golang]
-
-You can install these yourself following the instructions on their github pages, or you can run...
-
- ``` bash
- make setup
- ```
-
- This runs the script `scripts/install_dev_tools.sh`, which will install these tools for you.
+The first time you launch with the container a build will occur which can take some time, subsequent launches will use the cache so start immediately. 
 
 ## Building
 
 With your Go development environment set up, use `make` to build `azbrowse`.
 
-Take a look at the `Makefile` yourself, but the main rules are:
+### What Targets are there?
+
+Run `make help` to see what `targets` exist and what they do or take a look at the `Makefile` yourself. 
+
+Below are the simples ones to get you started.
 
 ### Run Tests and Build
 

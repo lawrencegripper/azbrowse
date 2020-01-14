@@ -22,13 +22,31 @@ type StatusEvent struct {
 	Timeout    time.Duration
 	createdAt  time.Time
 	InProgress bool
+	IsToast    bool
 	Failure    bool
 	id         uuid.UUID
+}
+
+// Icon returns an icon representing the event
+func (s *StatusEvent) Icon() string {
+	if s.InProgress {
+		return "⏳"
+	} else if s.Failure {
+		return "☠"
+	} else {
+		return "✓"
+	}
 }
 
 // ID returns the status message ID
 func (s *StatusEvent) ID() string {
 	return s.id.String()
+}
+
+// SetTimeout sets the timeout for a message, starting from now
+func (s *StatusEvent) SetTimeout(t time.Duration) {
+	s.createdAt = time.Now()
+	s.Timeout = t
 }
 
 // CreatedAt returns the time of the message creation
@@ -38,18 +56,32 @@ func (s *StatusEvent) CreatedAt() time.Time {
 
 // HasExpired returns true if the message has expired
 func (s *StatusEvent) HasExpired() bool {
-	return s.createdAt.Add(s.Timeout).After(time.Now())
+	return s.createdAt.Add(s.Timeout).Before(time.Now())
 }
 
 // Update sends and update to the status event
 func (s *StatusEvent) Update() {
-	SendStatusEvent(*s)
+	SendStatusEvent(s)
+}
+
+// Done marks the status event as done
+func (s *StatusEvent) Done() {
+	s.InProgress = false
+	if s.IsToast {
+		// Hide completed toast after a few secs
+		s.Timeout = time.Duration(time.Second * 5)
+	}
+	s.Update()
 }
 
 // SendStatusEvent sends status events
-func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
-	s.id = uuid.NewV4()
-	s.createdAt = time.Now()
+func SendStatusEvent(s *StatusEvent) (*StatusEvent, func()) {
+	if s.id == [16]byte{} {
+		s.id = uuid.NewV4()
+	}
+	if s.createdAt.IsZero() {
+		s.createdAt = time.Now()
+	}
 
 	// set default timeout
 	if s.Timeout == time.Duration(0) {
@@ -57,8 +89,7 @@ func SendStatusEvent(s StatusEvent) (StatusEvent, func()) {
 	}
 
 	doneFunc := func() {
-		s.InProgress = false
-		s.Update()
+		s.Done()
 	}
 
 	Publish("statusEvent", s)

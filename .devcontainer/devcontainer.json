@@ -12,6 +12,7 @@
 		"--security-opt",
 		"seccomp=unconfined",
 
+		"--name", "azbdev",
 		// Mount go mod cache
 		"-v", "azbrowse-gomodcache:/go/pkg",
 		// Cache vscode exentsions installs and homedir
@@ -27,7 +28,6 @@
 		// Mount azure, git and docker config
 		"-v", "${env:HOME}${env:USERPROFILE}/.azure:/root/.azure",
 		"-v", "${env:HOME}${env:USERPROFILE}/.gitconfig:/root/.gitconfig", // Required due to volume mount used for .vscode-server
-		"-v", "${env:HOME}${env:USERPROFILE}/.docker/config.json:/root/.docker/config.json"
 	],
 	// Use 'settings' to set *default* container specific settings.json values on container create. 
 	// You can edit these settings after create using File > Preferences > Settings > Remote.

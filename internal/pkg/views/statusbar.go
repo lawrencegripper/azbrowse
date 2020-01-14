@@ -17,7 +17,7 @@ type StatusbarWidget struct {
 	x, y            int
 	w               int
 	hideGuids       bool
-	messages        map[string]eventing.StatusEvent
+	messages        map[string]*eventing.StatusEvent
 	currentMessage  *eventing.StatusEvent
 	messageAddition string
 	HelpKeyBinding  string
@@ -31,7 +31,7 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 		y:         y,
 		w:         w,
 		hideGuids: hideGuids,
-		messages:  map[string]eventing.StatusEvent{},
+		messages:  map[string]*eventing.StatusEvent{},
 	}
 
 	widget.currentMessage = &eventing.StatusEvent{}
@@ -75,14 +75,14 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				for _, message := range widget.messages {
 					if message.InProgress {
 						foundInProgress = true
-						widget.currentMessage = &message
+						widget.currentMessage = message
 						break
 					}
 				}
 
 				if !foundInProgress {
 					for _, message := range widget.messages {
-						widget.currentMessage = &message
+						widget.currentMessage = message
 						break
 					}
 				}
@@ -103,10 +103,14 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 
 func (w *StatusbarWidget) addStatusEvent(eventObj interface{}) {
 	// See if we have any new events
-	event := eventObj.(eventing.StatusEvent)
+	event := eventObj.(*eventing.StatusEvent)
+	if event.IsToast {
+		// Leave toast notifications for the notifications panel
+		return
+	}
 	w.messages[event.ID()] = event
 	// Favor the most recent message
-	w.currentMessage = &event
+	w.currentMessage = event
 }
 
 // Layout draws the widget in the gocui view
@@ -123,13 +127,12 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		w.currentMessage.Message = stripSecretVals(w.currentMessage.Message)
 	}
 
-	if w.currentMessage.InProgress {
-		fmt.Fprint(v, style.Loading("⏳  "+w.currentMessage.Message))
-	} else if w.currentMessage.Failure {
-		fmt.Fprint(v, style.Loading("☠ "+w.currentMessage.Message))
+	if w.currentMessage.InProgress || w.currentMessage.Failure {
+		fmt.Fprint(v, style.Loading(w.currentMessage.Icon()+"  "+w.currentMessage.Message))
 	} else {
-		fmt.Fprint(v, style.Completed("✓ "+w.currentMessage.Message))
+		fmt.Fprint(v, style.Completed(w.currentMessage.Icon()+" "+w.currentMessage.Message))
 	}
+
 	fmt.Fprint(v, w.messageAddition)
 
 	return nil
@@ -137,7 +140,7 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 
 // Status updates the message in the status bar and whether to show loading indicator
 func (w *StatusbarWidget) Status(message string, loading bool) func() {
-	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
+	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 		Message:    message,
 		InProgress: loading,
 		Timeout:    time.Duration(time.Second * 3),

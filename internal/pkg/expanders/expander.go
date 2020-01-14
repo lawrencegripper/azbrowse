@@ -19,10 +19,11 @@ type expanderAndResponse struct {
 func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, []*TreeNode, error) {
 	newItems := []*TreeNode{}
 
-	_, done := eventing.SendStatusEvent(eventing.StatusEvent{
-		InProgress: true,
+	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 		Message:    "Opening: " + currentItem.ID,
+		InProgress: true,
 	})
+	defer done()
 
 	span, ctx := tracing.StartSpanFromContext(ctx, "expand:"+currentItem.ItemType+":"+currentItem.Name, tracing.SetTag("item", currentItem))
 	defer span.Finish()
@@ -73,7 +74,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 			span, _ := tracing.StartSpanFromContext(ctx, "subexpand:"+result.SourceDescription, tracing.SetTag("result", done))
 			// Did it fail?
 			if result.Err != nil {
-				eventing.SendStatusEvent(eventing.StatusEvent{
+				eventing.SendStatusEvent(&eventing.StatusEvent{
 					Failure: true,
 					Message: "Expander '" + result.SourceDescription + "' failed on resource: " + currentItem.ID + "Err: " + result.Err.Error(),
 					Timeout: time.Duration(time.Second * 15),
@@ -102,7 +103,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 			}
 			span.Finish()
 		case <-timeout:
-			eventing.SendStatusEvent(eventing.StatusEvent{
+			eventing.SendStatusEvent(&eventing.StatusEvent{
 				Failure: true,
 				Message: "Timed out opening:" + currentItem.ID,
 				Timeout: time.Duration(time.Second * 10),
@@ -116,7 +117,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
 		result := GetDefaultExpander().Expand(ctx, currentItem)
 		if result.Err != nil {
-			eventing.SendStatusEvent(eventing.StatusEvent{
+			eventing.SendStatusEvent(&eventing.StatusEvent{
 				InProgress: true,
 				Message:    "Failed to expand resource: " + result.Err.Error(),
 				Timeout:    time.Duration(time.Second * 3),

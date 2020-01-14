@@ -71,7 +71,7 @@ func (e *ContainerInstanceExpander) Expand(ctx context.Context, currentItem *Tre
 func (e *ContainerInstanceExpander) expandContainers(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	resourceAPIVersion, err := armclient.GetAPIVersion(currentItem.ArmType)
 	if err != nil {
-		eventing.SendStatusEvent(eventing.StatusEvent{
+		eventing.SendStatusEvent(&eventing.StatusEvent{
 			Failure: true,
 			Message: "Failed to get resouceVersion for the Type:" + currentItem.ArmType,
 			Timeout: time.Duration(time.Second * 5),
