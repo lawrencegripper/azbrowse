@@ -242,7 +242,12 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 			resourceAPIVersionLookup = make(map[string]string)
 			for _, provider := range providerResponse.Providers {
 				for _, resourceType := range provider.ResourceTypes {
-					resourceAPIVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = resourceType.APIVersions[0]
+					for _, apiVersion := range resourceType.APIVersions {
+						if !strings.Contains(apiVersion, "preview") {
+							resourceAPIVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = apiVersion
+							break
+						}
+					}
 				}
 			}
 
