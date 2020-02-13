@@ -183,14 +183,15 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 
 // Refresh refreshes the current view
 func (w *ListWidget) Refresh() {
-	w.statusView.Status("Refreshing", true)
+	done := w.statusView.Status("Refreshing", true)
+	defer done()
+
 	currentSelection := w.CurrentSelection()
 
 	w.GoBack()
 	w.ExpandCurrentSelection()
 
 	w.ChangeSelection(currentSelection)
-	w.statusView.Status("Done refreshing", false)
 
 	w.ClearFilter()
 }

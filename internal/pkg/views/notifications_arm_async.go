@@ -2,6 +2,7 @@ package views
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -54,20 +55,14 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				if !exists {
 					pollLocation, exists = request.httpResponse.Header["Location"]
 					if !exists {
-						eventing.SendStatusEvent(&eventing.StatusEvent{
-							Failure: true,
-							Message: "Failed to find async header on delete action: " + request.requestPath,
-						})
+						eventing.SendFailureFromError("Failed to find async poll header", fmt.Errorf("Missing header in %+v", request.httpResponse.Header))
 						continue
 					}
 				}
 
 				parsedURL, err := url.Parse(request.requestPath)
 				if err != nil {
-					eventing.SendStatusEvent(&eventing.StatusEvent{
-						Failure: true,
-						Message: "Failed to parse url: " + request.requestPath,
-					})
+					eventing.SendFailureFromError("Failed to parse url while making async request", err)
 					continue
 				}
 
@@ -115,19 +110,13 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				})
 				req, err := http.NewRequest("GET", pollItem.pollURI, nil)
 				if err != nil {
-					eventing.SendStatusEvent(&eventing.StatusEvent{
-						Failure: true,
-						Message: "Failed polling async status of: " + err.Error(),
-					})
+					eventing.SendFailureFromError("Failed create async poll request", err)
 					delete(inflightRequests, ID)
 					continue
 				}
 				response, err := armclient.LegacyInstance.DoRawRequest(ctx, req)
 				if err != nil {
-					eventing.SendStatusEvent(&eventing.StatusEvent{
-						Failure: true,
-						Message: "Failed polling async status of: " + err.Error(),
-					})
+					eventing.SendFailureFromError("Failed making async poll request", err)
 					delete(inflightRequests, ID)
 					continue
 				}

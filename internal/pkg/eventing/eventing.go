@@ -74,6 +74,15 @@ func (s *StatusEvent) Done() {
 	s.Update()
 }
 
+// SendFailureFromError sends a status event representing the error mesage and reason
+func SendFailureFromError(reason string, err error) *StatusEvent {
+	event, _ := SendStatusEvent(&StatusEvent{
+		Failure: true,
+		Message: reason + ": " + err.Error(),
+	})
+	return event
+}
+
 // SendStatusEvent sends status events
 func SendStatusEvent(s *StatusEvent) (*StatusEvent, func()) {
 	if s.id == [16]byte{} {
