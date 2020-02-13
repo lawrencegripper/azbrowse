@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -55,13 +54,21 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				if !exists {
 					pollLocation, exists = request.httpResponse.Header["Location"]
 					if !exists {
-						log.Panicf("Failed to find header on response: %+v", request.httpResponse)
+						eventing.SendStatusEvent(&eventing.StatusEvent{
+							Failure: true,
+							Message: "Failed to find async header on delete action: " + request.requestPath,
+						})
+						continue
 					}
 				}
 
 				parsedURL, err := url.Parse(request.requestPath)
 				if err != nil {
-					log.Panicf("Failed to parse url %s", request.requestPath)
+					eventing.SendStatusEvent(&eventing.StatusEvent{
+						Failure: true,
+						Message: "Failed to parse url: " + request.requestPath,
+					})
+					continue
 				}
 
 				resource := request.requestPath
@@ -108,11 +115,21 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				})
 				req, err := http.NewRequest("GET", pollItem.pollURI, nil)
 				if err != nil {
-					panic(err)
+					eventing.SendStatusEvent(&eventing.StatusEvent{
+						Failure: true,
+						Message: "Failed polling async status of: " + err.Error(),
+					})
+					delete(inflightRequests, ID)
+					continue
 				}
 				response, err := armclient.LegacyInstance.DoRawRequest(ctx, req)
 				if err != nil {
-					panic(err)
+					eventing.SendStatusEvent(&eventing.StatusEvent{
+						Failure: true,
+						Message: "Failed polling async status of: " + err.Error(),
+					})
+					delete(inflightRequests, ID)
+					continue
 				}
 
 				if response.StatusCode == 200 {
