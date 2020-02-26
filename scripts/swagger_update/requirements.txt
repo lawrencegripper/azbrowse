@@ -1,0 +1,4 @@
+gitpython
+pyyaml
+pytest
+regex

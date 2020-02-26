@@ -75,9 +75,10 @@ install:
 
 ## ----------Advanced Targets------------
 ## swagger-update:
-##		Download the latest swagger definitions for Azure services
+##		Download the latest swagger definitions for Azure services and filter to the latest versions
 swagger-update:
-	./scripts/update-swagger.sh
+	pip3 install -r scripts/swagger_update/requirements.txt 
+	python3 ./scripts/swagger_update/app.py
 	
 ## swagger-codegen:
 ##		Generate the code needed for browse services from the swagger definitions

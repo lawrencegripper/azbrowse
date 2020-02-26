@@ -16,5 +16,7 @@
         },
         "apiVersion": 2,
         "showGlobalVariables": true
-    }
+    },
+    "python.pythonPath": "/usr/bin/python3",
+    "python.formatting.provider": "black"
 }
