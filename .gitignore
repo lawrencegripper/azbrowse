@@ -6,4 +6,8 @@ bindings.json
 /swagger-codegen
 /dist
 scripts/bin/
+<<<<<<< HEAD
 .env
+=======
+scripts/swagger_update/__pycache__
+>>>>>>> 3fd2190e... Convert swagger update to python

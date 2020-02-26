@@ -39,7 +39,9 @@ RUN apt-get update \
     #
     # --> RPM used by goreleaser
     && apt install -y rpm \
-    #
+    # Install python3
+    && apt-get -y install python3-pip \
+    && apt-get -y install bash-completion \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
@@ -52,7 +54,9 @@ RUN echo "export HISTFILE=/root/commandhistory/.bash_history" >> "/root/.bashrc"
     && echo "export PROMPT_COMMAND='history -a'" >> "/root/.bashrc" \
     && mkdir -p /root/commandhistory \
     && touch /root/commandhistory/.bash_history
-    
+
+RUN echo "source /usr/share/bash-completion/bash_completion" >> "/root/.bashrc"
+
 # Git command prompt
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1 \
     && echo "if [ -f \"$HOME/.bash-git-prompt/gitprompt.sh\" ]; then GIT_PROMPT_ONLY_IN_REPO=1 && source $HOME/.bash-git-prompt/gitprompt.sh; fi" >> "/root/.bashrc"
@@ -82,3 +86,4 @@ RUN \
     # --> Go releaser 
     && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.123.3"\
     && rm -rf /go/src/ && rm -rf /go/pkg
+

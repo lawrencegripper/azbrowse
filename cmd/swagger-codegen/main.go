@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -55,43 +56,71 @@ func main() {
 
 }
 
+// APISet matches the structure of `api-set.json` files from swagger-update
+type APISet struct {
+	Name       string   `json:"name"`
+	InputFiles []string `json:"input_files"`
+}
+
 func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 	var paths []*swagger.Path
-	serviceFileInfos, err := ioutil.ReadDir("swagger-specs")
+	processAPISet := func(apiSetFolder string) bool {
+		apiSetPath := fmt.Sprintf("%s/api-set.json", apiSetFolder)
+		buf, err := ioutil.ReadFile(apiSetPath)
+		if err != nil {
+			return false
+		}
+		var apiSet APISet
+		err = json.Unmarshal(buf, &apiSet)
+		if err != nil {
+			panic(err)
+		}
+		// Build up paths for all files in the APISet
+		folderPaths := []swagger.Path{}
+		for _, inputFile := range apiSet.InputFiles {
+			fmt.Printf("\tprocessing %s/%s\n", apiSetFolder, inputFile)
+			doc := loadDoc(apiSetFolder + "/" + inputFile)
+			filePaths, err := swagger.GetPathsFromSwagger(doc, config, "")
+			if err != nil {
+				panic(err)
+			}
+			folderPaths = append(folderPaths, filePaths...)
+		}
+		if len(folderPaths) > 0 {
+			paths, err = swagger.MergeSwaggerPaths(paths, config, folderPaths, true, "")
+			if err != nil {
+				panic(err)
+			}
+			return true
+		}
+		return false
+	}
+
+	resourceProviderFileInfos, err := ioutil.ReadDir("swagger-specs")
 	if err != nil {
 		panic(err)
 	}
-	for _, serviceFileInfo := range serviceFileInfos {
-		if serviceFileInfo.IsDir() && serviceFileInfo.Name() != "common-types" {
-			fmt.Printf("Processing service folder: %s\n", serviceFileInfo.Name())
-			resourceTypeFileInfos, err := ioutil.ReadDir(fmt.Sprintf("swagger-specs/%s/resource-manager", serviceFileInfo.Name()))
+	for _, resourceProviderFileInfo := range resourceProviderFileInfos {
+		if resourceProviderFileInfo.IsDir() && resourceProviderFileInfo.Name() != "common-types" {
+			fmt.Printf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name())
+			resourceProviderFolderPath := fmt.Sprintf("swagger-specs/%s/resource-manager", resourceProviderFileInfo.Name())
+			resourceTypeFileInfos, err := ioutil.ReadDir(resourceProviderFolderPath)
+			_ = resourceTypeFileInfos
 			if err != nil {
 				continue // may just be data-plane folder
 			}
-			for _, resourceTypeFileInfo := range resourceTypeFileInfos {
-				if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
-					swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/%s/resource-manager/%s", serviceFileInfo.Name(), resourceTypeFileInfo.Name())))
-					swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
-					if err != nil {
-						panic(err)
-					}
-					// Build up paths for all files in the folder to allow proper sorting
-					folderPaths := []swagger.Path{}
-					for _, swaggerFileInfo := range swaggerFileInfos {
-						if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
-							fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
-							doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
-							filePaths, err := swagger.GetPathsFromSwagger(doc, config, "")
-							if err != nil {
-								panic(err)
-							}
-							folderPaths = append(folderPaths, filePaths...)
-						}
-					}
-					if len(folderPaths) > 0 {
-						paths, err = swagger.MergeSwaggerPaths(paths, config, folderPaths, true, "")
-						if err != nil {
-							panic(err)
+			processed := processAPISet(resourceProviderFolderPath)
+			if processed {
+				fmt.Printf("Got api-set.json")
+			} else {
+				// Didn't get an api-set.json in the resource provider - check in resource types
+				for _, resourceTypeFileInfo := range resourceTypeFileInfos {
+					if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
+						resourceTypeFolderPath := fmt.Sprintf("%s/%s", resourceProviderFolderPath, resourceTypeFileInfo.Name())
+						fmt.Printf("\tProcessing resource type folder: %s\n", resourceTypeFolderPath)
+						processed = processAPISet(resourceTypeFolderPath)
+						if processed {
+							fmt.Printf("Got api-set.json")
 						}
 					}
 				}
