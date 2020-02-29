@@ -1,0 +1,1 @@
+{"input_files": ["Microsoft.Network.Admin/preview/2015-06-15/Network.json", "Microsoft.Network.Admin/preview/2015-06-15/LoadBalancers.json", "Microsoft.Network.Admin/preview/2015-06-15/PublicIpAddresses.json", "Microsoft.Network.Admin/preview/2015-06-15/Quotas.json", "Microsoft.Network.Admin/preview/2015-06-15/VirtualNetworks.json"], "name": "package-2015-06-15"}
