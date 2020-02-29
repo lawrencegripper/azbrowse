@@ -209,7 +209,7 @@ func (w *ListWidget) GoBack() {
 		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
 		return
 	}
-	w.contentView.SetContent(previousPage.Data, previousPage.DataType, "Response")
+	w.contentView.SetContent(previousPage.ExpandedNodeItem, previousPage.Data, previousPage.DataType, "Response")
 	w.selected = 0
 	w.items = previousPage.Value
 	w.title = previousPage.Title
@@ -254,31 +254,30 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
 	}
 	currentItem := w.CurrentItem()
+
+	parentNodeID := "root"
+	nodeID := "root"
+	if w.expandedNodeItem != nil {
+		parentNodeID = w.expandedNodeItem.ID
+		nodeID = currentItem.ID
+	}
+
+	w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
 	if len(nodes) > 0 {
 		w.expandedNodeItem = currentItem
 		w.SetNodes(nodes)
+
+		if currentItem != nil {
+			w.title = w.title + "fooo>" + currentItem.Name
+		}
 	}
 
-	w.contentView.SetContent(content.Response, content.ResponseType, title)
-	if currentItem != nil {
-		w.title = w.title + ">" + currentItem.Name
-	}
-
-	if w.expandedNodeItem != nil {
-		eventing.Publish("list.navigated", ListNavigatedEventState{
-			Success:      true,
-			NewNodes:     nodes,
-			ParentNodeID: w.expandedNodeItem.ID,
-			NodeID:       currentItem.ID,
-		})
-	} else {
-		eventing.Publish("list.navigated", ListNavigatedEventState{
-			Success:      true,
-			NewNodes:     nodes,
-			ParentNodeID: "root",
-			NodeID:       "root",
-		})
-	}
+	eventing.Publish("list.navigated", ListNavigatedEventState{
+		Success:      true,
+		NewNodes:     nodes,
+		ParentNodeID: parentNodeID,
+		NodeID:       nodeID,
+	})
 }
 
 // GetNodes returns the currently listed nodes

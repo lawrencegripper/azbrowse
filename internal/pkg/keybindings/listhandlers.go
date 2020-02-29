@@ -485,7 +485,7 @@ func (h *ListUpdateHandler) DisplayText() string {
 	return "Update current item"
 }
 func (h *ListUpdateHandler) IsEnabled() bool {
-	item := h.List.CurrentExpandedItem()
+	item := h.Content.GetNode()
 	if item == nil ||
 		item.SwaggerResourceType == nil ||
 		item.SwaggerResourceType.PutEndpoint == nil ||
@@ -496,7 +496,7 @@ func (h *ListUpdateHandler) IsEnabled() bool {
 	return true
 }
 func (h *ListUpdateHandler) Invoke() error {
-	item := h.List.CurrentExpandedItem()
+	item := h.Content.GetNode()
 	if !h.IsEnabled() {
 		return nil
 	}
@@ -733,9 +733,9 @@ func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state vie
 
 		data, err := searchApiSet.DoRequest("GET", currentItem.ExpandURL+"&"+queryString)
 		if err != nil {
-			h.content.SetContent(fmt.Sprintf("%s", err), expanders.ResponseJSON, queryString)
+			h.content.SetContent(nil, fmt.Sprintf("%s", err), expanders.ResponseJSON, queryString)
 		} else {
-			h.content.SetContent(data, expanders.ResponseJSON, queryString)
+			h.content.SetContent(nil, data, expanders.ResponseJSON, queryString)
 		}
 	}
 }
