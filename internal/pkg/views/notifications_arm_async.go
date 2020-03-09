@@ -2,7 +2,7 @@ package views
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -55,13 +55,15 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				if !exists {
 					pollLocation, exists = request.httpResponse.Header["Location"]
 					if !exists {
-						log.Panicf("Failed to find header on response: %+v", request.httpResponse)
+						eventing.SendFailureStatusFromError("Failed to find async poll header", fmt.Errorf("Missing header in %+v", request.httpResponse.Header))
+						continue
 					}
 				}
 
 				parsedURL, err := url.Parse(request.requestPath)
 				if err != nil {
-					log.Panicf("Failed to parse url %s", request.requestPath)
+					eventing.SendFailureStatusFromError("Failed to parse url while making async request", err)
+					continue
 				}
 
 				resource := request.requestPath
@@ -108,11 +110,22 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				})
 				req, err := http.NewRequest("GET", pollItem.pollURI, nil)
 				if err != nil {
-					panic(err)
+					eventing.SendFailureStatusFromError("Failed create async poll request", err)
+					pollItem.event.InProgress = false
+					pollItem.event.Message = "Async check failed"
+					pollItem.event.SetTimeout(time.Second * 5)
+					delete(inflightRequests, ID)
+					continue
 				}
 				response, err := armclient.LegacyInstance.DoRawRequest(ctx, req)
 				if err != nil {
-					panic(err)
+					eventing.SendFailureStatusFromError("Failed making async poll request", err)
+					pollItem.event.InProgress = false
+					pollItem.event.Message = "Async check failed"
+					pollItem.event.SetTimeout(time.Second * 5)
+					pollItem.event.Done()
+					delete(inflightRequests, ID)
+					continue
 				}
 
 				if response.StatusCode == 200 {
