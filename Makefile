@@ -37,6 +37,11 @@ build: swagger-codegen test checks
 debug:
 	GO111MODULE=on dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2
 
+## debug-fuzzer:
+##		Starts azbrowse using Delve ready for debugging from VSCode and running the fuzzer.
+debug-fuzzer:
+	GO111MODULE=on dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2 -- -fuzzer 5
+
 ## dcterminal 
 ##		Starts an interactive terminal running inside the devcontainer
 dcterminal:

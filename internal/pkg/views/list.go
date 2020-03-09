@@ -255,21 +255,21 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 	}
 	currentItem := w.CurrentItem()
 
-	parentNodeID := "root"
-	nodeID := "root"
-	if w.expandedNodeItem != nil {
-		parentNodeID = w.expandedNodeItem.ID
-		nodeID = currentItem.ID
-	}
-
 	w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
 	if len(nodes) > 0 {
 		w.expandedNodeItem = currentItem
 		w.SetNodes(nodes)
 
 		if currentItem != nil {
-			w.title = w.title + "fooo>" + currentItem.Name
+			w.title = w.title + ">" + currentItem.Name
 		}
+	}
+
+	parentNodeID := "root"
+	nodeID := "root"
+	if w.expandedNodeItem != nil {
+		parentNodeID = w.expandedNodeItem.ID
+		nodeID = currentItem.ID
 	}
 
 	eventing.Publish("list.navigated", ListNavigatedEventState{

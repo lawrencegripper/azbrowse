@@ -498,6 +498,12 @@ func (h *ListUpdateHandler) IsEnabled() bool {
 func (h *ListUpdateHandler) Invoke() error {
 	item := h.Content.GetNode()
 	if !h.IsEnabled() {
+		eventing.SendStatusEvent(&eventing.StatusEvent{
+			InProgress: false,
+			Failure:    true,
+			Message:    "Updating not supported on this item",
+			Timeout:    time.Duration(time.Second * 2),
+		})
 		return nil
 	}
 
