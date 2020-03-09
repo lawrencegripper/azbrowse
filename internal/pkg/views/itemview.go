@@ -23,6 +23,7 @@ type ItemWidget struct {
 	x, y         int
 	w, h         int
 	hideGuids    bool
+	node         *expanders.TreeNode
 	content      string
 	contentType  expanders.ExpanderResponseType
 	view         *gocui.View
@@ -148,8 +149,9 @@ func (w *ItemWidget) PageUp() {
 }
 
 // SetContent displays the string in the itemview
-func (w *ItemWidget) SetContent(content string, contentType expanders.ExpanderResponseType, title string) {
+func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, contentType expanders.ExpanderResponseType, title string) {
 	w.g.Update(func(g *gocui.Gui) error {
+		w.node = node
 		w.content = content
 		w.contentType = contentType
 		// Reset the cursor and origin (scroll poisition)
@@ -169,6 +171,11 @@ func (w *ItemWidget) GetContent() string {
 // GetContentType returns the current content type
 func (w *ItemWidget) GetContentType() expanders.ExpanderResponseType {
 	return w.contentType
+}
+
+// GetNode returns the TreeNode associated with the currently displayed content (or nil if content is not related to a node)
+func (w *ItemWidget) GetNode() *expanders.TreeNode {
+	return w.node
 }
 
 // SetShouldRender set the shouldRender value of this item
