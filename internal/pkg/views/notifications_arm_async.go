@@ -111,12 +111,19 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				req, err := http.NewRequest("GET", pollItem.pollURI, nil)
 				if err != nil {
 					eventing.SendFailureStatusFromError("Failed create async poll request", err)
+					pollItem.event.InProgress = false
+					pollItem.event.Message = "Async check failed"
+					pollItem.event.SetTimeout(time.Second * 5)
 					delete(inflightRequests, ID)
 					continue
 				}
 				response, err := armclient.LegacyInstance.DoRawRequest(ctx, req)
 				if err != nil {
 					eventing.SendFailureStatusFromError("Failed making async poll request", err)
+					pollItem.event.InProgress = false
+					pollItem.event.Message = "Async check failed"
+					pollItem.event.SetTimeout(time.Second * 5)
+					pollItem.event.Done()
 					delete(inflightRequests, ID)
 					continue
 				}
