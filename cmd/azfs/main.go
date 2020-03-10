@@ -40,7 +40,7 @@ func run(mountpoint string) error {
 	if err != nil {
 		return err
 	}
-	defer c.Close()
+	defer c.Close() //nolint: errcheck
 
 	if p := c.Protocol(); !p.HasInvalidate() {
 		return fmt.Errorf("kernel FUSE support is too old to have invalidations: version %v", p)
@@ -94,7 +94,6 @@ func main() {
 
 // FS Structure
 type FS struct {
-	stateMap map[string]*expanders.TreeNode
 }
 
 var _ fs.FS = (*FS)(nil)
@@ -174,6 +173,8 @@ type Folder struct {
 	treeNode     *expanders.TreeNode
 	items        []*expanders.TreeNode
 	indexContent string
+	canDelete    bool
+	canEdit      bool
 }
 
 var _ fs.Node = (*Folder)(nil)
@@ -186,6 +187,17 @@ func (d *Folder) Attr(ctx context.Context, a *fuse.Attr) error {
 
 var _ fs.NodeStringLookuper = (*Folder)(nil)
 
+func canEdit(item *expanders.TreeNode) bool {
+	if item == nil ||
+		item.SwaggerResourceType == nil ||
+		item.SwaggerResourceType.PutEndpoint == nil ||
+		item.Metadata == nil ||
+		item.Metadata["SwaggerAPISetID"] == "" {
+		return false
+	}
+	return true
+}
+
 func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	if name == "index.json" {
 		file := &File{}
@@ -194,13 +206,15 @@ func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
 		if err != nil {
 			panic(err)
 		}
-		file.content.Store(string(prettyJSON.Bytes()))
+		file.content.Store(prettyJSON.String())
 		return file, nil
 	}
 	for i, treeNode := range d.items {
 		if nameFromTreeNode(treeNode) == name {
 			f := &Folder{
-				treeNode: treeNode,
+				treeNode:  treeNode,
+				canDelete: treeNode.DeleteURL != "",
+				canEdit:   canEdit(treeNode),
 				Dirent: fuse.Dirent{
 					Inode: uint64(i),
 					Type:  fuse.DT_Dir,
@@ -243,8 +257,8 @@ func (d *Folder) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 type File struct {
 	fs.NodeRef
 	// fuse     *fs.Server
-	content  atomic.Value
-	treeNode *expanders.TreeNode
+	content atomic.Value
+	// treeNode *expanders.TreeNode
 }
 
 var _ fs.Node = (*File)(nil)

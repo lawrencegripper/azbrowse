@@ -62,3 +62,8 @@
   [[issues.exclude-rules]]
     path = "internal/pkg/keybindings/globalhandlers.go"
     linters = ["golint"]
+
+  # Ignore azfs
+  [[issues.exclude-rules]]
+    path = "cmd/azfs/main.go"
+    linters = ["golint"]
