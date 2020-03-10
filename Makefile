@@ -148,3 +148,14 @@ endif
 		-t $(DEV_CONTAINER_TAG) \
 		-c "${PWD}/scripts/ci_integration_tests.sh && ${PWD}/scripts/ci_release.sh"
 		
+
+asfs-build:
+	go build ./cmd/azfs
+
+azfs-test:
+	-@ps aux | grep "[g]o run ./cmd/azfs" | awk '{print $2}' | xargs kill
+	-@fusermount -u /azfs
+	mkdir -p /azfs
+	go run ./cmd/azfs /azfs
+
+

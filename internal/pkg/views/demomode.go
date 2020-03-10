@@ -29,7 +29,8 @@ func getNameAndType(s string) (NameAndNodeType, bool) {
 	return NameAndNodeType{possibleNames[1], possibleTypes[1]}, true
 }
 
-func stripSecretVals(s string) string {
+// StripSecretVals removes secret values
+func StripSecretVals(s string) string {
 	guidRegex := regexp.MustCompile(`[{(]?[0-9a-f]{8}[-]?([0-9a-f]{4}[-]?){3}[0-9a-f]{12}[)}]?`)
 	s = guidRegex.ReplaceAllString(s, "00000000-0000-0000-0000-HIDDEN000000")
 
