@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"time"
 
 	"bazil.org/fuse"
@@ -42,6 +43,11 @@ func run(mountpoint string) error {
 	return nil
 }
 
+func responseLogge(requestPath string, response *http.Response, responseBody string) {
+	log.Println(requestPath)
+	log.Println(responseBody)
+}
+
 func createFS(mountpoint string) (*fuse.Conn, error) {
 	c, err := fuse.Mount(
 		mountpoint,
@@ -64,14 +70,8 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 	// Load the db
 	storage.LoadDB()
 
-	// Start tracking async responses from ARM
-	responseProcessor, err := views.StartWatchingAsyncARMRequests(ctx)
-	if err != nil {
-		log.Panicln(err)
-	}
-
 	// Create an ARMClient instance for us to use
-	armClient := armclient.NewClientFromCLI("", responseProcessor)
+	armClient := armclient.NewClientFromCLI("", responseLogge)
 	armclient.LegacyInstance = *armClient
 
 	expanders.InitializeExpanders(armClient)
@@ -101,7 +101,7 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 	filesys := &filesystem.FS{}
 	go func() {
 		if err := srv.Serve(filesys); err != nil {
-			panic(err)
+			log.Println(err)
 		}
 	}()
 

@@ -12,11 +12,19 @@
             "remotePath": "${workspaceFolder}",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceFolder}",
-            "env": {},
-            "args": [],
-            // run azbrowse in a terminal with the following command before starting the debugger
-            // go build ./cmd/azbrowse &&  dlv exec ./azbrowse --headless --listen localhost:2345 --api-version 2
+            // start azbrowse with make debug
+        }, 
+        {
+            "name": "Debug azfs edit",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/cmd/azfs",
+            "args": [
+                "-test.run",
+                "TestEditRG"
+            ],
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

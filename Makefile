@@ -1,4 +1,5 @@
 DEV_CONTAINER_TAG:=lawrencegripper/azbrowsedevcontainer:latest
+-include .env
 
 .PHONY: checks test build
 
@@ -152,9 +153,20 @@ endif
 asfs-build:
 	go build ./cmd/azfs
 
-azfs-test:
+azfs-run:
 	-@fusermount -u /mnt/azfs
 	mkdir -p /mnt/azfs
 	go run ./cmd/azfs --mount /mnt/azfs --enableEdit
 
+# azfs-test:
+# 		Tests the azfs filesystem with integration tests
+#
+# A '.env' file like the following is required 
+#
+# > TESTSUB=yoursubhere
+# > TESTRESOURCE=/rghere/resourcehere
+#
+# The resource specified should have a value of 'replaceme' as a tag
+azfs-test:
+	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} go test -count=1 -timeout 30s github.com/lawrencegripper/azbrowse/cmd/azfs -v
 

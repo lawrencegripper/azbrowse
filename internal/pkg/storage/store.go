@@ -1,15 +1,23 @@
 package storage
 
 import (
-	"encoding/json"
 	"fmt"
-	"github.com/boltdb/bolt"
 	"log"
 	"os/user"
 	"time"
+
+	"github.com/boltdb/bolt"
 )
 
 var db *bolt.DB
+
+// CloseDB closes the db
+func CloseDB() {
+	err := db.Close()
+	if err != nil {
+		panic(err)
+	}
+}
 
 // LoadDB initializes and loads the DB instance
 func LoadDB() {
@@ -49,59 +57,6 @@ func LoadDB() {
 	}
 	fmt.Println("Loading db complete")
 
-}
-
-// ClearResources removes all resources from the
-func ClearResources() error {
-	return db.Update(func(tx *bolt.Tx) error {
-		return tx.DeleteBucket([]byte("search"))
-	})
-}
-
-// PutResourceBatch puts a batch of resources into the boltdb
-func PutResourceBatch(key string, value []Resource) error {
-	err := db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("search"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	return db.Batch(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("search"))
-		bytes, err := json.Marshal(value)
-		if err != nil {
-			return err
-		}
-		err = b.Put([]byte(key), bytes)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-}
-
-// GetAllResources returns all the resources seen in the last crawl
-func GetAllResources() ([]Resource, error) {
-	resources := []Resource{}
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("search"))
-		return b.ForEach(func(key, value []byte) error {
-			var storedResources []Resource
-			err := json.Unmarshal([]byte(value), &storedResources)
-			if err != nil {
-				return err
-			}
-
-			resources = append(resources, storedResources...)
-			return nil
-		})
-	})
-	return resources, err
 }
 
 // PutCache puts an item in the cache bucket

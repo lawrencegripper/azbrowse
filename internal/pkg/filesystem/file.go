@@ -100,22 +100,23 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 
 	log.Println(string(newContent))
 
+	f.content.Store(string(newContent))
+
 	// Submit to server
 	apiSetID := f.treeNode.Metadata["SwaggerAPISetID"]
 	apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
 	if apiSetPtr == nil {
-		log.Println(err)
+		log.Println("nil apiset :(")
 		return nil
 	}
 	apiSet := *apiSetPtr
 
-	err = apiSet.Update(ctx, f.treeNode, string(newContent))
+	err = apiSet.Update(ctx, f.treeNode, f.content.Load().(string))
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 
-	f.content.Store(string(newContent))
 	return nil
 }
 
