@@ -11,8 +11,8 @@
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
-		"--cap-add SYS_ADMIN",
-		"--device /dev/fuse",
+		"--privileged",
+		"--device", "/dev/fuse",
 
 		"--name", "azbdev",
 		// Mount go mod cache
@@ -23,8 +23,6 @@
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		// Use host network
 		"--network=host",
-		// Mount ssh 
-		"-v", "${env:HOME}${env:USERPROFILE}/.ssh:/root/.ssh",
 		// Mount azure, git and docker config
 		"-v", "${env:HOME}${env:USERPROFILE}/.azure:/root/.azure",
 		"-v", "${env:HOME}${env:USERPROFILE}/.gitconfig:/root/.gitconfig", // Required due to volume mount used for .vscode-server

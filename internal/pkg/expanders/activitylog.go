@@ -59,6 +59,9 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 	}
 
 	for i, log := range activityLogs.Value {
+		if len(value.GetArray("value"))-1 < i {
+			break
+		}
 		// Update the existing state as we have more up-to-date info
 		objectJSON := string(value.GetArray("value")[i].MarshalTo([]byte("")))
 
