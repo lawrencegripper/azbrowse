@@ -8,13 +8,16 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"sync/atomic"
 	"syscall"
+	"time"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	_ "bazil.org/fuse/fs/fstestutil"
 	"bazil.org/fuse/fuseutil"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
@@ -22,10 +25,9 @@ import (
 )
 
 var ctx = context.Background()
+var demoMode bool
 
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "  %s MOUNTPOINT\n", os.Args[0])
 	flag.PrintDefaults()
 }
 
@@ -62,6 +64,26 @@ func run(mountpoint string) error {
 	expanders.InitializeExpanders(armClient)
 	armClient.PopulateResourceAPILookup(ctx)
 
+	// print status messages
+	go func() {
+		newEvents := eventing.SubscribeToStatusEvents()
+		for {
+			// Wait for a second to see if we have any new messages
+			timeout := time.After(time.Second)
+			select {
+			case eventObj := <-newEvents:
+				status := eventObj.(*eventing.StatusEvent)
+				message := status.Message
+				if demoMode {
+					message = views.StripSecretVals(status.Message)
+				}
+				fmt.Printf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
+			case <-timeout:
+				// Update the UI
+			}
+		}
+	}()
+
 	srv := fs.New(c, nil)
 	filesys := &FS{}
 
@@ -79,15 +101,22 @@ func run(mountpoint string) error {
 
 func main() {
 	flag.Usage = usage
-	flag.Parse()
+	flag.String("mount", "/mnt/azfs", "defualt: /mnt/azfs location for mounting the filesystem")
+	flag.Bool("demo", false, "enable demo mode")
 
-	if flag.NArg() != 1 {
+	flag.Parse()
+	mountpoint := flag.Lookup("mount")
+	if mountpoint == nil {
 		usage()
 		os.Exit(2)
 	}
-	mountpoint := flag.Arg(0)
 
-	if err := run(mountpoint); err != nil {
+	isDemo := flag.Lookup("demo")
+	if isDemo != nil {
+		demoMode = true
+	}
+
+	if err := run(mountpoint.Value.String()); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -137,6 +166,24 @@ func nameFromTreeNode(treeNode *expanders.TreeNode) string {
 	return treeNode.Name
 }
 
+func canEdit(item *expanders.TreeNode) bool {
+	if item == nil ||
+		item.SwaggerResourceType == nil ||
+		item.SwaggerResourceType.PutEndpoint == nil ||
+		item.Metadata == nil ||
+		item.Metadata["SwaggerAPISetID"] == "" {
+		return false
+	}
+	return true
+}
+
+func indexFileName(treeNode *expanders.TreeNode, response *expanders.ExpanderResponse) string {
+	if treeNode == nil || response == nil {
+		return "index.json"
+	}
+	return treeNode.ItemType + "." + treeNode.Name + "." + strings.ToLower(string(response.ResponseType))
+}
+
 func (d *RootDir) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	for i, treeNode := range d.items {
 		if nameFromTreeNode(treeNode) == name {
@@ -172,7 +219,7 @@ type Folder struct {
 	fuse.Dirent
 	treeNode     *expanders.TreeNode
 	items        []*expanders.TreeNode
-	indexContent string
+	indexContent *expanders.ExpanderResponse
 	canDelete    bool
 	canEdit      bool
 }
@@ -187,26 +234,21 @@ func (d *Folder) Attr(ctx context.Context, a *fuse.Attr) error {
 
 var _ fs.NodeStringLookuper = (*Folder)(nil)
 
-func canEdit(item *expanders.TreeNode) bool {
-	if item == nil ||
-		item.SwaggerResourceType == nil ||
-		item.SwaggerResourceType.PutEndpoint == nil ||
-		item.Metadata == nil ||
-		item.Metadata["SwaggerAPISetID"] == "" {
-		return false
-	}
-	return true
-}
-
 func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
-	if name == "index.json" {
+	if name == indexFileName(d.treeNode, d.indexContent) {
 		file := &File{}
-		var prettyJSON bytes.Buffer
-		err := json.Indent(&prettyJSON, []byte(views.StripSecretVals(d.indexContent)), "", "   ")
-		if err != nil {
-			panic(err)
+		content := d.indexContent.Response
+
+		if d.indexContent.ResponseType == "JSON" {
+			var prettyJSON bytes.Buffer
+			err := json.Indent(&prettyJSON, []byte(d.indexContent.Response), "", "   ")
+			if err != nil {
+				panic(err)
+			}
+			content = prettyJSON.String()
 		}
-		file.content.Store(prettyJSON.String())
+
+		file.content.Store(content)
 		return file, nil
 	}
 	for i, treeNode := range d.items {
@@ -235,7 +277,11 @@ func (d *Folder) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 		panic(err)
 	}
 	d.items = newItems
-	d.indexContent = rootContent.Response
+	d.indexContent = rootContent
+
+	if demoMode {
+		rootContent.Response = views.StripSecretVals(rootContent.Response)
+	}
 
 	dirItems := make([]fuse.Dirent, len(d.items)+1)
 	for i, treeNode := range d.items {
@@ -249,7 +295,7 @@ func (d *Folder) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	dirItems[lastIndex] = fuse.Dirent{
 		Inode: uint64(lastIndex),
 		Type:  fuse.DT_File,
-		Name:  "index.json",
+		Name:  indexFileName(d.treeNode, d.indexContent),
 	}
 	return dirItems, nil
 }
@@ -294,25 +340,3 @@ func (f *File) Read(ctx context.Context, req *fuse.ReadRequest, resp *fuse.ReadR
 	fuseutil.HandleRead(req, resp, []byte(t))
 	return nil
 }
-
-// func (f *File) tick() {
-// 	// Intentionally a variable-length format, to demonstrate size changes.
-// 	f.count++
-// 	s := fmt.Sprintf("%d\t%s\n", f.count, time.Now())
-// 	f.content.Store(s)
-
-// 	// For simplicity, this example tries to send invalidate
-// 	// notifications even when the kernel does not hold a reference to
-// 	// the node, so be extra sure to ignore ErrNotCached.
-// 	if err := f.fuse.InvalidateNodeData(f); err != nil && err != fuse.ErrNotCached {
-// 		log.Printf("invalidate error: %v", err)
-// 	}
-// }
-
-// func (f *File) update() {
-// 	tick := time.NewTicker(1 * time.Second)
-// 	defer tick.Stop()
-// 	for range tick.C {
-// 		f.tick()
-// 	}
-// }

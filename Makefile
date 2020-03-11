@@ -154,8 +154,8 @@ asfs-build:
 
 azfs-test:
 	-@ps aux | grep "[g]o run ./cmd/azfs" | awk '{print $2}' | xargs kill
-	-@fusermount -u /azfs
-	mkdir -p /azfs
-	go run ./cmd/azfs /azfs
+	-@fusermount -u /mnt/azfs
+	mkdir -p /mnt/azfs
+	go run ./cmd/azfs --mount /mnt/azfs --demo
 
 
