@@ -155,6 +155,6 @@ asfs-build:
 azfs-test:
 	-@fusermount -u /mnt/azfs
 	mkdir -p /mnt/azfs
-	go run ./cmd/azfs --mount /mnt/azfs --demo --enableEdit
+	go run ./cmd/azfs --mount /mnt/azfs --enableEdit
 
 
