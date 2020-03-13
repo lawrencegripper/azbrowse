@@ -125,7 +125,11 @@ func TestSubscriptions(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 3, len(files), "Expected 3 subscriptions from mock response")
+	for _, f := range files {
+		t.Log(f.Name())
+	}
+
+	assert.Equal(t, 4, len(files), "Expected 3 subscriptions + index file from mock response")
 
 }
 
@@ -138,7 +142,6 @@ func TestRG(t *testing.T) {
 	defer mnt.Close()
 	defer storage.CloseDB()
 
-	//TODO: Remove
 	// Walk to Sub level
 	subFiles, err := ioutil.ReadDir(mnt.Dir)
 	if err != nil {
@@ -150,7 +153,24 @@ func TestRG(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 7, len(files), "Expected 6 RGs from mock response")
+	assert.Equal(t, 7, len(files), "Expected 6 RGs + index file from mock response")
+}
+
+func TestRG_direct(t *testing.T) {
+	configureExpanders(t)
+	filesystem := &FS{}
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	files, err := ioutil.ReadDir(path.Join(mnt.Dir, "Thingy1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, 7, len(files), "Expected 6 RGs + index file from mock response")
 }
 
 func TestRGResourceList(t *testing.T) {
@@ -183,7 +203,7 @@ func TestRGResourceList(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 13, len(files), "Expected 13 resource files from mock response")
+	assert.Equal(t, 13, len(files), "Expected 12 resources + index file from mock response")
 }
 
 func TestGetResource(t *testing.T) {
@@ -218,7 +238,6 @@ func TestGetResource(t *testing.T) {
 
 	for _, f := range resourceFiles {
 		t.Log(f.Name())
-
 	}
 
 	builtPath = path.Join(builtPath, "thingsthings123")
@@ -227,5 +246,5 @@ func TestGetResource(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 5, len(files), "Expected 5 subresources / files from mock response")
+	assert.Equal(t, 5, len(files), "Expected 4 subresources + index file from mock response")
 }

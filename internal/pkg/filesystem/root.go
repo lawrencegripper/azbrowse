@@ -2,9 +2,7 @@ package filesystem
 
 import (
 	"context"
-	"os"
 	"strings"
-	"syscall"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
@@ -23,7 +21,7 @@ var _ fs.FS = (*FS)(nil)
 func (f *FS) Root() (fs.Node, error) {
 	// Create an empty tentant TreeNode. This by default expands
 	// to show the current tenants subscriptions
-	_, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
+	content, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
 		ItemType:  expanders.TentantItemType,
 		ID:        "AvailableSubscriptions",
 		ExpandURL: expanders.ExpandURLNotSupported,
@@ -32,27 +30,36 @@ func (f *FS) Root() (fs.Node, error) {
 		panic(err)
 	}
 
-	return &RootDir{
-		fs:    f,
+	return &Folder{
+		Dirent: fuse.Dirent{
+			// Inode: uint64(i),
+			Type: fuse.DT_Dir,
+			Name: "root",
+		},
 		items: newItems,
+		treeNode: &expanders.TreeNode{
+			Name:     "root",
+			ItemType: "subscription",
+		},
+		indexContent: content,
 	}, nil
 }
 
-// RootDir implements both Node and Handle for the root directory.
-type RootDir struct {
-	fs    *FS
-	items []*expanders.TreeNode
-}
+// // RootDir implements both Node and Handle for the root directory.
+// type RootDir struct {
+// 	fs    *FS
+// 	items []*expanders.TreeNode
+// }
 
-var _ fs.Node = (*RootDir)(nil)
+// var _ fs.Node = (*RootDir)(nil)
 
-func (d *RootDir) Attr(ctx context.Context, a *fuse.Attr) error {
-	a.Inode = 1
-	a.Mode = os.ModeDir | 0555
-	return nil
-}
+// func (d *RootDir) Attr(ctx context.Context, a *fuse.Attr) error {
+// 	a.Inode = 1
+// 	a.Mode = os.ModeDir | 0555
+// 	return nil
+// }
 
-var _ fs.NodeStringLookuper = (*RootDir)(nil)
+// var _ fs.NodeStringLookuper = (*RootDir)(nil)
 
 func nameFromTreeNode(treeNode *expanders.TreeNode) string {
 	// fmt.Printf("%+v", *treeNode)
@@ -77,33 +84,33 @@ func indexFileName(treeNode *expanders.TreeNode, response *expanders.ExpanderRes
 	return treeNode.ItemType + "." + treeNode.Name + "." + strings.ToLower(string(response.ResponseType))
 }
 
-func (d *RootDir) Lookup(ctx context.Context, name string) (fs.Node, error) {
-	for i, treeNode := range d.items {
-		if nameFromTreeNode(treeNode) == name {
-			f := &Folder{
-				treeNode: treeNode,
-				Dirent: fuse.Dirent{
-					Inode: uint64(i),
-					Type:  fuse.DT_Dir,
-					Name:  nameFromTreeNode(treeNode),
-				},
-			}
-			return f, nil
-		}
-	}
-	return nil, syscall.ENOENT
-}
+// func (d *RootDir) Lookup(ctx context.Context, name string) (fs.Node, error) {
+// 	for i, treeNode := range d.items {
+// 		if nameFromTreeNode(treeNode) == name {
+// 			f := &Folder{
+// 				treeNode: treeNode,
+// 				Dirent: fuse.Dirent{
+// 					Inode: uint64(i),
+// 					Type:  fuse.DT_Dir,
+// 					Name:  nameFromTreeNode(treeNode),
+// 				},
+// 			}
+// 			return f, nil
+// 		}
+// 	}
+// 	return nil, syscall.ENOENT
+// }
 
-var _ fs.HandleReadDirAller = (*RootDir)(nil)
+// var _ fs.HandleReadDirAller = (*RootDir)(nil)
 
-func (d *RootDir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
-	dirItems := make([]fuse.Dirent, len(d.items))
-	for i, treeNode := range d.items {
-		dirItems[i] = fuse.Dirent{
-			Inode: uint64(i),
-			Type:  fuse.DT_Dir,
-			Name:  nameFromTreeNode(treeNode),
-		}
-	}
-	return dirItems, nil
-}
+// func (d *RootDir) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
+// 	dirItems := make([]fuse.Dirent, len(d.items))
+// 	for i, treeNode := range d.items {
+// 		dirItems[i] = fuse.Dirent{
+// 			Inode: uint64(i),
+// 			Type:  fuse.DT_Dir,
+// 			Name:  nameFromTreeNode(treeNode),
+// 		}
+// 	}
+// 	return dirItems, nil
+// }

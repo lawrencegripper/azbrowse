@@ -47,9 +47,10 @@ func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
 			var prettyJSON bytes.Buffer
 			err := json.Indent(&prettyJSON, []byte(d.indexContent.Response), "", "   ")
 			if err != nil {
-				panic(err)
+				// todo: log failure to json format
+			} else {
+				content = prettyJSON.String()
 			}
-			content = prettyJSON.String()
 		}
 
 		file.content.Store(content)
@@ -110,15 +111,18 @@ func (d *Folder) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 var _ fs.HandleReadDirAller = (*Folder)(nil)
 
 func (d *Folder) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
-	rootContent, newItems, err := expanders.ExpandItem(ctx, d.treeNode)
-	if err != nil {
-		panic(err)
-	}
-	d.items = newItems
-	d.indexContent = rootContent
+	if d.indexContent == nil {
+		rootContent, newItems, err := expanders.ExpandItem(ctx, d.treeNode)
+		if err != nil {
+			panic(err)
+		}
 
-	if *DemoMode {
-		rootContent.Response = views.StripSecretVals(rootContent.Response)
+		if *DemoMode {
+			rootContent.Response = views.StripSecretVals(rootContent.Response)
+		}
+
+		d.items = newItems
+		d.indexContent = rootContent
 	}
 
 	dirItems := make([]fuse.Dirent, len(d.items)+1)
