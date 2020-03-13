@@ -46,29 +46,34 @@ func configureExpanders(t *testing.T) {
 
 	// Create mock ARM API
 	gock.New(testServer).
+		Get("providers/microsoft.insights/metricNamespaces").
+		Reply(200).
+		JSON("{}")
+
+	gock.New(testServer).
 		Get("subscriptions").
 		Reply(200).
 		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/subscriptions/response.json"))
 
 	gock.New(testServer).
+		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/providers/Microsoft.Storage/storageAccounts/thingsthings123").
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
+
+	gock.New(testServer).
+		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/resources").
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/resourcelist.json"))
+
+	gock.New(testServer).
+		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups").
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
+
+	gock.New(testServer).
 		Get("providers").
 		Reply(200).
 		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/providers/response.json"))
-
-	gock.New(testServer).
-		Get("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
-
-	gock.New(testServer).
-		Get("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
-
-	gock.New(testServer).
-		Get("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/resources").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/resourcelist.json"))
 
 	httpClient := &http.Client{Transport: &http.Transport{}}
 	gock.InterceptClient(httpClient)
@@ -148,7 +153,7 @@ func TestRG(t *testing.T) {
 	assert.Equal(t, 7, len(files), "Expected 6 RGs from mock response")
 }
 
-func TestResource(t *testing.T) {
+func TestRGResourceList(t *testing.T) {
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -178,5 +183,49 @@ func TestResource(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 9, len(files), "Expected 9 resources from mock response")
+	assert.Equal(t, 13, len(files), "Expected 13 resource files from mock response")
+}
+
+func TestGetResource(t *testing.T) {
+	configureExpanders(t)
+	filesystem := &FS{}
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	//TODO: Remove
+	// Walk to Sub level
+	subFiles, err := ioutil.ReadDir(mnt.Dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	builtPath := path.Join(mnt.Dir, subFiles[0].Name())
+	//TODO: Remove
+	// Walk to RG level
+	rgFiles, err := ioutil.ReadDir(builtPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	builtPath = path.Join(builtPath, rgFiles[0].Name())
+	resourceFiles, err := ioutil.ReadDir(builtPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, f := range resourceFiles {
+		t.Log(f.Name())
+
+	}
+
+	builtPath = path.Join(builtPath, "thingsthings123")
+	files, err := ioutil.ReadDir(builtPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, 5, len(files), "Expected 5 subresources / files from mock response")
 }

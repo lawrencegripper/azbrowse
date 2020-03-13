@@ -1,7 +1,7 @@
 {
     "value": [
         {
-            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell",
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing",
             "name": "1thing",
             "location": "northeurope",
             "properties": {

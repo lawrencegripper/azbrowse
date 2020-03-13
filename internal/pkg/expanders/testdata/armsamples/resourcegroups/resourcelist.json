@@ -1,6 +1,16 @@
 {
   "value": [
     {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/providers/Microsoft.Storage/storageAccounts/thingsthings123",
+      "name": "thingsthings123",
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "location": "westeurope"
+    },
+    {
       "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959",
       "name": "kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959",
       "type": "Microsoft.Compute/disks",

@@ -159,7 +159,7 @@ azfs-run:
 	go run ./cmd/azfs --mount /mnt/azfs --enableEdit
 
 # azfs-test:
-# 		Tests the azfs filesystem with integration tests
+# 		Tests the azfs filesystem with unit tests and mocked api
 #
 # A '.env' file like the following is required 
 #
@@ -168,5 +168,17 @@ azfs-run:
 #
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-test:
+	go test -count=1 -timeout 30s ./internal/pkg/filesystem -v
+
+# azfs-integration:
+# 		Tests the azfs filesystem with integration tests
+#
+# A '.env' file like the following is required 
+#
+# > TESTSUB=yoursubhere
+# > TESTRESOURCE=/rghere/resourcehere
+#
+# The resource specified should have a value of 'replaceme' as a tag
+azfs-integration:
 	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} go test -count=1 -timeout 30s github.com/lawrencegripper/azbrowse/cmd/azfs -v
 
