@@ -21,6 +21,11 @@ import (
 const expectedSubs = 4
 
 func TestBrowseToRoot(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
+
 	// horrible hack
 	boolTrue := false
 	demoMode = &boolTrue
@@ -53,6 +58,11 @@ func TestBrowseToRoot(t *testing.T) {
 }
 
 func TestEditRG(t *testing.T) {
+	if testing.Short() {
+		t.Log("Skipping integration test")
+		return
+	}
+
 	// horrible hack
 	boolTrue := false
 	demoMode = &boolTrue

@@ -16,7 +16,7 @@ help : Makefile
 ## test:
 ## 		Run quick executing unit tests
 test:
-	GO111MODULE=on go test -p 1 -v -count=1 -short ./...
+	GO111MODULE=on go test -p 1 -count=1 -short ./...
 
 ## integration: 
 ##		Run integration and unit tests
