@@ -41,7 +41,8 @@ func (f *FS) Root() (fs.Node, error) {
 			Name:     "root",
 			ItemType: "subscription",
 		},
-		indexContent: content,
+		indexContent:    content,
+		isParentDeleted: func() bool { return false },
 	}, nil
 }
 

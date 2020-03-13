@@ -72,7 +72,7 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 
 	// Create an ARMClient instance for us to use
 	armClient := armclient.NewClientFromCLI("", responseLogge)
-	armclient.LegacyInstance = *armClient
+	armclient.LegacyInstance = armClient
 
 	expanders.InitializeExpanders(armClient)
 	armClient.PopulateResourceAPILookup(ctx)

@@ -1,9 +1,11 @@
 package filesystem
 
 import (
-	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"os/exec"
 	"path"
 	"testing"
 	"time"
@@ -18,7 +20,13 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-const testServer = "https://management.azure.com"
+const (
+	testServer = "https://management.azure.com"
+	// Todo: Fix this moronic naming
+	subNameMock      = "Thingy1"         // Good job naming this
+	rgNameMock       = "1thing"          // Oh you got better at it
+	resourceNameMock = "thingsthings123" // Nailed it
+)
 
 func createResponseLogger(t *testing.T) armclient.ResponseProcessor {
 	return func(requestPath string, response *http.Response, responseBody string) {
@@ -38,27 +46,33 @@ func getJSONFromFile(t *testing.T, path string) string {
 func configureExpanders(t *testing.T) {
 	// ctx := context.Background()
 	boolFalsePtr := false
+	boolTruePtr := true
 	DemoMode = &boolFalsePtr
-	EditMode = &boolFalsePtr
+	EditMode = &boolTruePtr
 
 	// Load the db
 	storage.LoadDB()
 
 	// Create mock ARM API
 	gock.New(testServer).
-		Get("providers/microsoft.insights/metricNamespaces").
-		Reply(200).
-		JSON("{}")
-
-	gock.New(testServer).
-		Get("subscriptions").
+		Get("/subscriptions").
 		Reply(200).
 		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/subscriptions/response.json"))
 
 	gock.New(testServer).
-		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/providers/Microsoft.Storage/storageAccounts/thingsthings123").
+		Delete("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/providers/Microsoft.Storage/storageAccounts/thingsthings123").
+		Reply(200).
+		JSON("{}")
+
+	gock.New(testServer).
+		Get("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/providers/Microsoft.Storage/storageAccounts/thingsthings123").
 		Reply(200).
 		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
+
+	gock.New(testServer).
+		Delete("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing").
+		Reply(200).
+		JSON("{}")
 
 	gock.New(testServer).
 		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/resources").
@@ -70,21 +84,18 @@ func configureExpanders(t *testing.T) {
 		Reply(200).
 		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
 
-	gock.New(testServer).
-		Get("providers").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/providers/response.json"))
-
 	httpClient := &http.Client{Transport: &http.Transport{}}
 	gock.InterceptClient(httpClient)
 
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromClientAndTokenFunc(httpClient, expanders.DummyTokenFunc(), createResponseLogger(t))
+	armclient.LegacyInstance = client
 
 	expanders.InitializeExpanders(client)
 	client.PopulateResourceAPILookup(ctx)
 
 	// print status messages
+
 	go func() {
 		newEvents := eventing.SubscribeToStatusEvents()
 		for {
@@ -94,7 +105,7 @@ func configureExpanders(t *testing.T) {
 			case eventObj := <-newEvents:
 				status := eventObj.(*eventing.StatusEvent)
 				message := status.Message
-				fmt.Printf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
+				t.Logf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
 			case <-timeout:
 				// Update the UI
 			}
@@ -111,7 +122,7 @@ func setupMount(t *testing.T, filesys fs.FS) (mnt *fstestutil.Mount) {
 	return mnt
 }
 
-func TestSubscriptions(t *testing.T) {
+func Test_Get_Subs(t *testing.T) {
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -133,7 +144,7 @@ func TestSubscriptions(t *testing.T) {
 
 }
 
-func TestRG(t *testing.T) {
+func Test_Get_Sub_TreeWalk(t *testing.T) {
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -156,24 +167,7 @@ func TestRG(t *testing.T) {
 	assert.Equal(t, 7, len(files), "Expected 6 RGs + index file from mock response")
 }
 
-func TestRG_direct(t *testing.T) {
-	configureExpanders(t)
-	filesystem := &FS{}
-
-	mnt := setupMount(t, filesystem)
-
-	defer mnt.Close()
-	defer storage.CloseDB()
-
-	files, err := ioutil.ReadDir(path.Join(mnt.Dir, "Thingy1"))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	assert.Equal(t, 7, len(files), "Expected 6 RGs + index file from mock response")
-}
-
-func TestRGResourceList(t *testing.T) {
+func Test_Get_RG_WalkTree(t *testing.T) {
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -206,7 +200,7 @@ func TestRGResourceList(t *testing.T) {
 	assert.Equal(t, 13, len(files), "Expected 12 resources + index file from mock response")
 }
 
-func TestGetResource(t *testing.T) {
+func Test_Get_Resource_DirectNavigation(t *testing.T) {
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -215,36 +209,86 @@ func TestGetResource(t *testing.T) {
 	defer mnt.Close()
 	defer storage.CloseDB()
 
-	//TODO: Remove
-	// Walk to Sub level
-	subFiles, err := ioutil.ReadDir(mnt.Dir)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	builtPath := path.Join(mnt.Dir, subFiles[0].Name())
-	//TODO: Remove
-	// Walk to RG level
-	rgFiles, err := ioutil.ReadDir(builtPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	builtPath = path.Join(builtPath, rgFiles[0].Name())
-	resourceFiles, err := ioutil.ReadDir(builtPath)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	for _, f := range resourceFiles {
-		t.Log(f.Name())
-	}
-
-	builtPath = path.Join(builtPath, "thingsthings123")
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
 	files, err := ioutil.ReadDir(builtPath)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 5, len(files), "Expected 4 subresources + index file from mock response")
+	assert.Equal(t, 5, len(files), "Expected 4 sub resources + index file from mock response")
+}
+
+func Test_Delete_Resource_DirectNavigation(t *testing.T) {
+	configureExpanders(t)
+	filesystem := &FS{}
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
+	err := os.RemoveAll(builtPath)
+
+	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+}
+
+func Test_Delete_RG_DirectNavigation(t *testing.T) {
+	configureExpanders(t)
+	filesystem := &FS{}
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
+	err := os.RemoveAll(builtPath)
+
+	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+}
+
+// This test use "RemoveAll" which looks like it is different to "rm -r"
+func Test_Delete_RG_AfterBrowse(t *testing.T) {
+	configureExpanders(t)
+	filesystem := &FS{}
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
+
+	_, err := ioutil.ReadDir(builtPath)
+	assert.NoError(t, err, "Expect to be able to list rg")
+
+	err = os.RemoveAll(builtPath)
+
+	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+}
+
+// This test uses "rm -r" as it behaves differently from "RemoveAll"
+func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
+	t.Error("This test fails as it makes tons of GOCK calls that aren't handled. Review mocking")
+	configureExpanders(t)
+	filesystem := &FS{}
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
+
+	_, err := ioutil.ReadDir(builtPath)
+	assert.NoError(t, err, "Expect to be able to list rg")
+
+	cmd := exec.Command("sh", "-c", "rm -r "+builtPath)
+	_, err = cmd.CombinedOutput()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
 }
