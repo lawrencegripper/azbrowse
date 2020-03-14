@@ -56,12 +56,12 @@ fmt:
 ## run:
 ##		Quick command to lint and then launch azbrowse
 run: checks install
-	azbrowse
+	azbrowse -debug
 
 ## fuzz-from:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems
 fuzz: checks install
-	azbrowse -fuzzer 5
+	azbrowse -fuzzer 5 -debug
 
 ## fuzz:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems

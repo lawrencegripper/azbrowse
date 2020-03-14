@@ -36,6 +36,9 @@ func TestBrowseToRoot(t *testing.T) {
 	}
 
 	conn, err := createFS(path)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	defer cleanup(path, conn)
 
@@ -45,7 +48,7 @@ func TestBrowseToRoot(t *testing.T) {
 	time.Sleep(time.Second * 2)
 
 	fmt.Println(path)
-	files, err := OSReadDir(path)
+	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		t.Error(err)
 		return
@@ -74,6 +77,9 @@ func TestEditRG(t *testing.T) {
 	}
 
 	conn, err := createFS(azfsPath)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	defer cleanup(azfsPath, conn)
 
@@ -83,7 +89,7 @@ func TestEditRG(t *testing.T) {
 	<-conn.Ready
 
 	// Read root
-	_, err = OSReadDir(azfsPath)
+	_, err = ioutil.ReadDir(azfsPath)
 	if err != nil {
 		t.Error(err)
 		return
@@ -103,7 +109,7 @@ func TestEditRG(t *testing.T) {
 
 	// Read sub
 	subPath := path.Join(azfsPath, subscription)
-	_, err = OSReadDir(subPath)
+	_, err = ioutil.ReadDir(subPath)
 	if err != nil {
 		t.Error(err)
 		return
@@ -116,7 +122,7 @@ func TestEditRG(t *testing.T) {
 	for _, segment := range segments {
 		lastSegment = segment
 		builtPath = path.Join(builtPath, segment)
-		_, err = OSReadDir(builtPath)
+		_, err = ioutil.ReadDir(builtPath)
 		if err != nil {
 			t.Error(err)
 			return
@@ -152,22 +158,4 @@ func cleanup(path string, conn *fuse.Conn) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func OSReadDir(root string) ([]string, error) {
-	var files []string
-	f, err := os.Open(root)
-	if err != nil {
-		return files, err
-	}
-	fileInfo, err := f.Readdir(-1)
-	f.Close()
-	if err != nil {
-		return files, err
-	}
-
-	for _, file := range fileInfo {
-		files = append(files, file.Name())
-	}
-	return files, nil
 }

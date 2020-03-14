@@ -65,5 +65,5 @@
 
   # Ignore azfs
   [[issues.exclude-rules]]
-    path = "cmd/azfs/main.go"
+    path = "internal/pkg/*"
     linters = ["golint"]

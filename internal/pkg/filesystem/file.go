@@ -16,6 +16,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 )
 
+// File represents the root response from a treeNode returned from an expander
 type File struct {
 	fs.NodeRef
 
@@ -86,10 +87,16 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 	}
 
 	// Write original content to disk
-	file.Write([]byte(f.content.Load().(string)))
+	_, err = file.Write([]byte(f.content.Load().(string)))
+	if err != nil {
+		return err
+	}
 
 	// mutate the result
-	file.WriteAt(req.Data, req.Offset)
+	_, err = file.WriteAt(req.Data, req.Offset)
+	if err != nil {
+		return err
+	}
 
 	// Update content in local system
 	reader := bufio.NewReader(file)

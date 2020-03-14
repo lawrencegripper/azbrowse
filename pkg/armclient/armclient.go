@@ -6,13 +6,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"golang.org/x/time/rate"
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/opentracing/opentracing-go"
 )
 
 const (
@@ -31,6 +35,7 @@ type Client struct {
 	client             *http.Client
 	tenantID           string
 	responseProcessors []ResponseProcessor
+	limiter            *rate.Limiter
 
 	acquireToken TokenFunc
 }
@@ -39,6 +44,9 @@ type Client struct {
 // injected client
 var LegacyInstance *Client
 
+const requestPerSecLimit = 1
+const requestPerSecBurst = 5
+
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
 func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) *Client {
 	aquireToken := func(clearCache bool) (AzCLIToken, error) {
@@ -46,6 +54,7 @@ func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) 
 	}
 	return &Client{
 		responseProcessors: responseProcessors,
+		limiter:            rate.NewLimiter(requestPerSecLimit, requestPerSecBurst),
 		acquireToken:       aquireToken,
 		client:             &http.Client{},
 	}
@@ -56,6 +65,7 @@ func NewClientFromClientAndTokenFunc(client *http.Client, tokenFunc TokenFunc, r
 	return &Client{
 		responseProcessors: responseProcessors,
 		acquireToken:       tokenFunc,
+		limiter:            rate.NewLimiter(requestPerSecLimit, requestPerSecBurst),
 		client:             client,
 	}
 }
@@ -123,6 +133,20 @@ func (c *Client) DoRawRequest(ctx context.Context, req *http.Request) (*http.Res
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
+	var span opentracing.Span
+	reservation := c.limiter.Reserve()
+	if !reservation.OK() {
+		panic("Ratelimitter prevented request which should never happen.")
+	}
+	delay := reservation.Delay()
+	if delay.Seconds() > 0 {
+		span, _ = tracing.StartSpanFromContext(ctx, "ratelimitted")
+		eventing.SendFailureStatus("Request rate limitted due to high call volume")
+	}
+	time.Sleep(reservation.Delay())
+	if span != nil {
+		span.Finish()
+	}
 	return c.client.Do(req.WithContext(ctx))
 }
 

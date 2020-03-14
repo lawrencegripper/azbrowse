@@ -110,7 +110,7 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 
 func main() {
 	flag.Usage = usage
-	mountLocation = flag.String("mount", "/mnt/azfs", "defualt: /mnt/azfs location for mounting the filesystem")
+	mountLocation = flag.String("mount", "/mnt/azfs", "default: /mnt/azfs location for mounting the filesystem")
 	demoMode = flag.Bool("demo", false, "enable demo mode")
 	editMode = flag.Bool("enableEdit", false, "enable delete/edit")
 
