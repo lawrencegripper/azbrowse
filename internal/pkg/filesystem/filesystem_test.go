@@ -233,11 +233,11 @@ func Test_Get_RG_WalkTree(t *testing.T) {
 }
 
 func Test_Get_Resource_DirectNavigation(t *testing.T) {
+	configureExpanders(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
 	addMockResource(t)
-	configureExpanders(t)
 
 	filesystem := &FS{}
 
@@ -256,25 +256,40 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 	checkPendingMocks(t)
 }
 
-// func Test_Edit_Resource_DirectNavigation(t *testing.T) {
-// 	configureExpanders(t)
-// 	filesystem := &FS{}
+func Test_Edit_Resource_DirectNavigation(t *testing.T) {
+	configureExpanders(t)
+	addMockSub(t)
+	addMockGroups(t)
+	addMockGroupResources(t)
+	addMockResource(t)
 
-// 	mnt := setupMount(t, filesystem)
+	// Allow an edit
+	gock.New(testServer).
+		Put(resourcePath).
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
 
-// 	defer mnt.Close()
-// 	defer storage.CloseDB()
+	filesystem := &FS{}
 
-// 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
-// 	files, err := ioutil.ReadDir(builtPath)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	mnt := setupMount(t, filesystem)
 
-// 	//Todo: Do some editing here....
+	defer mnt.Close()
+	defer storage.CloseDB()
 
-// 	assert.Equal(t, 5, len(files), "Expected 4 sub resources + index file from mock response")
-// }
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
+	_, err := ioutil.ReadDir(builtPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	//Todo: Do some editing here....
+	resourceFilePath := path.Join(builtPath, fmt.Sprintf("resource.%s.json", resourceNameMock))
+	err = ioutil.WriteFile(resourceFilePath, []byte("{ 'somejson': 'here' }"), 0777)
+
+	assert.NoError(t, err, "Expect write to succeed")
+
+	checkPendingMocks(t)
+}
 
 func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 	configureExpanders(t)
