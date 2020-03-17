@@ -97,8 +97,6 @@ func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
 		}
 	}
 
-	log.Printf("Failed to match name: %s on folder %s", name, d.Name)
-
 	return nil, syscall.ENOENT
 }
 
@@ -111,14 +109,6 @@ func (d *Folder) isDeleteInProgress() bool {
 	return false
 }
 
-// Todo currently `rm -r thing` gives an error deleting an RG but the delete is processed. Error:
-//
-// rm: WARNING: Circular directory structure.
-// This almost certainly means that you have a corrupted file system.
-// NOTIFY YOUR SYSTEM MANAGER.
-// The following directory is part of the cycle:
-// 30466/Deployments
-// rm: cannot remove '30466': Input/output error
 func (d *Folder) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 	if !d.fs.editMode {
 		log.Println("NOOP: Editing disabled")

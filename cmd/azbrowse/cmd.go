@@ -77,6 +77,19 @@ func handleCommandAndArgs() {
 	runFuzzer := runCmd.Int("fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 	runTenantID := runCmd.String("tenant-id", "", "(optional) specify the tenant id to get an access token for (see `az")
 
+	// Version command
+	versionCmd := flag.NewFlagSet("version", flag.ExitOnError)
+	// Version usage
+	versionCmd.Usage = runCmd.Usage
+
+	// azfs command
+	azfsCmd := flag.NewFlagSet("azfs", flag.ExitOnError)
+	azfsAcceptRisk := azfsCmd.Bool("accept-risk", false, "Warning: accept the risk of running this alpha quality filesystem. Do not use on production subscriptions")
+	azfsEditEnabled := azfsCmd.Bool("edit", false, "enable editing")
+	azfsMount := azfsCmd.String("mount", "/mnt/azfs", "location to mount filesystem")
+	azfsSubscription := azfsCmd.String("sub", "", "filter to only show a single subscription, provide the 'name' or 'id' of the subscription")
+	azfsDemo := azfsCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
+
 	// Root usage
 	runCmd.Usage = func() {
 		// Usage
@@ -95,19 +108,10 @@ func handleCommandAndArgs() {
 
 		fmt.Fprintf(os.Stderr, "\nCommands:\n")
 		fmt.Fprintf(os.Stderr, "  version       Print version information\n")
+		fmt.Fprintf(os.Stderr, "  azfs          Mount the Azure ARM API as a fuse filesystem\n")
+		fmt.Fprintf(os.Stderr, "\nOptions:\n")
+		azfsCmd.PrintDefaults()
 	}
-
-	// Version command
-	versionCmd := flag.NewFlagSet("version", flag.ExitOnError)
-	// Version usage
-	versionCmd.Usage = runCmd.Usage
-
-	// azfs command
-	azfsCmd := flag.NewFlagSet("azfs", flag.ExitOnError)
-	azfsAcceptRisk := azfsCmd.Bool("accept-risk", false, "Warning: accept the risk of running this alpha quality filesystem. Do not use on production subscriptions")
-	azfsEditEnabled := azfsCmd.Bool("edit", false, "enable editing")
-	azfsMount := azfsCmd.String("mount", "/mnt/azfs", "location to mount filesystem")
-	azfsDemo := azfsCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
 
 	// Handle root command
 	if len(os.Args) < 2 {
@@ -141,10 +145,10 @@ func handleCommandAndArgs() {
 	if azfsCmd.Parsed() {
 		os.Exit(func() int {
 			if !*azfsAcceptRisk {
-				fmt.Println("This is an alpha quality feature you must accept the risk to your subscription by adding '-accept-risk'")
+				fmt.Println("This is an alpha quality feature you must accept the risk to your subscription by adding '-accept-risk'. Use '-sub subscriptionname' to only mount a single subscription")
 				os.Exit(1)
 			}
-			closer, err := filesystem.Run(*azfsMount, *azfsEditEnabled, *azfsDemo)
+			closer, err := filesystem.Run(*azfsMount, *azfsSubscription, *azfsEditEnabled, *azfsDemo)
 			if err != nil {
 				panic(err)
 			}

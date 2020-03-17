@@ -18,8 +18,8 @@ import (
 )
 
 // Run starts a fuze based filesystem over the Azure ARM API
-func Run(mountpoint string, editMode bool, demoMode bool) (func(), error) {
-	c, err := createFS(mountpoint, editMode, demoMode)
+func Run(mountpoint string, filterToSub string, editMode bool, demoMode bool) (func(), error) {
+	c, err := createFS(mountpoint, filterToSub, editMode, demoMode)
 	if err != nil {
 		log.Println("Failed to create fs")
 		return func() {}, err
@@ -27,7 +27,9 @@ func Run(mountpoint string, editMode bool, demoMode bool) (func(), error) {
 
 	// Check if the mount process has an error to report.
 	<-c.Ready
-	closer := func() { Close(mountpoint, c) }
+	closer := func() {
+		Close(mountpoint, c) //nolint: errcheck
+	}
 
 	if err := c.MountError; err != nil {
 		log.Println("Failed to mount fs")
@@ -41,7 +43,7 @@ func responseLogge(requestPath string, response *http.Response, responseBody str
 	log.Println(responseBody)
 }
 
-func createFS(mountpoint string, editMode bool, demoMode bool) (*fuse.Conn, error) {
+func createFS(mountpoint string, filterToSub string, editMode bool, demoMode bool) (*fuse.Conn, error) {
 	c, err := fuse.Mount(
 		mountpoint,
 		fuse.FSName("azfs"),
@@ -92,8 +94,9 @@ func createFS(mountpoint string, editMode bool, demoMode bool) (*fuse.Conn, erro
 
 	srv := fs.New(c, nil)
 	filesys := &FS{
-		demoMode: demoMode,
-		editMode: editMode,
+		demoMode:             demoMode,
+		editMode:             editMode,
+		filterToSubscription: filterToSub,
 	}
 	go func() {
 		if err := srv.Serve(filesys); err != nil {

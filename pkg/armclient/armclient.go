@@ -60,7 +60,7 @@ func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) 
 	}
 }
 
-// NewTestClientFromClientAndTokenFunc create a client for testing using custom token func and httpclient
+// NewClientFromConfig create a client for testing using custom token func and httpclient
 func NewClientFromConfig(client *http.Client, tokenFunc TokenFunc, reqPerSecLimit float64, responseProcessors ...ResponseProcessor) *Client {
 	return &Client{
 		responseProcessors: responseProcessors,

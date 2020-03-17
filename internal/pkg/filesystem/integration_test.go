@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 	"testing"
@@ -19,8 +18,6 @@ import (
 
 // Warning: Hacky tests for me to get started with, need improvement.
 
-const expectedSubs = 4
-
 func TestBrowseToRoot(t *testing.T) {
 	gock.Off()
 	if testing.Short() {
@@ -33,7 +30,7 @@ func TestBrowseToRoot(t *testing.T) {
 		t.Error(err)
 	}
 
-	conn, err := createFS(path, false, false)
+	conn, err := createFS(path, "", false, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,7 +65,7 @@ func TestEditRG(t *testing.T) {
 		t.Error(err)
 	}
 
-	conn, err := createFS(azfsPath, false, false)
+	conn, err := createFS(azfsPath, "", false, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,11 +138,6 @@ func TestEditRG(t *testing.T) {
 }
 
 func cleanup(path string, conn *fuse.Conn) {
-	// conn.Close()
 	storage.CloseDB()
-	cmd := exec.Command("sh", "-c", "fusermount -u "+path)
-	_, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Fatal(err)
-	}
+	Close(path, conn) //nolint: errcheck
 }

@@ -10,8 +10,9 @@ import (
 )
 
 type FS struct {
-	demoMode bool
-	editMode bool
+	demoMode             bool
+	editMode             bool
+	filterToSubscription string
 }
 
 var ctx = context.Background()
@@ -28,6 +29,16 @@ func (f *FS) Root() (fs.Node, error) {
 	})
 	if err != nil {
 		panic(err)
+	}
+
+	// Filter to a single subscription if specified
+	if f.filterToSubscription != "" {
+		for _, sub := range newItems {
+			if sub.Name == f.filterToSubscription || sub.ID == f.filterToSubscription {
+				newItems = []*expanders.TreeNode{sub}
+				break
+			}
+		}
 	}
 
 	return &Folder{

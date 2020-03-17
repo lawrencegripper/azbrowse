@@ -100,8 +100,7 @@ func configureExpandersAndGock(t *testing.T) {
 	gock.InterceptClient(httpClient)
 
 	// Set the ARM client to use out test server
-	// client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000, createResponseLogger(t))
-	client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000)
+	client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000, createResponseLogger(t))
 	armclient.LegacyInstance = client
 
 	expanders.InitializeExpanders(client)
@@ -296,7 +295,6 @@ func Test_Delete_Resource_EditMode_Off(t *testing.T) {
 	}
 
 	// Allow delete call on rg
-	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
 	gock.New(testServer).
 		Delete(rgPath).
 		Reply(200).
@@ -325,7 +323,6 @@ func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 	}
 
 	// Allow delete call on rg
-	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
 	gock.New(testServer).
 		Delete(rgPath).
 		Reply(200).
