@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
+	"strings"
 	"testing"
 	"time"
 
@@ -41,6 +43,44 @@ func getJSONFromFile(t *testing.T, path string) string {
 	return string(dat)
 }
 
+var rgPath string
+var resourcePath string
+
+func addMockSub(t *testing.T) {
+	gock.New(testServer).
+		Get("/subscriptions").
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/subscriptions/response.json"))
+
+	gock.New(testServer).
+		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups").
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
+}
+
+func addMockRG(t *testing.T) {
+	gock.New(testServer).
+		Get(rgPath + "/resources").
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/resourcelist.json"))
+
+}
+
+func addMockResource(t *testing.T) {
+	gock.New(testServer).
+		Get(resourcePath).
+		Reply(200).
+		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
+}
+
+func checkPendingMocks(t *testing.T) {
+	pendingMocks := gock.Pending()
+	assert.Equal(t, 0, len(pendingMocks), "Expect all mocks APIs to be called")
+	for _, m := range pendingMocks {
+		t.Logf("Pending mock not called: %s %+v", m.Request().URLStruct, m.Request())
+	}
+}
+
 func configureExpanders(t *testing.T) {
 	// ctx := context.Background()
 	boolFalsePtr := false
@@ -51,44 +91,8 @@ func configureExpanders(t *testing.T) {
 	// Load the db
 	storage.LoadDB()
 
-	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
-	resourcePath := fmt.Sprintf("%s/providers/Microsoft.Storage/storageAccounts/%s", rgPath, resourceNameMock)
-
-	// Create mock ARM API
-	gock.New(testServer).
-		Delete(rgPath + "/*").
-		Reply(200).
-		JSON("{}")
-
-	gock.New(testServer).
-		Get("/subscriptions").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/subscriptions/response.json"))
-
-	gock.New(testServer).
-		Delete(resourcePath).
-		Reply(200).
-		JSON("{}")
-
-	gock.New(testServer).
-		Get(resourcePath).
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
-
-	gock.New(testServer).
-		Delete(rgPath).
-		Reply(200).
-		JSON("{}")
-
-	gock.New(testServer).
-		Get(rgPath + "/resources").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/resourcelist.json"))
-
-	gock.New(testServer).
-		Get("subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups").
-		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
+	rgPath = fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
+	resourcePath = fmt.Sprintf("%s/providers/Microsoft.Storage/storageAccounts/%s", rgPath, resourceNameMock)
 
 	httpClient := &http.Client{Transport: &http.Transport{}}
 	gock.InterceptClient(httpClient)
@@ -129,6 +133,7 @@ func setupMount(t *testing.T, filesys fs.FS) (mnt *fstestutil.Mount) {
 }
 
 func Test_Get_Subs(t *testing.T) {
+	addMockSub(t)
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -147,10 +152,11 @@ func Test_Get_Subs(t *testing.T) {
 	}
 
 	assert.Equal(t, 4, len(files), "Expected 3 subscriptions + index file from mock response")
-
+	checkPendingMocks(t)
 }
 
 func Test_Get_Sub_TreeWalk(t *testing.T) {
+	addMockSub(t)
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -171,9 +177,13 @@ func Test_Get_Sub_TreeWalk(t *testing.T) {
 	}
 
 	assert.Equal(t, 7, len(files), "Expected 6 RGs + index file from mock response")
+	checkPendingMocks(t)
 }
 
 func Test_Get_RG_WalkTree(t *testing.T) {
+	addMockSub(t)
+	addMockRG(t)
+
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -204,9 +214,13 @@ func Test_Get_RG_WalkTree(t *testing.T) {
 	}
 
 	assert.Equal(t, 13, len(files), "Expected 12 resources + index file from mock response")
+	checkPendingMocks(t)
 }
 
 func Test_Get_Resource_DirectNavigation(t *testing.T) {
+	addMockSub(t)
+	addMockRG(t)
+
 	configureExpanders(t)
 	filesystem := &FS{}
 
@@ -222,6 +236,7 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 	}
 
 	assert.Equal(t, 5, len(files), "Expected 4 sub resources + index file from mock response")
+	checkPendingMocks(t)
 }
 
 // func Test_Edit_Resource_DirectNavigation(t *testing.T) {
@@ -245,8 +260,18 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 // }
 
 func Test_Delete_Resource_DirectNavigation(t *testing.T) {
+	addMockSub(t)
+	addMockRG(t)
+
 	configureExpanders(t)
 	filesystem := &FS{}
+
+	// Allow delete call on rg
+	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
+	gock.New(testServer).
+		Delete(rgPath).
+		Reply(200).
+		JSON("{}")
 
 	mnt := setupMount(t, filesystem)
 
@@ -257,11 +282,21 @@ func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 	err := os.RemoveAll(builtPath)
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+
+	checkPendingMocks(t)
 }
 
 func Test_Delete_RG_DirectNavigation(t *testing.T) {
+	addMockSub(t)
+
 	configureExpanders(t)
 	filesystem := &FS{}
+
+	// Allow delete call on rg
+	gock.New(testServer).
+		Delete(rgPath).
+		Reply(200).
+		JSON("{}")
 
 	mnt := setupMount(t, filesystem)
 
@@ -272,12 +307,22 @@ func Test_Delete_RG_DirectNavigation(t *testing.T) {
 	err := os.RemoveAll(builtPath)
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+	checkPendingMocks(t)
 }
 
 // This test use "RemoveAll" which looks like it is different to "rm -r"
 func Test_Delete_RG_AfterBrowse(t *testing.T) {
+	addMockSub(t)
+	addMockRG(t)
+
 	configureExpanders(t)
 	filesystem := &FS{}
+
+	// Allow delete call on rg
+	gock.New(testServer).
+		Delete(rgPath).
+		Reply(200).
+		JSON("{}")
 
 	mnt := setupMount(t, filesystem)
 
@@ -292,29 +337,49 @@ func Test_Delete_RG_AfterBrowse(t *testing.T) {
 	err = os.RemoveAll(builtPath)
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+	checkPendingMocks(t)
 }
 
-// // This test uses "rm -r" as it behaves differently from "RemoveAll"
-// func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
-// 	t.Error("This test fails as it makes tons of GOCK calls that aren't handled. Review mocking")
-// 	configureExpanders(t)
-// 	filesystem := &FS{}
+// This test uses "rm -r" as it behaves differently from "RemoveAll"
+func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
+	addMockSub(t)
+	addMockRG(t)
 
-// 	mnt := setupMount(t, filesystem)
+	configureExpanders(t)
 
-// 	defer mnt.Close()
-// 	defer storage.CloseDB()
+	// Allow to delete this stuff
+	providers := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s/providers", rgNameMock)
+	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
 
-// 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
+	gock.New(testServer).
+		AddMatcher(func(req *http.Request, gockReq *gock.Request) (bool, error) {
+			if (strings.HasPrefix(req.URL.Path, providers) || req.URL.Path == rgPath) && req.Method == "DELETE" {
+				return true, nil
+			}
+			return false, nil
+		}).
+		Persist().
+		Reply(200).
+		JSON("{}")
 
-// 	_, err := ioutil.ReadDir(builtPath)
-// 	assert.NoError(t, err, "Expect to be able to list rg")
+	filesystem := &FS{}
 
-// 	cmd := exec.Command("sh", "-c", "rm -r "+builtPath)
-// 	_, err = cmd.CombinedOutput()
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
+	mnt := setupMount(t, filesystem)
 
-// 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
-// }
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
+
+	_, err := ioutil.ReadDir(builtPath)
+	assert.NoError(t, err, "Expect to be able to list rg")
+
+	cmd := exec.Command("sh", "-c", "rm -r "+builtPath)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Log(string(output))
+	}
+
+	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+	assert.Equal(t, 1, len(gock.Pending()), "Expect nearly all mocks APIs to be called, the persistent mock doesn't count")
+}

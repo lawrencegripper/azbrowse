@@ -141,6 +141,7 @@ func (d *Folder) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 
 			log.Printf("---> Attemping delete on %s", req.Name)
 			// Start deletion
+			// fallback to ARM request to delete
 			fallback := true
 			if treeNode.Expander != nil {
 				deleted, err := treeNode.Expander.Delete(ctx, treeNode)
@@ -148,6 +149,10 @@ func (d *Folder) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 			}
 			if fallback {
 				// fallback to ARM request to delete
+				if treeNode.DeleteURL == "" {
+					log.Printf("Delete not supported skipping node '%s' doing delete: %+v", treeNode.Name+treeNode.ItemType, req)
+					return nil
+				}
 				_, err := armclient.LegacyInstance.DoRequest(ctx, "DELETE", treeNode.DeleteURL)
 				if err != nil {
 					panic(err)

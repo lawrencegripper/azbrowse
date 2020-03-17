@@ -44,8 +44,8 @@ type Client struct {
 // injected client
 var LegacyInstance *Client
 
-const requestPerSecLimit = 1
-const requestPerSecBurst = 5
+const requestPerSecLimit = 10
+const requestPerSecBurst = 50
 
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
 func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) *Client {
