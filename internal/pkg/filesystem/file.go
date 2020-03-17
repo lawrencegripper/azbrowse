@@ -19,14 +19,9 @@ import (
 // File represents the root response from a treeNode returned from an expander
 type File struct {
 	fs.NodeRef
-
-	mu sync.Mutex
-
-	// fuse     *fs.Server
+	mu       sync.Mutex
 	content  atomic.Value
 	treeNode *expanders.TreeNode
-	// number of write-capable handles currently open
-	writers uint
 }
 
 var _ fs.Node = (*File)(nil)
@@ -50,8 +45,6 @@ var _ fs.NodeOpener = (*File)(nil)
 func (f *File) Open(ctx context.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-
-	f.writers++
 
 	resp.Flags |= fuse.OpenKeepCache
 	return f, nil
@@ -124,6 +117,10 @@ func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.Wri
 		return err
 	}
 
+	log.Println("Write completed")
+
+	resp.Size = len(newContent)
+
 	return nil
 }
 
@@ -157,21 +154,6 @@ var _ = fs.HandleReleaser(&File{})
 func (f *File) Release(ctx context.Context, req *fuse.ReleaseRequest) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
-
-	return nil
-}
-
-var _ = fs.HandleFlusher(&File{})
-
-func (f *File) Flush(ctx context.Context, req *fuse.FlushRequest) error {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-
-	if f.writers == 0 {
-		// Read-only handles also get flushes. Make sure we don't
-		// overwrite valid file contents with a nil buffer.
-		return nil
-	}
 
 	return nil
 }

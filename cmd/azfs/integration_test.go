@@ -14,6 +14,7 @@ import (
 	"bazil.org/fuse"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
+	"github.com/stretchr/testify/assert"
 )
 
 // Warning: Hacky tests for me to get started with, need improvement.
@@ -55,9 +56,7 @@ func TestBrowseToRoot(t *testing.T) {
 	}
 	fmt.Println(path)
 
-	if len(files) != expectedSubs {
-		t.Error("Expected 4 subscriptions")
-	}
+	assert.Equal(t, 5, len(files))
 }
 
 func TestEditRG(t *testing.T) {
@@ -146,8 +145,6 @@ func TestEditRG(t *testing.T) {
 	if err != nil {
 		log.Println(err)
 	}
-
-	time.Sleep(time.Second)
 }
 
 func cleanup(path string, conn *fuse.Conn) {
