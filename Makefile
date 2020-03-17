@@ -144,6 +144,7 @@ endif
 		-e DOCKER_PASSWORD="${DOCKER_PASSWORD}" \
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
+		--device /dev/fuse \
 		--entrypoint /bin/bash \
 		--workdir "${PWD}" \
 		-t $(DEV_CONTAINER_TAG) \

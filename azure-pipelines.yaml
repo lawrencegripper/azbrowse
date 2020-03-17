@@ -10,7 +10,9 @@ steps:
       unset GITHUB_TOKEN
       unset DOCKER_PASSWORD
     fi
-    sudo -E make devcontainer-release
+    #Install fuse on dockerhost as required
+    sudo apt install fuse -y
+    make devcontainer-release
   displayName: 'Build, Test and *Publish *(only on master)'
   env:
     BUILD_NUMBER: $(Build.BuildId)

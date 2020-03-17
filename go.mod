@@ -23,7 +23,7 @@ require (
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
-	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f
+	github.com/mailru/easyjson v0.0.0-20190221075403-6243d8e04c3f // indirect
 	github.com/mattn/go-runewidth v0.0.3 // indirect
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
 	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed

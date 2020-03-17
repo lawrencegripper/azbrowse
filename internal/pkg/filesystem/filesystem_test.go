@@ -1,3 +1,5 @@
+// +build !windows
+
 package filesystem
 
 import (
@@ -9,9 +11,11 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 
 	"bazil.org/fuse/fs"
 	"bazil.org/fuse/fs/fstestutil"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -24,21 +28,16 @@ const (
 	subNameMock      = "1testsub"
 	rgNameMock       = "1testrg"
 	resourceNameMock = "1teststorageaccount"
+	printVerboseLogs = false
 )
 
 func createResponseLogger(t *testing.T) armclient.ResponseProcessor {
 	return func(requestPath string, response *http.Response, responseBody string) {
-		t.Log(requestPath)
-		t.Log(responseBody)
+		if printVerboseLogs {
+			t.Log(requestPath)
+			t.Log(responseBody)
+		}
 	}
-}
-
-func getJSONFromFile(t *testing.T, path string) string {
-	dat, err := ioutil.ReadFile(path)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return string(dat)
 }
 
 var rgPath = fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
@@ -57,28 +56,28 @@ func addMockSub(t *testing.T) {
 	gock.New(testServer).
 		AddMatcher(createExactGetMatcher("/subscriptions")).
 		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/subscriptions/response.json"))
+		File("../expanders/testdata/armsamples/subscriptions/response.json")
 }
 
 func addMockGroups(t *testing.T) {
 	gock.New(testServer).
 		AddMatcher(createExactGetMatcher("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups")).
 		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/response.json"))
+		File("../expanders/testdata/armsamples/resourcegroups/response.json")
 }
 
 func addMockGroupResources(t *testing.T) {
 	gock.New(testServer).
 		AddMatcher(createExactGetMatcher(rgPath + "/resources")).
 		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resourcegroups/resourcelist.json"))
+		File("../expanders/testdata/armsamples/resourcegroups/resourcelist.json")
 }
 
 func addMockResource(t *testing.T) {
 	gock.New(testServer).
 		AddMatcher(createExactGetMatcher(resourcePath)).
 		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
+		File("../expanders/testdata/armsamples/resource/response.json")
 }
 
 func checkPendingMocks(t *testing.T) {
@@ -95,7 +94,6 @@ func configureExpandersAndGock(t *testing.T) {
 
 	// Reset gock
 	gock.Off()
-
 	httpClient := &http.Client{Transport: &http.Transport{}}
 	gock.InterceptClient(httpClient)
 
@@ -104,25 +102,34 @@ func configureExpandersAndGock(t *testing.T) {
 	armclient.LegacyInstance = client
 
 	expanders.InitializeExpanders(client)
-	client.PopulateResourceAPILookup(ctx)
+	providerData, err := storage.GetCache("providerCache")
+	if err != nil || providerData == "" {
+		gock.New(testServer).
+			AddMatcher(createExactGetMatcher("/providers")).
+			Reply(200).
+			File("../expanders/testdata/armsamples/providers/response.json")
+
+		client.PopulateResourceAPILookup(ctx)
+	}
 
 	// print status messages
-
-	// go func() {
-	// 	newEvents := eventing.SubscribeToStatusEvents()
-	// 	for {
-	// 		// Wait for a second to see if we have any new messages
-	// 		timeout := time.After(time.Second)
-	// 		select {
-	// 		case eventObj := <-newEvents:
-	// 			status := eventObj.(*eventing.StatusEvent)
-	// 			message := status.Message
-	// 			t.Logf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
-	// 		case <-timeout:
-	// 			// Update the UI
-	// 		}
-	// 	}
-	// }()
+	if printVerboseLogs {
+		go func() {
+			newEvents := eventing.SubscribeToStatusEvents()
+			for {
+				// Wait for a second to see if we have any new messages
+				timeout := time.After(time.Second)
+				select {
+				case eventObj := <-newEvents:
+					status := eventObj.(*eventing.StatusEvent)
+					message := status.Message
+					t.Logf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
+				case <-timeout:
+					// Update the UI
+				}
+			}
+		}()
+	}
 
 }
 
@@ -258,7 +265,7 @@ func Test_Edit_Resource_DirectNavigation(t *testing.T) {
 	gock.New(testServer).
 		Put(resourcePath).
 		Reply(200).
-		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
+		File("../expanders/testdata/armsamples/resource/response.json")
 
 	filesystem := &FS{
 		editMode: true,
