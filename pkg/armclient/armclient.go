@@ -44,7 +44,7 @@ type Client struct {
 // injected client
 var LegacyInstance *Client
 
-const requestPerSecLimit = 1
+const requestPerSecLimit = 10
 const requestPerSecBurst = 5
 
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
@@ -61,11 +61,11 @@ func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) 
 }
 
 // NewTestClientFromClientAndTokenFunc create a client for testing using custom token func and httpclient
-func NewTestClientFromClientAndTokenFunc(client *http.Client, tokenFunc TokenFunc, responseProcessors ...ResponseProcessor) *Client {
+func NewClientFromConfig(client *http.Client, tokenFunc TokenFunc, reqPerSecLimit float64, responseProcessors ...ResponseProcessor) *Client {
 	return &Client{
 		responseProcessors: responseProcessors,
 		acquireToken:       tokenFunc,
-		limiter:            rate.NewLimiter(1000, 5000), // Keep the rate limitter but set high values for tests to complete quickly
+		limiter:            rate.NewLimiter(rate.Limit(reqPerSecLimit), 10), // Keep the rate limitter but set high values for tests to complete quickly
 		client:             client,
 	}
 }
