@@ -24,7 +24,7 @@ func Test_ArmClient_AzCliToken_Refresh(t *testing.T) {
 		}
 		return AzCLIToken{}, nil
 	}
-	client := NewClientFromClientAndTokenFunc(ts.Client(), tokenFunc)
+	client := NewTestClientFromClientAndTokenFunc(ts.Client(), tokenFunc)
 
 	client.DoRequest(context.Background(), "GET", ts.URL+"/subscriptions/1/resourceGroups/rg1") //nolint: errcheck
 
@@ -51,7 +51,7 @@ func Test_ArmClient_AzCliToken_DontRefresh(t *testing.T) {
 		return AzCLIToken{}, nil
 	}
 	// Set the ARM client to use out test server
-	client := NewClientFromClientAndTokenFunc(ts.Client(), tokenFunc)
+	client := NewTestClientFromClientAndTokenFunc(ts.Client(), tokenFunc)
 
 	client.DoRequest(context.Background(), "GET", ts.URL+"/subscriptions/1/resourceGroups/rg1") //nolint: errcheck
 
