@@ -279,6 +279,7 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 	configureExpanders(t)
 	addMockSub(t)
+	addMockGroups(t)
 	addMockGroupResources(t)
 
 	filesystem := &FS{}
@@ -299,8 +300,7 @@ func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 	err := os.RemoveAll(builtPath)
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
-
-	// checkPendingMocks(t)
+	checkPendingMocks(t)
 }
 
 func Test_Delete_RG_DirectNavigation(t *testing.T) {
@@ -325,7 +325,7 @@ func Test_Delete_RG_DirectNavigation(t *testing.T) {
 	err := os.RemoveAll(builtPath)
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
-	// checkPendingMocks(t)
+	checkPendingMocks(t)
 }
 
 // This test use "RemoveAll" which looks like it is different to "rm -r"
@@ -333,14 +333,13 @@ func Test_Delete_RG_AfterBrowse(t *testing.T) {
 	configureExpanders(t)
 	addMockSub(t)
 	addMockGroups(t)
-	addMockResource(t)
+	addMockGroupResources(t)
+
 	// Allow delete call on rg
 	gock.New(testServer).
 		Delete(rgPath).
 		Reply(200).
 		JSON("{}")
-	addMockSub(t)
-	addMockGroupResources(t)
 
 	filesystem := &FS{}
 
@@ -357,6 +356,7 @@ func Test_Delete_RG_AfterBrowse(t *testing.T) {
 	err = os.RemoveAll(builtPath)
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+	checkPendingMocks(t)
 }
 
 // This test uses "rm -r" as it behaves differently from "RemoveAll"
@@ -399,4 +399,6 @@ func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
 	}
 
 	assert.NoError(t, err, "Expected no error when deleting resource: %s", builtPath)
+	pendingMocks := gock.Pending()
+	assert.Equal(t, 1, len(pendingMocks), "Expect nearly all mocks APIs to be called (pending catch all mock doesn't track calls to it)")
 }
