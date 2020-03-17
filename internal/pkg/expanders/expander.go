@@ -83,7 +83,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 			}
 			if result.IsPrimaryResponse {
 				if hasPrimaryResponse {
-					panic("Two handlers returned a primary response for this item... failing")
+					panic(fmt.Sprintf("Two handlers returned a primary response for this item... failing. ID: %s EXPANDER: %s", currentItem.ID, result.SourceDescription))
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true

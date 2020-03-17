@@ -4,8 +4,8 @@
       "tier": "Standard"
     },
     "kind": "Storage",
-    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1thing/providers/Microsoft.Storage/storageAccounts/thingsthings123",
-    "name": "thingsthings123",
+    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Storage/storageAccounts/1teststorageaccount",
+    "name": "1teststorageaccount",
     "type": "Microsoft.Storage/storageAccounts",
     "location": "northeurope",
     "tags": {
