@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"runtime"
+	"syscall"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
@@ -99,6 +102,13 @@ func handleCommandAndArgs() {
 	// Version usage
 	versionCmd.Usage = runCmd.Usage
 
+	// azfs command
+	azfsCmd := flag.NewFlagSet("azfs", flag.ExitOnError)
+	azfsAcceptRisk := azfsCmd.Bool("accept-risk", false, "Warning: accept the risk of running this alpha quality filesystem. Do not use on production subscriptions")
+	azfsEditEnabled := azfsCmd.Bool("edit", false, "enable editing")
+	azfsMount := azfsCmd.String("mount", "/mnt/azfs", "location to mount filesystem")
+	azfsDemo := azfsCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
+
 	// Handle root command
 	if len(os.Args) < 2 {
 		if err := runCmd.Parse(os.Args[1:]); err != nil {
@@ -113,6 +123,10 @@ func handleCommandAndArgs() {
 			if err := versionCmd.Parse(os.Args[2:]); err != nil {
 				usageAndExit()
 			}
+		case "azfs":
+			if err := azfsCmd.Parse(os.Args[2:]); err != nil {
+				usageAndExit()
+			}
 		default: // default to root command
 			if err := runCmd.Parse(os.Args[1:]); err != nil {
 				usageAndExit()
@@ -123,6 +137,29 @@ func handleCommandAndArgs() {
 	// Detect which command was parsed and invoke  handler
 	if versionCmd.Parsed() {
 		os.Exit(handleVersionCmd(&settings))
+	}
+	if azfsCmd.Parsed() {
+		os.Exit(func() int {
+			if !*azfsAcceptRisk {
+				fmt.Println("This is an alpha quality feature you must accept the risk to your subscription by adding '-accept-risk'")
+				os.Exit(1)
+			}
+			closer, err := filesystem.Run(*azfsMount, *azfsEditEnabled, *azfsDemo)
+			if err != nil {
+				panic(err)
+			}
+			c := make(chan os.Signal, 2)
+			signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+			<-c
+			fmt.Println("Ctrl+C pressed attempting to unmounting azfs and exit. \n If you see a 'device busy' message exit all processes using the filesystem then unmount will proceed \n Alternatively press CTRL+C again to force exit.")
+			go func() {
+				<-c
+				os.Exit(0)
+			}()
+			closer()
+			os.Exit(0)
+			return 1
+		}())
 	}
 	if runCmd.Parsed() {
 		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate, runFuzzer, runTenantID))

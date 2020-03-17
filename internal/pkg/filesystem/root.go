@@ -10,11 +10,11 @@ import (
 )
 
 type FS struct {
+	demoMode bool
+	editMode bool
 }
 
 var ctx = context.Background()
-var DemoMode *bool
-var EditMode *bool
 
 var _ fs.FS = (*FS)(nil)
 
@@ -43,6 +43,7 @@ func (f *FS) Root() (fs.Node, error) {
 		},
 		indexContent:    content,
 		isParentDeleted: func() bool { return false },
+		fs:              f,
 	}, nil
 }
 

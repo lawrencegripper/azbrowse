@@ -19,6 +19,7 @@ import (
 // File represents the root response from a treeNode returned from an expander
 type File struct {
 	fs.NodeRef
+	fs       *FS
 	mu       sync.Mutex
 	content  atomic.Value
 	treeNode *expanders.TreeNode
@@ -70,6 +71,10 @@ func (d *File) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
 var _ fs.HandleWriter = (*File)(nil)
 
 func (f *File) Write(ctx context.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
+	if !f.fs.editMode {
+		log.Println("NOOP: Editing disabled")
+		return nil
+	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
 

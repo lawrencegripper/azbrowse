@@ -18,6 +18,7 @@ import (
 
 type Folder struct {
 	fuse.Dirent
+	fs              *FS
 	treeNode        *expanders.TreeNode
 	items           []*expanders.TreeNode
 	subFolders      []*Folder
@@ -56,6 +57,7 @@ func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	if name == indexFileName(d.treeNode, d.indexContent) {
 		file := &File{
 			treeNode: d.treeNode,
+			fs:       d.fs,
 		}
 		content := d.indexContent.Response
 
@@ -88,6 +90,7 @@ func (d *Folder) Lookup(ctx context.Context, name string) (fs.Node, error) {
 
 					return d.isBeingDeleted
 				},
+				fs: d.fs,
 			}
 			d.subFolders = append(d.subFolders, f)
 			return f, nil
@@ -117,6 +120,10 @@ func (d *Folder) isDeleteInProgress() bool {
 // 30466/Deployments
 // rm: cannot remove '30466': Input/output error
 func (d *Folder) Remove(ctx context.Context, req *fuse.RemoveRequest) error {
+	if !d.fs.editMode {
+		log.Println("NOOP: Editing disabled")
+		return fuse.EPERM
+	}
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
@@ -173,7 +180,7 @@ func (d *Folder) LoadNodeFromARM() {
 		panic(err)
 	}
 
-	if *DemoMode {
+	if d.fs.demoMode {
 		rootContent.Response = views.StripSecretVals(rootContent.Response)
 	}
 

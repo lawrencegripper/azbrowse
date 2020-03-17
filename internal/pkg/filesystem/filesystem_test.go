@@ -9,11 +9,9 @@ import (
 	"path"
 	"strings"
 	"testing"
-	"time"
 
 	"bazil.org/fuse/fs"
 	"bazil.org/fuse/fs/fstestutil"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -91,25 +89,19 @@ func checkPendingMocks(t *testing.T) {
 	}
 }
 
-func configureExpanders(t *testing.T) {
-	// ctx := context.Background()
-	boolFalsePtr := false
-	boolTruePtr := true
-	DemoMode = &boolFalsePtr
-	EditMode = &boolTruePtr
-
+func configureExpandersAndGock(t *testing.T) {
 	// Load the db
 	storage.LoadDB()
 
-	gock.Clean()
-	gock.CleanUnmatchedRequest()
-	// gock.OffAll()
+	// Reset gock
+	gock.Off()
 
 	httpClient := &http.Client{Transport: &http.Transport{}}
 	gock.InterceptClient(httpClient)
 
 	// Set the ARM client to use out test server
-	client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000, createResponseLogger(t))
+	// client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000, createResponseLogger(t))
+	client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000)
 	armclient.LegacyInstance = client
 
 	expanders.InitializeExpanders(client)
@@ -117,21 +109,21 @@ func configureExpanders(t *testing.T) {
 
 	// print status messages
 
-	go func() {
-		newEvents := eventing.SubscribeToStatusEvents()
-		for {
-			// Wait for a second to see if we have any new messages
-			timeout := time.After(time.Second)
-			select {
-			case eventObj := <-newEvents:
-				status := eventObj.(*eventing.StatusEvent)
-				message := status.Message
-				t.Logf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
-			case <-timeout:
-				// Update the UI
-			}
-		}
-	}()
+	// go func() {
+	// 	newEvents := eventing.SubscribeToStatusEvents()
+	// 	for {
+	// 		// Wait for a second to see if we have any new messages
+	// 		timeout := time.After(time.Second)
+	// 		select {
+	// 		case eventObj := <-newEvents:
+	// 			status := eventObj.(*eventing.StatusEvent)
+	// 			message := status.Message
+	// 			t.Logf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
+	// 		case <-timeout:
+	// 			// Update the UI
+	// 		}
+	// 	}
+	// }()
 
 }
 
@@ -144,7 +136,7 @@ func setupMount(t *testing.T, filesys fs.FS) (mnt *fstestutil.Mount) {
 }
 
 func Test_Get_Subs(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 
 	filesystem := &FS{}
@@ -168,7 +160,7 @@ func Test_Get_Subs(t *testing.T) {
 }
 
 func Test_Get_Sub_TreeWalk(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 
@@ -195,7 +187,7 @@ func Test_Get_Sub_TreeWalk(t *testing.T) {
 }
 
 func Test_Get_RG_WalkTree(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
@@ -233,7 +225,7 @@ func Test_Get_RG_WalkTree(t *testing.T) {
 }
 
 func Test_Get_Resource_DirectNavigation(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
@@ -257,7 +249,7 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 }
 
 func Test_Edit_Resource_DirectNavigation(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
@@ -269,7 +261,9 @@ func Test_Edit_Resource_DirectNavigation(t *testing.T) {
 		Reply(200).
 		JSON(getJSONFromFile(t, "../expanders/testdata/armsamples/resource/response.json"))
 
-	filesystem := &FS{}
+	filesystem := &FS{
+		editMode: true,
+	}
 
 	mnt := setupMount(t, filesystem)
 
@@ -291,13 +285,44 @@ func Test_Edit_Resource_DirectNavigation(t *testing.T) {
 	checkPendingMocks(t)
 }
 
-func Test_Delete_Resource_DirectNavigation(t *testing.T) {
-	configureExpanders(t)
+func Test_Delete_Resource_EditMode_Off(t *testing.T) {
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
 
-	filesystem := &FS{}
+	filesystem := &FS{
+		editMode: false,
+	}
+
+	// Allow delete call on rg
+	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
+	gock.New(testServer).
+		Delete(rgPath).
+		Reply(200).
+		JSON("{}")
+
+	mnt := setupMount(t, filesystem)
+
+	defer mnt.Close()
+	defer storage.CloseDB()
+
+	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
+	err := os.RemoveAll(builtPath)
+
+	assert.Error(t, err, "Expected error when deleting resource with edit mode disabled: %s", builtPath)
+	assert.Equal(t, 1, len(gock.Pending()), "Expect delete mock to not have been called")
+}
+
+func Test_Delete_Resource_DirectNavigation(t *testing.T) {
+	configureExpandersAndGock(t)
+	addMockSub(t)
+	addMockGroups(t)
+	addMockGroupResources(t)
+
+	filesystem := &FS{
+		editMode: true,
+	}
 
 	// Allow delete call on rg
 	rgPath := fmt.Sprintf("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/%s", rgNameMock)
@@ -319,12 +344,13 @@ func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 }
 
 func Test_Delete_RG_DirectNavigation(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 
-	filesystem := &FS{}
-
+	filesystem := &FS{
+		editMode: true,
+	}
 	// Allow delete call on rg
 	gock.New(testServer).
 		Delete(rgPath).
@@ -345,7 +371,7 @@ func Test_Delete_RG_DirectNavigation(t *testing.T) {
 
 // This test use "RemoveAll" which looks like it is different to "rm -r"
 func Test_Delete_RG_AfterBrowse(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
@@ -356,8 +382,9 @@ func Test_Delete_RG_AfterBrowse(t *testing.T) {
 		Reply(200).
 		JSON("{}")
 
-	filesystem := &FS{}
-
+	filesystem := &FS{
+		editMode: true,
+	}
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
@@ -376,7 +403,7 @@ func Test_Delete_RG_AfterBrowse(t *testing.T) {
 
 // This test uses "rm -r" as it behaves differently from "RemoveAll"
 func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
-	configureExpanders(t)
+	configureExpandersAndGock(t)
 	addMockSub(t)
 	addMockGroups(t)
 	addMockGroupResources(t)
@@ -395,7 +422,9 @@ func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
 		Reply(200).
 		JSON("{}")
 
-	filesystem := &FS{}
+	filesystem := &FS{
+		editMode: true,
+	}
 
 	mnt := setupMount(t, filesystem)
 

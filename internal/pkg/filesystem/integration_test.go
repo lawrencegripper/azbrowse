@@ -1,4 +1,4 @@
-package main
+package filesystem
 
 import (
 	"fmt"
@@ -12,9 +12,9 @@ import (
 	"time"
 
 	"bazil.org/fuse"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/stretchr/testify/assert"
+	"gopkg.in/h2non/gock.v1"
 )
 
 // Warning: Hacky tests for me to get started with, need improvement.
@@ -22,21 +22,18 @@ import (
 const expectedSubs = 4
 
 func TestBrowseToRoot(t *testing.T) {
+	gock.Off()
 	if testing.Short() {
 		t.Log("Skipping integration test")
 		return
 	}
-
-	// horrible hack
-	boolTrue := false
-	demoMode = &boolTrue
 
 	path, err := ioutil.TempDir("", "azfs")
 	if err != nil {
 		t.Error(err)
 	}
 
-	conn, err := createFS(path)
+	conn, err := createFS(path, false, false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,22 +57,18 @@ func TestBrowseToRoot(t *testing.T) {
 }
 
 func TestEditRG(t *testing.T) {
+	gock.Off()
 	if testing.Short() {
 		t.Log("Skipping integration test")
 		return
 	}
-
-	// horrible hack
-	boolTrue := false
-	demoMode = &boolTrue
-	filesystem.DemoMode = &boolTrue
 
 	azfsPath, err := ioutil.TempDir("", "azfs")
 	if err != nil {
 		t.Error(err)
 	}
 
-	conn, err := createFS(azfsPath)
+	conn, err := createFS(azfsPath, false, false)
 	if err != nil {
 		t.Fatal(err)
 	}

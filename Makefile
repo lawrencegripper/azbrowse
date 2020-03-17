@@ -168,7 +168,7 @@ azfs-run:
 #
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-test:
-	go test -count=1 -timeout 30s ./internal/pkg/filesystem -v
+	go test -count=1 -timeout 30s -short ./internal/pkg/filesystem
 
 # azfs-integration:
 # 		Tests the azfs filesystem with integration tests
@@ -180,5 +180,5 @@ azfs-test:
 #
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-integration:
-	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} go test -count=1 -timeout 30s github.com/lawrencegripper/azbrowse/cmd/azfs -v
+	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} go test -count=1 -timeout 30s ./internal/pkg/filesystem -v
 

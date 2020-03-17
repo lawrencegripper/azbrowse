@@ -1,46 +1,39 @@
-package main
+package filesystem
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
-	_ "bazil.org/fuse/fs/fstestutil"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-func usage() {
-	flag.PrintDefaults()
-}
-
-var demoMode *bool
-var editMode *bool
-var mountLocation *string
-
-func run(mountpoint string) error {
-
-	c, err := createFS(mountpoint)
+// Run starts a fuze based filesystem over the Azure ARM API
+func Run(mountpoint string, editMode bool, demoMode bool) (func(), error) {
+	c, err := createFS(mountpoint, editMode, demoMode)
 	if err != nil {
-		return err
+		log.Println("Failed to create fs")
+		return func() {}, err
 	}
 
 	// Check if the mount process has an error to report.
 	<-c.Ready
+	closer := func() { Close(mountpoint, c) }
 
 	if err := c.MountError; err != nil {
-		return err
+		log.Println("Failed to mount fs")
+		return closer, err
 	}
-	return nil
+	return closer, nil
 }
 
 func responseLogge(requestPath string, response *http.Response, responseBody string) {
@@ -48,7 +41,7 @@ func responseLogge(requestPath string, response *http.Response, responseBody str
 	log.Println(responseBody)
 }
 
-func createFS(mountpoint string) (*fuse.Conn, error) {
+func createFS(mountpoint string, editMode bool, demoMode bool) (*fuse.Conn, error) {
 	c, err := fuse.Mount(
 		mountpoint,
 		fuse.FSName("azfs"),
@@ -87,7 +80,7 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 			case eventObj := <-newEvents:
 				status := eventObj.(*eventing.StatusEvent)
 				message := status.Message
-				if *demoMode {
+				if demoMode {
 					message = views.StripSecretVals(status.Message)
 				}
 				fmt.Printf("%s STATUS: %s IN PROG: %t FAILED: %t \n", status.Icon(), message, status.InProgress, status.Failure)
@@ -98,7 +91,10 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 	}()
 
 	srv := fs.New(c, nil)
-	filesys := &filesystem.FS{}
+	filesys := &FS{
+		demoMode: demoMode,
+		editMode: editMode,
+	}
 	go func() {
 		if err := srv.Serve(filesys); err != nil {
 			log.Println(err)
@@ -108,21 +104,31 @@ func createFS(mountpoint string) (*fuse.Conn, error) {
 	return c, nil
 }
 
-func main() {
-	flag.Usage = usage
-	mountLocation = flag.String("mount", "/mnt/azfs", "default: /mnt/azfs location for mounting the filesystem")
-	demoMode = flag.Bool("demo", false, "enable demo mode")
-	editMode = flag.Bool("enableEdit", false, "enable delete/edit")
+// Close unmounts the filesystem and waits for fs.Serve to return. Any
+// returned error will be stored in Err. It is safe to call Close
+// multiple times.
+func Close(mount string, conn *fuse.Conn) error {
+	prev := ""
+	for tries := 0; tries < 1000; tries++ {
+		err := fuse.Unmount(mount)
+		if err != nil {
+			msg := err.Error()
+			// hide repeating errors
+			if msg != prev {
+				// TODO do more than log?
 
-	flag.Parse()
-
-	filesystem.EditMode = editMode
-	filesystem.DemoMode = demoMode
-
-	if err := run(*mountLocation); err != nil {
-		log.Fatal(err)
+				// silence a very common message we can't do anything
+				// about, for the first few tries. it'll still show if
+				// the condition persists.
+				if !strings.HasSuffix(err.Error(), ": Device or resource busy") || tries > 10 {
+					log.Printf("unmount error: %v", err)
+					prev = msg
+				}
+			}
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		break
 	}
-
-	stop := make(chan bool)
-	<-stop
+	return conn.Close()
 }
