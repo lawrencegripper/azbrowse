@@ -522,7 +522,7 @@ func (h *ListUpdateHandler) Invoke() error {
 		fileExtension = ".json"
 
 		if !json.Valid([]byte(content)) {
-			h.status.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+			h.status.Status("Resource content is not valid JSON", false)
 			return fmt.Errorf("Resource content is not valid JSON: %s", content)
 		}
 

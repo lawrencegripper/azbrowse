@@ -54,7 +54,7 @@ func handleVersionCmd(settings *config.Settings) int {
 	fmt.Println(commit)
 	fmt.Println(date)
 	fmt.Println(goversion)
-	fmt.Println(fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH))
+	fmt.Printf("%s/%s\n", runtime.GOOS, runtime.GOARCH)
 	return 0
 }
 
