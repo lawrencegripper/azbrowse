@@ -73,7 +73,7 @@ func (h *CopyHandler) Invoke() error {
 	switch contentType {
 	case expanders.ResponseJSON:
 		if !json.Valid([]byte(content)) {
-			h.StatusBar.Status(fmt.Sprintf("Resource content is not valid JSON"), false)
+			h.StatusBar.Status("Resource content is not valid JSON", false)
 			return fmt.Errorf("Resource content is not valid JSON: %s", content)
 		}
 
