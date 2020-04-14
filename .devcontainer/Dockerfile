@@ -87,3 +87,7 @@ RUN \
     && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.123.3"\
     && rm -rf /go/src/ && rm -rf /go/pkg
 
+
+# Install pip
+COPY get-pip.py /tmp/get-pip.py
+RUN python3 /tmp/get-pip.py
