@@ -15,6 +15,7 @@ help : Makefile
 ## test:
 ## 		Run quick executing unit tests
 test:
+	pytest ./scripts/swagger_update/test_swagger_update.py
 	GO111MODULE=on go test -p 1 -v -count=1 -short ./...
 
 ## integration: 
