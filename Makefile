@@ -16,7 +16,12 @@ help : Makefile
 ## test:
 ## 		Run quick executing unit tests
 test:
+<<<<<<< HEAD
 	GO111MODULE=on go test -p 1 -count=1 -short ./...
+=======
+	pytest ./scripts/swagger_update/test_swagger_update.py
+	GO111MODULE=on go test -p 1 -v -count=1 -short ./...
+>>>>>>> 7afaf29a... Add swagger update tests to `make test`
 
 ## integration: 
 ##		Run integration and unit tests
