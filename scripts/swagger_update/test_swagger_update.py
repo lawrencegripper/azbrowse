@@ -1,5 +1,5 @@
 import pytest
-from swagger_update import *
+from api_set import *
 
 
 def test_get_api_version_from_readme_with_invalid_file_path_returns_none():
