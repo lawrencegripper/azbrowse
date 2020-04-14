@@ -24,8 +24,7 @@
 		// Use host network
 		"--network=host",
 		// Mount azure, git and docker config
-		"-v", "${env:HOME}${env:USERPROFILE}/.azure:/root/.azure",
-		"-v", "${env:HOME}${env:USERPROFILE}/.gitconfig:/root/.gitconfig", // Required due to volume mount used for .vscode-server
+		"-v", "${env:HOME}${env:USERPROFILE}/.azure:/root/.azure"
 	],
 	// Use 'settings' to set *default* container specific settings.json values on container create. 
 	// You can edit these settings after create using File > Preferences > Settings > Remote.
