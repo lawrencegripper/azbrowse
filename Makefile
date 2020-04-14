@@ -14,7 +14,8 @@ help : Makefile
 
 ## test:
 ## 		Run quick executing unit tests
-test:
+test: swagger-update-requirements
+	pytest ./scripts/swagger_update/test_swagger_update.py
 	GO111MODULE=on go test -p 1 -v -count=1 -short ./...
 
 ## integration: 
@@ -75,10 +76,13 @@ install:
 
 ## ----------Advanced Targets------------
 ## swagger-update:
-##		Download the latest swagger definitions for Azure services
-swagger-update:
-	./scripts/update-swagger.sh
+##		Download the latest swagger definitions for Azure services and filter to the latest versions
+swagger-update: swagger-update-requirements
+	python3 ./scripts/swagger_update/app.py
 	
+swagger-update-requirements:
+	pip3 install -r scripts/swagger_update/requirements.txt 
+
 ## swagger-codegen:
 ##		Generate the code needed for browse services from the swagger definitions
 swagger-codegen:
