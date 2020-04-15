@@ -14,10 +14,10 @@ fi
 
 # If running inside CI login to docker
 if [ -z ${IS_CI} ]; then
-  echo "Not running in circle, skipping cirlce setup"
+  echo "Not running in circle, skipping CI setup"
 else 
   echo "Publishing"
-  if [ -z $PR_NUMBER ] && [[ $BRANCH == "master" ]]; then
+  if [ -z $IS_PR ] && [[ $BRANCH == "master" ]]; then
     export PUBLISH=true
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     echo "On master setting PUBLISH=true"
