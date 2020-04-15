@@ -13,9 +13,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image, run tests and publish(on master only)
-      run: apt update && apt install build-essential fuse -y && make devcontainer-release
+      run: sudo apt update && sudo apt install build-essential fuse -y && sudo -E make devcontainer-release
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         BUILD_NUMBER: ${{ github.run_id }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

@@ -17,12 +17,12 @@ if [ -z ${IS_CI} ]; then
   echo "Not running in circle, skipping CI setup"
 else 
   echo "Publishing"
-  if [ -z $IS_PR ] && [[ $BRANCH == "master" ]]; then
+  if [ -z $IS_PR ] && [[ $BRANCH == "refs/heads/master" ]]; then
     export PUBLISH=true
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     echo "On master setting PUBLISH=true"
   else 
-    echo "Skipping publish as is from PR: $PR_NUMBER or not master BRANCH: $BRANCH"
+    echo "Skipping publish as is from PR: $PR_NUMBER or not 'refs/heads/master' BRANCH: $BRANCH"
   fi
 fi
 

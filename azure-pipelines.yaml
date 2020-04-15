@@ -20,6 +20,6 @@ steps:
     DOCKER_PASSWORD: $(DOCKER_PASSWORD)
     GITHUB_TOKEN: $(GITHUB_TOKEN)
     IS_CI: 1
-    PR_NUMBER: $(System.PullRequest.PullRequestNumber)
+    IS_PR: $(System.PullRequest.PullRequestNumber)
     REASON: $(Build.Reason)
     BRANCH: $(Build.SourceBranchName)
