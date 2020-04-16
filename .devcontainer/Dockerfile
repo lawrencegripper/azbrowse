@@ -32,8 +32,6 @@ RUN apt-get update \
     #
     # --> xvfb for integration testing (gocui requires a valid tty which isn't available in ci)
     && apt-get install --no-install-recommends -y xvfb libgl1-mesa-dri \
-    # --> xterm for integration testing
-    && apt-get install -y xterm \
     # 
     # Install Release Tools
     #

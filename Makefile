@@ -17,12 +17,12 @@ help : Makefile
 ## 		Run quick executing unit tests
 test: swagger-update-requirements
 	pytest ./scripts/swagger_update/test_swagger_update.py
-	GO111MODULE=on go test -p 1 -v -count=1 -short ./...
+	GO111MODULE=on go test -p 1 -short ./...
 
 ## integration: 
 ##		Run integration and unit tests
 integration:
-	GO111MODULE=on go test -v -count=1 ./...
+	GO111MODULE=on go test ./...
 
 ## checks:
 ##		Check/lint code
@@ -138,21 +138,28 @@ ifdef DEVCONTAINER
 endif
 	@echo "Using tag: $(DEV_CONTAINER_TAG)"
 	# Note command mirrors required envs from host into container. Using '@' to avoid showing values in CI output.
+	# Docs
+	# 1. We set colums/lines/term so integration tests happen with fixed size terminal for constency
+	# 2. Build/CI/PR etc for controlling build vs build and publish release
+	# 3. -v var/rundocker.socket to allow docker builds via mounted docker socket
+	# 4. privileged and --device to allow fuse testing
 	@docker run -v ${PWD}:${PWD} \
+		-e COLUMNS=195 -e LINES=50 -e TERM="xterm-256color" \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
-		-e PR_NUMBER="${PR_NUMBER}" \
+		-e IS_PR="${IS_PR}" \
 		-e BRANCH="${BRANCH}" \
 		-e GITHUB_TOKEN="${GITHUB_TOKEN}" \
 		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
 		-e DOCKER_PASSWORD="${DOCKER_PASSWORD}" \
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
+		--privileged \
 		--device /dev/fuse \
 		--entrypoint /bin/bash \
 		--workdir "${PWD}" \
 		-t $(DEV_CONTAINER_TAG) \
-		-c "${PWD}/scripts/ci_integration_tests.sh && ${PWD}/scripts/ci_release.sh"
+		-c "${PWD}/scripts/ci_release.sh"
 		
 
 asfs-build:

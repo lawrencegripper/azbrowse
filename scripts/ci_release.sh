@@ -37,6 +37,7 @@ cd ../
 echo "->Use make build to codegen, lint and check"
 make build
 
+echo "->Check codegen results haven't changed checkedin code"
 if [[ $(git diff --stat) != '' ]]; then
   echo "--> Ditry GIT: Failing as swagger-generated caused changes, please run 'make swagger-update' and 'make swagger-generate' and commit changes for build to pass"
   git status
@@ -45,6 +46,14 @@ if [[ $(git diff --stat) != '' ]]; then
 else
   echo "'swagger-gen' ran and no changes detected in code: Success"
 fi
+
+echo "->Run Integration tests on fake display"
+Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &
+XVFB_PROC=$!
+sleep 1
+export DISPLAY=:99
+make integration
+kill $XVFB_PROC
 
 echo "->Run go releaser"
 if [ -z ${PUBLISH} ]; then

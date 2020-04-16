@@ -19,6 +19,15 @@ import (
 )
 
 // Warning: Hacky tests for me to get started with, need improvement.
+func TestMain(m *testing.M) {
+	subscription := os.Getenv("TESTSUB")
+	if subscription == "" {
+		fmt.Println("Skipping Integration tests: must set 'TESTSUB' env to run tests")
+		return
+	}
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestBrowseToRoot(t *testing.T) {
 	gock.Off()
