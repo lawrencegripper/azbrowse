@@ -20,7 +20,7 @@ ENV GO111MODULE=on
 
 # Configure apt, install packages and tools
 RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano \
+    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
     && apt-get -y install git iproute2 procps lsb-release \
@@ -83,8 +83,11 @@ RUN \
     && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
     # --> Go releaser 
     && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.123.3"\
+    # --> Go rich output for testing with colors
+    && go get github.com/kyoh86/richgo@v0.3.3 \
     && rm -rf /go/src/ && rm -rf /go/pkg
 
+RUN echo "alias go=richgo" >> "/root/.bashrc"
 
 # Install pip
 COPY get-pip.py /tmp/get-pip.py

@@ -1,6 +1,9 @@
 DEV_CONTAINER_TAG:=lawrencegripper/azbrowsedevcontainer:latest
 -include .env
 
+# Used to override with richgo for colorized test output
+GO_BINARY?=go
+
 .PHONY: checks test build
 
 ## ----------Targets------------
@@ -16,33 +19,34 @@ help : Makefile
 ## test:
 ## 		Run quick executing unit tests
 test: swagger-update-requirements
+	echo ${go}
 	pytest ./scripts/swagger_update/test_swagger_update.py
-	GO111MODULE=on go test -p 1 -short ./...
+	$(GO_BINARY) test -p 1 -short ./...
 
 ## integration: 
 ##		Run integration and unit tests
 integration:
-	GO111MODULE=on go test ./...
+	$(GO_BINARY) test ./...
 
 ## checks:
 ##		Check/lint code
 checks:
-	GO111MODULE=on golangci-lint run
+	golangci-lint run
 
 ## build: 
 ##		Build azbrowse binary
 build: swagger-codegen test checks 
-	GO111MODULE=on go build ./cmd/azbrowse
+	$(GO_BINARY) build ./cmd/azbrowse
 
 ## debug:
 ##		Starts azbrowse using Delve ready for debugging from VSCode.
 debug:
-	GO111MODULE=on dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2
+	dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2
 
 ## debug-fuzzer:
 ##		Starts azbrowse using Delve ready for debugging from VSCode and running the fuzzer.
 debug-fuzzer:
-	GO111MODULE=on dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2 -- -fuzzer 5
+	dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2 -- -fuzzer 5
 
 ## dcterminal 
 ##		Starts an interactive terminal running inside the devcontainer
@@ -73,7 +77,7 @@ fuzz-from: checks install
 ## install: 
 ##		Build and install azbrowse on this machine
 install:
-	GO111MODULE=on go install ./cmd/azbrowse
+	$(GO_BINARY) install ./cmd/azbrowse
 
 ## ----------Advanced Targets------------
 ## swagger-update:
@@ -88,19 +92,19 @@ swagger-update-requirements:
 ##		Generate the code needed for browse services from the swagger definitions
 swagger-codegen:
 	export GO111MODULE=on
-	go run ./cmd/swagger-codegen/ 
+	$(GO_BINARY) run ./cmd/swagger-codegen/ 
 	# Format the generated code
 	gofmt -s -w internal/pkg/expanders/swagger-armspecs.generated.go
 	gofmt -s -w internal/pkg/expanders/search.generated.go
 	# Build the generated go files to check for any go build issues
-	go build internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go internal/pkg/expanders/test_utils.go
+	$(GO_BINARY) build internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go internal/pkg/expanders/test_utils.go
 	# Test the generated code initalizes
-	go test -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
+	$(GO_BINARY) test -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
 
 ## test-selfupdate:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
 test-selfupdate: checks
-	GO111MODULE=on go install -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
+	$(GO_BINARY) install -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
 	azbrowse
 
 ## devcontainer:
@@ -139,12 +143,11 @@ endif
 	@echo "Using tag: $(DEV_CONTAINER_TAG)"
 	# Note command mirrors required envs from host into container. Using '@' to avoid showing values in CI output.
 	# Docs
-	# 1. We set colums/lines/term so integration tests happen with fixed size terminal for constency
-	# 2. Build/CI/PR etc for controlling build vs build and publish release
-	# 3. -v var/rundocker.socket to allow docker builds via mounted docker socket
-	# 4. privileged and --device to allow fuse testing
+	# - Build/CI/PR etc for controlling build vs build and publish release
+	# - "-v var/rundocker.socket" to allow docker builds via mounted docker socket
+	# - "privileged" and "--device" to allow fuse testing
 	@docker run -v ${PWD}:${PWD} \
-		-e COLUMNS=195 -e LINES=50 -e TERM="xterm-256color" \
+		-e "TERM=xterm-256color" \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
 		-e IS_PR="${IS_PR}" \
@@ -163,12 +166,12 @@ endif
 		
 
 asfs-build:
-	go build ./cmd/azfs
+	$(GO_BINARY) build ./cmd/azfs
 
 azfs-run:
 	-@fusermount -u /mnt/azfs
 	mkdir -p /mnt/azfs
-	go run ./cmd/azfs --mount /mnt/azfs --enableEdit
+	$(GO_BINARY) run ./cmd/azfs --mount /mnt/azfs --enableEdit
 
 # azfs-test:
 # 		Tests the azfs filesystem with unit tests and mocked api
@@ -180,7 +183,7 @@ azfs-run:
 #
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-test:
-	go test -count=1 -timeout 30s -short ./internal/pkg/filesystem
+	$(GO_BINARY) test -count=1 -timeout 30s -short ./internal/pkg/filesystem
 
 # azfs-integration:
 # 		Tests the azfs filesystem with integration tests
@@ -192,5 +195,5 @@ azfs-test:
 #
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-integration:
-	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} go test -count=1 -timeout 30s ./internal/pkg/filesystem -v
+	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -count=1 -timeout 30s ./internal/pkg/filesystem -v
 
