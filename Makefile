@@ -4,7 +4,7 @@ DEV_CONTAINER_TAG:=lawrencegripper/azbrowsedevcontainer:latest
 # Used to override with richgo for colorized test output
 GO_BINARY?=go
 
-.PHONY: checks test build
+.PHONY: checks test build fail
 
 ## ----------Targets------------
 ## all:
@@ -196,4 +196,8 @@ azfs-test:
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-integration:
 	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -count=1 -timeout 30s ./internal/pkg/filesystem -v
+
+fail: 
+	echo 1
+	$(shell exit 1)
 

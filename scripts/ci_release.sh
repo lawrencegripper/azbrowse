@@ -58,19 +58,20 @@ Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &
 XVFB_PROC=$!
 sleep 1
 export DISPLAY=:99
-statusfile=$(mktemp)
+exitcodefile=$(mktemp)
 logfile=$(mktemp)
 
-echo "Run `make integration` in Xterm"
-xterm -e sh -c 'GO_BINARY=richgo make integration > '"$logfile"'; echo $? > '"$statusfile"
+echo "Run make integration in Xterm"
+xterm sh -c 'make integration > '"$logfile"'; echo $? > '"$exitcodefile"
 echo "Tests finished"
-status=$(cat "$statusfile")
-rm "$statusfile"
+cat $exitcodefile
+exitcode=$(cat "$exitcodefile")
+rm "$exitcodefile"
 
-if [[ $status == "0" ]]; then
+if [[ $exitcode == "0" ]]; then
   echo "Tests passed"
 else
-  echo "Tests returned exit code: $status"
+  echo "Tests returned exit code: $exitcode"
   echo "Tests FAILED. Logs:"
   cat "$logfile"
   go version
