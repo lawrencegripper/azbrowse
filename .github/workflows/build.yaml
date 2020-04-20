@@ -6,14 +6,21 @@ on:
   pull_request:
     branches: [ master ]
 
-jobs:
-  build:
+jobs:  
+  build-xpath:
     runs-on: ubuntu-18.04
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: CI Tooling
+      run: sudo apt update && sudo apt install build-essential fuse -y
+    
+    - name: Build devcontainer for tooling
+      run: sudo -E make devcontainer
+
     - name: Build the Docker image, run tests and publish(on master only)
-      run: sudo apt update && sudo apt install build-essential fuse -y && sudo -E make devcontainer-release
+      run: sudo -E make devcontainer-release
       env:
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         BUILD_NUMBER: ${{ github.run_id }}

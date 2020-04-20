@@ -5,9 +5,9 @@ cd `dirname $0`
 
 print_header () {
   echo ""
-  echo "$(tput setaf 10)$(tput bold)-------------------------------------------------------"
-  echo "---------------> $1 "
-  echo "------------------------------------------------------- $(tput sgr0)"
+  echo "$(tput setaf 12)$(tput bold)------------------------------------------------------- $(tput sgr0)"
+  echo "$(tput setaf 12)$(tput bold)--------------->$(tput sgr0) $1 "
+  echo "$(tput setaf 12)$(tput bold)------------------------------------------------------- $(tput sgr0)"
   echo ""
 }
 
@@ -62,19 +62,22 @@ exitcodefile=$(mktemp)
 logfile=$(mktemp)
 
 echo "Run make integration in Xterm"
-xterm sh -c 'make integration > '"$logfile"'; echo $? > '"$exitcodefile"
+xterm -e sh -c 'make integration > '"$logfile"'; echo $? > '"$exitcodefile"
 echo "Tests finished"
 cat $exitcodefile
 exitcode=$(cat "$exitcodefile")
 rm "$exitcodefile"
 
 if [[ $exitcode == "0" ]]; then
+  cat "$logfile"
+
   echo "Tests passed"
 else
-  echo "Tests returned exit code: $exitcode"
-  echo "Tests FAILED. Logs:"
   cat "$logfile"
   go version
+  
+  echo "Tests returned exit code: $exitcode"
+  echo "Tests FAILED. Logs:"
   exit 1
 fi 
 kill $XVFB_PROC

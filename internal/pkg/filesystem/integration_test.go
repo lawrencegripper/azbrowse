@@ -18,23 +18,20 @@ import (
 	"gopkg.in/h2non/gock.v1"
 )
 
-// Warning: Hacky tests for me to get started with, need improvement.
-func TestMain(m *testing.M) {
+func shouldSkipIntTest(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping integration test as only running short tests")
+
+	}
 	subscription := os.Getenv("TESTSUB")
 	if subscription == "" {
-		fmt.Println("Skipping Integration tests: must set 'TESTSUB' env to run tests")
-		return
+		t.Skip("Skipping integration test as TESTSUB not set")
 	}
-	code := m.Run()
-	os.Exit(code)
 }
 
 func TestBrowseToRoot(t *testing.T) {
 	gock.Off()
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
+	shouldSkipIntTest(t)
 
 	path, err := ioutil.TempDir("", "azfs")
 	if err != nil {
@@ -66,10 +63,7 @@ func TestBrowseToRoot(t *testing.T) {
 
 func TestEditRG(t *testing.T) {
 	gock.Off()
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
+	shouldSkipIntTest(t)
 
 	azfsPath, err := ioutil.TempDir("", "azfs")
 	if err != nil {

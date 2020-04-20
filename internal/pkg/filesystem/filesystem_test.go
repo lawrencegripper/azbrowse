@@ -250,7 +250,7 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 5, len(files), "Expected 4 sub resources + index file from mock response")
+	assert.Equal(t, 6, len(files), "Expected 4 sub resources + index file from mock response")
 	checkPendingMocks(t)
 }
 

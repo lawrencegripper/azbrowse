@@ -53,13 +53,20 @@ func main() {
 	paths = loadAzureSearchDataPlaneSpecs(config)
 	writeOutput(paths, config, "./internal/pkg/expanders/search.generated.go", "AzureSearchServiceExpander")
 	fmt.Println()
-
 }
 
 // APISet matches the structure of `api-set.json` files from swagger-update
 type APISet struct {
 	Name       string   `json:"name"`
 	InputFiles []string `json:"input_files"`
+}
+
+func print(s string) {
+	if os.Getenv("VERBOSE") == "true" {
+		fmt.Print(s)
+	} else {
+		fmt.Print(".")
+	}
 }
 
 func loadARMSwagger(config *swagger.Config) []*swagger.Path {
@@ -78,7 +85,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 		// Build up paths for all files in the APISet
 		folderPaths := []swagger.Path{}
 		for _, inputFile := range apiSet.InputFiles {
-			fmt.Printf("\tprocessing %s/%s\n", apiSetFolder, inputFile)
+			print(fmt.Sprintf("\tprocessing %s/%s\n", apiSetFolder, inputFile))
 			doc := loadDoc(apiSetFolder + "/" + inputFile)
 			filePaths, err := swagger.GetPathsFromSwagger(doc, config, "")
 			if err != nil {
@@ -102,7 +109,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 	}
 	for _, resourceProviderFileInfo := range resourceProviderFileInfos {
 		if resourceProviderFileInfo.IsDir() && resourceProviderFileInfo.Name() != "common-types" {
-			fmt.Printf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name())
+			print(fmt.Sprintf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name()))
 			resourceProviderFolderPath := fmt.Sprintf("swagger-specs/%s/resource-manager", resourceProviderFileInfo.Name())
 			resourceTypeFileInfos, err := ioutil.ReadDir(resourceProviderFolderPath)
 			_ = resourceTypeFileInfos
@@ -111,16 +118,16 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 			}
 			processed := processAPISet(resourceProviderFolderPath)
 			if processed {
-				fmt.Printf("Got api-set.json")
+				print("Got api-set.json")
 			} else {
 				// Didn't get an api-set.json in the resource provider - check in resource types
 				for _, resourceTypeFileInfo := range resourceTypeFileInfos {
 					if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
 						resourceTypeFolderPath := fmt.Sprintf("%s/%s", resourceProviderFolderPath, resourceTypeFileInfo.Name())
-						fmt.Printf("\tProcessing resource type folder: %s\n", resourceTypeFolderPath)
+						print(fmt.Sprintf("\tProcessing resource type folder: %s\n", resourceTypeFolderPath))
 						processed = processAPISet(resourceTypeFolderPath)
 						if processed {
-							fmt.Printf("Got api-set.json")
+							print("Got api-set.json")
 						}
 					}
 				}
@@ -221,7 +228,7 @@ func loadAzureSearchDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
 		}
 		for _, swaggerFileInfo := range swaggerFileInfos {
 			if !swaggerFileInfo.IsDir() && strings.HasSuffix(swaggerFileInfo.Name(), ".json") {
-				fmt.Printf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name())
+				print(fmt.Sprintf("\tprocessing %s/%s\n", swaggerPath, swaggerFileInfo.Name()))
 				doc := loadDoc(swaggerPath + "/" + swaggerFileInfo.Name())
 				pathPrefix := ""
 				if swaggerFileInfo.Name() == "searchindex.json" {

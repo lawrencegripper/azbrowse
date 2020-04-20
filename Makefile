@@ -35,7 +35,7 @@ checks:
 
 ## build: 
 ##		Build azbrowse binary
-build: swagger-codegen test checks 
+build: swagger-codegen checks test  
 	$(GO_BINARY) build ./cmd/azbrowse
 
 ## debug:
@@ -86,10 +86,11 @@ swagger-update: swagger-update-requirements
 	python3 ./scripts/swagger_update/app.py
 	
 swagger-update-requirements:
-	pip3 install -r scripts/swagger_update/requirements.txt 
+	pip3 install -q -r scripts/swagger_update/requirements.txt 
 
 ## swagger-codegen:
 ##		Generate the code needed for browse services from the swagger definitions
+##		set VERBOSE=true to see full output
 swagger-codegen:
 	export GO111MODULE=on
 	$(GO_BINARY) run ./cmd/swagger-codegen/ 
@@ -110,10 +111,10 @@ test-selfupdate: checks
 ## devcontainer:
 ##		Builds the devcontainer used for VSCode and CI
 devcontainer:
-	@echo "Using tag: $(DEV_CONTAINER_TAG)"
+	@echo "Building devcontainer using tag: $(DEV_CONTAINER_TAG)"
 	# Get cached layers by pulling previous version (leading dash means it's optional, will continue on failure)
 	-docker pull $(DEV_CONTAINER_TAG)
-	# Build the devcontainer
+	# Build the devcontainer: Hide output if it builds to keep things clean
 	docker build -f ./.devcontainer/Dockerfile ./.devcontainer --cache-from $(DEV_CONTAINER_TAG) -t $(DEV_CONTAINER_TAG)
 
 ## devcontainer-push:
@@ -123,7 +124,7 @@ devcontainer-push:
 
 ## devcontainer-integration:
 ##		Used for locally running integration tests
-devcontainer-integration: devcontainer
+devcontainer-integration:
 ifdef DEVCONTAINER
 	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
 endif
@@ -136,7 +137,7 @@ endif
 
 ## devcontainer-release:
 ##		Used by the build to create, test and publish
-devcontainer-release: devcontainer
+devcontainer-release:
 ifdef DEVCONTAINER
 	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
 endif
@@ -195,7 +196,7 @@ azfs-test:
 #
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-integration:
-	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -count=1 -timeout 30s ./internal/pkg/filesystem -v
+	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -v -count=1 -timeout 30s ./internal/pkg/filesystem
 
 fail: 
 	echo 1
