@@ -75,7 +75,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 
 	time.Sleep(time.Second * 5)
 
-	client := armclient.NewClientFromClientAndTokenFunc(ts.Client(), dummyTokenFunc())
+	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 	expanders.InitializeExpanders(client)
 
 	g, err := gocui.NewGui(gocui.Output256)
@@ -118,7 +118,7 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	defer ts.Close()
 
 	// Set the ARM client to use out test server
-	client := armclient.NewClientFromClientAndTokenFunc(ts.Client(), dummyTokenFunc())
+	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
 	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
@@ -161,7 +161,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	defer ts.Close()
 
 	// Set the ARM client to use out test server
-	client := armclient.NewClientFromClientAndTokenFunc(ts.Client(), dummyTokenFunc())
+	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
 	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {
@@ -209,7 +209,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	time.Sleep(2 * time.Second)
 
 	// Set the ARM client to use out test server
-	client := armclient.NewClientFromClientAndTokenFunc(ts.Client(), dummyTokenFunc())
+	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
 	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {

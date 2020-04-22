@@ -108,8 +108,8 @@ func (e *SubscriptionExpander) testCases() (bool, *[]expanderTestCase) {
 				st.Expect(t, len(r.Nodes), 6)
 
 				// Validate content
-				st.Expect(t, r.Nodes[0].Name, "cloudshell")
-				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell/resources?api-version=2017-05-10")
+				st.Expect(t, r.Nodes[0].Name, "1testrg")
+				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/resources?api-version=2017-05-10")
 			},
 		},
 		{

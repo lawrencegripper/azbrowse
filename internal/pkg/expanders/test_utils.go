@@ -4,7 +4,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
-func dummyTokenFunc() func(clearCache bool) (armclient.AzCLIToken, error) {
+// DummyTokenFunc is used in the mock armclient
+func DummyTokenFunc() func(clearCache bool) (armclient.AzCLIToken, error) {
 	return func(clearCache bool) (armclient.AzCLIToken, error) {
 		return armclient.AzCLIToken{
 			AccessToken:  "bob",

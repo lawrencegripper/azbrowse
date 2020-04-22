@@ -16,7 +16,7 @@ func Test_stripSecretVals_SuccessfullyReplaceSecrets(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 
-			actual := stripSecretVals(test.input)
+			actual := StripSecretVals(test.input)
 			assert.Equal(t, test.expected, actual)
 
 			// while not a requirement for stripSecretVals, all our tests are valid json

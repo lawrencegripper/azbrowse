@@ -15,6 +15,17 @@ Currently I'm using it every day **but it is experimental so use with caution on
 
 ![Demo](./docs/images/quickdemo-azbrowse.gif)
 
+# Cool what else can it do?
+
+Lots [check out the guided tour here](docs/getting-started.md).
+
+- Edit/Update resource
+- Multi-resource delete
+- Actions on resources such as restart and list-keys
+- ASCII Graphs for resource metrics
+- Interactice command panel for filtering and more
+- [Experimental fuse filesystem mount for Azure API](docs/azfs-intro.md)
+
 ## Install
 
 > Pre-req: Ensure you have the [`az` command from Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) setup on your machine and are logged-in otherwise `azbrowse` won't work!

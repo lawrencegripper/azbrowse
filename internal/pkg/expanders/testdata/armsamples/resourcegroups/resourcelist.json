@@ -1,14 +1,24 @@
 {
   "value": [
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Storage/storageAccounts/1teststorageaccount",
+      "name": "1teststorageaccount",
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "location": "westeurope"
+    },
+    {
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959",
       "name": "kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959",
       "type": "Microsoft.Compute/disks",
       "sku": {
         "name": "Standard_LRS",
         "tier": "Standard"
       },
-      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_0",
+      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_0",
       "location": "westeurope",
       "tags": {
         "created-by": "kubernetes-azure-dd",
@@ -18,14 +28,14 @@
       }
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-1e6f8e93-ea71-11e9-8830-869b9d805959",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-1e6f8e93-ea71-11e9-8830-869b9d805959",
       "name": "kubernetes-dynamic-pvc-1e6f8e93-ea71-11e9-8830-869b9d805959",
       "type": "Microsoft.Compute/disks",
       "sku": {
         "name": "Standard_LRS",
         "tier": "Standard"
       },
-      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_4",
+      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_4",
       "location": "westeurope",
       "tags": {
         "created-by": "kubernetes-azure-dd",
@@ -35,14 +45,14 @@
       }
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-27959f63-ea71-11e9-8830-869b9d805959",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-27959f63-ea71-11e9-8830-869b9d805959",
       "name": "kubernetes-dynamic-pvc-27959f63-ea71-11e9-8830-869b9d805959",
       "type": "Microsoft.Compute/disks",
       "sku": {
         "name": "Standard_LRS",
         "tier": "Standard"
       },
-      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_1",
+      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_1",
       "location": "westeurope",
       "tags": {
         "created-by": "kubernetes-azure-dd",
@@ -52,14 +62,14 @@
       }
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-2864bdf6-ea71-11e9-8830-869b9d805959",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/disks/kubernetes-dynamic-pvc-2864bdf6-ea71-11e9-8830-869b9d805959",
       "name": "kubernetes-dynamic-pvc-2864bdf6-ea71-11e9-8830-869b9d805959",
       "type": "Microsoft.Compute/disks",
       "sku": {
         "name": "Standard_LRS",
         "tier": "Standard"
       },
-      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_1",
+      "managedBy": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss/virtualMachines/aks-nodepool1-27758783-vmss_1",
       "location": "westeurope",
       "tags": {
         "created-by": "kubernetes-azure-dd",
@@ -69,7 +79,7 @@
       }
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/virtualMachineScaleSets/aks-nodepool1-27758783-vmss",
       "name": "aks-nodepool1-27758783-vmss",
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "sku": {
@@ -87,7 +97,7 @@
       }
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Compute/virtualMachineScaleSets/aks-poolbob-27758783-vmss",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Compute/virtualMachineScaleSets/aks-poolbob-27758783-vmss",
       "name": "aks-poolbob-27758783-vmss",
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "sku": {
@@ -105,19 +115,19 @@
       }
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Network/networkSecurityGroups/aks-agentpool-27758783-nsg",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Network/networkSecurityGroups/aks-agentpool-27758783-nsg",
       "name": "aks-agentpool-27758783-nsg",
       "type": "Microsoft.Network/networkSecurityGroups",
       "location": "westeurope"
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Network/routeTables/aks-agentpool-27758783-routetable",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Network/routeTables/aks-agentpool-27758783-routetable",
       "name": "aks-agentpool-27758783-routetable",
       "type": "Microsoft.Network/routeTables",
       "location": "westeurope"
     },
     {
-      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MC_lgkubeflow1_lgkubeflow1_westeurope/providers/Microsoft.Network/virtualNetworks/aks-vnet-27758783",
+      "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Network/virtualNetworks/aks-vnet-27758783",
       "name": "aks-vnet-27758783",
       "type": "Microsoft.Network/virtualNetworks",
       "location": "westeurope"

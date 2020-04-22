@@ -3,9 +3,15 @@ set -e
 
 cd `dirname $0`
 
-echo ""
-echo "-------> RELEASE PROCESS"
-echo ""
+print_header () {
+  echo ""
+  echo "$(tput setaf 12)$(tput bold)------------------------------------------------------- $(tput sgr0)"
+  echo "$(tput setaf 12)$(tput bold)--------------->$(tput sgr0) $1 "
+  echo "$(tput setaf 12)$(tput bold)------------------------------------------------------- $(tput sgr0)"
+  echo ""
+}
+
+print_header "RELEASE PROCESS"
 # Fail if build number not set
 if [ -z "$BUILD_NUMBER" ]; then
     echo "Envvar 'BUILD_NUMBER' must be set for this script to work correctly. When building locally for debugging/testing this script is not needed use 'go build' instead."
@@ -31,12 +37,12 @@ git tag -f v1.2.$BUILD_NUMBER
 
 export GOVERSION=$(go version)
 
-echo "->Move to root directory"
+print_header "Use make build to codegen, lint and check"
+
 cd ../
+GO_BINARY=richgo make build
 
-echo "->Use make build to codegen, lint and check"
-make build
-
+print_header "Check codegen results haven't changed checkedin code"
 if [[ $(git diff --stat) != '' ]]; then
   echo "--> Ditry GIT: Failing as swagger-generated caused changes, please run 'make swagger-update' and 'make swagger-generate' and commit changes for build to pass"
   git status
@@ -46,7 +52,38 @@ else
   echo "'swagger-gen' ran and no changes detected in code: Success"
 fi
 
-echo "->Run go releaser"
+print_header "Run Integration tests on fake display"
+
+Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &
+XVFB_PROC=$!
+sleep 1
+export DISPLAY=:99
+exitcodefile=$(mktemp)
+logfile=$(mktemp)
+
+echo "Run make integration in Xterm"
+xterm -e sh -c 'make integration > '"$logfile"'; echo $? > '"$exitcodefile"
+echo "Tests finished"
+cat $exitcodefile
+exitcode=$(cat "$exitcodefile")
+rm "$exitcodefile"
+
+if [[ $exitcode == "0" ]]; then
+  cat "$logfile"
+
+  echo "Tests passed"
+else
+  cat "$logfile"
+  go version
+  
+  echo "Tests returned exit code: $exitcode"
+  echo "Tests FAILED. Logs:"
+  exit 1
+fi 
+kill $XVFB_PROC
+
+print_header "Run go releaser"
+
 if [ -z ${PUBLISH} ]; then
   echo "Running with --skip-publish as PUBLISH not set"
   goreleaser --skip-publish --rm-dist

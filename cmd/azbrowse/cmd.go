@@ -4,9 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"runtime"
+	"syscall"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
@@ -74,6 +77,19 @@ func handleCommandAndArgs() {
 	runFuzzer := runCmd.Int("fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 	runTenantID := runCmd.String("tenant-id", "", "(optional) specify the tenant id to get an access token for (see `az")
 
+	// Version command
+	versionCmd := flag.NewFlagSet("version", flag.ExitOnError)
+	// Version usage
+	versionCmd.Usage = runCmd.Usage
+
+	// azfs command
+	azfsCmd := flag.NewFlagSet("azfs", flag.ExitOnError)
+	azfsAcceptRisk := azfsCmd.Bool("accept-risk", false, "Warning: accept the risk of running this alpha quality filesystem. Do not use on production subscriptions")
+	azfsEditEnabled := azfsCmd.Bool("edit", false, "enable editing")
+	azfsMount := azfsCmd.String("mount", "/mnt/azfs", "location to mount filesystem")
+	azfsSubscription := azfsCmd.String("sub", "", "filter to only show a single subscription, provide the 'name' or 'id' of the subscription")
+	azfsDemo := azfsCmd.Bool("demo", false, "run in demo mode to filter sensitive output")
+
 	// Root usage
 	runCmd.Usage = func() {
 		// Usage
@@ -92,12 +108,10 @@ func handleCommandAndArgs() {
 
 		fmt.Fprintf(os.Stderr, "\nCommands:\n")
 		fmt.Fprintf(os.Stderr, "  version       Print version information\n")
+		fmt.Fprintf(os.Stderr, "  azfs          Mount the Azure ARM API as a fuse filesystem\n")
+		fmt.Fprintf(os.Stderr, "\nOptions:\n")
+		azfsCmd.PrintDefaults()
 	}
-
-	// Version command
-	versionCmd := flag.NewFlagSet("version", flag.ExitOnError)
-	// Version usage
-	versionCmd.Usage = runCmd.Usage
 
 	// Handle root command
 	if len(os.Args) < 2 {
@@ -113,6 +127,10 @@ func handleCommandAndArgs() {
 			if err := versionCmd.Parse(os.Args[2:]); err != nil {
 				usageAndExit()
 			}
+		case "azfs":
+			if err := azfsCmd.Parse(os.Args[2:]); err != nil {
+				usageAndExit()
+			}
 		default: // default to root command
 			if err := runCmd.Parse(os.Args[1:]); err != nil {
 				usageAndExit()
@@ -123,6 +141,29 @@ func handleCommandAndArgs() {
 	// Detect which command was parsed and invoke  handler
 	if versionCmd.Parsed() {
 		os.Exit(handleVersionCmd(&settings))
+	}
+	if azfsCmd.Parsed() {
+		os.Exit(func() int {
+			if !*azfsAcceptRisk {
+				fmt.Println("This is an alpha quality feature you must accept the risk to your subscription by adding '-accept-risk'. Use '-sub subscriptionname' to only mount a single subscription")
+				os.Exit(1)
+			}
+			closer, err := filesystem.Run(*azfsMount, *azfsSubscription, *azfsEditEnabled, *azfsDemo)
+			if err != nil {
+				panic(err)
+			}
+			c := make(chan os.Signal, 2)
+			signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+			<-c
+			fmt.Println("Ctrl+C pressed attempting to unmounting azfs and exit. \n If you see a 'device busy' message exit all processes using the filesystem then unmount will proceed \n Alternatively press CTRL+C again to force exit.")
+			go func() {
+				<-c
+				os.Exit(0)
+			}()
+			closer()
+			os.Exit(0)
+			return 1
+		}())
 	}
 	if runCmd.Parsed() {
 		os.Exit(handleRunCmd(&settings, runDemo, runDebug, runNavigate, runFuzzer, runTenantID))

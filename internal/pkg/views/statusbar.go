@@ -124,7 +124,7 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	v.Wrap = true
 
 	if w.hideGuids {
-		w.currentMessage.Message = stripSecretVals(w.currentMessage.Message)
+		w.currentMessage.Message = StripSecretVals(w.currentMessage.Message)
 	}
 
 	if w.currentMessage.InProgress || w.currentMessage.Failure {

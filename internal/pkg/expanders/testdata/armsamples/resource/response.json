@@ -1,0 +1,49 @@
+{
+    "sku": {
+      "name": "Standard_LRS",
+      "tier": "Standard"
+    },
+    "kind": "Storage",
+    "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/providers/Microsoft.Storage/storageAccounts/1teststorageaccount",
+    "name": "1teststorageaccount",
+    "type": "Microsoft.Storage/storageAccounts",
+    "location": "northeurope",
+    "tags": {
+      "ms-resource-usage": "azure-cloud-shell"
+    },
+    "properties": {
+      "privateEndpointConnections": [],
+      "networkAcls": {
+        "bypass": "AzureServices",
+        "virtualNetworkRules": [],
+        "ipRules": [],
+        "defaultAction": "Allow"
+      },
+      "supportsHttpsTrafficOnly": true,
+      "encryption": {
+        "services": {
+          "file": {
+            "keyType": "Account",
+            "enabled": true,
+            "lastEnabledTime": "2018-11-13T15:33:56.6073046Z"
+          },
+          "blob": {
+            "keyType": "Account",
+            "enabled": true,
+            "lastEnabledTime": "2018-11-13T15:33:56.6073046Z"
+          }
+        },
+        "keySource": "Microsoft.Storage"
+      },
+      "provisioningState": "Succeeded",
+      "creationTime": "2018-11-13T15:33:56.5135290Z",
+      "primaryEndpoints": {
+        "blob": "https://thingsthings123.blob.core.windows.net/",
+        "queue": "https://thingsthings123.queue.core.windows.net/",
+        "table": "https://thingsthings123.table.core.windows.net/",
+        "file": "https://thingsthings123.file.core.windows.net/"
+      },
+      "primaryLocation": "northeurope",
+      "statusOfPrimary": "available"
+    }
+  }

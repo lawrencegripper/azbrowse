@@ -11,6 +11,8 @@
 		"--cap-add=SYS_PTRACE",
 		"--security-opt",
 		"seccomp=unconfined",
+		"--privileged",
+		"--device", "/dev/fuse",
 
 		"--name", "azbdev",
 		// Mount go mod cache

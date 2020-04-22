@@ -257,10 +257,10 @@ func (e *ResourceGroupResourceExpander) testCases() (bool, *[]expanderTestCase) 
 				// Logs and deployment always added to an RG
 				additionalItemsAddedToRG := 2
 
-				st.Expect(t, len(r.Nodes), 9+additionalItemsAddedToRG)
+				st.Expect(t, len(r.Nodes), 10+additionalItemsAddedToRG)
 
 				// Validate content
-				st.Expect(t, r.Nodes[2].Name, "kubernetes-dynamic-pvc-1a6ddbda-ea71-11e9-8830-869b9d805959")
+				st.Expect(t, r.Nodes[2].Name, "1teststorageaccount")
 			},
 		},
 	}

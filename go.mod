@@ -3,6 +3,7 @@ module github.com/lawrencegripper/azbrowse
 go 1.12
 
 require (
+	bazil.org/fuse v0.0.0-20200117225306-7b5117fecadc
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296 // indirect
 	github.com/alecthomas/chroma v0.6.7
@@ -38,6 +39,7 @@ require (
 	github.com/stuartleeks/gocui v0.4.1
 	github.com/valyala/fastjson v1.4.0
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20190405180640-052fc3cfdbc2 // indirect
 	gopkg.in/h2non/gock.v1 v1.0.15
 	gopkg.in/yaml.v2 v2.2.4

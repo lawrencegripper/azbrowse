@@ -60,7 +60,7 @@ func Test_Expanders(t *testing.T) {
 				gock.InterceptClient(httpClient)
 
 				// Set the ARM client to use out test server
-				client := armclient.NewClientFromClientAndTokenFunc(httpClient, dummyTokenFunc())
+				client := armclient.NewClientFromConfig(httpClient, DummyTokenFunc(), 5000)
 				// set dummy client
 				expander.setClient(client)
 

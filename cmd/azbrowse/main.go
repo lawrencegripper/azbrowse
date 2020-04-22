@@ -55,7 +55,7 @@ func run(settings *config.Settings) {
 
 	// Create an ARMClient instance for us to use
 	armClient := armclient.NewClientFromCLI(settings.TenantID, responseProcessor)
-	armclient.LegacyInstance = *armClient
+	armclient.LegacyInstance = armClient
 
 	// Initialize the expanders which will let the user walk the tree of
 	// resources in Azure

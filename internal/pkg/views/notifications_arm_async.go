@@ -51,7 +51,8 @@ func StartWatchingAsyncARMRequests(ctx context.Context) (armclient.ResponseProce
 				var pollLocation []string
 				var exists bool
 
-				pollLocation, exists = request.httpResponse.Header["Azure-AsyncOperation"] //nolint:staticcheck Azure header isn't canonical
+				// Azure header isn't canonical
+				pollLocation, exists = request.httpResponse.Header["Azure-AsyncOperation"] //nolint:staticcheck
 				if !exists {
 					pollLocation, exists = request.httpResponse.Header["Location"]
 					if !exists {

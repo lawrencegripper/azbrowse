@@ -39,6 +39,7 @@ func StartSpanFromContext(ctx context.Context, operationName string, opts ...ope
 		span, ctx := opentracing.StartSpanFromContext(ctx, operationName, opts...)
 		return span, ctx
 	}
+
 	// so we fallback to this one
 	span := opentracing.StartSpan(operationName, opts...)
 	return span, ctx

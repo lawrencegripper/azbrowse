@@ -6,4 +6,5 @@ bindings.json
 /swagger-codegen
 /dist
 scripts/bin/
+.env
 scripts/swagger_update/__pycache__

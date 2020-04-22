@@ -83,6 +83,15 @@ func SendFailureStatusFromError(reason string, err error) *StatusEvent {
 	return event
 }
 
+// SendFailureStatus sends a status event representing the reason
+func SendFailureStatus(reason string) *StatusEvent {
+	event, _ := SendStatusEvent(&StatusEvent{
+		Failure: true,
+		Message: reason,
+	})
+	return event
+}
+
 // SendStatusEvent sends status events
 func SendStatusEvent(s *StatusEvent) (*StatusEvent, func()) {
 	if s.id == [16]byte{} {

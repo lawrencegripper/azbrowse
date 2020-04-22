@@ -1,8 +1,8 @@
 {
     "value": [
         {
-            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/cloudshell",
-            "name": "cloudshell",
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg",
+            "name": "1testrg",
             "location": "northeurope",
             "properties": {
                 "provisioningState": "Succeeded"

@@ -143,7 +143,7 @@ func (e *TenantExpander) testCases() (bool, *[]expanderTestCase) {
 				st.Expect(t, len(r.Nodes), 3)
 
 				// Validate content
-				st.Expect(t, r.Nodes[0].Display, "Thingy1")
+				st.Expect(t, r.Nodes[0].Display, "1testsub")
 				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups?api-version=2018-05-01")
 			},
 		},
