@@ -28,7 +28,7 @@ func confirmAndSelfUpdate() {
 
 	// Disable auto update if we're running from Snap as the filesystem is readonly so we can't update ourselves
 	isSnap := os.Getenv("SNAP_NAME")
-	if isSnap != "" {
+	if isSnap == "azbrowse" {
 		fmt.Print("\n\n UPDATE AVAILABLE \n \n Release notes: "+latest.ReleaseNotes+" \n You installed via snap - upgrade to: ", latest.Version, " by running 'sudo snap refresh azbrowse'")
 		return
 	}
