@@ -1,8 +1,6 @@
+FROM golang:1.13.5-stretch
 # Build required snapcraft snaps
 # https://snapcraft.io/docs/snapcraft-docker-images
-
-FROM ubuntu:xenial as builder
-
 # Grab dependencies
 RUN apt-get update
 RUN apt-get dist-upgrade --yes
@@ -36,22 +34,6 @@ RUN echo "#!/bin/sh" > /snap/bin/snapcraft
 RUN snap_version="$(awk '/^version:/{print $2}' /snap/snapcraft/current/meta/snap.yaml)" && echo "export SNAP_VERSION=\"$snap_version\"" >> /snap/bin/snapcraft
 RUN echo 'exec "$SNAP/usr/bin/python3" "$SNAP/bin/snapcraft" "$@"' >> /snap/bin/snapcraft
 RUN chmod +x /snap/bin/snapcraft
-
-#-------------------------------------------------------------------------------------------------------------
-# Copyright (c) Microsoft Corporation. All rights reserved.
-# Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
-#-------------------------------------------------------------------------------------------------------------
-
-FROM golang:1.13.5-stretch
-
-# Copy snapcraft stuff
-COPY --from=builder /snap/core /snap/core
-COPY --from=builder /snap/core18 /snap/core18
-COPY --from=builder /snap/snapcraft /snap/snapcraft
-COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
-
-# Generate locale.
-RUN apt-get update && apt-get install --yes sudo locales && locale-gen en_US.UTF-8
 
 # Set the proper environment.
 ENV LANG="en_US.UTF-8"
