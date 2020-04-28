@@ -85,7 +85,7 @@ snapcrafts:
     confinement: strict
     apps:
       azbrowse:
-        plugs: [ "home", "personal-files", "network", "system-observe", "process-control" ]
+        plugs: [ "home", "network", "system-observe", "process-control" ]
 
 
 changelog:
