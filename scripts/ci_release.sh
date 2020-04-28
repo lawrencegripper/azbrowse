@@ -24,9 +24,17 @@ if [ -z ${IS_CI} ]; then
 else 
   echo "Publishing"
   if [ -z $IS_PR ] && [[ $BRANCH == "refs/heads/master" ]]; then
-    export PUBLISH=true
-    docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     echo "On master setting PUBLISH=true"
+    export PUBLISH=true
+    
+    echo "Docker login"
+    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+
+    echo "Snapcraft Login"
+    echo $SNAPCRAFT_LOGIN | base64 -d > snap.login
+    snapcraft login --with snap.login
+    # cleanup login file
+    rm snap.login
   else 
     echo "Skipping publish as is from PR: $PR_NUMBER or not 'refs/heads/master' BRANCH: $BRANCH"
   fi
