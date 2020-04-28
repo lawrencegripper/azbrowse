@@ -29,7 +29,12 @@ func confirmAndSelfUpdate() {
 	// Disable auto update if we're running from Snap as the filesystem is readonly so we can't update ourselves
 	isSnap := os.Getenv("SNAP_NAME")
 	if isSnap == "azbrowse" {
-		fmt.Print("\n\n UPDATE AVAILABLE \n \n Release notes: "+latest.ReleaseNotes+" \n You installed via snap - upgrade to: ", latest.Version, " by running 'sudo snap refresh azbrowse'")
+		fmt.Print("\n\n UPDATE AVAILABLE \n \n Release notes: "+latest.ReleaseNotes+" \n You installed via snap - upgrade to: ", latest.Version, " by running 'sudo snap refresh azbrowse'. Press any key to continue.")
+		_, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		if err != nil {
+			log.Panicf("Invalid input: '%v'", err)
+			return
+		}
 		return
 	}
 
