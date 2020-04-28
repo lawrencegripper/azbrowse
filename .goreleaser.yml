@@ -1,68 +1,66 @@
 builds:
-- env:
-  - CGO_ENABLED=0
-  goos:
-    - linux
-    - darwin
-    - windows
-  goarch:
-    - 386
-    - amd64
-  main: ./cmd/azbrowse/
-  ldflags:
-   - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}} -X "main.goversion={{.Env.GOVERSION}}"
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+    main: ./cmd/azbrowse/
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.ShortCommit}} -X main.date={{.Date}} -X "main.goversion={{.Env.GOVERSION}}"
 
 checksum:
-  name_template: '{{ .ProjectName }}_checksums.txt'
+  name_template: "{{ .ProjectName }}_checksums.txt"
 
 archives:
   - id: zip
-    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     format_overrides:
-    - goos: windows
-      format: zip
+      - goos: windows
+        format: zip
 
 nfpms:
-  - 
-    name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    homepage:  https://github.com/lawrencegripper/azbrowse
+  - file_name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    homepage: https://github.com/lawrencegripper/azbrowse
     description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
     maintainer: Lawrence Gripper <info@grippers.co.uk>
     license: MIT
     vendor: LawrenceGripper
     formats:
-    - deb
-    - rpm
+      - deb
+      - rpm
     dependencies:
-    - git
+      - git
     recommends:
-    - rpm
+      - rpm
 
 dockers:
   - goos: linux
     goarch: amd64
     binaries:
-    - azbrowse
+      - azbrowse
     # Templates of the Docker image names.
     image_templates:
-    - "lawrencegripper/azbrowse:latest"
-    - "lawrencegripper/azbrowse:{{ .Tag }}"
-    - "lawrencegripper/azbrowse:v{{ .Major }}"
+      - "lawrencegripper/azbrowse:latest"
+      - "lawrencegripper/azbrowse:{{ .Tag }}"
+      - "lawrencegripper/azbrowse:v{{ .Major }}"
     skip_push: false
     dockerfile: Dockerfile
     # Template of the docker build flags.
     build_flag_templates:
-    - "--label=org.label-schema.schema-version=1.0"
-    - "--label=org.label-schema.version={{.Version}}"
-    - "--label=org.label-schema.name={{.ProjectName}}"
+      - "--label=org.label-schema.schema-version=1.0"
+      - "--label=org.label-schema.version={{.Version}}"
+      - "--label=org.label-schema.name={{.ProjectName}}"
 
 brews:
-  -
-    github:
+  - github:
       owner: lawrencegripper
       name: homebrew-tap
     folder: Formula
-    homepage:  https://github.com/lawrencegripper/azbrowse
+    homepage: https://github.com/lawrencegripper/azbrowse
     description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
     test: |
       system "#{bin}/azbrowse --version"
@@ -71,12 +69,12 @@ scoop:
   bucket:
     owner: lawrencegripper
     name: scoop-bucket
-  homepage:  https://github.com/lawrencegripper/azbrowse
+  homepage: https://github.com/lawrencegripper/azbrowse
   description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
   license: MIT
 
 snapcrafts:
-  - name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
     name: azbrowse
     summary: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
     description: |
@@ -85,12 +83,25 @@ snapcrafts:
     confinement: strict
     apps:
       azbrowse:
-        plugs: [ "home", "network", "system-observe", "process-control" ]
+        plugs:
+          [
+            "network",
+            "personal-files",
+            "system-observe",
+            "process-control",
+          ]
+    plugs:
+      personal-files:
+        read:
+          - $HOME/.azbrowse.db
+          - $HOME/.azbrowse-settings.json
+        write:
+          - $HOME/.azbrowse.db
 
 
 changelog:
   sort: asc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - "^docs:"
+      - "^test:"
