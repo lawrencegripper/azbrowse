@@ -80,24 +80,7 @@ snapcrafts:
     description: |
       What can it do? Lots check out the guided tour here. https://github.com/lawrencegripper/azbrowse/blob/master/docs/getting-started.md
     grade: stable
-    confinement: strict
-    apps:
-      azbrowse:
-        plugs:
-          [
-            "network",
-            "personal-files",
-            "system-observe",
-            "process-control",
-          ]
-    plugs:
-      personal-files:
-        read:
-          - $HOME/.azbrowse.db
-          - $HOME/.azbrowse-settings.json
-        write:
-          - $HOME/.azbrowse.db
-
+    confinement: classic
 
 changelog:
   sort: asc
