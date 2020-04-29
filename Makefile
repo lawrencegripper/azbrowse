@@ -157,6 +157,7 @@ endif
 		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
 		-e DOCKER_PASSWORD="${DOCKER_PASSWORD}" \
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
+		-e SNAPCRAFT_LOGIN="$(SNAPCRAFT_LOGIN)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--privileged \
 		--device /dev/fuse \
