@@ -6,6 +6,7 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/lawrencegripper/azbrowse)
 [![Release](https://img.shields.io/github/release/lawrencegripper/azbrowse.svg?style=flat-square)](https://github.com/lawrencegripper/azbrowse/releases/latest)
 [![Build Status](https://dev.azure.com/lawrencegripper/githubbuilds/_apis/build/status/lawrencegripper.azbrowse?branchName=master)](https://dev.azure.com/lawrencegripper/githubbuilds/_build/latest?definitionId=5&branchName=master)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flawrencegripper%2Fazbrowse.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Flawrencegripper%2Fazbrowse?ref=badge_shield)
 
 ## Status
 
@@ -96,3 +97,7 @@ See the [docs](docs/README.md) for getting started guides, configuration docs, .
 [golangcilinter]: https://github.com/golangci/golangci-lint
 [golangdep]: https://github.com/golang/dep
 [gopath]: https://golang.org/doc/code.html#GOPATH
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Flawrencegripper%2Fazbrowse.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Flawrencegripper%2Fazbrowse?ref=badge_large)
