@@ -13,6 +13,8 @@ const tmpl = `
 	PatchEndpoint: endpoints.MustGetEndpointInfoFromURL("{{ .Operations.Patch.Endpoint.TemplateURL }}", "{{ .Operations.Patch.Endpoint.APIVersion}}"),{{end}}
 	{{- if .Operations.Put.Permitted }}
 	PutEndpoint: endpoints.MustGetEndpointInfoFromURL("{{ .Operations.Put.Endpoint.TemplateURL }}", "{{ .Operations.Put.Endpoint.APIVersion}}"),{{end}}
+	{{- if .FixedContent}}
+	FixedContent: "{{ .FixedContent}}",{{end}}
 	{{- if .Children}}
 	Children: {{template "PathList" .Children}},{{end}}
 	{{- if .SubPaths}}

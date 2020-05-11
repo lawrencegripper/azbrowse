@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"golang.org/x/time/rate"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
+
+	"golang.org/x/time/rate"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -50,7 +51,7 @@ const requestPerSecBurst = 5
 // NewClientFromCLI creates a new client using the auth details on disk used by the azurecli
 func NewClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) *Client {
 	aquireToken := func(clearCache bool) (AzCLIToken, error) {
-		return aquireTokenFromAzCLI(clearCache, tenantID)
+		return acquireTokenFromAzCLI(clearCache, tenantID)
 	}
 	return &Client{
 		responseProcessors: responseProcessors,

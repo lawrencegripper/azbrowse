@@ -17,7 +17,7 @@ type AzCLIToken struct {
 
 var currentToken *AzCLIToken
 
-func aquireTokenFromAzCLI(clearCache bool, tenantID string) (AzCLIToken, error) {
+func acquireTokenFromAzCLI(clearCache bool, tenantID string) (AzCLIToken, error) {
 	if currentToken == nil || clearCache {
 		args := []string{"account", "get-access-token", "--output", "json"}
 
@@ -46,4 +46,21 @@ func aquireTokenFromAzCLI(clearCache bool, tenantID string) (AzCLIToken, error) 
 	}
 
 	return *currentToken, nil
+}
+
+// AcquireTokenForResourceFromAzCLI gets a token for the specified resource endpoint
+func AcquireTokenForResourceFromAzCLI(resource string) (AzCLIToken, error) {
+	args := []string{"account", "get-access-token", "--output", "json", "--resource", resource}
+
+	out, err := exec.Command("az", args...).Output()
+	if err != nil {
+		return AzCLIToken{}, fmt.Errorf("%s (try running 'az account get-access-token' to get more details)", err)
+	}
+
+	var r AzCLIToken
+	err = json.Unmarshal(out, &r)
+	if err != nil {
+		return AzCLIToken{}, err
+	}
+	return r, nil
 }

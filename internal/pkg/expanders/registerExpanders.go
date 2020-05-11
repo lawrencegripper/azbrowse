@@ -70,6 +70,9 @@ func InitializeExpanders(client *armclient.Client) {
 		&AzureSearchServiceExpander{
 			client: client,
 		},
+		&AzureDatabricksExpander{
+			client: client,
+		},
 	}
 }
 
