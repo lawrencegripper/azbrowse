@@ -239,7 +239,7 @@ func (c SwaggerAPISetDatabricks) Delete(ctx context.Context, item *TreeNode) (bo
 		bodyValue["job_id"] = metadata["job_id"]
 	case "/api/2.0/jobs/runs/get":
 		bodyValue["run_id"] = metadata["run_id"]
-	case "/api/2.0/secrets/scopes/get":
+	case "/api/2.0/secrets/{scope}":
 		bodyValue["scope"] = metadata["scope"]
 	case "/api/2.0/secrets/get":
 		bodyValue["scope"] = metadata["scope"]
