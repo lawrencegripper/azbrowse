@@ -214,7 +214,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
 	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
 	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
-	listCopyItemIDCommand := keybindings.NewListCopyItemIDHandler(list, status)
+	itemCopyItemIDCommand := keybindings.NewItemCopyItemIDHandler(content, status)
 	listDebugCopyItemDataCommand := keybindings.NewListDebugCopyItemDataHandler(list, status)
 
 	commands := []keybindings.Command{
@@ -224,7 +224,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 		listActionsCommand,
 		listOpenCommand,
 		listUpdateCommand,
-		listCopyItemIDCommand,
+		itemCopyItemIDCommand,
 		toggleDemoModeCommand,
 	}
 	if settings.EnableTracing {
@@ -275,7 +275,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	keybindings.AddHandler(keybindings.NewListHomeHandler(list))
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
 	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
-	keybindings.AddHandler(listCopyItemIDCommand)
+	keybindings.AddHandler(itemCopyItemIDCommand)
 	if settings.EnableTracing {
 		keybindings.AddHandler(listDebugCopyItemDataCommand)
 	}
