@@ -124,6 +124,14 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 
 	subResources := []SubResource{}
 	url := "https://" + c.workspaceURL + currentItem.ExpandURL
+	if currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/api/2.0/jobs/runs/list" {
+		url = url + "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
+		jobID := currentItem.Metadata["job_id"]
+		if jobID != "" {
+			url = url + "&job_id=" + jobID
+		}
+	}
+
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %s", err)
@@ -172,6 +180,7 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 					Name:         itemID,
 					Metadata:     metadata,
 				}
+
 				if subResourceType.DeleteEndpoint != nil && subResourceType.DeleteEndpoint.TemplateURL != "" {
 					subResource.DeleteURL = subResourceType.DeleteEndpoint.TemplateURL // delete urls are all fixed values
 				}
@@ -182,9 +191,10 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 	}
 
 	return APISetExpandResponse{
-		Response:     data,
-		ResponseType: ResponseJSON,
-		SubResources: subResources,
+		Response:      data,
+		ResponseType:  ResponseJSON,
+		SubResources:  subResources,
+		ChildMetadata: currentItem.Metadata, // propagate metadata (e.g. job_id) down the tree
 	}, nil
 }
 
