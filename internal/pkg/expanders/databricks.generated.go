@@ -54,6 +54,16 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 				}},
 		},
 		{
+			Display:  "runs",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/runs/list", ""),
+			SubResources: []swagger.ResourceType{
+				{
+					Display:        "{run_id}",
+					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/runs/get", ""),
+					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/runs/delete", ""),
+				}},
+		},
+		{
 			Display:  "secrets",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/scopes/list", ""),
 			SubResources: []swagger.ResourceType{

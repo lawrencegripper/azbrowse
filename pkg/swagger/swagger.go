@@ -150,6 +150,18 @@ func addConfigPaths(paths []Path, config *Config) ([]Path, error) {
 				getOperation.Endpoint = &getEndpoint
 			}
 			newPath.Operations.Get = getOperation
+
+			if additionalPath.DeletePath != "" {
+				deleteEndpoint, err := endpoints.GetEndpointInfoFromURL(additionalPath.DeletePath, "")
+				if err != nil {
+					return []Path{}, err
+				}
+				newPath.Operations.Delete = PathOperation{
+					Permitted: true,
+					Endpoint:  &deleteEndpoint,
+				}
+			}
+
 			paths = append(paths, newPath)
 		}
 	}

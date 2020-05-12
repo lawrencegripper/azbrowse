@@ -146,6 +146,8 @@ type AdditionalPath struct {
 	Path string
 	// GetPath allows the actual path used at runtime to be overridden
 	GetPath string
+	// DeletePath allows a delete url to be specified
+	DeletePath string
 	// FixedContent provides static content to render in place of making an API call
 	FixedContent string
 	// SubPathRegesx holds regex info for modifying subpath URLs
