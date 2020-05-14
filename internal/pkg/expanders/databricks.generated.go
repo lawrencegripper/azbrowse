@@ -19,6 +19,10 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 				}},
 		},
 		{
+			Display:  "dbfs",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/list", ""),
+		},
+		{
 			Display:  "groups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/groups/list", ""),
 		},

@@ -230,7 +230,16 @@
                     }
                 }
             }
+        },
+        "/api/2.0/dbfs/list": {
+            "get": {
+                "description": "list dbfs",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
         }
-
     }
 }

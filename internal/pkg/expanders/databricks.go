@@ -126,7 +126,8 @@ func (e *AzureDatabricksExpander) expandWorkspaceRoot(ctx context.Context, curre
 			display = resourceType.Endpoint.TemplateURL
 		}
 		queryString := ""
-		if resourceType.Endpoint.TemplateURL == "/api/2.0/workspace/list" {
+		if resourceType.Endpoint.TemplateURL == "/api/2.0/dbfs/list" ||
+			resourceType.Endpoint.TemplateURL == "/api/2.0/workspace/list" {
 			queryString = "?path=/"
 		}
 		newItems = append(newItems, &TreeNode{

@@ -139,6 +139,7 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 		return APISetExpandResponse{}, err
 	}
 	if len(resourceType.SubResources) > 0 ||
+		currentItemTemplateURL == "/api/2.0/dbfs/list" ||
 		currentItemTemplateURL == "/api/2.0/workspace/list" {
 
 		// We have defined subResources (or a node such as workspaces) - Unmarshal the response and add these to newItems
@@ -231,6 +232,8 @@ func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) (string
 		return "items", "principal", "principal", []string{"scope"}
 	case "/api/2.0/token/list":
 		return "token_infos", "token_id", "token_id", []string{"scope"}
+	case "/api/2.0/dbfs/list":
+		return "files", "path", "path", []string{}
 	case "/api/2.0/workspace/list":
 		return "objects", "path", "path", []string{}
 	}
