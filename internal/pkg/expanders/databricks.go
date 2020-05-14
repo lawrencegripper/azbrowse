@@ -66,8 +66,8 @@ func (e *AzureDatabricksExpander) Expand(ctx context.Context, currentItem *TreeN
 			ID:        currentItem.ID + "/<workspace>",
 			Parentid:  currentItem.ID,
 			Namespace: "AzureDatabricksExpander",
-			Name:      "Connect to Databricks workspace...",
-			Display:   "Connect to Databricks workspace...",
+			Name:      "Connect to Databricks workspace",
+			Display:   "Connect to Databricks workspace",
 			ItemType:  SubResourceType,
 			ExpandURL: ExpandURLNotSupported,
 			Metadata: map[string]string{
