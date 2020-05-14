@@ -93,6 +93,10 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 		{
 			Display:  "token",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/token/list", ""),
+		},
+		{
+			Display:  "workspace",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/list", ""),
 		}}
 
 }

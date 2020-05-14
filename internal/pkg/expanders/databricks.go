@@ -125,13 +125,17 @@ func (e *AzureDatabricksExpander) expandWorkspaceRoot(ctx context.Context, curre
 		if display == "{}" {
 			display = resourceType.Endpoint.TemplateURL
 		}
+		queryString := ""
+		if resourceType.Endpoint.TemplateURL == "/api/2.0/workspace/list" {
+			queryString = "?path=/"
+		}
 		newItems = append(newItems, &TreeNode{
 			Parentid:            currentItem.ID,
 			ID:                  currentItem.ID + "/" + display,
 			Namespace:           "swagger",
 			Name:                display,
 			Display:             display,
-			ExpandURL:           resourceType.Endpoint.TemplateURL, // all fixed template URLs
+			ExpandURL:           resourceType.Endpoint.TemplateURL + queryString, // all fixed template URLs or have a starting query string
 			ItemType:            SubResourceType,
 			SwaggerResourceType: &resourceType,
 			Metadata: map[string]string{

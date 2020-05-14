@@ -124,7 +124,8 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 
 	subResources := []SubResource{}
 	url := "https://" + c.workspaceURL + currentItem.ExpandURL
-	if currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/api/2.0/jobs/runs/list" {
+	currentItemTemplateURL := currentItem.SwaggerResourceType.Endpoint.TemplateURL
+	if currentItemTemplateURL == "/api/2.0/jobs/runs/list" {
 		url = url + "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
 		jobID := currentItem.Metadata["job_id"]
 		if jobID != "" {
@@ -137,16 +138,25 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 		err = fmt.Errorf("Failed to make request: %s", err)
 		return APISetExpandResponse{}, err
 	}
-	if len(resourceType.SubResources) > 0 {
-		// We have defined subResources - Unmarshal the response and add these to newItems
+	if len(resourceType.SubResources) > 0 ||
+		currentItemTemplateURL == "/api/2.0/workspace/list" {
+
+		// We have defined subResources (or a node such as workspaces) - Unmarshal the response and add these to newItems
 		// TODO!
 
-		if len(resourceType.SubResources) > 1 {
+		var subResourceType swagger.ResourceType
+		switch len(resourceType.SubResources) {
+		case 0:
+			// currentItemTemplateURL == "/api/2.0/workspaces/list"
+			// reuse current resource type as we recurse down
+			subResourceType = resourceType
+		case 1:
+			subResourceType = resourceType.SubResources[0]
+		default:
 			return APISetExpandResponse{}, fmt.Errorf("Only expecting a single SubResource type")
 		}
-		subResourceType := resourceType.SubResources[0]
 
-		arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItem.SwaggerResourceType.Endpoint.TemplateURL)
+		arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItemTemplateURL)
 
 		var jsonData map[string]interface{}
 		if err = json.Unmarshal([]byte(data), &jsonData); err != nil {
@@ -172,6 +182,10 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 					metadata[k] = v
 				}
 				metadata[queryStringName] = itemID
+				if itemID == currentItem.Metadata[queryStringName] {
+					// skip adding the item (e.g. workspace list returns existing item when on a file)
+					continue
+				}
 
 				subResource := SubResource{
 					ID:           c.nodeID + expandURL,
@@ -217,6 +231,8 @@ func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) (string
 		return "items", "principal", "principal", []string{"scope"}
 	case "/api/2.0/token/list":
 		return "token_infos", "token_id", "token_id", []string{"scope"}
+	case "/api/2.0/workspace/list":
+		return "objects", "path", "path", []string{}
 	}
 	return "", "", "", []string{}
 }
