@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
@@ -133,6 +134,11 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 		}
 	}
 
+	responseType := ResponseJSON
+	if currentItemTemplateURL == "/api/2.0/workspace/export" {
+		responseType = ResponsePlainText
+	}
+
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %s", err)
@@ -185,6 +191,23 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 				metadata[queryStringName] = itemID
 				if itemID == currentItem.Metadata[queryStringName] {
 					// skip adding the item (e.g. workspace list returns existing item when on a file)
+					if currentItemTemplateURL == "/api/2.0/workspace/list" {
+						// Add a child item to show the contents
+						subResource := SubResource{
+							ID: c.nodeID + expandURL + "/content",
+							ResourceType: swagger.ResourceType{
+								Children:     []swagger.ResourceType{},
+								SubResources: []swagger.ResourceType{},
+								Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
+							},
+							ExpandURL: "/api/2.0/workspace/export?format=SOURCE&direct_download=true&path=" + itemID,
+							Name:      "Content: " + itemID,
+							Metadata:  metadata,
+						}
+						// TODO - consider adding a PutEndpoint and handling this in Update
+						// see https://docs.databricks.com/dev-tools/api/latest/examples.html#import-a-notebook-or-directory
+						subResources = append(subResources, subResource)
+					}
 					continue
 				}
 
@@ -207,7 +230,7 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 
 	return APISetExpandResponse{
 		Response:      data,
-		ResponseType:  ResponseJSON,
+		ResponseType:  responseType,
 		SubResources:  subResources,
 		ChildMetadata: currentItem.Metadata, // propagate metadata (e.g. job_id) down the tree
 	}, nil
