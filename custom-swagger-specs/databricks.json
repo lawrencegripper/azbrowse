@@ -1,0 +1,225 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "0.0.1",
+        "title": "databricks",
+        "description": "minimal spec for databricks REST API to use with azbrowse codegen",
+        "termsOfService": "blah",
+        "license": {
+            "name": "MIT",
+            "url": "http://opensource.org/licenses/MIT"
+        }
+    },
+    "paths": {
+        "/api/2.0/clusters/list": {
+            "get": {
+                "description": "list clusters",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/clusters/get": {
+            "get": {
+                "description": "get cluster",
+                "parameters": [
+                    {
+                        "name": "cluster_id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "foo"
+                    }
+                }
+            }
+        },
+        "/api/2.0/jobs/list": {
+            "get": {
+                "description": "list jobs",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/jobs/get": {
+            "get": {
+                "description": "get job",
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "foo"
+                    }
+                }
+            }
+        },
+        "/api/2.0/jobs/runs/list": {
+            "get": {
+                "description": "list runs",
+                "parameters": [
+                    {
+                        "name": "job_id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/jobs/runs/get": {
+            "get": {
+                "description": "get run",
+                "parameters": [
+                    {
+                        "name": "run_id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "foo"
+                    }
+                }
+            }
+        },
+        "/api/2.0/secrets/scopes/list": {
+            "get": {
+                "description": "list secret scopes",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/secrets/list": {
+            "get": {
+                "description": "list secrets",
+                "parameters": [
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/secrets/acls/list": {
+            "get": {
+                "description": "list secret scope ACL",
+                "parameters": [
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/secrets/acls/get": {
+            "get": {
+                "description": "get secret scope ACL",
+                "parameters": [
+                    {
+                        "name": "scope",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "principal",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/groups/list": {
+            "get": {
+                "description": "list groups",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/instance-pools/list": {
+            "get": {
+                "description": "list instance pools",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/instance-pools/get": {
+            "get": {
+                "description": "get instance pool",
+                "parameters": [
+                    {
+                        "name": "instance_pool_id",
+                        "in": "query",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "foo"
+                    }
+                }
+            }
+        },
+        "/api/2.0/token/list": {
+            "get": {
+                "description": "list tokens",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        }
+    }
+}

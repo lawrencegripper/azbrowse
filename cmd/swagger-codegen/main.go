@@ -53,6 +53,14 @@ func main() {
 	paths = loadAzureSearchDataPlaneSpecs(config)
 	writeOutput(paths, config, "./internal/pkg/expanders/search.generated.go", "AzureSearchServiceExpander")
 	fmt.Println()
+
+	fmt.Println("*******************************************")
+	fmt.Println("  Processing Databricks Data-plane Specs ")
+	fmt.Println("*******************************************")
+	config = getDatabricksDataPlaneConfig()
+	paths = loadDatabricksDataPlaneSpecs(config)
+	writeOutput(paths, config, "./internal/pkg/expanders/databricks.generated.go", "AzureDatabricksExpander")
+	fmt.Println()
 }
 
 // APISet matches the structure of `api-set.json` files from swagger-update
@@ -242,6 +250,75 @@ func loadAzureSearchDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
 				}
 			}
 		}
+	}
+	return paths
+}
+
+// getARMConfig returns the config for ARM Swagger processing
+func getDatabricksDataPlaneConfig() *swagger.Config {
+	return &swagger.Config{
+		SuppressAPIVersion: true,
+		AdditionalPaths: []swagger.AdditionalPath{
+			// add as a missing path - also overridden to map to the actual endpoint that exists!
+			{Name: "{scope}", Path: "/api/2.0/secrets/{scope}", DeletePath: "/api/2.0/secrets/scopes/delete"},
+			// Add extra point for runs listing
+			{Name: "runs", Path: "/api/2.0/runs", GetPath: "/api/2.0/jobs/runs/list"},
+			{Name: "{run_id}", Path: "/api/2.0/runs/{run_id}", GetPath: "/api/2.0/jobs/runs/get", DeletePath: "/api/2.0/jobs/runs/delete"},
+		},
+		// Override the some paths to relate them to each other better
+		Overrides: map[string]swagger.PathOverride{
+			"/api/2.0/clusters/get": { // push cluster get under cluster list
+				Path:       "/api/2.0/clusters/list/{cluster_id}",
+				PutPath:    "/api/2.0/clusters/edit",
+				DeletePath: "/api/2.0/clusters/permanent-delete",
+			},
+
+			"/api/2.0/instance-pools/list": {
+				Path: "/api/2.0/instance-pools",
+			},
+			"/api/2.0/instance-pools/get": {
+				Path:       "/api/2.0/instance-pools/{instance_pool_id}",
+				DeletePath: "/api/2.0/instance-pools/delete",
+			},
+
+			"/api/2.0/jobs/list": { // tweak job list path to be sorted before others!
+				Path: "/api/2.0/jobs",
+			},
+			"/api/2.0/jobs/get": { // push job get under job list
+				Path:       "/api/2.0/jobs/{job_id}",
+				DeletePath: "/api/2.0/jobs/delete",
+			},
+			"/api/2.0/jobs/runs/list": { // push run list under job get
+				Path: "/api/2.0/jobs/{job_id}/runs",
+			},
+			"/api/2.0/jobs/runs/get": { // push run get under run list
+				Path:       "/api/2.0/jobs/{job_id}/runs/{run_id}",
+				DeletePath: "/api/2.0/jobs/runs/delete",
+			},
+
+			"/api/2.0/secrets/scopes/list": { // Ensure secret scope list is sorted top for secrets urls
+				Path: "/api/2.0/secrets",
+			},
+			"/api/2.0/secrets/list": { // push secrets under secret scopes
+				Path: "/api/2.0/secrets/{scope}/secrets",
+			},
+			"/api/2.0/secrets/acls/list": { // push secret acls under secret scopes
+				Path: "/api/2.0/secrets/{scope}/acls",
+			},
+			"/api/2.0/secrets/acls/get": { // push secret acls under secret scopes
+				Path: "/api/2.0/secrets/{scope}/acls/{principal}",
+			},
+		},
+	}
+}
+func loadDatabricksDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
+	var paths []*swagger.Path
+
+	doc := loadDoc("custom-swagger-specs/databricks.json")
+	pathPrefix := ""
+	paths, err := swagger.MergeSwaggerDoc(paths, config, doc, true, pathPrefix)
+	if err != nil {
+		panic(err)
 	}
 	return paths
 }

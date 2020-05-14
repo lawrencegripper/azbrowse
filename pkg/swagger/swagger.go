@@ -150,6 +150,18 @@ func addConfigPaths(paths []Path, config *Config) ([]Path, error) {
 				getOperation.Endpoint = &getEndpoint
 			}
 			newPath.Operations.Get = getOperation
+
+			if additionalPath.DeletePath != "" {
+				deleteEndpoint, err := endpoints.GetEndpointInfoFromURL(additionalPath.DeletePath, "")
+				if err != nil {
+					return []Path{}, err
+				}
+				newPath.Operations.Delete = PathOperation{
+					Permitted: true,
+					Endpoint:  &deleteEndpoint,
+				}
+			}
+
 			paths = append(paths, newPath)
 		}
 	}
@@ -187,10 +199,14 @@ func GetPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string)
 		if err != nil {
 			return []Path{}, err
 		}
-		lastSegment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
-		name := lastSegment.Match
+		segment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
+		name := segment.Match
+		if name == "list" && len(endpoint.URLSegments) > 2 {
+			segment = endpoint.URLSegments[len(endpoint.URLSegments)-2] // 'list' is generic and usually preceded by something more descriptive
+			name = segment.Match
+		}
 		if name == "" {
-			name = "{" + lastSegment.Name + "}"
+			name = "{" + segment.Name + "}"
 		}
 		path := Path{
 			Endpoint:              &endpoint,
