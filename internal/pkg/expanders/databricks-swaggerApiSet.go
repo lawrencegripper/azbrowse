@@ -268,5 +268,11 @@ func (c SwaggerAPISetDatabricks) Delete(ctx context.Context, item *TreeNode) (bo
 
 // Update attempts to update the specified item with new content
 func (c SwaggerAPISetDatabricks) Update(ctx context.Context, item *TreeNode, content string) error {
-	return fmt.Errorf("Not implemented")
+
+	// Assumptions:
+	//  - All updates are POST operations
+	//  - All updates use fixed URLS (i.e. the ID is in the body, not the URL)
+	url := "https://" + c.workspaceURL + item.SwaggerResourceType.PutEndpoint.TemplateURL
+	_, err := c.DoRequestWithBody("POST", url, content)
+	return err
 }

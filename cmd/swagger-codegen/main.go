@@ -286,6 +286,7 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 			},
 			"/api/2.0/jobs/get": { // push job get under job list
 				Path:       "/api/2.0/jobs/{job_id}",
+				PutPath:    "/api/2.0/jobs/reset",
 				DeletePath: "/api/2.0/jobs/delete",
 			},
 			"/api/2.0/jobs/runs/list": { // push run list under job get
@@ -303,7 +304,9 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 				Path: "/api/2.0/secrets/{scope}/secrets",
 			},
 			"/api/2.0/secrets/acls/list": { // push secret acls under secret scopes
-				Path: "/api/2.0/secrets/{scope}/acls",
+				Path:       "/api/2.0/secrets/{scope}/acls",
+				PutPath:    "/api/2.0/secrets/acls/put",
+				DeletePath: "/api/2.0/secrets/acls/delete",
 			},
 			"/api/2.0/secrets/acls/get": { // push secret acls under secret scopes
 				Path: "/api/2.0/secrets/{scope}/acls/{principal}",

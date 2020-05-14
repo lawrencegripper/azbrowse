@@ -40,6 +40,7 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 					Display:        "{job_id}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/get", ""),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/delete", ""),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/reset", ""),
 					Children: []swagger.ResourceType{
 						{
 							Display:  "runs",
@@ -73,8 +74,10 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/scopes/delete", ""),
 					Children: []swagger.ResourceType{
 						{
-							Display:  "acls",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/list", ""),
+							Display:        "acls",
+							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/list", ""),
+							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/delete", ""),
+							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/put", ""),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{principal}",
