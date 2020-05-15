@@ -234,6 +234,15 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 						subResources = append(subResources, subResource)
 					case "/api/2.0/dbfs/list":
 						fileSize := item["file_size"].(float64)
+						// Replace content with get_status response
+						path := currentItem.Metadata["path"]
+						url := "https://" + c.workspaceURL + "/api/2.0/dbfs/get-status?path=" + path
+						data, err = c.DoRequest("GET", url)
+						if err != nil {
+							err = fmt.Errorf("Failed to make request: %v", err)
+							return APISetExpandResponse{}, err
+						}
+
 						if fileSize == 0 /* 0 => directory */ {
 							continue
 						}

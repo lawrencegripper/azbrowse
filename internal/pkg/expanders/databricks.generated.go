@@ -76,6 +76,7 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 					Display:        "{scope}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/{scope}", ""),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/scopes/delete", ""),
+					FixedContent:   "Choose a node to expand...",
 					Children: []swagger.ResourceType{
 						{
 							Display:        "acls",
