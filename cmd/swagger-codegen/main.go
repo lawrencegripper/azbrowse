@@ -311,6 +311,14 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 			"/api/2.0/secrets/acls/get": { // push secret acls under secret scopes
 				Path: "/api/2.0/secrets/{scope}/acls/{principal}",
 			},
+			"/api/2.0/dbfs/list": {
+				Path:       "/api/2.0/dbfs",
+				DeletePath: "/api/2.0/dbfs/delete",
+			},
+			"/api/2.0/workspace/list": {
+				Path:       "/api/2.0/workspace",
+				DeletePath: "/api/2.0/workspace/delete",
+			},
 		},
 	}
 }

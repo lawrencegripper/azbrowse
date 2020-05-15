@@ -19,8 +19,9 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 				}},
 		},
 		{
-			Display:  "dbfs",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/list", ""),
+			Display:        "dbfs",
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/list", ""),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/delete", ""),
 		},
 		{
 			Display:  "groups",
@@ -100,8 +101,9 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/token/list", ""),
 		},
 		{
-			Display:  "workspace",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/list", ""),
+			Display:        "workspace",
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/list", ""),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/delete", ""),
 		}}
 
 }

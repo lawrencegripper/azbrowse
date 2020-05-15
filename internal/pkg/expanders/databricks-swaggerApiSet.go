@@ -224,6 +224,8 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 								Children:     []swagger.ResourceType{},
 								SubResources: []swagger.ResourceType{},
 								Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
+								// PutPath:    "/api/2.0/workspace/import", // Needs handling of more properties from original source: https://docs.databricks.com/dev-tools/api/latest/workspace.html#import
+								DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
 							},
 							ExpandURL: "/api/2.0/workspace/export?format=SOURCE&direct_download=true&path=" + itemID,
 							Name:      "Content: " + itemID,
@@ -262,9 +264,11 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 							subResource = SubResource{
 								ID: c.nodeID + expandURL + "/content",
 								ResourceType: swagger.ResourceType{
-									Children:     []swagger.ResourceType{},
-									SubResources: []swagger.ResourceType{},
-									Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/read", ""),
+									Children:       []swagger.ResourceType{},
+									SubResources:   []swagger.ResourceType{},
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/read", ""),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/put", ""),
+									DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
 								},
 								ExpandURL: "/api/2.0/dbfs/read?offset=0&path=" + itemID,
 								Name:      "Content: " + itemID,
@@ -356,6 +360,12 @@ func (c SwaggerAPISetDatabricks) Delete(ctx context.Context, item *TreeNode) (bo
 	case "/api/2.0/secrets/acls/get":
 		bodyValue["scope"] = metadata["scope"]
 		bodyValue["principal"] = metadata["principal"]
+	case "/api/2.0/dbfs/list":
+		bodyValue["path"] = metadata["path"]
+		bodyValue["recursive"] = true
+	case "/api/2.0/workspace/list":
+		bodyValue["path"] = metadata["path"]
+		bodyValue["recursive"] = true
 	}
 
 	if len(bodyValue) > 0 {
@@ -381,7 +391,17 @@ func (c SwaggerAPISetDatabricks) Update(ctx context.Context, item *TreeNode, con
 	// Assumptions:
 	//  - All updates are POST operations
 	//  - All updates use fixed URLS (i.e. the ID is in the body, not the URL)
+	// Exceptions:
+	//  - /api/2.0/dbfs/put - body needs wrapping
+	body := content
+
+	if item.SwaggerResourceType.PutEndpoint.TemplateURL == "/api/2.0/dbfs/put" {
+		path := item.Metadata["path"]
+		base64Content := base64.StdEncoding.EncodeToString([]byte(content))
+		body = fmt.Sprintf("{\"path\":\"%s\", \"overwrite\":true,\"contents\":\"%s\"}", path, base64Content)
+	}
+
 	url := "https://" + c.workspaceURL + item.SwaggerResourceType.PutEndpoint.TemplateURL
-	_, err := c.DoRequestWithBody("POST", url, content)
+	_, err := c.DoRequestWithBody("POST", url, body)
 	return err
 }
