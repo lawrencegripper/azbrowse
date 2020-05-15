@@ -3,6 +3,7 @@ package expanders
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -106,11 +107,19 @@ func (c SwaggerAPISetDatabricks) DoRequestWithBodyAndHeaders(verb string, url st
 // ExpandResource returns metadata about child resources of the specified resource node
 func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
-	if currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/api/2.0/secrets/{scope}" {
-		// fake node added to tree structure
-		// no resources to add, but pass child metadata
+	currentItemTemplateURL := currentItem.SwaggerResourceType.Endpoint.TemplateURL
+	// if currentItemTemplateURL == "/api/2.0/secrets/{scope}" {
+	// 	// fake node added to tree structure
+	// 	// no resources to add, but pass child metadata
+	// 	return APISetExpandResponse{
+	// 		Response:      "Choose a node to expand...",
+	// 		ResponseType:  ResponsePlainText,
+	// 		ChildMetadata: currentItem.Metadata,
+	// 	}, nil
+	// }
+	if currentItem.SwaggerResourceType.FixedContent != "" {
 		return APISetExpandResponse{
-			Response:      "Choose a node to expand...",
+			Response:      currentItem.SwaggerResourceType.FixedContent,
 			ResponseType:  ResponsePlainText,
 			ChildMetadata: currentItem.Metadata,
 		}, nil
@@ -125,7 +134,6 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 
 	subResources := []SubResource{}
 	url := "https://" + c.workspaceURL + currentItem.ExpandURL
-	currentItemTemplateURL := currentItem.SwaggerResourceType.Endpoint.TemplateURL
 	if currentItemTemplateURL == "/api/2.0/jobs/runs/list" {
 		url = url + "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
 		jobID := currentItem.Metadata["job_id"]
@@ -135,21 +143,36 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 	}
 
 	responseType := ResponseJSON
-	if currentItemTemplateURL == "/api/2.0/workspace/export" {
+	if currentItemTemplateURL == "/api/2.0/workspace/export" || currentItemTemplateURL == "/api/2.0/dbfs/read" {
 		responseType = ResponsePlainText
 	}
 
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
-		err = fmt.Errorf("Failed to make request: %s", err)
+		err = fmt.Errorf("Failed to make request: %v", err)
 		return APISetExpandResponse{}, err
 	}
+
+	if currentItemTemplateURL == "/api/2.0/dbfs/read" {
+		var jsonData map[string]interface{}
+		if err = json.Unmarshal([]byte(data), &jsonData); err != nil {
+			err = fmt.Errorf("Failed to json decode dbfs content: %v", err)
+			return APISetExpandResponse{}, err
+		}
+		data = jsonData["data"].(string)
+		buf, err := base64.StdEncoding.DecodeString(data)
+		if err != nil {
+			err = fmt.Errorf("Failed to base64 decode dbfs content : %v", err)
+			return APISetExpandResponse{}, err
+		}
+		data = string(buf)
+	}
+
 	if len(resourceType.SubResources) > 0 ||
 		currentItemTemplateURL == "/api/2.0/dbfs/list" ||
 		currentItemTemplateURL == "/api/2.0/workspace/list" {
 
 		// We have defined subResources (or a node such as workspaces) - Unmarshal the response and add these to newItems
-		// TODO!
 
 		var subResourceType swagger.ResourceType
 		switch len(resourceType.SubResources) {
@@ -163,12 +186,12 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 			return APISetExpandResponse{}, fmt.Errorf("Only expecting a single SubResource type")
 		}
 
-		arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItemTemplateURL)
-
 		var jsonData map[string]interface{}
 		if err = json.Unmarshal([]byte(data), &jsonData); err != nil {
 			return APISetExpandResponse{}, err
 		}
+
+		arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItemTemplateURL)
 		itemArrayTemp := jsonData[arrayPath]
 		if itemArrayTemp != nil {
 			itemArray := itemArrayTemp.([]interface{})
@@ -191,7 +214,9 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 				metadata[queryStringName] = itemID
 				if itemID == currentItem.Metadata[queryStringName] {
 					// skip adding the item (e.g. workspace list returns existing item when on a file)
-					if currentItemTemplateURL == "/api/2.0/workspace/list" {
+					// and determinte whether to add a "Contents" child node
+					switch currentItemTemplateURL {
+					case "/api/2.0/workspace/list":
 						// Add a child item to show the contents
 						subResource := SubResource{
 							ID: c.nodeID + expandURL + "/content",
@@ -206,6 +231,39 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 						}
 						// TODO - consider adding a PutEndpoint and handling this in Update
 						// see https://docs.databricks.com/dev-tools/api/latest/examples.html#import-a-notebook-or-directory
+						subResources = append(subResources, subResource)
+					case "/api/2.0/dbfs/list":
+						fileSize := item["file_size"].(float64)
+						if fileSize == 0 /* 0 => directory */ {
+							continue
+						}
+						var subResource SubResource
+						if fileSize > 8192 /* pick a max size to handle */ {
+							subResource = SubResource{
+								ID: c.nodeID + expandURL + "/content",
+								ResourceType: swagger.ResourceType{
+									Children:     []swagger.ResourceType{},
+									SubResources: []swagger.ResourceType{},
+									FixedContent: "File too large to load",
+								},
+								Name: "Content: " + itemID,
+							}
+						} else {
+							// Add a child item to show the contents
+							subResource = SubResource{
+								ID: c.nodeID + expandURL + "/content",
+								ResourceType: swagger.ResourceType{
+									Children:     []swagger.ResourceType{},
+									SubResources: []swagger.ResourceType{},
+									Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/read", ""),
+								},
+								ExpandURL: "/api/2.0/dbfs/read?offset=0&path=" + itemID,
+								Name:      "Content: " + itemID,
+								Metadata:  metadata,
+							}
+							// TODO - consider adding a PutEndpoint and handling this in Update
+							// see https://docs.databricks.com/dev-tools/api/latest/dbfs.html#put
+						}
 						subResources = append(subResources, subResource)
 					}
 					continue

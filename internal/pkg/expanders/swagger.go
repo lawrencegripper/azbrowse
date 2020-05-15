@@ -174,40 +174,22 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	}
 
 	// Add any children to newItems
-	matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL)
-	templateValues := matchResult.Values
-	for _, child := range resourceType.Children {
-		loopChild := child
+	if len(resourceType.Children) > 0 {
+		matchResult := resourceType.Endpoint.Match(currentItem.ExpandURL)
+		templateValues := matchResult.Values
+		for _, child := range resourceType.Children {
+			loopChild := child
 
-		var url string
-		var err error
-		if apiSet.MatchChildNodesByName() {
-			url, err = child.Endpoint.BuildURL(templateValues)
-		} else {
-			valueArray := resourceType.Endpoint.GenerateValueArrayFromMap(templateValues)
-			url, err = child.Endpoint.BuildURLFromArray(valueArray)
-		}
-		if err != nil {
-			err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
-			return ExpanderResult{
-				Nodes:             nil,
-				Response:          ExpanderResponse{Response: data, ResponseType: dataType},
-				Err:               err,
-				SourceDescription: "SwaggerResourceExpander",
-			}
-		}
-
-		display := substituteValues(child.Display, templateValues)
-		deleteURL := ""
-		if child.DeleteEndpoint != nil {
+			var url string
+			var err error
 			if apiSet.MatchChildNodesByName() {
-				deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+				url, err = child.Endpoint.BuildURL(templateValues)
 			} else {
-				valueArray := child.DeleteEndpoint.GenerateValueArrayFromMap(templateValues)
-				deleteURL, err = child.DeleteEndpoint.BuildURLFromArray(valueArray)
+				valueArray := resourceType.Endpoint.GenerateValueArrayFromMap(templateValues)
+				url, err = child.Endpoint.BuildURLFromArray(valueArray)
 			}
 			if err != nil {
-				err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
+				err = fmt.Errorf("Error building URL: %s\nURL:%s", child.Display, err)
 				return ExpanderResult{
 					Nodes:             nil,
 					Response:          ExpanderResponse{Response: data, ResponseType: dataType},
@@ -215,24 +197,44 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 					SourceDescription: "SwaggerResourceExpander",
 				}
 			}
-		}
-		metadata := map[string]string{
-			"SwaggerAPISetID": apiSet.ID(),
-		}
-		e.copyMetadata(metadata, childMetadata)
 
-		newItems = append(newItems, &TreeNode{
-			Parentid:            currentItem.ID,
-			ID:                  currentItem.ID + "/" + display,
-			Namespace:           "swagger",
-			Name:                display,
-			Display:             display,
-			ExpandURL:           url,
-			ItemType:            SubResourceType,
-			DeleteURL:           deleteURL,
-			SwaggerResourceType: &loopChild,
-			Metadata:            metadata,
-		})
+			display := substituteValues(child.Display, templateValues)
+			deleteURL := ""
+			if child.DeleteEndpoint != nil {
+				if apiSet.MatchChildNodesByName() {
+					deleteURL, err = child.DeleteEndpoint.BuildURL(templateValues)
+				} else {
+					valueArray := child.DeleteEndpoint.GenerateValueArrayFromMap(templateValues)
+					deleteURL, err = child.DeleteEndpoint.BuildURLFromArray(valueArray)
+				}
+				if err != nil {
+					err = fmt.Errorf("Error building child delete url '%s': %s", child.DeleteEndpoint.TemplateURL, err)
+					return ExpanderResult{
+						Nodes:             nil,
+						Response:          ExpanderResponse{Response: data, ResponseType: dataType},
+						Err:               err,
+						SourceDescription: "SwaggerResourceExpander",
+					}
+				}
+			}
+			metadata := map[string]string{
+				"SwaggerAPISetID": apiSet.ID(),
+			}
+			e.copyMetadata(metadata, childMetadata)
+
+			newItems = append(newItems, &TreeNode{
+				Parentid:            currentItem.ID,
+				ID:                  currentItem.ID + "/" + display,
+				Namespace:           "swagger",
+				Name:                display,
+				Display:             display,
+				ExpandURL:           url,
+				ItemType:            SubResourceType,
+				DeleteURL:           deleteURL,
+				SwaggerResourceType: &loopChild,
+				Metadata:            metadata,
+			})
+		}
 	}
 
 	return ExpanderResult{

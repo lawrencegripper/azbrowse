@@ -260,7 +260,7 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 		SuppressAPIVersion: true,
 		AdditionalPaths: []swagger.AdditionalPath{
 			// add as a missing path - also overridden to map to the actual endpoint that exists!
-			{Name: "{scope}", Path: "/api/2.0/secrets/{scope}", DeletePath: "/api/2.0/secrets/scopes/delete"},
+			{Name: "{scope}", Path: "/api/2.0/secrets/{scope}", DeletePath: "/api/2.0/secrets/scopes/delete", FixedContent: "Choose a node to expand..."},
 			// Add extra point for runs listing
 			{Name: "runs", Path: "/api/2.0/runs", GetPath: "/api/2.0/jobs/runs/list"},
 			{Name: "{run_id}", Path: "/api/2.0/runs/{run_id}", GetPath: "/api/2.0/jobs/runs/get", DeletePath: "/api/2.0/jobs/runs/delete"},
