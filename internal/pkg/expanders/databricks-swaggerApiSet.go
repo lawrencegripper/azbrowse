@@ -26,7 +26,7 @@ type DatabricksAPIResponseMetadata struct {
 	// ResponseArrayPath is the path to the array of items in the JSON response
 	ResponseArrayPath string
 	// ResponseArrayPath is name of the identified property for items in the JSON response
-	ResponseIdPropertyName string
+	ResponseIDPropertyName string
 	// SubResourceQueryStringName is the name of the query string parameter to identify an item in sub resource requests ()
 	SubResourceQueryStringName string
 	// ResponsePropertyMappings holds details for properties to extra from the response object into item metadata
@@ -36,13 +36,13 @@ type DatabricksAPIResponseMetadata struct {
 }
 
 // NewDatabricksAPIResponseMetadata creates a DatabricksAPIResponseMetadata instance
-func NewDatabricksAPIResponseMetadata(responseArrayPath string, responseIdPropertyName string, subResourceQueryStringName string, subResourceAdditionalMetadata []string) DatabricksAPIResponseMetadata {
+func NewDatabricksAPIResponseMetadata(responseArrayPath string, responseIDPropertyName string, subResourceQueryStringName string, subResourceAdditionalMetadata []string) DatabricksAPIResponseMetadata {
 	metadataNames := append(subResourceAdditionalMetadata, subResourceQueryStringName)
 	return DatabricksAPIResponseMetadata{
 		ResponseArrayPath:            responseArrayPath,
-		ResponseIdPropertyName:       responseIdPropertyName,
+		ResponseIDPropertyName:       responseIDPropertyName,
 		SubResourceQueryStringName:   subResourceQueryStringName,
-		ResponsePropertyMappings:     []ResponsePropertyMapping{{ResponsePropertyName: responseIdPropertyName, MetadataName: subResourceQueryStringName}},
+		ResponsePropertyMappings:     []ResponsePropertyMapping{{ResponsePropertyName: responseIDPropertyName, MetadataName: subResourceQueryStringName}},
 		SubResourceQueryStringValues: metadataNames,
 	}
 }
