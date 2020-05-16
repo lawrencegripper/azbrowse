@@ -165,7 +165,7 @@ func (c SwaggerAPISetDatabricks) addWorkspaceContentNode(subResources *[]SubReso
 			// PutPath:    "/api/2.0/workspace/import", // Needs handling of more properties from original source: https://docs.databricks.com/dev-tools/api/latest/workspace.html#import
 			DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
 		},
-		ExpandURL: "/api/2.0/workspace/export?format=SOURCE&direct_download=true&path=" + itemID,
+		ExpandURL: "/api/2.0/workspace/export?format=SOURCE&path=" + itemID,
 		Name:      "Content: " + itemID,
 		Metadata:  metadata,
 	}
