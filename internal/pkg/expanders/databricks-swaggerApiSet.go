@@ -120,15 +120,6 @@ func (c SwaggerAPISetDatabricks) DoRequestWithBodyAndHeaders(verb string, url st
 func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
 	currentItemTemplateURL := currentItem.SwaggerResourceType.Endpoint.TemplateURL
-	// if currentItemTemplateURL == "/api/2.0/secrets/{scope}" {
-	// 	// fake node added to tree structure
-	// 	// no resources to add, but pass child metadata
-	// 	return APISetExpandResponse{
-	// 		Response:      "Choose a node to expand...",
-	// 		ResponseType:  ResponsePlainText,
-	// 		ChildMetadata: currentItem.Metadata,
-	// 	}, nil
-	// }
 	if currentItem.SwaggerResourceType.FixedContent != "" {
 		return APISetExpandResponse{
 			Response:      currentItem.SwaggerResourceType.FixedContent,
@@ -139,8 +130,6 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 
 	if currentItem.ExpandURL == "/api/2.0/secrets/list" || currentItem.ExpandURL == "/api/2.0/secrets/acls/list" {
 		// handle query string values for items that were added as Child nodes by the swagger expander
-
-		// TODO Update DeleteURL  when handling deletion!
 		currentItem.ExpandURL = currentItem.ExpandURL + "?scope=" + currentItem.Metadata["scope"]
 	}
 
