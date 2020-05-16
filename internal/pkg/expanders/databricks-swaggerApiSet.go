@@ -35,6 +35,13 @@ type DatabricksAPIResponseMetadata struct {
 	SubResourceQueryStringValues []string
 }
 
+type DatabricksWorkspaceGetStatusResponse struct {
+	Path       string `json:"path"`
+	Language   string `json:"language"`
+	ObjectType string `json:"object_type"`
+	ObjectID   string `jsong:"object_id"`
+}
+
 // NewDatabricksAPIResponseMetadata creates a DatabricksAPIResponseMetadata instance
 func NewDatabricksAPIResponseMetadata(responseArrayPath string, responseIDPropertyName string, subResourceQueryStringName string, subResourceAdditionalMetadata []string) DatabricksAPIResponseMetadata {
 	metadataNames := append(subResourceAdditionalMetadata, subResourceQueryStringName)
@@ -154,15 +161,33 @@ func (c SwaggerAPISetDatabricks) unpackFileContents(data string, contentPath str
 	return data, nil
 }
 
-func (c SwaggerAPISetDatabricks) addWorkspaceContentNode(subResources *[]SubResource, currentItem *TreeNode, expandURL string, itemID string, metadata map[string]string) {
+func (c SwaggerAPISetDatabricks) addWorkspaceContentNode(subResources *[]SubResource, currentItem *TreeNode, expandURL string, itemID string, metadata map[string]string) (string, error) {
+
+	// Replace content with get_status response
+	path := currentItem.Metadata["path"]
+	url := "https://" + c.workspaceURL + "/api/2.0/workspace/get-status?path=" + path
+	data, err := c.DoRequest("GET", url)
+	if err != nil {
+		err = fmt.Errorf("Failed to make get_status request: %v", err)
+		return "", err
+	}
+
+	var getStatusResponse DatabricksWorkspaceGetStatusResponse
+	if err = json.Unmarshal([]byte(data), &getStatusResponse); err != nil {
+		err = fmt.Errorf("Failed to unmarshal get_status response: %v", err)
+		return "", err
+	}
+	metadata["object_type"] = getStatusResponse.ObjectType
+	metadata["language"] = getStatusResponse.Language
+
 	// Add a child item to show the contents
 	subResource := SubResource{
 		ID: c.nodeID + expandURL + "/content",
 		ResourceType: swagger.ResourceType{
-			Children:     []swagger.ResourceType{},
-			SubResources: []swagger.ResourceType{},
-			Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
-			// PutPath:    "/api/2.0/workspace/import", // Needs handling of more properties from original source: https://docs.databricks.com/dev-tools/api/latest/workspace.html#import
+			Children:       []swagger.ResourceType{},
+			SubResources:   []swagger.ResourceType{},
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
+			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/import", ""),
 			DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
 		},
 		ExpandURL: "/api/2.0/workspace/export?format=SOURCE&path=" + itemID,
@@ -172,18 +197,19 @@ func (c SwaggerAPISetDatabricks) addWorkspaceContentNode(subResources *[]SubReso
 	// TODO - consider adding a PutEndpoint and handling this in Update
 	// see https://docs.databricks.com/dev-tools/api/latest/examples.html#import-a-notebook-or-directory
 	*subResources = append(*subResources, subResource)
+	return data, nil
 }
 func (c SwaggerAPISetDatabricks) addDbfsContentNode(subResources *[]SubResource, currentItem *TreeNode, item map[string]interface{}, expandURL string, itemID string, metadata map[string]string) (string, error) {
 	fileSize := item["file_size"].(float64)
+
 	// Replace content with get_status response
 	path := currentItem.Metadata["path"]
 	url := "https://" + c.workspaceURL + "/api/2.0/dbfs/get-status?path=" + path
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
-		err = fmt.Errorf("Failed to make request: %v", err)
+		err = fmt.Errorf("Failed to make get_status request: %v", err)
 		return "", err
 	}
-
 	if fileSize == 0 /* 0 => directory */ {
 		return data, nil
 	}
@@ -330,7 +356,13 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 					// and determinte whether to add a "Contents" child node
 					switch currentItemTemplateURL {
 					case "/api/2.0/workspace/list":
-						c.addWorkspaceContentNode(&subResources, currentItem, expandURL, itemID, metadata)
+						newData, err := c.addWorkspaceContentNode(&subResources, currentItem, expandURL, itemID, metadata)
+						if err != nil {
+							return APISetExpandResponse{}, err
+						}
+						if newData != "" {
+							data = newData
+						}
 					case "/api/2.0/dbfs/list":
 						newData, err := c.addDbfsContentNode(&subResources, currentItem, item, expandURL, itemID, metadata)
 						if err != nil {
@@ -454,10 +486,16 @@ func (c SwaggerAPISetDatabricks) Update(ctx context.Context, item *TreeNode, con
 	//  - /api/2.0/dbfs/put - body needs wrapping
 	body := content
 
-	if item.SwaggerResourceType.PutEndpoint.TemplateURL == "/api/2.0/dbfs/put" {
+	switch item.SwaggerResourceType.PutEndpoint.TemplateURL {
+	case "/api/2.0/dbfs/put":
 		path := item.Metadata["path"]
 		base64Content := base64.StdEncoding.EncodeToString([]byte(content))
 		body = fmt.Sprintf("{\"path\":\"%s\", \"overwrite\":true,\"contents\":\"%s\"}", path, base64Content)
+	case "/api/2.0/workspace/import":
+		path := item.Metadata["path"]
+		language := item.Metadata["language"]
+		base64Content := base64.StdEncoding.EncodeToString([]byte(content))
+		body = fmt.Sprintf("{\"path\":\"%s\", \"overwrite\":true, \"language\":\"%s\",\"content\":\"%s\"}", path, language, base64Content)
 	}
 
 	url := "https://" + c.workspaceURL + item.SwaggerResourceType.PutEndpoint.TemplateURL
