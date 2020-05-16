@@ -13,16 +13,38 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
+// ResponsePropertyMapping stores the mapping from response property name to Metadata item name
+type ResponsePropertyMapping struct {
+	// ResponsePropertyName is the name of the property used to look up a value in the response object
+	ResponsePropertyName string
+	// MetadataName is the name of the key to use to store the value in the item metadata
+	MetadataName string
+}
+
 // DatabricksAPIResponseMetadata describes how to process responses from the Databricks API
 type DatabricksAPIResponseMetadata struct {
 	// ResponseArrayPath is the path to the array of items in the JSON response
 	ResponseArrayPath string
 	// ResponseArrayPath is name of the identified property for items in the JSON response
 	ResponseIdPropertyName string
-	// SubResourceQueryStringName is the name of the query string parameter to identify an item in sub resource requests
+	// SubResourceQueryStringName is the name of the query string parameter to identify an item in sub resource requests ()
 	SubResourceQueryStringName string
-	// SubResourceAdditionalMetadata is an array of additional query string parameters to populate from item metadata
-	SubResourceAdditionalMetadata []string
+	// ResponsePropertyMappings holds details for properties to extra from the response object into item metadata
+	ResponsePropertyMappings []ResponsePropertyMapping
+	// SubResourceQueryStringValues is an array of query string parameters to populate from item metadata (this includes the SubResourceQueryStringName)
+	SubResourceQueryStringValues []string
+}
+
+// NewDatabricksAPIResponseMetadata creates a DatabricksAPIResponseMetadata instance
+func NewDatabricksAPIResponseMetadata(responseArrayPath string, responseIdPropertyName string, subResourceQueryStringName string, subResourceAdditionalMetadata []string) DatabricksAPIResponseMetadata {
+	metadataNames := append(subResourceAdditionalMetadata, subResourceQueryStringName)
+	return DatabricksAPIResponseMetadata{
+		ResponseArrayPath:            responseArrayPath,
+		ResponseIdPropertyName:       responseIdPropertyName,
+		SubResourceQueryStringName:   subResourceQueryStringName,
+		ResponsePropertyMappings:     []ResponsePropertyMapping{{ResponsePropertyName: responseIdPropertyName, MetadataName: subResourceQueryStringName}},
+		SubResourceQueryStringValues: metadataNames,
+	}
 }
 
 var _ SwaggerAPISet = SwaggerAPISetDatabricks{}
@@ -191,7 +213,6 @@ func (c SwaggerAPISetDatabricks) addDbfsContentNode(subResources *[]SubResource,
 			Name:      "Content: " + itemID,
 			Metadata:  metadata,
 		}
-		// TODO - consider adding a PutEndpoint and handling this in Update
 		// see https://docs.databricks.com/dev-tools/api/latest/dbfs.html#put
 	}
 	*subResources = append(*subResources, subResource)
@@ -210,28 +231,28 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 		}, nil
 	}
 
-	if currentItem.ExpandURL == "/api/2.0/secrets/list" || currentItem.ExpandURL == "/api/2.0/secrets/acls/list" {
-		// handle query string values for items that were added as Child nodes by the swagger expander
-		currentItem.ExpandURL = currentItem.ExpandURL + "?scope=" + currentItem.Metadata["scope"]
-	}
-
-	subResources := []SubResource{}
-	url := "https://" + c.workspaceURL + currentItem.ExpandURL
-	if currentItemTemplateURL == "/api/2.0/jobs/runs/list" {
-		url = url + "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
+	// handle query string values for items that were added as Child nodes by the swagger expander
+	expandQueryString := ""
+	switch currentItem.ExpandURL {
+	case "/api/2.0/secrets/list", "/api/2.0/secrets/acls/list":
+		expandQueryString = "?scope=" + currentItem.Metadata["scope"]
+	case "/api/2.0/jobs/runs/list":
+		expandQueryString = "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
 		jobID := currentItem.Metadata["job_id"]
 		if jobID != "" {
-			url = url + "&job_id=" + jobID
+			expandQueryString = expandQueryString + "&job_id=" + jobID
 		}
 	}
 
 	// Perform the request
+	url := "https://" + c.workspaceURL + currentItem.ExpandURL + expandQueryString
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %v", err)
 		return APISetExpandResponse{}, err
 	}
 
+	// unpack content responses that are wrapped in JSON/Base64 encoded
 	responseType := ResponseJSON
 	if currentItemTemplateURL == "/api/2.0/dbfs/read" {
 		responseType = ResponsePlainText
@@ -246,6 +267,8 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 		}
 	}
 
+	// Process subresources
+	subResources := []SubResource{}
 	if len(resourceType.SubResources) > 0 ||
 		currentItemTemplateURL == "/api/2.0/dbfs/list" ||
 		currentItemTemplateURL == "/api/2.0/workspace/list" {
@@ -272,20 +295,36 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 
 			for _, item := range itemArray {
 				item := item.(map[string]interface{})
-				itemIDTemp := item[expandParameters.ResponseIdPropertyName]
-				itemID := fmt.Sprintf("%v", itemIDTemp)
-				expandURL := fmt.Sprintf("%s?%s=%s", subResourceType.Endpoint.TemplateURL, expandParameters.SubResourceQueryStringName, itemID)
-
-				for _, queryStringName := range expandParameters.SubResourceAdditionalMetadata {
-					queryStringValue := currentItem.Metadata[queryStringName]
-					expandURL += fmt.Sprintf("&%s=%s", queryStringName, queryStringValue)
-				}
 
 				metadata := map[string]string{}
 				for k, v := range currentItem.Metadata {
 					metadata[k] = v
 				}
-				metadata[expandParameters.SubResourceQueryStringName] = itemID
+
+				// save metadata items from response
+				for _, responseItemToStore := range expandParameters.ResponsePropertyMappings {
+					valueTemp := item[responseItemToStore.ResponsePropertyName]
+					value := fmt.Sprintf("%v", valueTemp)
+					metadata[responseItemToStore.MetadataName] = value
+				}
+
+				// build query string from metadata
+				queryString := ""
+				queryStringSeparator := ""
+				for _, queryStringName := range expandParameters.SubResourceQueryStringValues {
+					queryStringValue := metadata[queryStringName]
+					if queryStringValue != "" {
+						queryString += fmt.Sprintf("%s%s=%s", queryStringSeparator, queryStringName, queryStringValue)
+						queryStringSeparator = "&"
+					}
+				}
+				expandURL := fmt.Sprintf("%s?%s", subResourceType.Endpoint.TemplateURL, queryString)
+
+				if currentItemTemplateURL == "/api/2.0/jobs/runs/list" {
+					expandURL = expandURL + "&limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
+				}
+
+				itemID := metadata[expandParameters.SubResourceQueryStringName]
 				if itemID == currentItem.Metadata[expandParameters.SubResourceQueryStringName] {
 					// skip adding the item (e.g. workspace list returns existing item when on a file)
 					// and determinte whether to add a "Contents" child node
@@ -331,27 +370,27 @@ func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) Databri
 
 	switch templateURL {
 	case "/api/2.0/clusters/list":
-		return DatabricksAPIResponseMetadata{"clusters", "cluster_id", "cluster_id", []string{}}
+		return NewDatabricksAPIResponseMetadata("clusters", "cluster_id", "cluster_id", []string{})
 	case "/api/2.0/instance-pools/list":
-		return DatabricksAPIResponseMetadata{"instance_pools", "instance_pool_id", "instance_pool_id", []string{}}
+		return NewDatabricksAPIResponseMetadata("instance_pools", "instance_pool_id", "instance_pool_id", []string{})
 	case "/api/2.0/jobs/list":
-		return DatabricksAPIResponseMetadata{"jobs", "job_id", "job_id", []string{}}
+		return NewDatabricksAPIResponseMetadata("jobs", "job_id", "job_id", []string{})
 	case "/api/2.0/jobs/runs/list":
-		return DatabricksAPIResponseMetadata{"runs", "run_id", "run_id", []string{}}
+		return NewDatabricksAPIResponseMetadata("runs", "run_id", "run_id", []string{"job_id"})
 	case "/api/2.0/secrets/scopes/list":
-		return DatabricksAPIResponseMetadata{"scopes", "name", "scope", []string{}}
+		return NewDatabricksAPIResponseMetadata("scopes", "name", "scope", []string{})
 	case "/api/2.0/secrets/list":
-		return DatabricksAPIResponseMetadata{"secrets", "key", "key", []string{}}
+		return NewDatabricksAPIResponseMetadata("secrets", "key", "key", []string{})
 	case "/api/2.0/secrets/acls/list":
-		return DatabricksAPIResponseMetadata{"items", "principal", "principal", []string{"scope"}}
+		return NewDatabricksAPIResponseMetadata("items", "principal", "principal", []string{"scope"})
 	case "/api/2.0/token/list":
-		return DatabricksAPIResponseMetadata{"token_infos", "token_id", "token_id", []string{"scope"}}
+		return NewDatabricksAPIResponseMetadata("token_infos", "token_id", "token_id", []string{"scope"})
 	case "/api/2.0/dbfs/list":
-		return DatabricksAPIResponseMetadata{"files", "path", "path", []string{}}
+		return NewDatabricksAPIResponseMetadata("files", "path", "path", []string{})
 	case "/api/2.0/workspace/list":
-		return DatabricksAPIResponseMetadata{"objects", "path", "path", []string{}}
+		return NewDatabricksAPIResponseMetadata("objects", "path", "path", []string{})
 	}
-	return DatabricksAPIResponseMetadata{"", "", "", []string{}}
+	return NewDatabricksAPIResponseMetadata("", "", "", []string{})
 }
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
