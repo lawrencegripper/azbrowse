@@ -116,6 +116,88 @@ func (c SwaggerAPISetDatabricks) DoRequestWithBodyAndHeaders(verb string, url st
 	return "", fmt.Errorf("Response failed with %s (%s): %s", response.Status, url, data)
 }
 
+func (c SwaggerAPISetDatabricks) unpackFileContents(data string, contentPath string) (string, error) {
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal([]byte(data), &jsonData); err != nil {
+		err = fmt.Errorf("Failed to json decode dbfs content: %v", err)
+		return "", err
+	}
+	data = jsonData[contentPath].(string)
+	buf, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		err = fmt.Errorf("Failed to base64 decode dbfs content : %v", err)
+		return "", err
+	}
+	data = string(buf)
+	return data, nil
+}
+
+func (c SwaggerAPISetDatabricks) addWorkspaceContentNode(subResources *[]SubResource, currentItem *TreeNode, expandURL string, itemID string, metadata map[string]string) {
+	// Add a child item to show the contents
+	subResource := SubResource{
+		ID: c.nodeID + expandURL + "/content",
+		ResourceType: swagger.ResourceType{
+			Children:     []swagger.ResourceType{},
+			SubResources: []swagger.ResourceType{},
+			Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
+			// PutPath:    "/api/2.0/workspace/import", // Needs handling of more properties from original source: https://docs.databricks.com/dev-tools/api/latest/workspace.html#import
+			DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
+		},
+		ExpandURL: "/api/2.0/workspace/export?format=SOURCE&direct_download=true&path=" + itemID,
+		Name:      "Content: " + itemID,
+		Metadata:  metadata,
+	}
+	// TODO - consider adding a PutEndpoint and handling this in Update
+	// see https://docs.databricks.com/dev-tools/api/latest/examples.html#import-a-notebook-or-directory
+	*subResources = append(*subResources, subResource)
+}
+func (c SwaggerAPISetDatabricks) addDbfsContentNode(subResources *[]SubResource, currentItem *TreeNode, item map[string]interface{}, expandURL string, itemID string, metadata map[string]string) (string, error) {
+	fileSize := item["file_size"].(float64)
+	// Replace content with get_status response
+	path := currentItem.Metadata["path"]
+	url := "https://" + c.workspaceURL + "/api/2.0/dbfs/get-status?path=" + path
+	data, err := c.DoRequest("GET", url)
+	if err != nil {
+		err = fmt.Errorf("Failed to make request: %v", err)
+		return "", err
+	}
+
+	if fileSize == 0 /* 0 => directory */ {
+		return data, nil
+	}
+	var subResource SubResource
+	if fileSize > 8192 /* pick a max size to handle */ {
+		subResource = SubResource{
+			ID: c.nodeID + expandURL + "/content",
+			ResourceType: swagger.ResourceType{
+				Children:     []swagger.ResourceType{},
+				SubResources: []swagger.ResourceType{},
+				FixedContent: "File too large to load",
+			},
+			Name: "Content: " + itemID,
+		}
+	} else {
+		// Add a child item to show the contents
+		subResource = SubResource{
+			ID: c.nodeID + expandURL + "/content",
+			ResourceType: swagger.ResourceType{
+				Children:       []swagger.ResourceType{},
+				SubResources:   []swagger.ResourceType{},
+				Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/read", ""),
+				PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/put", ""),
+				DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
+			},
+			ExpandURL: "/api/2.0/dbfs/read?offset=0&path=" + itemID,
+			Name:      "Content: " + itemID,
+			Metadata:  metadata,
+		}
+		// TODO - consider adding a PutEndpoint and handling this in Update
+		// see https://docs.databricks.com/dev-tools/api/latest/dbfs.html#put
+	}
+	*subResources = append(*subResources, subResource)
+	return data, nil
+}
+
 // ExpandResource returns metadata about child resources of the specified resource node
 func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
@@ -143,44 +225,35 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 		}
 	}
 
-	responseType := ResponseJSON
-	if currentItemTemplateURL == "/api/2.0/workspace/export" || currentItemTemplateURL == "/api/2.0/dbfs/read" {
-		responseType = ResponsePlainText
-	}
-
+	// Perform the request
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
 		err = fmt.Errorf("Failed to make request: %v", err)
 		return APISetExpandResponse{}, err
 	}
 
+	responseType := ResponseJSON
 	if currentItemTemplateURL == "/api/2.0/dbfs/read" {
-		var jsonData map[string]interface{}
-		if err = json.Unmarshal([]byte(data), &jsonData); err != nil {
-			err = fmt.Errorf("Failed to json decode dbfs content: %v", err)
+		responseType = ResponsePlainText
+		if data, err = c.unpackFileContents(data, "data"); err != nil {
 			return APISetExpandResponse{}, err
 		}
-		data = jsonData["data"].(string)
-		buf, err := base64.StdEncoding.DecodeString(data)
-		if err != nil {
-			err = fmt.Errorf("Failed to base64 decode dbfs content : %v", err)
+	}
+	if currentItemTemplateURL == "/api/2.0/workspace/export" {
+		responseType = ResponsePlainText
+		if data, err = c.unpackFileContents(data, "content"); err != nil {
 			return APISetExpandResponse{}, err
 		}
-		data = string(buf)
 	}
 
 	if len(resourceType.SubResources) > 0 ||
 		currentItemTemplateURL == "/api/2.0/dbfs/list" ||
 		currentItemTemplateURL == "/api/2.0/workspace/list" {
 
-		// We have defined subResources (or a node such as workspaces) - Unmarshal the response and add these to newItems
-
 		var subResourceType swagger.ResourceType
 		switch len(resourceType.SubResources) {
 		case 0:
-			// currentItemTemplateURL == "/api/2.0/workspaces/list"
-			// reuse current resource type as we recurse down
-			subResourceType = resourceType
+			subResourceType = resourceType // e.g. "/api/2.0/workspaces/list" where we reuse the current resource type as we drill down
 		case 1:
 			subResourceType = resourceType.SubResources[0]
 		default:
@@ -192,7 +265,6 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 			return APISetExpandResponse{}, err
 		}
 
-		// arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItemTemplateURL)
 		expandParameters := c.getExpandParameters(currentItemTemplateURL)
 		itemArrayTemp := jsonData[expandParameters.ResponseArrayPath]
 		if itemArrayTemp != nil {
@@ -219,84 +291,29 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 					// and determinte whether to add a "Contents" child node
 					switch currentItemTemplateURL {
 					case "/api/2.0/workspace/list":
-						// Add a child item to show the contents
-						subResource := SubResource{
-							ID: c.nodeID + expandURL + "/content",
-							ResourceType: swagger.ResourceType{
-								Children:     []swagger.ResourceType{},
-								SubResources: []swagger.ResourceType{},
-								Endpoint:     endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
-								// PutPath:    "/api/2.0/workspace/import", // Needs handling of more properties from original source: https://docs.databricks.com/dev-tools/api/latest/workspace.html#import
-								DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
-							},
-							ExpandURL: "/api/2.0/workspace/export?format=SOURCE&direct_download=true&path=" + itemID,
-							Name:      "Content: " + itemID,
-							Metadata:  metadata,
-						}
-						// TODO - consider adding a PutEndpoint and handling this in Update
-						// see https://docs.databricks.com/dev-tools/api/latest/examples.html#import-a-notebook-or-directory
-						subResources = append(subResources, subResource)
+						c.addWorkspaceContentNode(&subResources, currentItem, expandURL, itemID, metadata)
 					case "/api/2.0/dbfs/list":
-						fileSize := item["file_size"].(float64)
-						// Replace content with get_status response
-						path := currentItem.Metadata["path"]
-						url := "https://" + c.workspaceURL + "/api/2.0/dbfs/get-status?path=" + path
-						data, err = c.DoRequest("GET", url)
+						newData, err := c.addDbfsContentNode(&subResources, currentItem, item, expandURL, itemID, metadata)
 						if err != nil {
-							err = fmt.Errorf("Failed to make request: %v", err)
 							return APISetExpandResponse{}, err
 						}
-
-						if fileSize == 0 /* 0 => directory */ {
-							continue
+						if newData != "" {
+							data = newData
 						}
-						var subResource SubResource
-						if fileSize > 8192 /* pick a max size to handle */ {
-							subResource = SubResource{
-								ID: c.nodeID + expandURL + "/content",
-								ResourceType: swagger.ResourceType{
-									Children:     []swagger.ResourceType{},
-									SubResources: []swagger.ResourceType{},
-									FixedContent: "File too large to load",
-								},
-								Name: "Content: " + itemID,
-							}
-						} else {
-							// Add a child item to show the contents
-							subResource = SubResource{
-								ID: c.nodeID + expandURL + "/content",
-								ResourceType: swagger.ResourceType{
-									Children:       []swagger.ResourceType{},
-									SubResources:   []swagger.ResourceType{},
-									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/read", ""),
-									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/put", ""),
-									DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
-								},
-								ExpandURL: "/api/2.0/dbfs/read?offset=0&path=" + itemID,
-								Name:      "Content: " + itemID,
-								Metadata:  metadata,
-							}
-							// TODO - consider adding a PutEndpoint and handling this in Update
-							// see https://docs.databricks.com/dev-tools/api/latest/dbfs.html#put
-						}
-						subResources = append(subResources, subResource)
 					}
-					continue
+				} else {
+					subResource := SubResource{
+						ID:           c.nodeID + expandURL,
+						ResourceType: subResourceType,
+						ExpandURL:    expandURL,
+						Name:         itemID,
+						Metadata:     metadata,
+					}
+					if subResourceType.DeleteEndpoint != nil && subResourceType.DeleteEndpoint.TemplateURL != "" {
+						subResource.DeleteURL = subResourceType.DeleteEndpoint.TemplateURL // delete urls are all fixed values
+					}
+					subResources = append(subResources, subResource)
 				}
-
-				subResource := SubResource{
-					ID:           c.nodeID + expandURL,
-					ResourceType: subResourceType,
-					ExpandURL:    expandURL,
-					Name:         itemID,
-					Metadata:     metadata,
-				}
-
-				if subResourceType.DeleteEndpoint != nil && subResourceType.DeleteEndpoint.TemplateURL != "" {
-					subResource.DeleteURL = subResourceType.DeleteEndpoint.TemplateURL // delete urls are all fixed values
-				}
-
-				subResources = append(subResources, subResource)
 			}
 		}
 	}
