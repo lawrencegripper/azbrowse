@@ -13,6 +13,18 @@ import (
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
+// DatabricksAPIResponseMetadata describes how to process responses from the Databricks API
+type DatabricksAPIResponseMetadata struct {
+	// ResponseArrayPath is the path to the array of items in the JSON response
+	ResponseArrayPath string
+	// ResponseArrayPath is name of the identified property for items in the JSON response
+	ResponseIdPropertyName string
+	// SubResourceQueryStringName is the name of the query string parameter to identify an item in sub resource requests
+	SubResourceQueryStringName string
+	// SubResourceAdditionalMetadata is an array of additional query string parameters to populate from item metadata
+	SubResourceAdditionalMetadata []string
+}
+
 var _ SwaggerAPISet = SwaggerAPISetDatabricks{}
 
 // SwaggerAPISetDatabricks holds the config for working with an Azure Search Service
@@ -191,18 +203,19 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 			return APISetExpandResponse{}, err
 		}
 
-		arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItemTemplateURL)
-		itemArrayTemp := jsonData[arrayPath]
+		// arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItemTemplateURL)
+		expandParameters := c.getExpandParameters(currentItemTemplateURL)
+		itemArrayTemp := jsonData[expandParameters.ResponseArrayPath]
 		if itemArrayTemp != nil {
 			itemArray := itemArrayTemp.([]interface{})
 
 			for _, item := range itemArray {
 				item := item.(map[string]interface{})
-				itemIDTemp := item[idPropertyName]
+				itemIDTemp := item[expandParameters.ResponseIdPropertyName]
 				itemID := fmt.Sprintf("%v", itemIDTemp)
-				expandURL := fmt.Sprintf("%s?%s=%s", subResourceType.Endpoint.TemplateURL, queryStringName, itemID)
+				expandURL := fmt.Sprintf("%s?%s=%s", subResourceType.Endpoint.TemplateURL, expandParameters.SubResourceQueryStringName, itemID)
 
-				for _, queryStringName := range additionalQueryStrings {
+				for _, queryStringName := range expandParameters.SubResourceAdditionalMetadata {
 					queryStringValue := currentItem.Metadata[queryStringName]
 					expandURL += fmt.Sprintf("&%s=%s", queryStringName, queryStringValue)
 				}
@@ -211,8 +224,8 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 				for k, v := range currentItem.Metadata {
 					metadata[k] = v
 				}
-				metadata[queryStringName] = itemID
-				if itemID == currentItem.Metadata[queryStringName] {
+				metadata[expandParameters.SubResourceQueryStringName] = itemID
+				if itemID == currentItem.Metadata[expandParameters.SubResourceQueryStringName] {
 					// skip adding the item (e.g. workspace list returns existing item when on a file)
 					// and determinte whether to add a "Contents" child node
 					switch currentItemTemplateURL {
@@ -308,30 +321,31 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 }
 
 // get returns arrayPath, idPropertyName, queryStringName and an array of additional query strings to pass
-func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) (string, string, string, []string) {
+func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) DatabricksAPIResponseMetadata {
+
 	switch templateURL {
 	case "/api/2.0/clusters/list":
-		return "clusters", "cluster_id", "cluster_id", []string{}
+		return DatabricksAPIResponseMetadata{"clusters", "cluster_id", "cluster_id", []string{}}
 	case "/api/2.0/instance-pools/list":
-		return "instance_pools", "instance_pool_id", "instance_pool_id", []string{}
+		return DatabricksAPIResponseMetadata{"instance_pools", "instance_pool_id", "instance_pool_id", []string{}}
 	case "/api/2.0/jobs/list":
-		return "jobs", "job_id", "job_id", []string{}
+		return DatabricksAPIResponseMetadata{"jobs", "job_id", "job_id", []string{}}
 	case "/api/2.0/jobs/runs/list":
-		return "runs", "run_id", "run_id", []string{}
+		return DatabricksAPIResponseMetadata{"runs", "run_id", "run_id", []string{}}
 	case "/api/2.0/secrets/scopes/list":
-		return "scopes", "name", "scope", []string{}
+		return DatabricksAPIResponseMetadata{"scopes", "name", "scope", []string{}}
 	case "/api/2.0/secrets/list":
-		return "secrets", "key", "key", []string{}
+		return DatabricksAPIResponseMetadata{"secrets", "key", "key", []string{}}
 	case "/api/2.0/secrets/acls/list":
-		return "items", "principal", "principal", []string{"scope"}
+		return DatabricksAPIResponseMetadata{"items", "principal", "principal", []string{"scope"}}
 	case "/api/2.0/token/list":
-		return "token_infos", "token_id", "token_id", []string{"scope"}
+		return DatabricksAPIResponseMetadata{"token_infos", "token_id", "token_id", []string{"scope"}}
 	case "/api/2.0/dbfs/list":
-		return "files", "path", "path", []string{}
+		return DatabricksAPIResponseMetadata{"files", "path", "path", []string{}}
 	case "/api/2.0/workspace/list":
-		return "objects", "path", "path", []string{}
+		return DatabricksAPIResponseMetadata{"objects", "path", "path", []string{}}
 	}
-	return "", "", "", []string{}
+	return DatabricksAPIResponseMetadata{"", "", "", []string{}}
 }
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
