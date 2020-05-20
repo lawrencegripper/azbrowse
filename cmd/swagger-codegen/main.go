@@ -260,7 +260,7 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 		SuppressAPIVersion: true,
 		AdditionalPaths: []swagger.AdditionalPath{
 			// add as a missing path - also overridden to map to the actual endpoint that exists!
-			{Name: "{scope}", Path: "/api/2.0/secrets/{scope}", DeletePath: "/api/2.0/secrets/scopes/delete"},
+			{Name: "{scope}", Path: "/api/2.0/secrets/{scope}", DeletePath: "/api/2.0/secrets/scopes/delete", FixedContent: "Choose a node to expand..."},
 			// Add extra point for runs listing
 			{Name: "runs", Path: "/api/2.0/runs", GetPath: "/api/2.0/jobs/runs/list"},
 			{Name: "{run_id}", Path: "/api/2.0/runs/{run_id}", GetPath: "/api/2.0/jobs/runs/get", DeletePath: "/api/2.0/jobs/runs/delete"},
@@ -286,6 +286,7 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 			},
 			"/api/2.0/jobs/get": { // push job get under job list
 				Path:       "/api/2.0/jobs/{job_id}",
+				PutPath:    "/api/2.0/jobs/reset",
 				DeletePath: "/api/2.0/jobs/delete",
 			},
 			"/api/2.0/jobs/runs/list": { // push run list under job get
@@ -303,10 +304,20 @@ func getDatabricksDataPlaneConfig() *swagger.Config {
 				Path: "/api/2.0/secrets/{scope}/secrets",
 			},
 			"/api/2.0/secrets/acls/list": { // push secret acls under secret scopes
-				Path: "/api/2.0/secrets/{scope}/acls",
+				Path:       "/api/2.0/secrets/{scope}/acls",
+				PutPath:    "/api/2.0/secrets/acls/put",
+				DeletePath: "/api/2.0/secrets/acls/delete",
 			},
 			"/api/2.0/secrets/acls/get": { // push secret acls under secret scopes
 				Path: "/api/2.0/secrets/{scope}/acls/{principal}",
+			},
+			"/api/2.0/dbfs/list": {
+				Path:       "/api/2.0/dbfs",
+				DeletePath: "/api/2.0/dbfs/delete",
+			},
+			"/api/2.0/workspace/list": {
+				Path:       "/api/2.0/workspace",
+				DeletePath: "/api/2.0/workspace/delete",
 			},
 		},
 	}

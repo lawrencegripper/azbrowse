@@ -220,6 +220,26 @@
                     }
                 }
             }
+        },
+        "/api/2.0/workspace/list": {
+            "get": {
+                "description": "list workspace",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
+        },
+        "/api/2.0/dbfs/list": {
+            "get": {
+                "description": "list dbfs",
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                }
+            }
         }
     }
 }

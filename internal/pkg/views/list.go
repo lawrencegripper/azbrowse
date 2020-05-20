@@ -303,7 +303,7 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 		currentID := w.CurrentItem().ID
 		for _, node := range nodes {
 			if node.ID == currentID {
-				panic(fmt.Errorf("ids must be unique or the navigate command breaks"))
+				panic(fmt.Errorf("IDs must be unique or the navigate command breaks. ID: %s", currentID))
 			}
 		}
 	}

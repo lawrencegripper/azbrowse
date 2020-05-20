@@ -512,10 +512,10 @@ func (h *ListUpdateHandler) Invoke() error {
 		return err
 	}
 
-	var formattedContent string
 	fileExtension := ".txt"
 	contentType := h.Content.GetContentType()
 	content := h.Content.GetContent()
+	formattedContent := content
 
 	switch contentType {
 	case expanders.ResponseJSON:

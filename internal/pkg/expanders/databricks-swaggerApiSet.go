@@ -3,13 +3,56 @@ package expanders
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
+	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
+
+// ResponsePropertyMapping stores the mapping from response property name to Metadata item name
+type ResponsePropertyMapping struct {
+	// ResponsePropertyName is the name of the property used to look up a value in the response object
+	ResponsePropertyName string
+	// MetadataName is the name of the key to use to store the value in the item metadata
+	MetadataName string
+}
+
+// DatabricksAPIResponseMetadata describes how to process responses from the Databricks API
+type DatabricksAPIResponseMetadata struct {
+	// ResponseArrayPath is the path to the array of items in the JSON response
+	ResponseArrayPath string
+	// ResponseArrayPath is name of the identified property for items in the JSON response
+	ResponseIDPropertyName string
+	// SubResourceQueryStringName is the name of the query string parameter to identify an item in sub resource requests ()
+	SubResourceQueryStringName string
+	// ResponsePropertyMappings holds details for properties to extra from the response object into item metadata
+	ResponsePropertyMappings []ResponsePropertyMapping
+	// SubResourceQueryStringValues is an array of query string parameters to populate from item metadata (this includes the SubResourceQueryStringName)
+	SubResourceQueryStringValues []string
+}
+
+type DatabricksWorkspaceGetStatusResponse struct {
+	Path       string `json:"path"`
+	Language   string `json:"language"`
+	ObjectType string `json:"object_type"`
+	ObjectID   string `jsong:"object_id"`
+}
+
+// NewDatabricksAPIResponseMetadata creates a DatabricksAPIResponseMetadata instance
+func NewDatabricksAPIResponseMetadata(responseArrayPath string, responseIDPropertyName string, subResourceQueryStringName string, subResourceAdditionalMetadata []string) DatabricksAPIResponseMetadata {
+	metadataNames := append(subResourceAdditionalMetadata, subResourceQueryStringName)
+	return DatabricksAPIResponseMetadata{
+		ResponseArrayPath:            responseArrayPath,
+		ResponseIDPropertyName:       responseIDPropertyName,
+		SubResourceQueryStringName:   subResourceQueryStringName,
+		ResponsePropertyMappings:     []ResponsePropertyMapping{{ResponsePropertyName: responseIDPropertyName, MetadataName: subResourceQueryStringName}},
+		SubResourceQueryStringValues: metadataNames,
+	}
+}
 
 var _ SwaggerAPISet = SwaggerAPISetDatabricks{}
 
@@ -102,123 +145,284 @@ func (c SwaggerAPISetDatabricks) DoRequestWithBodyAndHeaders(verb string, url st
 	return "", fmt.Errorf("Response failed with %s (%s): %s", response.Status, url, data)
 }
 
+func (c SwaggerAPISetDatabricks) unpackFileContents(data string, contentPath string) (string, error) {
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal([]byte(data), &jsonData); err != nil {
+		err = fmt.Errorf("Failed to json decode dbfs content: %v", err)
+		return "", err
+	}
+	data = jsonData[contentPath].(string)
+	buf, err := base64.StdEncoding.DecodeString(data)
+	if err != nil {
+		err = fmt.Errorf("Failed to base64 decode dbfs content : %v", err)
+		return "", err
+	}
+	data = string(buf)
+	return data, nil
+}
+
+func (c SwaggerAPISetDatabricks) addWorkspaceContentNode(subResources *[]SubResource, currentItem *TreeNode, expandURL string, itemID string, metadata map[string]string) (string, error) {
+
+	// Replace content with get_status response
+	path := currentItem.Metadata["path"]
+	url := "https://" + c.workspaceURL + "/api/2.0/workspace/get-status?path=" + path
+	data, err := c.DoRequest("GET", url)
+	if err != nil {
+		err = fmt.Errorf("Failed to make get_status request: %v", err)
+		return "", err
+	}
+
+	var getStatusResponse DatabricksWorkspaceGetStatusResponse
+	if err = json.Unmarshal([]byte(data), &getStatusResponse); err != nil {
+		err = fmt.Errorf("Failed to unmarshal get_status response: %v", err)
+		return "", err
+	}
+	metadata["object_type"] = getStatusResponse.ObjectType
+	metadata["language"] = getStatusResponse.Language
+
+	// Add a child item to show the contents
+	subResource := SubResource{
+		ID: c.nodeID + expandURL + "/content",
+		ResourceType: swagger.ResourceType{
+			Children:       []swagger.ResourceType{},
+			SubResources:   []swagger.ResourceType{},
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/export", ""),
+			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/import", ""),
+			DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
+		},
+		ExpandURL: "/api/2.0/workspace/export?format=SOURCE&path=" + itemID,
+		Name:      "Content: " + itemID,
+		Metadata:  metadata,
+	}
+	// TODO - consider adding a PutEndpoint and handling this in Update
+	// see https://docs.databricks.com/dev-tools/api/latest/examples.html#import-a-notebook-or-directory
+	*subResources = append(*subResources, subResource)
+	return data, nil
+}
+func (c SwaggerAPISetDatabricks) addDbfsContentNode(subResources *[]SubResource, currentItem *TreeNode, item map[string]interface{}, expandURL string, itemID string, metadata map[string]string) (string, error) {
+	fileSize := item["file_size"].(float64)
+
+	// Replace content with get_status response
+	path := currentItem.Metadata["path"]
+	url := "https://" + c.workspaceURL + "/api/2.0/dbfs/get-status?path=" + path
+	data, err := c.DoRequest("GET", url)
+	if err != nil {
+		err = fmt.Errorf("Failed to make get_status request: %v", err)
+		return "", err
+	}
+	if fileSize == 0 /* 0 => directory */ {
+		return data, nil
+	}
+	var subResource SubResource
+	if fileSize > 8192 /* pick a max size to handle */ {
+		subResource = SubResource{
+			ID: c.nodeID + expandURL + "/content",
+			ResourceType: swagger.ResourceType{
+				Children:     []swagger.ResourceType{},
+				SubResources: []swagger.ResourceType{},
+				FixedContent: "File too large to load",
+			},
+			Name: "Content: " + itemID,
+		}
+	} else {
+		// Add a child item to show the contents
+		subResource = SubResource{
+			ID: c.nodeID + expandURL + "/content",
+			ResourceType: swagger.ResourceType{
+				Children:       []swagger.ResourceType{},
+				SubResources:   []swagger.ResourceType{},
+				Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/read", ""),
+				PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/put", ""),
+				DeleteEndpoint: currentItem.SwaggerResourceType.DeleteEndpoint,
+			},
+			ExpandURL: "/api/2.0/dbfs/read?offset=0&path=" + itemID,
+			Name:      "Content: " + itemID,
+			Metadata:  metadata,
+		}
+		// see https://docs.databricks.com/dev-tools/api/latest/dbfs.html#put
+	}
+	*subResources = append(*subResources, subResource)
+	return data, nil
+}
+
 // ExpandResource returns metadata about child resources of the specified resource node
 func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem *TreeNode, resourceType swagger.ResourceType) (APISetExpandResponse, error) {
 
-	if currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/api/2.0/secrets/{scope}" {
-		// fake node added to tree structure
-		// no resources to add, but pass child metadata
+	currentItemTemplateURL := currentItem.SwaggerResourceType.Endpoint.TemplateURL
+	if currentItem.SwaggerResourceType.FixedContent != "" {
 		return APISetExpandResponse{
-			Response:      "Choose a node to expand...",
+			Response:      currentItem.SwaggerResourceType.FixedContent,
 			ResponseType:  ResponsePlainText,
 			ChildMetadata: currentItem.Metadata,
 		}, nil
 	}
 
-	if currentItem.ExpandURL == "/api/2.0/secrets/list" || currentItem.ExpandURL == "/api/2.0/secrets/acls/list" {
-		// handle query string values for items that were added as Child nodes by the swagger expander
-
-		// TODO Update DeleteURL  when handling deletion!
-		currentItem.ExpandURL = currentItem.ExpandURL + "?scope=" + currentItem.Metadata["scope"]
-	}
-
-	subResources := []SubResource{}
-	url := "https://" + c.workspaceURL + currentItem.ExpandURL
-	if currentItem.SwaggerResourceType.Endpoint.TemplateURL == "/api/2.0/jobs/runs/list" {
-		url = url + "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
+	// handle query string values for items that were added as Child nodes by the swagger expander
+	expandQueryString := ""
+	switch currentItem.ExpandURL {
+	case "/api/2.0/secrets/list", "/api/2.0/secrets/acls/list":
+		expandQueryString = "?scope=" + currentItem.Metadata["scope"]
+	case "/api/2.0/jobs/runs/list":
+		expandQueryString = "?limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
 		jobID := currentItem.Metadata["job_id"]
 		if jobID != "" {
-			url = url + "&job_id=" + jobID
+			expandQueryString = expandQueryString + "&job_id=" + jobID
 		}
 	}
 
+	// Perform the request
+	url := "https://" + c.workspaceURL + currentItem.ExpandURL + expandQueryString
 	data, err := c.DoRequest("GET", url)
 	if err != nil {
-		err = fmt.Errorf("Failed to make request: %s", err)
+		err = fmt.Errorf("Failed to make request: %v", err)
 		return APISetExpandResponse{}, err
 	}
-	if len(resourceType.SubResources) > 0 {
-		// We have defined subResources - Unmarshal the response and add these to newItems
-		// TODO!
 
-		if len(resourceType.SubResources) > 1 {
+	// unpack content responses that are wrapped in JSON/Base64 encoded
+	responseType := ResponseJSON
+	if currentItemTemplateURL == "/api/2.0/dbfs/read" {
+		responseType = ResponsePlainText
+		if data, err = c.unpackFileContents(data, "data"); err != nil {
+			return APISetExpandResponse{}, err
+		}
+	}
+	if currentItemTemplateURL == "/api/2.0/workspace/export" {
+		responseType = ResponsePlainText
+		if data, err = c.unpackFileContents(data, "content"); err != nil {
+			return APISetExpandResponse{}, err
+		}
+	}
+
+	// Process subresources
+	subResources := []SubResource{}
+	if len(resourceType.SubResources) > 0 ||
+		currentItemTemplateURL == "/api/2.0/dbfs/list" ||
+		currentItemTemplateURL == "/api/2.0/workspace/list" {
+
+		var subResourceType swagger.ResourceType
+		switch len(resourceType.SubResources) {
+		case 0:
+			subResourceType = resourceType // e.g. "/api/2.0/workspaces/list" where we reuse the current resource type as we drill down
+		case 1:
+			subResourceType = resourceType.SubResources[0]
+		default:
 			return APISetExpandResponse{}, fmt.Errorf("Only expecting a single SubResource type")
 		}
-		subResourceType := resourceType.SubResources[0]
-
-		arrayPath, idPropertyName, queryStringName, additionalQueryStrings := c.getExpandParameters(currentItem.SwaggerResourceType.Endpoint.TemplateURL)
 
 		var jsonData map[string]interface{}
 		if err = json.Unmarshal([]byte(data), &jsonData); err != nil {
 			return APISetExpandResponse{}, err
 		}
-		itemArrayTemp := jsonData[arrayPath]
+
+		expandParameters := c.getExpandParameters(currentItemTemplateURL)
+		itemArrayTemp := jsonData[expandParameters.ResponseArrayPath]
 		if itemArrayTemp != nil {
 			itemArray := itemArrayTemp.([]interface{})
 
 			for _, item := range itemArray {
 				item := item.(map[string]interface{})
-				itemIDTemp := item[idPropertyName]
-				itemID := fmt.Sprintf("%v", itemIDTemp)
-				expandURL := fmt.Sprintf("%s?%s=%s", subResourceType.Endpoint.TemplateURL, queryStringName, itemID)
-
-				for _, queryStringName := range additionalQueryStrings {
-					queryStringValue := currentItem.Metadata[queryStringName]
-					expandURL += fmt.Sprintf("&%s=%s", queryStringName, queryStringValue)
-				}
 
 				metadata := map[string]string{}
 				for k, v := range currentItem.Metadata {
 					metadata[k] = v
 				}
-				metadata[queryStringName] = itemID
 
-				subResource := SubResource{
-					ID:           c.nodeID + expandURL,
-					ResourceType: subResourceType,
-					ExpandURL:    expandURL,
-					Name:         itemID,
-					Metadata:     metadata,
+				// save metadata items from response
+				for _, responseItemToStore := range expandParameters.ResponsePropertyMappings {
+					valueTemp := item[responseItemToStore.ResponsePropertyName]
+					value := fmt.Sprintf("%v", valueTemp)
+					metadata[responseItemToStore.MetadataName] = value
 				}
 
-				if subResourceType.DeleteEndpoint != nil && subResourceType.DeleteEndpoint.TemplateURL != "" {
-					subResource.DeleteURL = subResourceType.DeleteEndpoint.TemplateURL // delete urls are all fixed values
+				// build query string from metadata
+				queryString := ""
+				queryStringSeparator := ""
+				for _, queryStringName := range expandParameters.SubResourceQueryStringValues {
+					queryStringValue := metadata[queryStringName]
+					if queryStringValue != "" {
+						queryString += fmt.Sprintf("%s%s=%s", queryStringSeparator, queryStringName, queryStringValue)
+						queryStringSeparator = "&"
+					}
+				}
+				expandURL := fmt.Sprintf("%s?%s", subResourceType.Endpoint.TemplateURL, queryString)
+
+				if currentItemTemplateURL == "/api/2.0/jobs/runs/list" {
+					expandURL = expandURL + "&limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
 				}
 
-				subResources = append(subResources, subResource)
+				itemID := metadata[expandParameters.SubResourceQueryStringName]
+				if itemID == currentItem.Metadata[expandParameters.SubResourceQueryStringName] {
+					// skip adding the item (e.g. workspace list returns existing item when on a file)
+					// and determinte whether to add a "Contents" child node
+					switch currentItemTemplateURL {
+					case "/api/2.0/workspace/list":
+						newData, err := c.addWorkspaceContentNode(&subResources, currentItem, expandURL, itemID, metadata)
+						if err != nil {
+							return APISetExpandResponse{}, err
+						}
+						if newData != "" {
+							data = newData
+						}
+					case "/api/2.0/dbfs/list":
+						newData, err := c.addDbfsContentNode(&subResources, currentItem, item, expandURL, itemID, metadata)
+						if err != nil {
+							return APISetExpandResponse{}, err
+						}
+						if newData != "" {
+							data = newData
+						}
+					}
+				} else {
+					subResource := SubResource{
+						ID:           c.nodeID + expandURL,
+						ResourceType: subResourceType,
+						ExpandURL:    expandURL,
+						Name:         itemID,
+						Metadata:     metadata,
+					}
+					if subResourceType.DeleteEndpoint != nil && subResourceType.DeleteEndpoint.TemplateURL != "" {
+						subResource.DeleteURL = subResourceType.DeleteEndpoint.TemplateURL // delete urls are all fixed values
+					}
+					subResources = append(subResources, subResource)
+				}
 			}
 		}
 	}
 
 	return APISetExpandResponse{
 		Response:      data,
-		ResponseType:  ResponseJSON,
+		ResponseType:  responseType,
 		SubResources:  subResources,
 		ChildMetadata: currentItem.Metadata, // propagate metadata (e.g. job_id) down the tree
 	}, nil
 }
 
 // get returns arrayPath, idPropertyName, queryStringName and an array of additional query strings to pass
-func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) (string, string, string, []string) {
+func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) DatabricksAPIResponseMetadata {
+
 	switch templateURL {
 	case "/api/2.0/clusters/list":
-		return "clusters", "cluster_id", "cluster_id", []string{}
+		return NewDatabricksAPIResponseMetadata("clusters", "cluster_id", "cluster_id", []string{})
 	case "/api/2.0/instance-pools/list":
-		return "instance_pools", "instance_pool_id", "instance_pool_id", []string{}
+		return NewDatabricksAPIResponseMetadata("instance_pools", "instance_pool_id", "instance_pool_id", []string{})
 	case "/api/2.0/jobs/list":
-		return "jobs", "job_id", "job_id", []string{}
+		return NewDatabricksAPIResponseMetadata("jobs", "job_id", "job_id", []string{})
 	case "/api/2.0/jobs/runs/list":
-		return "runs", "run_id", "run_id", []string{}
+		return NewDatabricksAPIResponseMetadata("runs", "run_id", "run_id", []string{"job_id"})
 	case "/api/2.0/secrets/scopes/list":
-		return "scopes", "name", "scope", []string{}
+		return NewDatabricksAPIResponseMetadata("scopes", "name", "scope", []string{})
 	case "/api/2.0/secrets/list":
-		return "secrets", "key", "key", []string{}
+		return NewDatabricksAPIResponseMetadata("secrets", "key", "key", []string{})
 	case "/api/2.0/secrets/acls/list":
-		return "items", "principal", "principal", []string{"scope"}
+		return NewDatabricksAPIResponseMetadata("items", "principal", "principal", []string{"scope"})
 	case "/api/2.0/token/list":
-		return "token_infos", "token_id", "token_id", []string{"scope"}
+		return NewDatabricksAPIResponseMetadata("token_infos", "token_id", "token_id", []string{"scope"})
+	case "/api/2.0/dbfs/list":
+		return NewDatabricksAPIResponseMetadata("files", "path", "path", []string{})
+	case "/api/2.0/workspace/list":
+		return NewDatabricksAPIResponseMetadata("objects", "path", "path", []string{})
 	}
-	return "", "", "", []string{}
+	return NewDatabricksAPIResponseMetadata("", "", "", []string{})
 }
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
@@ -247,6 +451,12 @@ func (c SwaggerAPISetDatabricks) Delete(ctx context.Context, item *TreeNode) (bo
 	case "/api/2.0/secrets/acls/get":
 		bodyValue["scope"] = metadata["scope"]
 		bodyValue["principal"] = metadata["principal"]
+	case "/api/2.0/dbfs/list":
+		bodyValue["path"] = metadata["path"]
+		bodyValue["recursive"] = true
+	case "/api/2.0/workspace/list":
+		bodyValue["path"] = metadata["path"]
+		bodyValue["recursive"] = true
 	}
 
 	if len(bodyValue) > 0 {
@@ -268,5 +478,27 @@ func (c SwaggerAPISetDatabricks) Delete(ctx context.Context, item *TreeNode) (bo
 
 // Update attempts to update the specified item with new content
 func (c SwaggerAPISetDatabricks) Update(ctx context.Context, item *TreeNode, content string) error {
-	return fmt.Errorf("Not implemented")
+
+	// Assumptions:
+	//  - All updates are POST operations
+	//  - All updates use fixed URLS (i.e. the ID is in the body, not the URL)
+	// Exceptions:
+	//  - /api/2.0/dbfs/put - body needs wrapping
+	body := content
+
+	switch item.SwaggerResourceType.PutEndpoint.TemplateURL {
+	case "/api/2.0/dbfs/put":
+		path := item.Metadata["path"]
+		base64Content := base64.StdEncoding.EncodeToString([]byte(content))
+		body = fmt.Sprintf("{\"path\":\"%s\", \"overwrite\":true,\"contents\":\"%s\"}", path, base64Content)
+	case "/api/2.0/workspace/import":
+		path := item.Metadata["path"]
+		language := item.Metadata["language"]
+		base64Content := base64.StdEncoding.EncodeToString([]byte(content))
+		body = fmt.Sprintf("{\"path\":\"%s\", \"overwrite\":true, \"language\":\"%s\",\"content\":\"%s\"}", path, language, base64Content)
+	}
+
+	url := "https://" + c.workspaceURL + item.SwaggerResourceType.PutEndpoint.TemplateURL
+	_, err := c.DoRequestWithBody("POST", url, body)
+	return err
 }

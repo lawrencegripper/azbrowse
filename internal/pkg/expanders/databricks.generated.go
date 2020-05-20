@@ -19,6 +19,11 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 				}},
 		},
 		{
+			Display:        "dbfs",
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/list", ""),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/dbfs/delete", ""),
+		},
+		{
 			Display:  "groups",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/groups/list", ""),
 		},
@@ -40,6 +45,7 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 					Display:        "{job_id}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/get", ""),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/delete", ""),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/jobs/reset", ""),
 					Children: []swagger.ResourceType{
 						{
 							Display:  "runs",
@@ -71,10 +77,13 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 					Display:        "{scope}",
 					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/{scope}", ""),
 					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/scopes/delete", ""),
+					FixedContent:   "Choose a node to expand...",
 					Children: []swagger.ResourceType{
 						{
-							Display:  "acls",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/list", ""),
+							Display:        "acls",
+							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/list", ""),
+							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/delete", ""),
+							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/api/2.0/secrets/acls/put", ""),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{principal}",
@@ -90,6 +99,11 @@ func (e *AzureDatabricksExpander) loadResourceTypes() []swagger.ResourceType {
 		{
 			Display:  "token",
 			Endpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/token/list", ""),
+		},
+		{
+			Display:        "workspace",
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/list", ""),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/api/2.0/workspace/delete", ""),
 		}}
 
 }
