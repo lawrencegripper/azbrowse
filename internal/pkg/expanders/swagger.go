@@ -130,48 +130,42 @@ func (e *SwaggerResourceExpander) Expand(ctx context.Context, currentItem *TreeN
 	apiSet := *apiSetPtr
 
 	data := ""
-	dataType := ResponsePlainText
 	newItems := []*TreeNode{}
-	childMetadata := map[string]string{}
 
-	if resourceType.FixedContent == "" {
-		// Get sub resources from config
-		expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
-		if err != nil {
-			return ExpanderResult{
-				Nodes:             nil,
-				Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
-				Err:               err,
-				SourceDescription: "SwaggerResourceExpander",
-			}
+	// Get sub resources from config
+	expandResult, err := apiSet.ExpandResource(ctx, currentItem, *resourceType)
+	if err != nil {
+		return ExpanderResult{
+			Nodes:             nil,
+			Response:          ExpanderResponse{Response: expandResult.Response, ResponseType: expandResult.ResponseType},
+			Err:               err,
+			SourceDescription: "SwaggerResourceExpander",
 		}
-		data = expandResult.Response
-		dataType = expandResult.ResponseType
-
-		if len(expandResult.SubResources) > 0 {
-			for _, subResource := range expandResult.SubResources {
-				metadata := map[string]string{
-					"SwaggerAPISetID": apiSet.ID(),
-				}
-				e.copyMetadata(metadata, subResource.Metadata)
-				newItems = append(newItems, &TreeNode{
-					Parentid:            currentItem.ID,
-					Namespace:           "swagger",
-					Name:                subResource.Name,
-					Display:             subResource.Name,
-					ID:                  subResource.ID,
-					ExpandURL:           subResource.ExpandURL,
-					ItemType:            SubResourceType,
-					DeleteURL:           subResource.DeleteURL,
-					SwaggerResourceType: &subResource.ResourceType,
-					Metadata:            metadata,
-				})
-			}
-		}
-		childMetadata = expandResult.ChildMetadata
-	} else {
-		data = resourceType.FixedContent
 	}
+	data = expandResult.Response
+	dataType := expandResult.ResponseType
+
+	if len(expandResult.SubResources) > 0 {
+		for _, subResource := range expandResult.SubResources {
+			metadata := map[string]string{
+				"SwaggerAPISetID": apiSet.ID(),
+			}
+			e.copyMetadata(metadata, subResource.Metadata)
+			newItems = append(newItems, &TreeNode{
+				Parentid:            currentItem.ID,
+				Namespace:           "swagger",
+				Name:                subResource.Name,
+				Display:             subResource.Name,
+				ID:                  subResource.ID,
+				ExpandURL:           subResource.ExpandURL,
+				ItemType:            SubResourceType,
+				DeleteURL:           subResource.DeleteURL,
+				SwaggerResourceType: &subResource.ResourceType,
+				Metadata:            metadata,
+			})
+		}
+	}
+	childMetadata := expandResult.ChildMetadata
 
 	// Add any children to newItems
 	if len(resourceType.Children) > 0 {

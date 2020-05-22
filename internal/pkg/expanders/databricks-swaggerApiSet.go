@@ -408,11 +408,11 @@ func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) Databri
 	case "/api/2.0/secrets/scopes/list":
 		return NewDatabricksAPIResponseMetadata("scopes", "name", "scope", []string{})
 	case "/api/2.0/secrets/list":
-		return NewDatabricksAPIResponseMetadata("secrets", "key", "key", []string{})
+		return NewDatabricksAPIResponseMetadata("secrets", "key", "key", []string{"scope"})
 	case "/api/2.0/secrets/acls/list":
 		return NewDatabricksAPIResponseMetadata("items", "principal", "principal", []string{"scope"})
 	case "/api/2.0/token/list":
-		return NewDatabricksAPIResponseMetadata("token_infos", "token_id", "token_id", []string{"scope"})
+		return NewDatabricksAPIResponseMetadata("token_infos", "token_id", "token_id", []string{})
 	case "/api/2.0/dbfs/list":
 		return NewDatabricksAPIResponseMetadata("files", "path", "path", []string{})
 	case "/api/2.0/workspace/list":
