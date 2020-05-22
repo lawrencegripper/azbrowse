@@ -346,10 +346,6 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 				}
 				expandURL := fmt.Sprintf("%s?%s", subResourceType.Endpoint.TemplateURL, queryString)
 
-				if currentItemTemplateURL == "/api/2.0/jobs/runs/list" {
-					expandURL = expandURL + "&limit=0" // TODO add paging. "limit=0" sets the maximum number allowed - see https://docs.databricks.com/dev-tools/api/latest/jobs.html#runs-list
-				}
-
 				itemID := metadata[expandParameters.SubResourceQueryStringName]
 				if itemID == currentItem.Metadata[expandParameters.SubResourceQueryStringName] {
 					// skip adding the item (e.g. workspace list returns existing item when on a file)
@@ -408,7 +404,7 @@ func (c SwaggerAPISetDatabricks) getExpandParameters(templateURL string) Databri
 	case "/api/2.0/jobs/list":
 		return NewDatabricksAPIResponseMetadata("jobs", "job_id", "job_id", []string{})
 	case "/api/2.0/jobs/runs/list":
-		return NewDatabricksAPIResponseMetadata("runs", "run_id", "run_id", []string{"job_id"})
+		return NewDatabricksAPIResponseMetadata("runs", "run_id", "run_id", []string{})
 	case "/api/2.0/secrets/scopes/list":
 		return NewDatabricksAPIResponseMetadata("scopes", "name", "scope", []string{})
 	case "/api/2.0/secrets/list":
