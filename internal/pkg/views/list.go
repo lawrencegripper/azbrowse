@@ -216,6 +216,7 @@ func (w *ListWidget) GoBack() {
 	w.title = previousPage.Title
 	w.selected = previousPage.Selection
 	w.expandedNodeItem = previousPage.ExpandedNodeItem
+	w.filterString = previousPage.FilterString
 
 	eventing.Publish("list.navigated", ListNavigatedEventState{
 		Success:      true,
@@ -297,6 +298,7 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 			Value:            w.items,
 			Title:            w.title,
 			Selection:        w.selected,
+			FilterString:     w.filterString,
 			ExpandedNodeItem: w.CurrentItem(),
 		})
 
