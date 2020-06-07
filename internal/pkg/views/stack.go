@@ -9,6 +9,7 @@ type Page struct {
 	DataType         expanders.ExpanderResponseType
 	Title            string
 	Selection        int
+	FilterString     string
 	ExpandedNodeItem *expanders.TreeNode
 }
 
