@@ -49,8 +49,8 @@ func acquireTokenFromAzCLI(clearCache bool, tenantID string) (AzCLIToken, error)
 }
 
 // AcquireTokenForResourceFromAzCLI gets a token for the specified resource endpoint
-func AcquireTokenForResourceFromAzCLI(resource string) (AzCLIToken, error) {
-	args := []string{"account", "get-access-token", "--output", "json", "--resource", resource}
+func AcquireTokenForResourceFromAzCLI(subscription string, resource string) (AzCLIToken, error) {
+	args := []string{"account", "get-access-token", "--output", "json", "--subscription", subscription, "--resource", resource}
 
 	out, err := exec.Command("az", args...).Output()
 	if err != nil {
