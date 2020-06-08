@@ -34,7 +34,7 @@ func createRootCmd() *cobra.Command {
 	var navigateTo string
 	var fuzzerDurationMinutes int
 	var tenantID string
-	var tenantIDFromSubscription string
+	var subscription string
 
 	cmd := &cobra.Command{
 		Use: "azbrowse",
@@ -65,15 +65,28 @@ func createRootCmd() *cobra.Command {
 
 			if tenantID != "" {
 				settings.TenantID = tenantID
-			} else if tenantIDFromSubscription != "" {
-				// [?name=='mpeck-stuartle' || id== '36ce814f-1b29-4695-9bde-1e2ad14bda0f'].tenantId
-				query := fmt.Sprintf("[?name=='%[1]s' || id== '%[1]s'].tenantId", tenantIDFromSubscription)
+			} else if subscription != "" {
+				// [?name=='subscriptionName' || id== 'ab99572b-a482-4a02-acf3-96ba46e90f76'].tenantId
+				// get tenant id from subscription id/name
+				query := fmt.Sprintf("[?name=='%[1]s' || id== '%[1]s'].tenantId", subscription)
 				out, err := exec.Command("az", "account", "list", "--query", query, "--output", "tsv").Output()
 				if err != nil {
 					_ = cmd.Usage()
 					os.Exit(1)
 				}
 				settings.TenantID = strings.TrimSuffix(string(out), "\n")
+
+				if settings.NavigateToID == "" {
+					// Set to navigate to the subscription only if --navigate hasn't also been set
+					// get subscription id from id/name
+					query := fmt.Sprintf("[?name=='%[1]s' || id== '%[1]s'].id", subscription)
+					out, err := exec.Command("az", "account", "list", "--query", query, "--output", "tsv").Output()
+					if err != nil {
+						_ = cmd.Usage()
+						os.Exit(1)
+					}
+					settings.NavigateToID = "/subscriptions/" + strings.TrimSuffix(string(out), "\n")
+				}
 			}
 			run(&settings)
 		},
@@ -83,9 +96,9 @@ func createRootCmd() *cobra.Command {
 	cmd.Flags().StringVar(&navigateTo, "navigate", "", "navigate to resource")
 	cmd.Flags().IntVar(&fuzzerDurationMinutes, "fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 	cmd.Flags().StringVar(&tenantID, "tenant-id", "", "(optional) specify the tenant id to get an access token for (see az account list -o json)")
-	cmd.Flags().StringVar(&tenantIDFromSubscription, "tenant-id-from-sub", "", "(optional) specify a subscription to identify the tenant-id to use")
+	cmd.Flags().StringVar(&subscription, "subscription", "", "(optional) specify a subscription to load")
 
-	if err := cmd.RegisterFlagCompletionFunc("tenant-id-from-sub", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	if err := cmd.RegisterFlagCompletionFunc("subscription", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 
 		out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
 		if err != nil {
