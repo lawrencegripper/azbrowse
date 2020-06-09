@@ -278,6 +278,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	keybindings.AddHandler(keybindings.NewListClearFilterHandler(list))
 	keybindings.AddHandler(commandPanelAzureSearchQueryCommand)
 	keybindings.AddHandler(itemCopyItemIDCommand)
+	keybindings.AddHandler(listSortCommand)
 	if settings.EnableTracing {
 		keybindings.AddHandler(listDebugCopyItemDataCommand)
 	}
