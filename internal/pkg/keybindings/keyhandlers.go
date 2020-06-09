@@ -43,6 +43,7 @@ const (
 	HandlerIDFilter                  HandlerID = "filter"                //nolint:golint
 	HandlerIDAzureSearchQuery        HandlerID = "azuresearchquery"      //nolist:golint
 	HandlerIDToggleDemoMode          HandlerID = "toggledemomode"        //nolist:golint
+	HandlerIDListSort                HandlerID = "listsort"              //nolint:golint
 )
 
 // KeyHandler is an interface that all key handlers must implement

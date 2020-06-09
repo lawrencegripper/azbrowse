@@ -216,6 +216,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
 	itemCopyItemIDCommand := keybindings.NewItemCopyItemIDHandler(content, status)
 	listDebugCopyItemDataCommand := keybindings.NewListDebugCopyItemDataHandler(list, status)
+	listSortCommand := keybindings.NewListSortHandler(list)
 
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
@@ -226,6 +227,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 		listUpdateCommand,
 		itemCopyItemIDCommand,
 		toggleDemoModeCommand,
+		listSortCommand,
 	}
 	if settings.EnableTracing {
 		commands = append(commands, listDebugCopyItemDataCommand)
