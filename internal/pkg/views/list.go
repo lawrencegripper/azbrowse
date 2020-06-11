@@ -3,6 +3,7 @@ package views
 import (
 	"context"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
@@ -398,4 +399,18 @@ func (w *ListWidget) MoveDown() {
 func (w *ListWidget) SetShouldRender(val bool) {
 	w.shouldRender = val
 	w.contentView.SetShouldRender(val)
+}
+
+func (w *ListWidget) SortItems() {
+
+	getSortName := func(itemName string) string {
+		return strings.ToLower(itemName)
+	}
+	sortFunc := func(i, j int) bool {
+		iValue := getSortName(w.items[i].Name)
+		jValue := getSortName(w.items[j].Name)
+		return iValue < jValue
+	}
+
+	sort.Slice(w.items, sortFunc)
 }
