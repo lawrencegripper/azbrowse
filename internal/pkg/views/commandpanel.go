@@ -268,7 +268,7 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 		triggerLayout = true
 	}
 	if w.options != nil {
-		// apply filter, re-selecting the current item
+		// apply filter, re-selecting the current item (assuming it's still in the list)
 		selectedID := ""
 		if w.selectedIndex >= 0 && w.selectedIndex < len(*w.filteredOptions) {
 			selectedID = (*w.filteredOptions)[w.selectedIndex].ID
@@ -283,6 +283,10 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 				}
 				filterOptions = append(filterOptions, option)
 			}
+		}
+		// if there's just a single item in the list then select it
+		if len(filterOptions) == 1 {
+			w.selectedIndex = 0
 		}
 		w.filteredOptions = &filterOptions
 		triggerLayout = true
