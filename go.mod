@@ -13,6 +13,7 @@ require (
 	github.com/cskr/pubsub v1.0.1
 	github.com/fatih/color v1.7.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
+	github.com/go-delve/delve v1.4.1 // indirect
 	github.com/go-openapi/analysis v0.18.0 // indirect
 	github.com/go-openapi/errors v0.18.0 // indirect
 	github.com/go-openapi/loads v0.18.0
@@ -40,7 +41,6 @@ require (
 	github.com/valyala/fastjson v1.4.0
 	golang.org/x/oauth2 v0.0.0-20181203162652-d668ce993890 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	golang.org/x/tools v0.0.0-20190405180640-052fc3cfdbc2 // indirect
 	gopkg.in/h2non/gock.v1 v1.0.15
 	gopkg.in/yaml.v2 v2.2.4
 	gotest.tools v2.2.0+incompatible

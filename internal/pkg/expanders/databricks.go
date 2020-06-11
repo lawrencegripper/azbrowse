@@ -156,11 +156,16 @@ func (e *AzureDatabricksExpander) expandWorkspaceRoot(ctx context.Context, curre
 
 func (e *AzureDatabricksExpander) createAPISetForWorkspace(ctx context.Context, workspaceID string) (*SwaggerAPISetDatabricks, error) {
 
-	managementToken, err := armclient.AcquireTokenForResourceFromAzCLI(azureManagementEndpoint)
+	subscriptionID := armclient.GetSubscriptionIDFromResourceID(workspaceID)
+	if subscriptionID == "" {
+		return nil, fmt.Errorf("Failed to find subscription ID in %s", workspaceID)
+	}
+
+	managementToken, err := armclient.AcquireTokenForResourceFromAzCLI(subscriptionID, azureManagementEndpoint)
 	if err != nil {
 		return nil, err
 	}
-	databricksToken, err := armclient.AcquireTokenForResourceFromAzCLI(azureDatabricksGlobalApplicationID)
+	databricksToken, err := armclient.AcquireTokenForResourceFromAzCLI(subscriptionID, azureDatabricksGlobalApplicationID)
 	if err != nil {
 		return nil, err
 	}
