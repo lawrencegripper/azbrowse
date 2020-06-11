@@ -14,6 +14,8 @@ Passing the `--tenant-id` argument allows you to control the Azure Active Direct
 
 Running `az account list --query "[].{name:name, tenantId:tenantId}" -o table` will give you a list of subscriptions and their associated tenant. Then you can pass the tenant to azbrowse, e.g. `azbrowse --tenant-id 00000000-0000-0000-0000-000000000000`
 
+Alternatively you can use the `--subscription` argument to launch straight into a Subscription no matter which tentant it it under. With command completion enabled `source <(azbrowse completion bash)` you can use tap to complete partial subscription names. 
+
 ## Navigating to resources
 
 The `--navigate` argument allows you to pass the ID of a resource to navigate to. See [Getting Started](./getting-started.md) for more info on this.

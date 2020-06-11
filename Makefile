@@ -61,18 +61,18 @@ fmt:
 ## run:
 ##		Quick command to lint and then launch azbrowse
 run: checks install
-	azbrowse -debug
+	azbrowse --debug
 
 ## fuzz-from:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems
 fuzz: checks install
-	azbrowse -fuzzer 5 -debug
+	azbrowse --fuzzer 5 --debug
 
 ## fuzz:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems
 ## 		Accepts `node_id=/some/path/here` to start at a certain location in subscriptions
 fuzz-from: checks install
-	azbrowse -fuzzer 5 -navigate ${node_id}
+	azbrowse --fuzzer 5 --navigate ${node_id}
 
 ## install: 
 ##		Build and install azbrowse on this machine

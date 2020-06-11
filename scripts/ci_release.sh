@@ -41,7 +41,7 @@ else
 fi
 
 # Set version for release (picked up later by goreleaser)
-git tag -f v1.2.$BUILD_NUMBER
+git tag -f v2.0.$BUILD_NUMBER
 
 export GOVERSION=$(go version)
 

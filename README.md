@@ -69,13 +69,23 @@ Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
 
 [This extension from Noel Bundick lets you do just that](https://github.com/noelbundick/azure-cli-extension-noelbundick/blob/master/README.md#browse)
 
-#### DIY
+### Shell completion
+
+Azbrowse can generate shell completions for a number of different shells using the `azbrowse completion` command. 
+
+For example, to configure compltion in bash add the following to `~/.bashrc` or `~/.profile`
+
+```bash
+source <(azbrowse completion bash)
+```
+
+### DIY
 
 Simply download the archive/package suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it.
 
 Bonus: Add it to your `$PATH` so you can run `azbrowse` anywhere. 
 
-#### Test out via Docker
+### Test out via Docker
 
 You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
