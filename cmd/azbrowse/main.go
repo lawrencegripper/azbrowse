@@ -178,7 +178,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 				panic(err)
 			}
 
-			list.Navigate(newItems, newContent, "Subscriptions")
+			list.Navigate(newItems, newContent, "Subscriptions", false)
 
 			return nil
 		})

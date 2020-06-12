@@ -14,21 +14,15 @@ import (
 
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
-	x, y  int
-	w, h  int
-	g     *gocui.Gui
-	items []*expanders.TreeNode
-
-	filteredItems []*expanders.TreeNode
-	filterString  string
+	x, y int
+	w, h int
+	g    *gocui.Gui
 
 	contentView          *ItemWidget
 	statusView           *StatusbarWidget
 	navStack             Stack
-	title                string
+	currentPage          *Page
 	ctx                  context.Context
-	selected             int
-	expandedNodeItem     *expanders.TreeNode
 	view                 *gocui.View
 	enableTracing        bool
 	FullscreenKeyBinding string
@@ -48,30 +42,36 @@ type ListNavigatedEventState struct {
 
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, shouldRender bool, g *gocui.Gui) *ListWidget {
-	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, filterString: "", title: title, shouldRender: shouldRender, g: g}
+	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, shouldRender: shouldRender, g: g}
 	return listWidget
 }
 
 func (w *ListWidget) itemCount() int {
-	if w.filterString == "" {
-		return len(w.items)
+	if w.currentPage == nil {
+		return 0
+	}
+	if w.currentPage.FilterString == "" {
+		return len(w.currentPage.Items)
 	}
 
-	return len(w.filteredItems)
+	return len(w.currentPage.FilteredItems)
 }
 
 // SetFilter sets the filter to be applied to list items
 func (w *ListWidget) SetFilter(filterString string) {
+	if w.currentPage == nil {
+		return
+	}
 	filteredItems := []*expanders.TreeNode{}
-	for _, item := range w.items {
+	for _, item := range w.currentPage.Items {
 		if strings.Contains(strings.ToLower(item.Display), filterString) {
 			filteredItems = append(filteredItems, item)
 		}
 	}
 
-	w.selected = 0
-	w.filterString = filterString
-	w.filteredItems = filteredItems
+	w.currentPage.Selection = 0
+	w.currentPage.FilterString = filterString
+	w.currentPage.FilteredItems = filteredItems
 
 	w.g.Update(func(gui *gocui.Gui) error {
 		return nil
@@ -80,15 +80,20 @@ func (w *ListWidget) SetFilter(filterString string) {
 
 // ClearFilter clears a filter if applied
 func (w *ListWidget) ClearFilter() {
-	w.filterString = ""
+	if w.currentPage != nil {
+		w.currentPage.FilterString = ""
+	}
 }
 
 func (w *ListWidget) itemsToShow() []*expanders.TreeNode {
-	if w.filterString == "" {
-		return w.items
+	if w.currentPage == nil {
+		return []*expanders.TreeNode{}
+	}
+	if w.currentPage.FilterString == "" {
+		return w.currentPage.Items
 	}
 
-	return w.filteredItems
+	return w.currentPage.FilteredItems
 }
 
 func highlightText(displayText string, highlight string) string {
@@ -123,13 +128,13 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 
 		for i, s := range w.itemsToShow() {
 			var itemToShow string
-			if i == w.selected {
+			if i == w.currentPage.Selection {
 				itemToShow = "▶ "
 			} else {
 				itemToShow = "  "
 			}
 
-			itemToShow = itemToShow + highlightText(s.Display, w.filterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
+			itemToShow = itemToShow + highlightText(s.Display, w.currentPage.FilterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 			linesUsedCount += strings.Count(itemToShow, "\n")
 			renderedItems = append(renderedItems, itemToShow)
@@ -141,15 +146,15 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		topIndex := w.lastTopIndex
 		bottomIndex := w.lastTopIndex + maxItemsCanShow
 
-		if w.selected >= bottomIndex {
+		if w.currentPage.Selection >= bottomIndex {
 			// need to adjust down
-			diff := w.selected - bottomIndex + 1
+			diff := w.currentPage.Selection - bottomIndex + 1
 			topIndex += diff
 			bottomIndex += diff
 		}
-		if w.selected < topIndex {
+		if w.currentPage.Selection < topIndex {
 			// need to adjust up
-			diff := topIndex - w.selected
+			diff := topIndex - w.currentPage.Selection
 			topIndex -= diff
 			bottomIndex -= diff
 		}
@@ -167,9 +172,9 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 
 		// If the title is getting too long trim things
 		// down from the front
-		title := w.title
-		if w.filterString != "" {
-			title += "[filter=" + w.filterString + "]"
+		title := w.currentPage.Title
+		if w.currentPage.FilterString != "" {
+			title += "[filter=" + w.currentPage.FilterString + "]"
 		}
 		if len(title) > w.w {
 			trimLength := len(title) - w.w + 5 // Add five for spacing and elipsis
@@ -189,19 +194,43 @@ func (w *ListWidget) Refresh() {
 
 	currentSelection := w.CurrentSelection()
 
+	// capture current state
+	sorted := false
+	filterString := ""
+	if w.currentPage != nil {
+		if w.currentPage.Sorted {
+			sorted = true
+		}
+		if w.currentPage.FilterString != "" {
+			filterString = w.currentPage.FilterString
+			w.ClearFilter() // clear filter so that `GoBack` actually navigates back
+		}
+	}
+
 	w.GoBack()
 	w.ExpandCurrentSelection()
 
 	w.ChangeSelection(currentSelection)
 
 	w.ClearFilter()
+
+	// reapply state
+	if sorted {
+		w.SortItems()
+	}
+	if filterString != "" {
+		w.SetFilter(filterString)
+	}
 }
 
 // GoBack takes the user back to preview view
 func (w *ListWidget) GoBack() {
 	eventing.Publish("list.prenavigate", "GOBACK")
 
-	if w.filterString != "" {
+	if w.currentPage == nil {
+		return
+	}
+	if w.currentPage.FilterString != "" {
 		// initial Back action is to clear filter, subsequent Back actions are normal
 		w.ClearFilter()
 		return
@@ -212,17 +241,12 @@ func (w *ListWidget) GoBack() {
 		return
 	}
 	w.contentView.SetContent(previousPage.ExpandedNodeItem, previousPage.Data, previousPage.DataType, "Response")
-	w.selected = 0
-	w.items = previousPage.Value
-	w.title = previousPage.Title
-	w.selected = previousPage.Selection
-	w.expandedNodeItem = previousPage.ExpandedNodeItem
-	w.filterString = previousPage.FilterString
+	w.currentPage = previousPage
 
 	eventing.Publish("list.navigated", ListNavigatedEventState{
 		Success:      true,
-		NewNodes:     w.items,
-		ParentNodeID: w.expandedNodeItem.Parentid,
+		NewNodes:     w.currentPage.Items,
+		ParentNodeID: w.currentPage.ExpandedNodeItem.Parentid,
 		IsBack:       true,
 	})
 }
@@ -230,8 +254,9 @@ func (w *ListWidget) GoBack() {
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
 
-	if w.title == "Subscriptions" {
-		w.title = ""
+	suppressPreviousTitle := false
+	if w.currentPage != nil && w.currentPage.Title == "Subscriptions" {
+		suppressPreviousTitle = true
 	}
 
 	currentItem := w.CurrentItem()
@@ -247,12 +272,16 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		newContent = nil
 		newTitle = ""
 	}
-	w.Navigate(newItems, newContent, newTitle)
+	w.Navigate(newItems, newContent, newTitle, suppressPreviousTitle)
 }
 
 // Navigate updates the currently selected list nodes, title and details content
-func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.ExpanderResponse, title string) {
+func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.ExpanderResponse, title string, suppressPreviousTitle bool) {
 
+	titlePrefix := ""
+	if !suppressPreviousTitle && w.currentPage != nil {
+		titlePrefix = w.currentPage.Title + ">"
+	}
 	if len(nodes) == 0 && content == nil && title == "" {
 		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
 	}
@@ -260,18 +289,20 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 
 	w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
 	if len(nodes) > 0 {
-		w.expandedNodeItem = currentItem
+		if w.currentPage != nil {
+			w.currentPage.ExpandedNodeItem = currentItem
+		}
 		w.SetNodes(nodes)
 
 		if currentItem != nil {
-			w.title = w.title + ">" + currentItem.Name
+			w.currentPage.Title = titlePrefix + currentItem.Name
 		}
 	}
 
 	parentNodeID := "root"
 	nodeID := "root"
-	if w.expandedNodeItem != nil {
-		parentNodeID = w.expandedNodeItem.ID
+	if w.currentPage.ExpandedNodeItem != nil {
+		parentNodeID = w.currentPage.ExpandedNodeItem.ID
 		nodeID = currentItem.ID
 	}
 
@@ -285,7 +316,10 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 
 // GetNodes returns the currently listed nodes
 func (w *ListWidget) GetNodes() []*expanders.TreeNode {
-	return w.items
+	if w.currentPage == nil {
+		return []*expanders.TreeNode{}
+	}
+	return w.currentPage.Items
 }
 
 // SetNodes allows others to set the list nodes
@@ -293,15 +327,7 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 
 	// Capture current view to navstack
 	if w.HasCurrentItem() {
-		w.navStack.Push(&Page{
-			Data:             w.contentView.GetContent(),
-			DataType:         w.contentView.GetContentType(),
-			Value:            w.items,
-			Title:            w.title,
-			Selection:        w.selected,
-			FilterString:     w.filterString,
-			ExpandedNodeItem: w.CurrentItem(),
-		})
+		w.navStack.Push(w.currentPage)
 
 		currentID := w.CurrentItem().ID
 		for _, node := range nodes {
@@ -310,9 +336,10 @@ func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
 			}
 		}
 	}
-
-	w.selected = 0
-	w.items = nodes
+	w.currentPage = &Page{
+		Selection: 0,
+		Items:     nodes,
+	}
 	w.ClearFilter()
 }
 
@@ -323,35 +350,49 @@ func (w *ListWidget) ChangeSelection(i int) {
 	} else if i < 0 {
 		i = 0
 	}
-	w.selected = i
+	if w.currentPage != nil {
+		w.currentPage.Selection = i
+	}
 }
 
 // CurrentSelection returns the current selection int
 func (w *ListWidget) CurrentSelection() int {
-	return w.selected
+	if w.currentPage == nil {
+		return -1
+	}
+	return w.currentPage.Selection
 }
 
 // HasCurrentItem indicates whether there is a current item
 func (w *ListWidget) HasCurrentItem() bool {
-	return w.selected < len(w.items)
+	if w.currentPage == nil {
+		return false
+	}
+	return w.currentPage.Selection < len(w.currentPage.Items)
 }
 
 // CurrentItem returns the selected item as a treenode
 func (w *ListWidget) CurrentItem() *expanders.TreeNode {
 	if w.HasCurrentItem() {
-		return w.itemsToShow()[w.selected]
+		return w.itemsToShow()[w.currentPage.Selection]
 	}
 	return nil
 }
 
 // CurrentExpandedItem returns the currently expanded item as a treenode
 func (w *ListWidget) CurrentExpandedItem() *expanders.TreeNode {
-	return w.expandedNodeItem
+	if w.currentPage == nil {
+		return nil
+	}
+	return w.currentPage.ExpandedNodeItem
 }
 
 // MovePageDown changes the selection to be a page further down the list
 func (w *ListWidget) MovePageDown() {
-	i := w.selected
+	if w.currentPage == nil {
+		return
+	}
+	i := w.currentPage.Selection
 
 	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i < w.itemCount(); i++ {
 		item := w.itemsToShow()[i]
@@ -364,7 +405,10 @@ func (w *ListWidget) MovePageDown() {
 
 // MovePageUp changes the selection to be a page further up the list
 func (w *ListWidget) MovePageUp() {
-	i := w.selected
+	if w.currentPage == nil {
+		return
+	}
+	i := w.currentPage.Selection
 
 	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i >= 0; i-- {
 		item := w.itemsToShow()[i]
@@ -401,16 +445,20 @@ func (w *ListWidget) SetShouldRender(val bool) {
 	w.contentView.SetShouldRender(val)
 }
 
+// SortItems sorts the current list items by Name
 func (w *ListWidget) SortItems() {
-
+	if w.currentPage == nil {
+		return
+	}
 	getSortName := func(itemName string) string {
 		return strings.ToLower(itemName)
 	}
 	sortFunc := func(i, j int) bool {
-		iValue := getSortName(w.items[i].Name)
-		jValue := getSortName(w.items[j].Name)
+		iValue := getSortName(w.currentPage.Items[i].Name)
+		jValue := getSortName(w.currentPage.Items[j].Name)
 		return iValue < jValue
 	}
 
-	sort.Slice(w.items, sortFunc)
+	sort.Slice(w.currentPage.Items, sortFunc)
+	w.currentPage.Sorted = true
 }
