@@ -4,13 +4,15 @@ import "github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 
 // Page represents a previous view in the nav stack
 type Page struct {
-	Value            []*expanders.TreeNode
+	Items            []*expanders.TreeNode
 	Data             string
 	DataType         expanders.ExpanderResponseType
 	Title            string
 	Selection        int
 	FilterString     string
+	FilteredItems    []*expanders.TreeNode
 	ExpandedNodeItem *expanders.TreeNode
+	Sorted           bool
 }
 
 // Stack is a basic LIFO stack that resizes as needed.
