@@ -8,7 +8,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 )
 
-var processNavigations = true
+var navigateToInProgress = true
 
 // NavigateTo will navigate through the tree to a node with
 // a matching ItemID or as far as it can get
@@ -22,18 +22,18 @@ func NavigateTo(list *views.ListWidget, itemID string) {
 		for {
 			navigateStateInterface := <-navigatedChannel
 
-			if processNavigations {
+			if navigateToInProgress {
 				navigateState := navigateStateInterface.(views.ListNavigatedEventState)
 				if !navigateState.Success {
 					// we got as far as we could - now stop!
-					processNavigations = false
+					navigateToInProgress = false
 					list.SetShouldRender(true)
 					continue
 				}
 				nodeList := navigateState.NewNodes
 
 				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
-					processNavigations = false
+					navigateToInProgress = false
 					list.SetShouldRender(true)
 				} else {
 
@@ -54,7 +54,7 @@ func NavigateTo(list *views.ListWidget, itemID string) {
 
 					if !gotNode {
 						// we got as far as we could - now stop!
-						processNavigations = false
+						navigateToInProgress = false
 						list.SetShouldRender(true)
 					}
 				}

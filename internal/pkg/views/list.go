@@ -141,6 +141,10 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		}
 
 		linesPerItem := linesUsedCount / w.itemCount()
+		// Handle a rare edge case where no lines are used per item
+		if linesPerItem == 0 {
+			linesPerItem = 1
+		}
 		maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
 
 		topIndex := w.lastTopIndex

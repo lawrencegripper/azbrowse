@@ -57,7 +57,13 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 
 		itemIDSegmentLength := len(strings.Split(currentNode.ID, "/"))
 
-		if r := regexp.MustCompile(".*/providers/Microsoft.Web/sites/.*/instances/.*"); r.MatchString(itemID) {
+		// Don't walk too deeply into any tree
+		if itemIDSegmentLength > 11 {
+			return true
+		}
+
+		// Skip walking all processes on every instance of a webapp!
+		if r := regexp.MustCompile(".*/sites/.*/processes"); r.MatchString(currentNode.ID) {
 			return true
 		}
 
@@ -101,7 +107,7 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 		if settings.NavigateToID != "" {
 			for {
 				<-time.After(time.Second * 1)
-				if !processNavigations {
+				if !navigateToInProgress {
 
 					// `-navigate` is finished, subscribe to nav events and get started
 					// by expanding the current item
@@ -127,9 +133,9 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
 
 			// If started with `-navigate` don't walk outside the specified resource
-			if settings.NavigateToID != "" && !strings.HasPrefix(navigateState.ParentNodeID, settings.NavigateToID) {
+			if navigateState.ParentNodeID != "root" && settings.NavigateToID != "" && !strings.HasPrefix(navigateState.ParentNodeID, settings.NavigateToID) {
 				fmt.Println("Fuzzer finished working on nodes under `-navigate` ID supplied")
-				st.Expect(testName("EXPECTED_limit_fuzz_to_navigate_node_id"), navigateState.ParentNodeID, settings.NavigateToID)
+				st.Expect(testName("EXPECTED ERROR limit_fuzz_to_navigate_node_id_fuzz_completed"), navigateState.ParentNodeID, settings.NavigateToID)
 			}
 
 			currentNodes := list.GetNodes()
