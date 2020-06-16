@@ -1,4 +1,4 @@
-FROM golang:1.13.5-stretch
+FROM golang:1.14.4-stretch
 # Build required snapcraft snaps
 # https://snapcraft.io/docs/snapcraft-docker-images
 # Grab dependencies
