@@ -39,7 +39,7 @@ func assertNavigationCorrect(expandedItem *expanders.TreeNode, resultingNodes []
 	// Assert container registry handled correctly
 	if r := regexp.MustCompile(".*/Microsoft.ContainerRegistry/registries/.*"); r.MatchString(expandedItem.ID) && itemIDSegmentLength == 9 {
 		expectedNodesInACR := 13
-		st.Expect(testName("containerRegistry_root_assertExpandHas5Nodes"), len(resultingNodes), expectedNodesInACR)
+		st.Expect(testName("containerRegistry_root_assertExpandNodeCount"), len(resultingNodes), expectedNodesInACR)
 	}
 
 	// Add more tests here...
@@ -48,22 +48,8 @@ func assertNavigationCorrect(expandedItem *expanders.TreeNode, resultingNodes []
 // StartAutomatedFuzzer will start walking the tree of nodes
 // logging out information and running tests while walking the tree
 func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui *gocui.Gui) {
-
-	type fuzzState struct {
-		current int
-		max     int
-	}
-
-	min := func(a, b int) int {
-		if a < b {
-			return a
-		}
-		return b
-	}
-
-	shouldSkipActivityProvider := false
 	shouldSkipMetricsProvider := false
-	shouldSkip := func(currentNode *expanders.TreeNode, itemID string) (shouldSkip bool, maxToExpand int) {
+	shouldSkip := func(currentNode *expanders.TreeNode, itemID string) (shouldSkip bool) {
 		///
 		/// Limit walking of things that have LOTS of nodes
 		/// so we don't get stuck
@@ -71,23 +57,23 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 
 		itemIDSegmentLength := len(strings.Split(currentNode.ID, "/"))
 
-		// Only expand limitted set under container repositories
+		if r := regexp.MustCompile(".*/providers/Microsoft.Web/sites/.*/instances/.*"); r.MatchString(itemID) {
+			return true
+		}
+
+		// Skip container repos
 		if r := regexp.MustCompile(".*/<repositories>/.*/.*"); r.MatchString(itemID) {
-			return false, 1
+			return true
 		}
 
-		// Only expand limitted set under activity log
+		// Skip activity log
 		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/<activitylog>"); r.MatchString(itemID) {
-			// Only walk the activity provider the first time we see it.
-			defer func() {
-				shouldSkipActivityProvider = true
-			}()
-			return shouldSkipActivityProvider, 1
+			return true
 		}
 
-		// Only expand limitted set under deployments
-		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/providers/Microsoft.Resources/deployments"); r.MatchString(itemID) && itemIDSegmentLength >= 7 {
-			return false, 1
+		// Skip expanding individual deployments
+		if r := regexp.MustCompile("/subscriptions/.*/resourceGroups/.*/providers/Microsoft.Resources/deployments/.*"); r.MatchString(itemID) && itemIDSegmentLength >= 7 {
+			return true
 		}
 
 		// Only expand limitted set under metrics
@@ -95,13 +81,13 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 			defer func() {
 				shouldSkipMetricsProvider = true
 			}()
-			return shouldSkipMetricsProvider, 1
+			return shouldSkipMetricsProvider
 		}
 
-		return false, -1
+		return false
 	}
 
-	stateMap := map[string]*fuzzState{}
+	visitedNodes := map[string]*expanders.TreeNode{}
 
 	startTime := time.Now()
 	endTime := startTime.Add(time.Duration(settings.FuzzerDurationMinutes) * time.Minute)
@@ -146,68 +132,34 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 				st.Expect(testName("EXPECTED_limit_fuzz_to_navigate_node_id"), navigateState.ParentNodeID, settings.NavigateToID)
 			}
 
-			nodeList := navigateState.NewNodes
+			currentNodes := list.GetNodes()
+			newNodeFound := false
+			for index, node := range currentNodes {
+				_, alreadyVisited := visitedNodes[node.ID]
+				if !alreadyVisited {
+					skip := shouldSkip(node, navigateState.ParentNodeID)
+					if skip {
+						visitedNodes[node.ID] = node
+						continue
+					}
 
-			// Create or Retrieve the current status of the fuzzer for this
-			// level in the tree
-			state, exists := stateMap[navigateState.ParentNodeID]
-			if !exists {
-				state = &fuzzState{
-					current: 0,
-					max:     len(nodeList),
+					list.ChangeSelection(index)
+					// Expand it
+					list.ExpandCurrentSelection()
+					visitedNodes[node.ID] = node
+					newNodeFound = true
+
+					// Assert things about the navigation based on the current item and the result nodes
+					assertNavigationCorrect(node, list.GetNodes())
+					break
 				}
-				stateMap[navigateState.ParentNodeID] = state
 			}
 
-			// Fuzzing completed on this level
-			if state.current >= state.max {
-				// Navigate back
+			// All nodes in the list already visited or skipped
+			if !newNodeFound {
 				list.GoBack()
-				continue
 			}
 
-			// Get the current item to decide if we should skip or limit how many
-			// children to expand
-			currentItem := list.GetNodes()[state.current]
-			skipItem, maxItem := shouldSkip(currentItem, navigateState.ParentNodeID)
-			if maxItem != -1 {
-				state.max = min(maxItem, state.max)
-			}
-
-			// Store the resulting nodes so we can assert tests about expandedItem -> resultingNodes
-			// behaved as expected
-			var resultNodes []*expanders.TreeNode
-
-			if skipItem {
-				// Skip the current item and expand
-				state.current++
-
-				// If skip takes us to the end of the available items nav back up stack
-				if state.current >= state.max {
-					// Navigate back
-					list.GoBack()
-					continue
-				}
-
-				// Move to next item
-				list.ChangeSelection(state.current)
-
-				// Expand it
-				list.ExpandCurrentSelection()
-
-				resultNodes = list.GetNodes()
-			} else {
-				// Move to current item
-				list.ChangeSelection(state.current)
-				// Expand it
-				list.ExpandCurrentSelection()
-				state.current++
-
-				resultNodes = list.GetNodes()
-			}
-
-			// Assert things about the navigation based on the current item and the result nodes
-			assertNavigationCorrect(currentItem, resultNodes)
 		}
 	}()
 }
