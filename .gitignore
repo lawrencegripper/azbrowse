@@ -9,3 +9,4 @@ scripts/bin/
 .env
 scripts/swagger_update/__pycache__
 snap.login*
+.pytest_cache
