@@ -1,4 +1,4 @@
-FROM golang:1.13.5-stretch
+FROM golang:1.14.4-stretch
 # Build required snapcraft snaps
 # https://snapcraft.io/docs/snapcraft-docker-images
 # Grab dependencies
@@ -114,9 +114,9 @@ RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/sta
 # Install Go tools
 RUN \
     # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v1.3.2 \
+    go get github.com/go-delve/delve/cmd/dlv@v1.4.1 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.2.1 \
+    && go get golang.org/x/tools/gopls@v0.4.1 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
