@@ -17,7 +17,7 @@ Currently I'm using it every day **but it is experimental so use with caution on
 
 # Cool what else can it do?
 
-Lots [check out the guided tour here](docs/getting-started.md). For advanced [config review the settings page here](docs/config.mg).
+Lots [check out the guided tour here](docs/getting-started.md). For advanced [config review the settings page here](docs/config.md).
 
 - Edit/Update resource
 - Multi-resource delete
