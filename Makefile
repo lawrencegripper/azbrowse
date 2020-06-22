@@ -103,6 +103,17 @@ swagger-codegen:
 	# Test the generated code initalizes
 	$(GO_BINARY) test -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
 
+## autocomplete-install:
+## 		Add autocompletion for azbrowse to your bash prompt
+autocomplete-install: install
+	echo 'source <(azbrowse completion bash)' >> ~/.bashrc
+	echo "Create a new shell and autocomplete will be working"
+
+## autocomplete-test:
+##		Invoke autocompletion for subscriptions and time the result
+autocomplete-test: install
+	@/bin/bash -c "time azbrowse __complete --subscription LG"
+
 ## test-selfupdate:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
 test-selfupdate: checks

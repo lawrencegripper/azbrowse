@@ -110,7 +110,7 @@ func createRootCmd() *cobra.Command {
 }
 
 // This allows azbrowse to update the account cache used for autocompletion
-// due to it's use in completion func errors are supressed
+// due to it's use in completion func errors are suppressed
 func getAccountListAndUpdateCache() []byte {
 	out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
 	if err != nil {
