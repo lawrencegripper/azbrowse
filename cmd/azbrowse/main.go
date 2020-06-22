@@ -82,7 +82,7 @@ func run(settings *config.Settings) {
 	// Asynconously update the account cache we're holding
 	go func() {
 		defer errorhandling.RecoveryWithCleanup()
-		updateAccountCache()
+		getAccountListAndUpdateCache()
 	}()
 
 	// Configure the gui instance

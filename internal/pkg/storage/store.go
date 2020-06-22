@@ -125,7 +125,10 @@ func GetCacheWithTTL(key string, ttl time.Duration) (valid bool, value string, e
 	return true, cacheItem, nil
 }
 
-// PutCacheItemForTTL puts an item in the cache bucket
+// PutCacheItemForTTL puts an item in the cache bucket.
+// *Warning* the current setup DOES NOT cleanup items after their TTL it only provides `GetCacheWithTTL`
+// which allows the user to get the key and highlights if it's past the TTL. TTL is defined by the caller when using `GetCacheWithTTL`.
+// This was used as currently no keys are noisy and require cleanup, future uses could update this to do cleanup.
 func PutCacheForTTL(key, value string) error {
 	// Save the Item
 	err := PutCache(key, value)

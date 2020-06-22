@@ -110,15 +110,17 @@ func createRootCmd() *cobra.Command {
 }
 
 // This allows azbrowse to update the account cache used for autocompletion
-func updateAccountCache() {
+// due to it's use in completion func errors are supressed
+func getAccountListAndUpdateCache() []byte {
 	out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
 	if err != nil {
-		return
+		return nil
 	}
 	err = storage.PutCacheForTTL(keyForAccountCache, string(out))
 	if err != nil {
 		panic("Failed to save account list to cache")
 	}
+	return out
 }
 
 // Provide support for autocompleting subscriptions
@@ -127,15 +129,11 @@ func subscriptionAutocompletion(cmd *cobra.Command, args []string, toComplete st
 
 	validCache, value, err := storage.GetCacheWithTTL(keyForAccountCache, time.Hour*6)
 	if !validCache || err != nil {
-		out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
-		if err != nil {
+		azAccountOutput := getAccountListAndUpdateCache()
+		if azAccountOutput == nil {
 			return []string{}, cobra.ShellCompDirectiveError
 		}
-		err = storage.PutCacheForTTL(keyForAccountCache, string(out))
-		if err != nil {
-			panic("Failed to save account list to cache")
-		}
-		accountList = out
+		accountList = azAccountOutput
 	} else {
 		accountList = []byte(value)
 	}
