@@ -39,13 +39,14 @@ func main() {
 }
 
 func run(settings *config.Settings) {
-	confirmAndSelfUpdate()
-
+	// Warning: The sequence of calls is important.
 	// Setup the root context and span for open tracing
 	ctx, span := configureTracing(settings)
 
 	// Load the db
 	storage.LoadDB()
+	// Note self update now requires storage loaded first.
+	confirmAndSelfUpdate()
 
 	// Start tracking async responses from ARM
 	responseProcessor, err := views.StartWatchingAsyncARMRequests(ctx)

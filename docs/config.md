@@ -4,6 +4,15 @@ By default azbrowse looks for configuration in `/root/.azbrowse-settings.json` o
 
 Below is a table containing some of the default key bindings. If you'd like to customise the key bindings to be more suitable for your setup, please refer to the section on [custom key bindings](#custom-key-bindings).
 
+## Updates
+
+Users can set Environment Vars to control how AzBrowse checks for updates. 
+
+| Environment Variable | Does |
+| ---------------------| ---------- |
+| `AZBROWSE_FORCE_UPDATE=anyvaluehere` | Force Azbrowse to check for updates on launch. Normaly would only check every 6 hours |
+| `AZBROWSE_SKIP_UPDATE=anyvaluehere` | Skip Update check |
+
 
 ## Navigation
 
