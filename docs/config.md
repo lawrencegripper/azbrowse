@@ -10,7 +10,7 @@ Users can set Environment Vars to control how AzBrowse checks for updates.
 
 | Environment Variable | Does |
 | ---------------------| ---------- |
-| `AZBROWSE_FORCE_UPDATE=anyvaluehere` | Force Azbrowse to check for updates on launch. Normaly would only check every 6 hours |
+| `AZBROWSE_FORCE_UPDATE=anyvaluehere` | Force Azbrowse to check for updates on launch. Normally would only check every 6 hours |
 | `AZBROWSE_SKIP_UPDATE=anyvaluehere` | Skip Update check |
 
 
