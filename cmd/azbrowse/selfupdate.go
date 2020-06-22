@@ -5,17 +5,47 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	"github.com/blang/semver"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
+const versionCacheKey = "versionCacheKey"
+
+func updateLastCheckedTime() {
+	// The value of the cache key doesn't matter. Key used to hold and identify if ttl has expired
+	err := storage.PutCacheForTTL(versionCacheKey, "set")
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
 func confirmAndSelfUpdate() {
+	skipUpdateEnv := os.Getenv("AZBROWSE_SKIP_UPDATE")
+	if skipUpdateEnv != "" {
+		log.Println("AZBROWSE_SKIP_UPDATE set so update check skipped")
+		return
+	}
+
+	isCacheValid, _, _ := storage.GetCacheWithTTL(versionCacheKey, time.Hour*6)
+	// Allow users to force an update by setting env
+	forceUpdate := os.Getenv("AZBROWSE_FORCE_UPDATE")
+	if forceUpdate == "" && isCacheValid {
+		log.Print("Skipping update check as already run in last 6 hours. Set AZBROWSE_FORCE_UPDATE=true to force update check")
+		return
+	}
+
+	log.Print("Checking for updates")
+
 	latest, found, err := selfupdate.DetectLatest("lawrencegripper/azbrowse")
 	if err != nil {
 		log.Println("Error occurred while detecting version:", err)
 		return
 	}
+
+	updateLastCheckedTime()
 
 	v, err := semver.Parse(version)
 	if err != nil {
