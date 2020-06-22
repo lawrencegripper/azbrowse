@@ -10,12 +10,16 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/spf13/cobra"
 )
+
+const keyForAccountCache = "accountCache"
 
 func handleCommandAndArgs() {
 
@@ -98,26 +102,52 @@ func createRootCmd() *cobra.Command {
 	cmd.Flags().StringVar(&tenantID, "tenant-id", "", "(optional) specify the tenant id to get an access token for (see az account list -o json)")
 	cmd.Flags().StringVar(&subscription, "subscription", "", "(optional) specify a subscription to load")
 
-	if err := cmd.RegisterFlagCompletionFunc("subscription", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-
-		out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
-		if err != nil {
-			return []string{}, cobra.ShellCompDirectiveError
-		}
-
-		reader := bytes.NewReader(out)
-		scanner := bufio.NewScanner(reader)
-		values := []string{}
-		for scanner.Scan() {
-			values = append(values, "\""+strings.ReplaceAll(scanner.Text(), " ", "\\ ")+"\"")
-		}
-
-		return values, cobra.ShellCompDirectiveNoFileComp
-	}); err != nil {
+	if err := cmd.RegisterFlagCompletionFunc("subscription", subscriptionAutocompletion); err != nil {
 		panic(err)
 	}
 
 	return cmd
+}
+
+// This allows azbrowse to update the account cache used for autocompletion
+func updateAccountCache() {
+	out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
+	if err != nil {
+		return
+	}
+	err = storage.PutCacheForTTL(keyForAccountCache, string(out))
+	if err != nil {
+		panic("Failed to save account list to cache")
+	}
+}
+
+// Provide support for autocompleting subscriptions
+func subscriptionAutocompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	var accountList []byte
+
+	validCache, value, err := storage.GetCacheWithTTL(keyForAccountCache, time.Hour*6)
+	if !validCache || err != nil {
+		out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
+		if err != nil {
+			return []string{}, cobra.ShellCompDirectiveError
+		}
+		err = storage.PutCacheForTTL(keyForAccountCache, string(out))
+		if err != nil {
+			panic("Failed to save account list to cache")
+		}
+		accountList = out
+	} else {
+		accountList = []byte(value)
+	}
+
+	reader := bytes.NewReader(accountList)
+	scanner := bufio.NewScanner(reader)
+	values := []string{}
+	for scanner.Scan() {
+		values = append(values, "\""+strings.ReplaceAll(scanner.Text(), " ", "\\ ")+"\"")
+	}
+
+	return values, cobra.ShellCompDirectiveNoFileComp
 }
 
 func createVersionCommand() *cobra.Command {

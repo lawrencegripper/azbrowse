@@ -29,12 +29,14 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
+	github.com/pkg/errors v0.8.1
 	github.com/rhysd/go-github-selfupdate v1.1.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
 	github.com/spf13/cobra v1.0.0
+	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 	github.com/stretchr/testify v1.3.0
 	github.com/stuartleeks/colorjson v0.0.0-20190711214622-761cbd7eeca6
 	github.com/stuartleeks/gocui v0.4.1

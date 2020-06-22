@@ -35,6 +35,9 @@ var (
 )
 
 func main() {
+	// Load the db as required for autocompletion caching
+	storage.LoadDB()
+	// Setup cobra commands
 	handleCommandAndArgs()
 }
 
@@ -43,8 +46,6 @@ func run(settings *config.Settings) {
 	// Setup the root context and span for open tracing
 	ctx, span := configureTracing(settings)
 
-	// Load the db
-	storage.LoadDB()
 	// Note self update now requires storage loaded first.
 	confirmAndSelfUpdate()
 
@@ -77,6 +78,12 @@ func run(settings *config.Settings) {
 
 	// recover from panic, if one occurrs, and leave terminal usable
 	defer errorhandling.RecoveryWithCleanup()
+
+	// Asynconously update the account cache we're holding
+	go func() {
+		defer errorhandling.RecoveryWithCleanup()
+		updateAccountCache()
+	}()
 
 	// Configure the gui instance
 	g.Highlight = true

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/blang/semver"
@@ -13,8 +12,11 @@ import (
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
+const versionCacheKey = "versionCacheKey"
+
 func updateLastCheckedTime() {
-	err := storage.PutCache("lastUpdateCheck", strconv.FormatInt(time.Now().Unix(), 10))
+	// The value of the cache key doesn't matter. Key used to hold and identify if ttl has expired
+	err := storage.PutCacheForTTL(versionCacheKey, "set")
 	if err != nil {
 		log.Panic(err)
 	}
@@ -27,24 +29,10 @@ func confirmAndSelfUpdate() {
 		return
 	}
 
-	lastCheckString, err := storage.GetCache("lastUpdateCheck")
-	if err != nil {
-		updateLastCheckedTime()
-		log.Print("Update check failed to retrieve storage value for last check time")
-		return
-	}
-
-	lastCheckEpoc, err := strconv.ParseInt(lastCheckString, 10, 64)
-	if err != nil {
-		updateLastCheckedTime()
-		log.Print("Update check failed to convert last check time to epoc")
-		return
-	}
-
-	timeToNextCheck := time.Unix(lastCheckEpoc, 0).Add(time.Hour * 6)
+	isCacheValid, _, _ := storage.GetCacheWithTTL(versionCacheKey, time.Hour*6)
 	// Allow users to force an update by setting env
 	forceUpdate := os.Getenv("AZBROWSE_FORCE_UPDATE")
-	if forceUpdate == "" && time.Now().Before(timeToNextCheck) {
+	if forceUpdate == "" && isCacheValid {
 		log.Print("Skipping update check as already run in last 6 hours. Set AZBROWSE_FORCE_UPDATE=true to force update check")
 		return
 	}
