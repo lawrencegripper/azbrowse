@@ -80,6 +80,11 @@ install:
 	$(GO_BINARY) install ./cmd/azbrowse
 
 ## ----------Advanced Targets------------
+## docs-update:
+##		Generate the docs for the command line
+docs-update: install
+	AZB_GEN_COMMAND_MARKDOWN=TRUE azbrowse
+
 ## swagger-update:
 ##		Download the latest swagger definitions for Azure services and filter to the latest versions
 swagger-update: swagger-update-requirements
