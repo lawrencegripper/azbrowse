@@ -60,6 +60,14 @@ else
   echo "'swagger-gen' ran and no changes detected in code: Success"
 fi
 
+make docs-update
+if [[ $(git diff --stat) != '' ]]; then
+  echo "--> Ditry GIT: Commandline args changed but 'make docs-update' hasn't been run. Please run it and commit changes."
+  git status
+  sleep 1
+  exit 1
+fi
+
 print_header "Run Integration tests on fake display"
 
 Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &

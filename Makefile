@@ -80,6 +80,11 @@ install:
 	$(GO_BINARY) install ./cmd/azbrowse
 
 ## ----------Advanced Targets------------
+## docs-update:
+##		Generate the docs for the command line
+docs-update: install
+	AZB_GEN_COMMAND_MARKDOWN=TRUE azbrowse
+
 ## swagger-update:
 ##		Download the latest swagger definitions for Azure services and filter to the latest versions
 swagger-update: swagger-update-requirements
@@ -113,6 +118,7 @@ autocomplete-install: install
 ##		Invoke autocompletion for subscriptions and time the result
 autocomplete-test: install
 	@/bin/bash -c "time azbrowse __complete --subscription LG"
+	@/bin/bash -c "time azbrowse __complete --navigate /"
 
 ## test-selfupdate:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature

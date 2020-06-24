@@ -17,7 +17,7 @@ Currently I'm using it every day **but it is experimental so use with caution on
 
 # Cool what else can it do?
 
-Lots [check out the guided tour here](docs/getting-started.md). For advanced [config review the settings page here](docs/config.md).
+Lots [check out the guided tour here](docs/getting-started.md).
 
 - Edit/Update resource
 - Multi-resource delete
@@ -25,6 +25,9 @@ Lots [check out the guided tour here](docs/getting-started.md). For advanced [co
 - ASCII Graphs for resource metrics
 - Interactice command panel for filtering and more
 - [Experimental fuse filesystem mount for Azure API](docs/azfs-intro.md)
+
+For advanced [config review the settings page here](docs/config.md). For [command line arguments and docs see this page](./docs/commandline/azbrowse.md).
+
 
 ## Install
 
