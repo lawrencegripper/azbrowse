@@ -21,8 +21,8 @@ import (
 	"github.com/spf13/cobra/doc"
 )
 
-const AccountCacheKey = "accountCache"
-const NavigateCacheKey = "navigateCache"
+const accountCacheKey = "accountCache"
+const navigateCacheKey = "navigateCache"
 
 func handleCommandAndArgs() {
 
@@ -140,7 +140,7 @@ func getResourceListAndUpdateCache() (string, error) {
 		return "", errors.Wrap(err, "Failed azGraph when updating cache")
 	}
 
-	err = storage.PutCacheForTTL(NavigateCacheKey, string(out))
+	err = storage.PutCacheForTTL(navigateCacheKey, string(out))
 	if err != nil {
 		cobra.CompErrorln("Failed to save graph response to navigateCache")
 		return "", errors.Wrap(err, "Failed storing azGraph result when updating cache")
@@ -162,7 +162,7 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 		cobra.CompDebugln(fmt.Sprintf("Subscription: %+v", *subscription), true)
 		cobra.CompDebugln(fmt.Sprintf("toComplete: %+v", toComplete), true)
 		// Cache the resource list for x mins
-		validCache, value, err := storage.GetCacheWithTTL(NavigateCacheKey, time.Minute*5)
+		validCache, value, err := storage.GetCacheWithTTL(navigateCacheKey, time.Minute*5)
 		if !validCache || err != nil {
 			resourceList, err := getResourceListAndUpdateCache()
 			if err != nil {
@@ -174,7 +174,7 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 		// The `subscription` field on azbrowse can be either a subscription name or GUID.
 		// The response from Graph only has the `subscriptionID`.
 		// This code maps from SubName to GUID.
-		var subscriptionGuid string
+		var subscriptionGUID string
 		if subscription != nil && *subscription != "" {
 			accountList, err := getAccountList()
 			if err != nil {
@@ -182,7 +182,7 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 			} else {
 				for _, sub := range accountList {
 					if sub.Name == *subscription || sub.ID == *subscription {
-						subscriptionGuid = sub.ID
+						subscriptionGUID = sub.ID
 						break
 					}
 				}
@@ -202,7 +202,7 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 		values := make([]string, 0, len(graphResponse))
 		for _, item := range graphResponse {
 			// Filter to only subs the user is interested in
-			if subscriptionGuid != "" && subscriptionGuid != item.SubscriptionID {
+			if subscriptionGUID != "" && subscriptionGUID != item.SubscriptionID {
 				// Skip as not in the subscription we're interested in
 				continue
 			}
@@ -254,7 +254,7 @@ func getAccountListAndUpdateCache() ([]accountItem, error) {
 		return nil, errors.Wrap(err, "Failed unmarshalling response from az to update account list cache")
 	}
 
-	err = storage.PutCacheForTTL(AccountCacheKey, string(out))
+	err = storage.PutCacheForTTL(accountCacheKey, string(out))
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to save account list to cache")
 	}
@@ -262,7 +262,7 @@ func getAccountListAndUpdateCache() ([]accountItem, error) {
 }
 
 func getAccountList() ([]accountItem, error) {
-	validCache, value, err := storage.GetCacheWithTTL(AccountCacheKey, time.Hour*6)
+	validCache, value, err := storage.GetCacheWithTTL(accountCacheKey, time.Hour*6)
 	if !validCache || err != nil {
 		azAccountOutput, err := getAccountListAndUpdateCache()
 		if err != nil {
