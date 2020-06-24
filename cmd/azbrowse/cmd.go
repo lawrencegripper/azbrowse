@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -97,16 +99,53 @@ func createRootCmd() *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&demo, "demo", false, "run in demo mode to filter sensitive output")
 	cmd.Flags().BoolVar(&debug, "debug", false, "run in debug mode")
-	cmd.Flags().StringVar(&navigateTo, "navigate", "", "navigate to resource")
+	cmd.Flags().StringVarP(&navigateTo, "navigate", "n", "", "navigate to resource")
 	cmd.Flags().IntVar(&fuzzerDurationMinutes, "fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 	cmd.Flags().StringVar(&tenantID, "tenant-id", "", "(optional) specify the tenant id to get an access token for (see az account list -o json)")
-	cmd.Flags().StringVar(&subscription, "subscription", "", "(optional) specify a subscription to load")
+	cmd.Flags().StringVarP(&subscription, "subscription", "s", "", "(optional) specify a subscription to load")
 
 	if err := cmd.RegisterFlagCompletionFunc("subscription", subscriptionAutocompletion); err != nil {
 		panic(err)
 	}
 
+	if err := cmd.RegisterFlagCompletionFunc("navigate", navigateAutocompletion); err != nil {
+		panic(err)
+	}
+
 	return cmd
+}
+
+func navigateAutocompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	query := `resourcecontainers | where type == "microsoft.resources/subscriptions/resourcegroups"` +
+		" | union (resources)" +
+		" | project name, id, subscriptionId, tenantId"
+	out, err := exec.Command("az", "graph", "query", "--graph-query",
+		query, "--output", "json").Output()
+	log.Println(query)
+	if err != nil {
+		log.Println(err.Error())
+		log.Panic(string(err.(*exec.ExitError).Stderr))
+		return []string{}, cobra.ShellCompDirectiveError
+	}
+
+	type graphItem struct {
+		ID             string `json:"id"`
+		Name           string `json:"name"`
+		SubscriptionID string `json:"subscriptionId"`
+		TenantID       string `json:"tenantId"`
+	}
+	var graphResponse []graphItem
+	err = json.Unmarshal(out, &graphResponse)
+	if err != nil {
+		return []string{}, cobra.ShellCompDirectiveError
+	}
+
+	values := make([]string, len(graphResponse))
+	for index, item := range graphResponse {
+		values[index] = item.ID
+	}
+
+	return values, cobra.ShellCompDirectiveNoFileComp
 }
 
 // This allows azbrowse to update the account cache used for autocompletion

@@ -113,6 +113,7 @@ autocomplete-install: install
 ##		Invoke autocompletion for subscriptions and time the result
 autocomplete-test: install
 	@/bin/bash -c "time azbrowse __complete --subscription LG"
+	@/bin/bash -c "time azbrowse __complete --navigate /"
 
 ## test-selfupdate:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
