@@ -1,11 +1,8 @@
 package main
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -18,10 +15,12 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
-const keyForAccountCache = "accountCache"
+const AccountCacheKey = "accountCache"
+const NavigateCacheKey = "navigateCache"
 
 func handleCommandAndArgs() {
 
@@ -108,80 +107,177 @@ func createRootCmd() *cobra.Command {
 		panic(err)
 	}
 
-	if err := cmd.RegisterFlagCompletionFunc("navigate", navigateAutocompletion); err != nil {
+	if err := cmd.RegisterFlagCompletionFunc("navigate", navigateAutocompletion(&subscription)); err != nil {
 		panic(err)
 	}
 
 	return cmd
 }
 
-func navigateAutocompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func getResourceListAndUpdateCache() (string, error) {
 	query := `resourcecontainers | where type == "microsoft.resources/subscriptions/resourcegroups"` +
 		" | union (resources)" +
 		" | project name, id, subscriptionId, tenantId"
-	out, err := exec.Command("az", "graph", "query", "--graph-query",
-		query, "--output", "json").Output()
-	log.Println(query)
+
+	graphArgs := []string{"graph", "query", "--graph-query", query, "--output", "json"}
+	cobra.CompDebugln(fmt.Sprintf("command: %+v", graphArgs), true)
+
+	out, err := exec.Command("az", graphArgs...).Output()
 	if err != nil {
-		log.Println(err.Error())
-		log.Panic(string(err.(*exec.ExitError).Stderr))
-		return []string{}, cobra.ShellCompDirectiveError
+		cobra.CompErrorln("az graph command failed")
+		return "", errors.Wrap(err, "Failed azGraph when updating cache")
 	}
 
-	type graphItem struct {
-		ID             string `json:"id"`
-		Name           string `json:"name"`
-		SubscriptionID string `json:"subscriptionId"`
-		TenantID       string `json:"tenantId"`
-	}
-	var graphResponse []graphItem
-	err = json.Unmarshal(out, &graphResponse)
+	err = storage.PutCacheForTTL(NavigateCacheKey, string(out))
 	if err != nil {
-		return []string{}, cobra.ShellCompDirectiveError
+		cobra.CompErrorln("Failed to save graph response to navigateCache")
+		return "", errors.Wrap(err, "Failed storing azGraph result when updating cache")
 	}
 
-	values := make([]string, len(graphResponse))
-	for index, item := range graphResponse {
-		values[index] = item.ID
-	}
+	return string(out), nil
+}
 
-	return values, cobra.ShellCompDirectiveNoFileComp
+type graphItem struct {
+	ID             string `json:"id"`
+	Name           string `json:"name"`
+	SubscriptionID string `json:"subscriptionId"`
+	TenantID       string `json:"tenantId"`
+}
+
+func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		// Debugging
+		cobra.CompDebugln(fmt.Sprintf("Subscription: %+v", *subscription), true)
+		cobra.CompDebugln(fmt.Sprintf("toComplete: %+v", toComplete), true)
+		// Cache the resource list for x mins
+		validCache, value, err := storage.GetCacheWithTTL(NavigateCacheKey, time.Minute*5)
+		if !validCache || err != nil {
+			resourceList, err := getResourceListAndUpdateCache()
+			if err != nil {
+				return []string{}, cobra.ShellCompDirectiveError
+			}
+			value = resourceList
+		}
+
+		// The `subscription` field on azbrowse can be either a subscription name or GUID.
+		// The response from Graph only has the `subscriptionID`.
+		// This code maps from SubName to GUID.
+		var subscriptionGuid string
+		if subscription != nil && *subscription != "" {
+			accountList, err := getAccountList()
+			if err != nil {
+				cobra.CompError(err.Error())
+			} else {
+				for _, sub := range accountList {
+					if sub.Name == *subscription || sub.ID == *subscription {
+						subscriptionGuid = sub.ID
+						break
+					}
+				}
+			}
+		}
+
+		var graphResponse []graphItem
+		err = json.Unmarshal([]byte(value), &graphResponse)
+		if err != nil {
+			return []string{}, cobra.ShellCompDirectiveError
+		}
+
+		// Used to limit completion suggestions to only the next segement deep
+		toCompleteDepth := len(strings.Split(toComplete, "/"))
+		isPartialDepth := false
+
+		values := make([]string, 0, len(graphResponse))
+		for _, item := range graphResponse {
+			// Filter to only subs the user is interested in
+			if subscriptionGuid != "" && subscriptionGuid != item.SubscriptionID {
+				// Skip as not in the subscription we're interested in
+				continue
+			}
+
+			// Provide completion only to the next segment of the resource
+			resourceDepth := len(strings.Split(item.ID, "/"))
+			if toCompleteDepth+1 < resourceDepth {
+				values = append(values, strings.Join(strings.Split(item.ID, "/")[:toCompleteDepth+1], "/")+"/")
+				isPartialDepth = true
+				continue
+			}
+
+			values = append(values, item.ID)
+		}
+
+		// If this is a completion limted by segement don't put a space
+		if isPartialDepth {
+			return values, cobra.ShellCompDirectiveNoSpace
+		}
+
+		return values, cobra.ShellCompDirectiveNoFileComp
+	}
+}
+
+type accountItem struct {
+	CloudName string `json:"cloudName"`
+	ID        string `json:"id"`
+	IsDefault bool   `json:"isDefault"`
+	Name      string `json:"name"`
+	State     string `json:"state"`
+	TenantID  string `json:"tenantId"`
+	User      struct {
+		Name string `json:"name"`
+		Type string `json:"type"`
+	} `json:"user"`
 }
 
 // This allows azbrowse to update the account cache used for autocompletion
 // due to it's use in completion func errors are suppressed
-func getAccountListAndUpdateCache() []byte {
-	out, err := exec.Command("az", "account", "list", "--query", "[].[name, id] | [] | sort(@)", "--output", "tsv").Output()
+func getAccountListAndUpdateCache() ([]accountItem, error) {
+	out, err := exec.Command("az", "account", "list", "--output", "json").Output()
 	if err != nil {
-		return nil
+		return nil, errors.Wrap(err, "Failed invoking az to update account list cache")
 	}
-	err = storage.PutCacheForTTL(keyForAccountCache, string(out))
+
+	var accounts []accountItem
+	err = json.Unmarshal(out, &accounts)
 	if err != nil {
-		panic("Failed to save account list to cache")
+		return nil, errors.Wrap(err, "Failed unmarshalling response from az to update account list cache")
 	}
-	return out
+
+	err = storage.PutCacheForTTL(AccountCacheKey, string(out))
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to save account list to cache")
+	}
+	return accounts, nil
+}
+
+func getAccountList() ([]accountItem, error) {
+	validCache, value, err := storage.GetCacheWithTTL(AccountCacheKey, time.Hour*6)
+	if !validCache || err != nil {
+		azAccountOutput, err := getAccountListAndUpdateCache()
+		if err != nil {
+			return nil, err
+		}
+		return azAccountOutput, nil
+	}
+
+	var accountList []accountItem
+	err = json.Unmarshal([]byte(value), &accountList)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed unmarshalling from cache to get account list")
+	}
+
+	return accountList, nil
 }
 
 // Provide support for autocompleting subscriptions
 func subscriptionAutocompletion(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	var accountList []byte
-
-	validCache, value, err := storage.GetCacheWithTTL(keyForAccountCache, time.Hour*6)
-	if !validCache || err != nil {
-		azAccountOutput := getAccountListAndUpdateCache()
-		if azAccountOutput == nil {
-			return []string{}, cobra.ShellCompDirectiveError
-		}
-		accountList = azAccountOutput
-	} else {
-		accountList = []byte(value)
+	accountList, err := getAccountList()
+	if err != nil {
+		return []string{}, cobra.ShellCompDirectiveError
 	}
-
-	reader := bytes.NewReader(accountList)
-	scanner := bufio.NewScanner(reader)
-	values := []string{}
-	for scanner.Scan() {
-		values = append(values, "\""+strings.ReplaceAll(scanner.Text(), " ", "\\ ")+"\"")
+	values := make([]string, len(accountList)*2)
+	for _, a := range accountList {
+		values = append(values, a.Name)
+		values = append(values, a.ID)
 	}
 
 	return values, cobra.ShellCompDirectiveNoFileComp

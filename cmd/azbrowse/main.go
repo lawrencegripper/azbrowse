@@ -79,10 +79,11 @@ func run(settings *config.Settings) {
 	// recover from panic, if one occurrs, and leave terminal usable
 	defer errorhandling.RecoveryWithCleanup()
 
-	// Asynconously update the account cache we're holding
+	// Asynconously update the cache we're holding for autocomplete
 	go func() {
 		defer errorhandling.RecoveryWithCleanup()
 		getAccountListAndUpdateCache()
+		getResourceListAndUpdateCache()
 	}()
 
 	// Configure the gui instance
