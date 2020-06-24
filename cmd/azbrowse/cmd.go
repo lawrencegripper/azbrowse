@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -17,6 +18,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"github.com/spf13/cobra/doc"
 )
 
 const AccountCacheKey = "accountCache"
@@ -30,6 +32,15 @@ func handleCommandAndArgs() {
 	rootCmd.AddCommand(createAzfsCommand())
 	rootCmd.AddCommand(createCompleteCommand(rootCmd))
 
+	// Special case used to generate markdown docs for the commands
+	if os.Getenv("AZB_GEN_COMMAND_MARKDOWN") == "TRUE" {
+		err := doc.GenMarkdownTree(rootCmd, "./docs/commandline/")
+		if err != nil {
+			log.Fatal(err)
+		}
+		os.Exit(0)
+	}
+
 	_ = rootCmd.Execute()
 }
 
@@ -42,7 +53,8 @@ func createRootCmd() *cobra.Command {
 	var subscription string
 
 	cmd := &cobra.Command{
-		Use: "azbrowse",
+		Use:   "azbrowse",
+		Short: "An interactive CLI for browsing Azure",
 		Run: func(cmd *cobra.Command, args []string) {
 
 			settings := config.Settings{
@@ -96,12 +108,12 @@ func createRootCmd() *cobra.Command {
 			run(&settings)
 		},
 	}
-	cmd.Flags().BoolVar(&demo, "demo", false, "run in demo mode to filter sensitive output")
-	cmd.Flags().BoolVar(&debug, "debug", false, "run in debug mode")
-	cmd.Flags().StringVarP(&navigateTo, "navigate", "n", "", "navigate to resource")
-	cmd.Flags().IntVar(&fuzzerDurationMinutes, "fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
+	cmd.Flags().StringVarP(&navigateTo, "navigate", "n", "", "(optional) navigate to resource by resource ID")
 	cmd.Flags().StringVar(&tenantID, "tenant-id", "", "(optional) specify the tenant id to get an access token for (see az account list -o json)")
 	cmd.Flags().StringVarP(&subscription, "subscription", "s", "", "(optional) specify a subscription to load")
+	cmd.Flags().BoolVar(&debug, "debug", false, "run in debug mode")
+	cmd.Flags().BoolVar(&demo, "demo", false, "run in demo mode to filter sensitive output")
+	cmd.Flags().IntVar(&fuzzerDurationMinutes, "fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
 
 	if err := cmd.RegisterFlagCompletionFunc("subscription", subscriptionAutocompletion); err != nil {
 		panic(err)
@@ -198,7 +210,7 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 			// Provide completion only to the next segment of the resource
 			resourceDepth := len(strings.Split(item.ID, "/"))
 			if toCompleteDepth+1 < resourceDepth {
-				values = append(values, strings.Join(strings.Split(item.ID, "/")[:toCompleteDepth+1], "/")+"/")
+				values = append(values, strings.Join(strings.Split(item.ID, "/")[:toCompleteDepth], "/")+"/")
 				isPartialDepth = true
 				continue
 			}
