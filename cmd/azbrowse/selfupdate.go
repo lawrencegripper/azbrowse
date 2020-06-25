@@ -9,7 +9,6 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
-	"github.com/pkg/errors"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
@@ -72,7 +71,7 @@ func confirmAndSelfUpdate() {
 
 	autoUpdateRaw, err := storage.GetCache(autoUpdateKey)
 	if err != nil {
-		panic(errors.Wrap(err, "Failed getting autoupdate key"))
+		panic(fmt.Errorf("Failed getting autoupdate key: %w", err))
 	}
 
 	if autoUpdateRaw != "true" {
@@ -90,7 +89,7 @@ func confirmAndSelfUpdate() {
 			fmt.Println("Auto update set for future updates")
 			err := storage.PutCache(autoUpdateKey, "true")
 			if err != nil {
-				panic(errors.Wrap(err, "Failed while setting autoupdate key"))
+				panic(fmt.Errorf("Failed setting autoupdate key: %w", err))
 			}
 		}
 	}
