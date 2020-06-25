@@ -120,11 +120,11 @@ autocomplete-test: install
 	@/bin/bash -c "time azbrowse __complete --subscription LG"
 	@/bin/bash -c "time azbrowse __complete --navigate /"
 
-## test-selfupdate:
+## selfupdate-test:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
-test-selfupdate: checks
+selfupdate-test: checks
 	$(GO_BINARY) install -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
-	azbrowse
+	AZBROWSE_FORCE_UPDATE=true azbrowse
 
 ## devcontainer:
 ##		Builds the devcontainer used for VSCode and CI

@@ -9,10 +9,12 @@ import (
 
 	"github.com/blang/semver"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
+	"github.com/pkg/errors"
 	"github.com/rhysd/go-github-selfupdate/selfupdate"
 )
 
 const versionCacheKey = "versionCacheKey"
+const autoUpdateKey = "autoUpdateKey"
 
 func updateLastCheckedTime() {
 	// The value of the cache key doesn't matter. Key used to hold and identify if ttl has expired
@@ -68,14 +70,29 @@ func confirmAndSelfUpdate() {
 		return
 	}
 
-	fmt.Print("\n\n UPDATE AVAILABLE \n \n Release notes: "+latest.ReleaseNotes+" \n Do you want to update to: ", latest.Version, "? (y/n): ")
-	input, err := bufio.NewReader(os.Stdin).ReadString('\n')
-	if err != nil || (input != "y\n" && input != "n\n" && input != "y\r\n" && input != "n\r\n") {
-		log.Panicf("Invalid input: '%s'\n", input)
-		return
+	autoUpdateRaw, err := storage.GetCache(autoUpdateKey)
+	if err != nil {
+		panic(errors.Wrap(err, "Failed getting autoupdate key"))
 	}
-	if input == "n\n" || input == "n\r\n" {
-		return
+
+	if autoUpdateRaw != "true" {
+		fmt.Print("\n\n UPDATE AVAILABLE \n \n Release notes: "+latest.ReleaseNotes+" \n Do you want to update to: ", latest.Version, "? 'y'/'n' or 'auto' (for always automatically): ")
+		input, err := bufio.NewReader(os.Stdin).ReadString('\n')
+		if err != nil || (input != "y\n" && input != "n\n" && input != "y\r\n" && input != "n\r\n" && input != "auto\n" && input != "auto\r\n") {
+			log.Panicf("Invalid input: '%s'\n", input)
+			return
+		}
+		if input == "n\n" || input == "n\r\n" {
+			return
+		}
+
+		if input == "auto\n" || input == "auto\r\n" {
+			fmt.Println("Auto update set for future updates")
+			err := storage.PutCache(autoUpdateKey, "true")
+			if err != nil {
+				panic(errors.Wrap(err, "Failed while setting autoupdate key"))
+			}
+		}
 	}
 
 	exe, err := os.Executable()

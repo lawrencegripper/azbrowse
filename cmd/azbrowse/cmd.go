@@ -133,7 +133,6 @@ func getResourceListAndUpdateCache() (string, error) {
 		" | project name, id, subscriptionId, tenantId"
 
 	graphArgs := []string{"graph", "query", "--graph-query", query, "--output", "json"}
-	cobra.CompDebugln(fmt.Sprintf("command: %+v", graphArgs), true)
 
 	out, err := exec.Command("az", graphArgs...).Output()
 	if err != nil {
