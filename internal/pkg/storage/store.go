@@ -17,7 +17,6 @@ const ttlLastUpdatedKey = "LastUpdated"
 
 // LoadDB initializes and loads the DB instance
 func LoadDB() {
-	fmt.Println("Loading db ...")
 	diskLocation := "/root/.azbrowse/"
 	user, err := user.Current()
 	if err == nil {
