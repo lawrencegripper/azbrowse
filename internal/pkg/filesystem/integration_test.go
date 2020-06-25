@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"bazil.org/fuse"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/h2non/gock.v1"
 )
@@ -143,6 +142,5 @@ func TestEditRG(t *testing.T) {
 }
 
 func cleanup(path string, conn *fuse.Conn) {
-	storage.CloseDB()
 	Close(path, conn) //nolint: errcheck
 }

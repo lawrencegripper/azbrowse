@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os/user"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/peterbourgon/diskv"
@@ -16,19 +15,12 @@ var clock mockableClock.Clock
 
 const ttlLastUpdatedKey = "LastUpdated"
 
-// CloseDB closes the db
-func CloseDB() {
-
-}
-
 // LoadDB initializes and loads the DB instance
 func LoadDB() {
 	fmt.Println("Loading db ...")
-	// dbLocation := "/root/.azbrowse.db"
 	diskLocation := "/root/.azbrowse/"
 	user, err := user.Current()
 	if err == nil {
-		// dbLocation = user.HomeDir + "/.azbrowse.db"
 		diskLocation = user.HomeDir + "/.azbrowse/"
 	}
 	initDb(diskLocation, mockableClock.New())
@@ -56,16 +48,13 @@ func PutCache(key, value string) error {
 
 // GetCache gets an item from the cache bucket
 func GetCache(key string) (string, error) {
+	// Honor legacy - todo: fixup and return notfound error
+	if !diskstore.Has(key) {
+		return "", nil
+	}
 	result, err := diskstore.Read(key)
 
 	if err != nil {
-
-		// Force similar behavior to bolt were non-existent key returns empty string
-		// Todo use errors.Is/As to make nicer
-		// pathError := os.PathError{}
-		if strings.Contains(err.Error(), "not a directory") {
-			return "", nil
-		}
 		return "", err
 	}
 	return string(result), nil
