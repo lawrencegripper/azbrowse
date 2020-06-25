@@ -34,6 +34,7 @@ func handleCommandAndArgs() {
 
 	// Special case used to generate markdown docs for the commands
 	if os.Getenv("AZB_GEN_COMMAND_MARKDOWN") == "TRUE" {
+		rootCmd.DisableAutoGenTag = true
 		err := doc.GenMarkdownTree(rootCmd, "./docs/commandline/")
 		if err != nil {
 			log.Fatal(err)
