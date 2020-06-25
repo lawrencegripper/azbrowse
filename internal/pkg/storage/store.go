@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/peterbourgon/diskv"
-	"github.com/pkg/errors"
 	mockableClock "github.com/stephanos/clock"
 )
 
@@ -61,8 +60,9 @@ func GetCache(key string) (string, error) {
 
 	if err != nil {
 
-		// Force similar behavior to bolt were non-existant key returns empty string
+		// Force similar behavior to bolt were non-existent key returns empty string
 		// Todo use errors.Is/As to make nicer
+		// pathError := os.PathError{}
 		if strings.Contains(err.Error(), "not a directory") {
 			return "", nil
 		}
@@ -91,7 +91,7 @@ func GetCacheWithTTL(key string, ttl time.Duration) (valid bool, value string, e
 	}
 	lastUpdatedEpoc, err := strconv.ParseInt(cacheItemLastUpdated, 10, 64)
 	if err != nil {
-		return false, cacheItem, errors.Wrapf(err, "Failed to parse %v", cacheItemLastUpdated)
+		return false, cacheItem, fmt.Errorf("Failed to parse %v: %w", cacheItemLastUpdated, err)
 	}
 
 	// Check if the ttl has expired
