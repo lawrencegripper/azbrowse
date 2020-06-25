@@ -2,94 +2,73 @@ package storage
 
 import (
 	"fmt"
-	"log"
 	"os/user"
 	"strconv"
+	"strings"
 	"time"
 
-	"github.com/boltdb/bolt"
+	"github.com/peterbourgon/diskv"
 	"github.com/pkg/errors"
 	mockableClock "github.com/stephanos/clock"
 )
 
-var db *bolt.DB
+var diskstore *diskv.Diskv
 var clock mockableClock.Clock
 
 const ttlLastUpdatedKey = "LastUpdated"
 
 // CloseDB closes the db
 func CloseDB() {
-	err := db.Close()
-	if err != nil {
-		panic(err)
-	}
+
 }
 
 // LoadDB initializes and loads the DB instance
 func LoadDB() {
 	fmt.Println("Loading db ...")
-	dbLocation := "/root/.azbrowse.db"
+	// dbLocation := "/root/.azbrowse.db"
+	diskLocation := "/root/.azbrowse/"
 	user, err := user.Current()
 	if err == nil {
-		dbLocation = user.HomeDir + "/.azbrowse.db"
+		// dbLocation = user.HomeDir + "/.azbrowse.db"
+		diskLocation = user.HomeDir + "/.azbrowse/"
 	}
-
-	initDb(dbLocation, mockableClock.New())
+	initDb(diskLocation, mockableClock.New())
 }
 
 func initDb(location string, inputClock mockableClock.Clock) {
 	clock = inputClock
-	waitingMessageTimer := time.AfterFunc(2*time.Second, func() {
-		fmt.Println("AzBrowse is waiting for access to '~/.azbrowse.db', do you have another instance of azbrowse open?")
+	flatTransform := func(s string) []string { return []string{} }
+	diskstore = diskv.New(diskv.Options{
+		BasePath:     location,
+		Transform:    flatTransform,
+		CacheSizeMax: 1024 * 1024,
 	})
-	dbCreate, err := bolt.Open(location, 0600, nil)
-	waitingMessageTimer.Stop()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	db = dbCreate
-
-	err = db.Update(func(tx *bolt.Tx) error {
-		_, err := tx.CreateBucketIfNotExists([]byte("cache"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		_, err = tx.CreateBucketIfNotExists([]byte("search"))
-		if err != nil {
-			return fmt.Errorf("create bucket: %s", err)
-		}
-		return nil
-	})
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Loading db complete")
 }
 
 // PutCache puts an item in the cache bucket
 func PutCache(key, value string) error {
-	return db.Update(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("cache"))
-		err := b.Put([]byte(key), []byte(value))
+	err := diskstore.Write(key, []byte(value))
+	if err != nil {
 		return err
-	})
+	}
+
+	return nil
 }
 
 // GetCache gets an item from the cache bucket
 func GetCache(key string) (string, error) {
-	var s []byte
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("cache"))
-		v := b.Get([]byte(key))
-		s = v
-		return nil
-	})
+	result, err := diskstore.Read(key)
+
 	if err != nil {
-		return "", fmt.Errorf("Failed to find item: %v", err)
+
+		// Force similar behavior to bolt were non-existant key returns empty string
+		// Todo use errors.Is/As to make nicer
+		if strings.Contains(err.Error(), "not a directory") {
+			return "", nil
+		}
+		return "", err
 	}
-	return string(s), nil
+	return string(result), nil
 }
 
 // GetCacheIfWithinTTL gets an item from the cache if it's with the TTL duration. To simplify the TTL is provided by the caller
