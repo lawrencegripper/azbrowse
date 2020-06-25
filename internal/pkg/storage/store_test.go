@@ -15,12 +15,12 @@ var testTime = time.Date(2019, 01, 01, 01, 00, 00, 00, time.UTC)
 
 func TestCacheWithTTL(t *testing.T) {
 	// Create a test instance of the DB
-	file, err := ioutil.TempFile(os.TempDir(), "azb-storagetests.db")
+	dirName, err := ioutil.TempDir(os.TempDir(), "azb-storagetests.db")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer os.Remove(file.Name()) //nolint: errcheck
-	initDb(file.Name(), mockClock)
+	// defer os.(dirName) //nolint: errcheck
+	initDb(dirName, mockClock)
 
 	tests := []struct {
 		// Name is used to identify the test, as the cache key and as the cache value

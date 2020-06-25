@@ -9,11 +9,9 @@ require (
 	github.com/alecthomas/chroma v0.6.7
 	github.com/atotto/clipboard v0.1.1
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/boltdb/bolt v1.3.1
 	github.com/cskr/pubsub v1.0.1
 	github.com/fatih/color v1.7.0
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8 // indirect
-	github.com/go-delve/delve v1.4.1 // indirect
 	github.com/go-openapi/analysis v0.18.0 // indirect
 	github.com/go-openapi/errors v0.18.0 // indirect
 	github.com/go-openapi/loads v0.18.0
@@ -29,7 +27,7 @@ require (
 	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
-	github.com/pkg/errors v0.8.1
+	github.com/peterbourgon/diskv v2.0.1+incompatible
 	github.com/rhysd/go-github-selfupdate v1.1.0
 	github.com/satori/go.uuid v1.2.0
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect

@@ -16,7 +16,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )
@@ -137,13 +136,13 @@ func getResourceListAndUpdateCache() (string, error) {
 	out, err := exec.Command("az", graphArgs...).Output()
 	if err != nil {
 		cobra.CompErrorln("az graph command failed")
-		return "", errors.Wrap(err, "Failed azGraph when updating cache")
+		return "", fmt.Errorf("Failed azGraph when updating cache: %w", err)
 	}
 
 	err = storage.PutCacheForTTL(navigateCacheKey, string(out))
 	if err != nil {
 		cobra.CompErrorln("Failed to save graph response to navigateCache")
-		return "", errors.Wrap(err, "Failed storing azGraph result when updating cache")
+		return "", fmt.Errorf("Failed storing azGraph result when updating cache: %w", err)
 	}
 
 	return string(out), nil
@@ -245,18 +244,18 @@ type accountItem struct {
 func getAccountListAndUpdateCache() ([]accountItem, error) {
 	out, err := exec.Command("az", "account", "list", "--output", "json").Output()
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed invoking az to update account list cache")
+		return nil, fmt.Errorf("Failed invoking az to update account list cache: %w", err)
 	}
 
 	var accounts []accountItem
 	err = json.Unmarshal(out, &accounts)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed unmarshalling response from az to update account list cache")
+		return nil, fmt.Errorf("Failed unmarshalling response from az to update account list cache: %w", err)
 	}
 
 	err = storage.PutCacheForTTL(accountCacheKey, string(out))
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed to save account list to cache")
+		return nil, fmt.Errorf("Failed to save account list to cache: %w", err)
 	}
 	return accounts, nil
 }
@@ -274,7 +273,7 @@ func getAccountList() ([]accountItem, error) {
 	var accountList []accountItem
 	err = json.Unmarshal([]byte(value), &accountList)
 	if err != nil {
-		return nil, errors.Wrap(err, "Failed unmarshalling from cache to get account list")
+		return nil, fmt.Errorf("Failed unmarshalling from cache to get account list: %w", err)
 	}
 
 	return accountList, nil

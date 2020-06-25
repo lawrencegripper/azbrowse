@@ -150,7 +150,6 @@ func Test_Get_Subs(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	files, err := ioutil.ReadDir(mnt.Dir)
 	if err != nil {
@@ -175,7 +174,6 @@ func Test_Get_Sub_TreeWalk(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	// Walk to Sub level
 	subFiles, err := ioutil.ReadDir(mnt.Dir)
@@ -203,7 +201,6 @@ func Test_Get_RG_WalkTree(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	//TODO: Remove
 	// Walk to Sub level
@@ -242,7 +239,6 @@ func Test_Get_Resource_DirectNavigation(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
 	files, err := ioutil.ReadDir(builtPath)
@@ -274,7 +270,6 @@ func Test_Edit_Resource_DirectNavigation(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
 	_, err := ioutil.ReadDir(builtPath)
@@ -310,7 +305,6 @@ func Test_Delete_Resource_EditMode_Off(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
 	err := os.RemoveAll(builtPath)
@@ -338,7 +332,6 @@ func Test_Delete_Resource_DirectNavigation(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock, resourceNameMock)
 	err := os.RemoveAll(builtPath)
@@ -364,7 +357,6 @@ func Test_Delete_RG_DirectNavigation(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
 	err := os.RemoveAll(builtPath)
@@ -392,7 +384,6 @@ func Test_Delete_RG_AfterBrowse(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
 
@@ -433,7 +424,6 @@ func Test_Delete_RG_AfterBrowse_Withrm(t *testing.T) {
 	mnt := setupMount(t, filesystem)
 
 	defer mnt.Close()
-	defer storage.CloseDB()
 
 	builtPath := path.Join(mnt.Dir, subNameMock, rgNameMock)
 
