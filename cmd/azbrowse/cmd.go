@@ -213,6 +213,8 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 		err = json.Unmarshal([]byte(value), &graphQueryResult)
 		if err != nil {
 			cobra.CompErrorln("Failed to unmarshal graph response:" + err.Error())
+			// Clear the cache as it can't be deserialized
+			storage.DeleteCache(accountCacheKey) //nolint: errcheck
 			return []string{}, cobra.ShellCompDirectiveError
 		}
 
@@ -295,6 +297,8 @@ func getAccountList() ([]accountItem, error) {
 	var accountList []accountItem
 	err = json.Unmarshal([]byte(value), &accountList)
 	if err != nil {
+		// Clear the cache as it can't be deserialized
+		storage.DeleteCache(accountCacheKey) //nolint: errcheck
 		return nil, fmt.Errorf("Failed unmarshalling from cache to get account list: %w", err)
 	}
 

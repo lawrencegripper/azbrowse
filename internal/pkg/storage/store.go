@@ -35,6 +35,14 @@ func initDb(location string, inputClock mockableClock.Clock) {
 	})
 }
 
+// DeleteCache removes an item from cache
+func DeleteCache(key string) error {
+	if !diskstore.Has(key) {
+		return nil
+	}
+	return diskstore.Erase(key)
+}
+
 // PutCache puts an item in the cache bucket
 func PutCache(key, value string) error {
 	err := diskstore.Write(key, []byte(value))
