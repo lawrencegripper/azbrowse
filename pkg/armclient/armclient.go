@@ -227,8 +227,7 @@ func (c *Client) DoResourceGraphQuery(ctx context.Context, subscription, query s
 	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
 }
 
-// DoResourceGraphQueryAll performs an azure graph query on all subs you have access too
-// Todo: refactor
+// DoResourceGraphQueryReturningObjectArray performs an azure graph query on all subs you have access too
 func (c *Client) DoResourceGraphQueryReturningObjectArray(ctx context.Context, subscriptionGUIDs []string, query string) (string, error) {
 	messageBody := `{"subscriptions": SUB_HERE, "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0, "resultFormat": "objectArray"}}`
 	jsonSubsArray, err := json.Marshal(subscriptionGUIDs)

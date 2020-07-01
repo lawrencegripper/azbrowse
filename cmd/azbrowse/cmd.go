@@ -209,8 +209,8 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 			value = resourceList
 		}
 
-		var graphResponse graphResponse
-		err = json.Unmarshal([]byte(value), &graphResponse)
+		var graphQueryResult graphResponse
+		err = json.Unmarshal([]byte(value), &graphQueryResult)
 		if err != nil {
 			cobra.CompErrorln("Failed to unmarshal graph response:" + err.Error())
 			return []string{}, cobra.ShellCompDirectiveError
@@ -220,8 +220,8 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 		toCompleteDepth := len(strings.Split(toComplete, "/"))
 		isPartialDepth := false
 
-		values := make([]string, 0, len(graphResponse.Data))
-		for _, item := range graphResponse.Data {
+		values := make([]string, 0, len(graphQueryResult.Data))
+		for _, item := range graphQueryResult.Data {
 			// Filter to only subs the user is interested in
 			if subscriptionGUID != "" && subscriptionGUID != item.SubscriptionID {
 				// Skip as not in the subscription we're interested in
