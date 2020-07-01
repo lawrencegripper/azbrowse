@@ -82,8 +82,8 @@ func run(settings *config.Settings) {
 	// Asynconously update the cache we're holding for autocomplete
 	go func() {
 		defer errorhandling.RecoveryWithCleanup()
-		getAccountListAndUpdateCache()  //nolint: errcheck
-		getResourceListAndUpdateCache() //nolint: errcheck
+		getAccountListAndUpdateCache()                       //nolint: errcheck
+		getResourceListAndUpdateCache([]string{}, armClient) //nolint: errcheck
 	}()
 
 	// Configure the gui instance

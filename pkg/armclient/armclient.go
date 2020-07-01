@@ -227,6 +227,21 @@ func (c *Client) DoResourceGraphQuery(ctx context.Context, subscription, query s
 	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
 }
 
+// DoResourceGraphQueryAll performs an azure graph query on all subs you have access too
+// Todo: refactor
+func (c *Client) DoResourceGraphQueryReturningObjectArray(ctx context.Context, subscriptionGUIDs []string, query string) (string, error) {
+	messageBody := `{"subscriptions": SUB_HERE, "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0, "resultFormat": "objectArray"}}`
+	jsonSubsArray, err := json.Marshal(subscriptionGUIDs)
+	if err != nil {
+		return "", err
+	}
+	messageBody = strings.Replace(messageBody, "SUB_HERE", string(jsonSubsArray), -1)
+	messageBody = strings.Replace(messageBody, "QUERY_HERE", query, -1)
+	// cobra.CompErrorln(messageBody)
+	tracing.SetTagOnCtx(ctx, "query", messageBody)
+	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
+}
+
 var resourceAPIVersionLookup map[string]string
 
 // GetAPIVersion returns the most recent API version for a resource
