@@ -81,9 +81,15 @@ func run(settings *config.Settings) {
 
 	// Asynconously update the cache we're holding for autocomplete
 	go func() {
+		// No error checking as these are fire and forget cache update methods.
+		// if they fail we don't want to interrupt normal operation
 		defer errorhandling.RecoveryWithCleanup()
-		getAccountListAndUpdateCache()  //nolint: errcheck
-		getResourceListAndUpdateCache() //nolint: errcheck
+		accountItems, _ := getAccountListAndUpdateCache() //nolint: errcheck
+		var allSubscriptionGUIDs []string
+		for _, sub := range accountItems {
+			allSubscriptionGUIDs = append(allSubscriptionGUIDs, sub.ID)
+		}
+		getResourceListAndUpdateCache(allSubscriptionGUIDs, armClient) //nolint: errcheck
 	}()
 
 	// Configure the gui instance

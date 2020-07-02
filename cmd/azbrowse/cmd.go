@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
 )
@@ -126,16 +128,15 @@ func createRootCmd() *cobra.Command {
 	return cmd
 }
 
-func getResourceListAndUpdateCache() (string, error) {
-	query := `resourcecontainers | where type == "microsoft.resources/subscriptions/resourcegroups"` +
+func getResourceListAndUpdateCache(subscriptions []string, client *armclient.Client) (string, error) {
+
+	query := `resourcecontainers | where type == 'microsoft.resources/subscriptions/resourcegroups'` +
 		" | union (resources)" +
 		" | project name, id, subscriptionId, tenantId"
 
-	graphArgs := []string{"graph", "query", "--graph-query", query, "--output", "json"}
-
-	out, err := exec.Command("az", graphArgs...).Output()
+	out, err := client.DoResourceGraphQueryReturningObjectArray(context.Background(), subscriptions, query)
 	if err != nil {
-		cobra.CompErrorln("az graph command failed")
+		cobra.CompErrorln("az graph rest query failed:" + err.Error())
 		return "", fmt.Errorf("Failed azGraph when updating cache: %w", err)
 	}
 
@@ -155,42 +156,65 @@ type graphItem struct {
 	TenantID       string `json:"tenantId"`
 }
 
+type graphResponse struct {
+	TotalRecords int         `json:"totalRecords"`
+	Count        int         `json:"count"`
+	Data         []graphItem `json:"data"`
+}
+
 func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		// Debugging
 		cobra.CompDebugln(fmt.Sprintf("Subscription: %+v", *subscription), true)
 		cobra.CompDebugln(fmt.Sprintf("toComplete: %+v", toComplete), true)
-		// Cache the resource list for x mins
-		validCache, value, err := storage.GetCacheWithTTL(navigateCacheKey, time.Minute*5)
-		if !validCache || err != nil {
-			resourceList, err := getResourceListAndUpdateCache()
-			if err != nil {
-				return []string{}, cobra.ShellCompDirectiveError
-			}
-			value = resourceList
-		}
 
+		accountList, err := getAccountList()
+		if err != nil {
+			cobra.CompError(err.Error())
+		}
+		// Graph queries are made against allSubscriptionGUIDs. We build up a list of all subs to query
+		// queries are always done over all subs so results can be cached for future autocompletions.
+		// If a user is only interested in one sub the filtering to a single subscription is done by this function later.
+		var allSubscriptionGUIDs []string
+		for _, sub := range accountList {
+			allSubscriptionGUIDs = append(allSubscriptionGUIDs, sub.ID)
+		}
 		// The `subscription` field on azbrowse can be either a subscription name or GUID.
 		// The response from Graph only has the `subscriptionID`.
 		// This code maps from SubName to GUID.
 		var subscriptionGUID string
 		if subscription != nil && *subscription != "" {
-			accountList, err := getAccountList()
-			if err != nil {
-				cobra.CompError(err.Error())
-			} else {
-				for _, sub := range accountList {
-					if sub.Name == *subscription || sub.ID == *subscription {
-						subscriptionGUID = sub.ID
-						break
-					}
+			for _, sub := range accountList {
+				allSubscriptionGUIDs = append(allSubscriptionGUIDs, sub.ID)
+				if sub.Name == *subscription || sub.ID == *subscription {
+					subscriptionGUID = sub.ID
+					break
 				}
 			}
 		}
 
-		var graphResponse []graphItem
-		err = json.Unmarshal([]byte(value), &graphResponse)
+		// Cache the resource list for x mins
+		validCache, value, err := storage.GetCacheWithTTL(navigateCacheKey, time.Minute*5)
+		if !validCache || err != nil {
+			client := armclient.NewClientFromCLI("")
+			if err != nil {
+				cobra.CompErrorln("Failed creating armclient:" + err.Error())
+				return []string{}, cobra.ShellCompDirectiveError
+			}
+			resourceList, err := getResourceListAndUpdateCache(allSubscriptionGUIDs, client)
+			if err != nil {
+				cobra.CompErrorln("Failed getting resource list:" + err.Error())
+				return []string{}, cobra.ShellCompDirectiveError
+			}
+			value = resourceList
+		}
+
+		var graphQueryResult graphResponse
+		err = json.Unmarshal([]byte(value), &graphQueryResult)
 		if err != nil {
+			cobra.CompErrorln("Failed to unmarshal graph response:" + err.Error())
+			// Clear the cache as it can't be deserialized
+			storage.DeleteCache(accountCacheKey) //nolint: errcheck
 			return []string{}, cobra.ShellCompDirectiveError
 		}
 
@@ -198,8 +222,8 @@ func navigateAutocompletion(subscription *string) func(cmd *cobra.Command, args 
 		toCompleteDepth := len(strings.Split(toComplete, "/"))
 		isPartialDepth := false
 
-		values := make([]string, 0, len(graphResponse))
-		for _, item := range graphResponse {
+		values := make([]string, 0, len(graphQueryResult.Data))
+		for _, item := range graphQueryResult.Data {
 			// Filter to only subs the user is interested in
 			if subscriptionGUID != "" && subscriptionGUID != item.SubscriptionID {
 				// Skip as not in the subscription we're interested in
@@ -273,6 +297,8 @@ func getAccountList() ([]accountItem, error) {
 	var accountList []accountItem
 	err = json.Unmarshal([]byte(value), &accountList)
 	if err != nil {
+		// Clear the cache as it can't be deserialized
+		storage.DeleteCache(accountCacheKey) //nolint: errcheck
 		return nil, fmt.Errorf("Failed unmarshalling from cache to get account list: %w", err)
 	}
 
