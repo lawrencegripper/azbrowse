@@ -100,6 +100,9 @@ kill $XVFB_PROC
 
 print_header "Run go releaser"
 
+# Workaround bug which intermittently causes failure building snap.
+rm -r -f /root/.cache/snapcraft/download
+
 if [ -z ${PUBLISH} ]; then
   echo "Running with --skip-publish as PUBLISH not set"
   goreleaser --skip-publish --rm-dist
