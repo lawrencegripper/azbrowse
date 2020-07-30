@@ -127,7 +127,7 @@ RUN \
     # --> GolangCI-lint
     && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.132.1"\
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.140.1"\
     # --> Go rich output for testing with colors
     && go get github.com/kyoh86/richgo@v0.3.3 \
     && rm -rf /go/src/ && rm -rf /go/pkg

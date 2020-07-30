@@ -1,5 +1,6 @@
 builds:
-  - env:
+  - id: all
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
