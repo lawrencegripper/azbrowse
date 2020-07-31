@@ -1,5 +1,6 @@
 builds:
-  - env:
+  - id: all
+    env:
       - CGO_ENABLED=0
     goos:
       - linux
@@ -73,16 +74,14 @@ scoop:
   description: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
   license: MIT
 
-# Removed until snap approved for publish
-# snapcrafts:
-#   - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-#     name: azbrowse
-#     summary: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
-#     description: |
-#       What can it do? Lots check out the guided tour here. https://github.com/lawrencegripper/azbrowse/blob/master/docs/getting-started.md
-#     grade: stable
-#     publish: false
-#     confinement: classic
+snapcrafts:
+  - name_template: "{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
+    name: azbrowse
+    summary: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
+    description: |
+      What can it do? Lots check out the guided tour here. https://github.com/lawrencegripper/azbrowse/blob/master/docs/getting-started.md
+    grade: stable
+    confinement: classic
 
 changelog:
   sort: asc
