@@ -82,6 +82,7 @@ snapcrafts:
       What can it do? Lots check out the guided tour here. https://github.com/lawrencegripper/azbrowse/blob/master/docs/getting-started.md
     grade: stable
     confinement: classic
+    publish: true
 
 changelog:
   sort: asc
