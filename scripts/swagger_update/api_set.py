@@ -98,7 +98,7 @@ def get_api_version_tag(resource_provider_name, readme_contents, overrides):
     if override != None:
         return override
 
-    tag_regex = re.compile("openapi-type: [a-z\\-]+\ntag: ([a-z\\-0-9]*)")
+    tag_regex = re.compile("openapi-type: [a-z\\-]+\n[^`]*tag: ([a-z\\-0-9]*)")
     match = tag_regex.search(readme_contents)
     if match == None:
         return None

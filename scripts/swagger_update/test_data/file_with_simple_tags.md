@@ -26,6 +26,7 @@ These are the global settings for the ContainerRegistry API.
 
 ``` yaml
 openapi-type: arm
+azure-arm: true
 tag: package-2019-06-preview
 ```
 
