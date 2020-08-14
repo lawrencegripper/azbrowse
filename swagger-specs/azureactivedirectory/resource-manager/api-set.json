@@ -1,6 +1,0 @@
-{
-    "input_files": [
-        "Microsoft.Aadiam/preview/2020-07-01-preview/azureADMetrics.json"
-    ],
-    "name": "package-preview-2020-07"
-}
