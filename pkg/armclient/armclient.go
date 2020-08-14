@@ -242,14 +242,19 @@ func (c *Client) DoResourceGraphQueryReturningObjectArray(ctx context.Context, s
 }
 
 var resourceAPIVersionLookup map[string]string
+var resourceAPIVersionPreviewLookup map[string]string
 
 // GetAPIVersion returns the most recent API version for a resource
 func GetAPIVersion(armType string) (string, error) {
 	value, exists := resourceAPIVersionLookup[armType]
-	if !exists {
-		return "MISSING", fmt.Errorf("API not found for the resource: %s", armType)
+	if exists {
+		return value, nil
 	}
-	return value, nil
+	value, exists = resourceAPIVersionPreviewLookup[armType]
+	if exists {
+		return value, nil
+	}
+	return "MISSING", fmt.Errorf("API not found for the resource: %s", armType)
 }
 
 // PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
@@ -280,10 +285,16 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 			}
 
 			resourceAPIVersionLookup = make(map[string]string)
+			resourceAPIVersionPreviewLookup = make(map[string]string)
 			for _, provider := range providerResponse.Providers {
 				for _, resourceType := range provider.ResourceTypes {
 					for _, apiVersion := range resourceType.APIVersions {
-						if !strings.Contains(apiVersion, "preview") {
+						if strings.Contains(apiVersion, "preview") {
+							// don't break here as we want to allow non-preview version to be set, instead check to avoid overwriting
+							if resourceAPIVersionPreviewLookup[provider.Namespace+"/"+resourceType.ResourceType] == "" {
+								resourceAPIVersionPreviewLookup[provider.Namespace+"/"+resourceType.ResourceType] = apiVersion
+							}
+						} else {
 							resourceAPIVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = apiVersion
 							break
 						}
