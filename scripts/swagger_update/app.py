@@ -17,6 +17,8 @@ if __name__ == "__main__":
         # frontdoor 2019-05 references 2019-03-01/network.json which is not listed in the input files
         # frontdoor 2019-04 references 2019-03-01/network.json which is not listed in the input files
         "frontdoor" : "",
+        "azureactivedirectory": "package-preview-2020-03", # package-preview-2020-07 references 2020-03 but isn't listed in the input files
+        "storage" : "package-2019-04", ## 2019-06 has links to privatelinks.json which isn't in the fileset
     }
 
     print(

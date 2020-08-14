@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Devices/stable/2019-11-04/iothub.json"], "name": "package-2019-11"}
+{"input_files": ["Microsoft.Devices/preview/2020-07-10-preview/iothub.json"], "name": "package-preview-2020-07"}
