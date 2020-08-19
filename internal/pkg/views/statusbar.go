@@ -115,7 +115,9 @@ func (w *StatusbarWidget) addStatusEvent(eventObj interface{}) {
 
 // Layout draws the widget in the gocui view
 func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
-	v, err := g.SetView(w.name, w.x, w.y, w.x+w.w, w.y+3)
+	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, 3)
+
+	v, err := g.SetView(w.name, x0, y0, x1, y1)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

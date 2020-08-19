@@ -29,6 +29,7 @@ type ListWidget struct {
 	ActionKeyBinding     string
 	lastTopIndex         int
 	shouldRender         bool
+	lastCalculatedHeight int
 }
 
 // ListNavigatedEventState captures the state when raising a `list.navigated` event
@@ -109,13 +110,17 @@ func highlightText(displayText string, highlight string) string {
 
 // Layout draws the widget in the gocui view
 func (w *ListWidget) Layout(g *gocui.Gui) error {
-	v, err := g.SetView("listWidget", w.x, w.y, w.x+w.w, w.y+w.h)
+	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
+	v, err := g.SetView("listWidget", x0, y0, x1, y1)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 	v.Clear()
 	w.view = v
 
+	width := x1 - x0 + 1
+	height := y1 - y0 + 1
+	w.lastCalculatedHeight = height
 	if w.shouldRender {
 		if w.itemCount() < 1 {
 			return nil
@@ -145,7 +150,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		if linesPerItem == 0 {
 			linesPerItem = 1
 		}
-		maxItemsCanShow := (w.h / linesPerItem) - 1 // minus 1 to be on the safe side
+		maxItemsCanShow := (height / linesPerItem) - 1 // minus 1 to be on the safe side
 
 		topIndex := w.lastTopIndex
 		bottomIndex := w.lastTopIndex + maxItemsCanShow
@@ -180,8 +185,8 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		if w.currentPage.FilterString != "" {
 			title += "[filter=" + w.currentPage.FilterString + "]"
 		}
-		if len(title) > w.w {
-			trimLength := len(title) - w.w + 5 // Add five for spacing and elipsis
+		if len(title) > width {
+			trimLength := len(title) - width + 5 // Add five for spacing and elipsis
 			title = ".." + title[trimLength:]
 		}
 
@@ -398,7 +403,7 @@ func (w *ListWidget) MovePageDown() {
 	}
 	i := w.currentPage.Selection
 
-	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i < w.itemCount(); i++ {
+	for remainingLinesToPage := w.lastCalculatedHeight; remainingLinesToPage > 0 && i < w.itemCount(); i++ {
 		item := w.itemsToShow()[i]
 		remainingLinesToPage -= strings.Count(item.Display, "\n") + 1 // +1 as there is an implicit newline
 		remainingLinesToPage--                                        // separator
@@ -414,7 +419,7 @@ func (w *ListWidget) MovePageUp() {
 	}
 	i := w.currentPage.Selection
 
-	for remainingLinesToPage := w.h; remainingLinesToPage > 0 && i >= 0; i-- {
+	for remainingLinesToPage := w.lastCalculatedHeight; remainingLinesToPage > 0 && i >= 0; i-- {
 		item := w.itemsToShow()[i]
 		remainingLinesToPage -= strings.Count(item.Display, "\n") + 1 // +1 as there is an implicit newline
 		remainingLinesToPage--                                        // separator
