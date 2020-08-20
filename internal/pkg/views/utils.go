@@ -24,5 +24,15 @@ func getViewBounds(g *gocui.Gui, x int, y int, width int, height int) (x0, y0, x
 	} else {
 		y1 = y0 + height // fixed height
 	}
+
+	if x1 > sx {
+		x1 = sx // don't allow x1 to exceed terminal width
+	}
+	if x1 <= x0 {
+		x0 = x1 - 2 // ensure we don't end up with zero width view
+	}
+	if y1 <= y0 {
+		y0 = y1 - 2 // ensure we don't end up with zero height view
+	}
 	return
 }
