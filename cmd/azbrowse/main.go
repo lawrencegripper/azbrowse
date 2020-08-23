@@ -212,10 +212,10 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	leftColumnWidth := 45
 
 	// Create the views used
-	status := views.NewStatusbarWidget(1, -2, 0, settings.HideGuids, g)
-	content := views.NewItemWidget(leftColumnWidth+2, 1, -leftColumnWidth-1, -4, settings.HideGuids, settings.ShouldRender, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, -4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
-	notifications := views.NewNotificationWidget(-45, 1, 45, g, client)
+	status := views.NewStatusbarWidget(1, -3, 0, settings.HideGuids, g)
+	content := views.NewItemWidget(leftColumnWidth+2, 0, 0, -4, settings.HideGuids, settings.ShouldRender, "")
+	list := views.NewListWidget(ctx, 1, 0, leftColumnWidth, -4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
+	notifications := views.NewNotificationWidget(-45, 0, 45, g, client)
 
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
 
