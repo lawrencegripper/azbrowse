@@ -243,7 +243,9 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 		height = height + 3
 	}
 
-	v, err := g.SetView(w.name, w.x, w.y, w.x+w.w, height)
+	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, height)
+
+	v, err := g.SetView(w.name, x0, y0, x1, y1)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

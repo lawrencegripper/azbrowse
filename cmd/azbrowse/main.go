@@ -201,10 +201,9 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 }
 
 func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *config.Settings, client *armclient.Client) *views.ListWidget {
-	maxX, maxY := g.Size()
+	maxX, _ := g.Size()
 	// Padding
 	maxX = maxX - 2
-	maxY = maxY - 2
 
 	if maxX < 72 {
 		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
@@ -213,10 +212,10 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	leftColumnWidth := 45
 
 	// Create the views used
-	status := views.NewStatusbarWidget(1, maxY-2, maxX, settings.HideGuids, g)
-	content := views.NewItemWidget(leftColumnWidth+2, 1, maxX-leftColumnWidth-1, maxY-4, settings.HideGuids, settings.ShouldRender, "")
-	list := views.NewListWidget(ctx, 1, 1, leftColumnWidth, maxY-4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
-	notifications := views.NewNotificationWidget(maxX-45, 1, 45, g, client)
+	status := views.NewStatusbarWidget(1, -3, 0, settings.HideGuids, g)
+	content := views.NewItemWidget(leftColumnWidth+2, 0, 0, -4, settings.HideGuids, settings.ShouldRender, "")
+	list := views.NewListWidget(ctx, 1, 0, leftColumnWidth, -4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
+	notifications := views.NewNotificationWidget(-45, 0, 45, g, client)
 
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
 

@@ -42,7 +42,9 @@ func NewItemWidget(x, y, w, h int, hideGuids bool, shouldRender bool, content st
 func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	w.g = g
 
-	v, err := g.SetView("itemWidget", w.x, w.y, w.x+w.w, w.y+w.h)
+	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
+
+	v, err := g.SetView("itemWidget", x0, y0, x1, y1)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
