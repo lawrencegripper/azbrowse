@@ -313,7 +313,8 @@ func subscriptionAutocompletion(cmd *cobra.Command, args []string, toComplete st
 	}
 	values := make([]string, len(accountList)*2)
 	for _, a := range accountList {
-		values = append(values, a.Name)
+		// Add the name and correctly escape spaces and quote the value
+		values = append(values, "\""+strings.Replace(a.Name, " ", "\\ ", -1)+"\"")
 		values = append(values, a.ID)
 	}
 
