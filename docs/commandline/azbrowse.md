@@ -18,6 +18,7 @@ azbrowse [flags]
       --fuzzer int            run fuzzer (optionally specify the duration in minutes) (default -1)
   -h, --help                  help for azbrowse
   -n, --navigate string       (optional) navigate to resource by resource ID
+  -r, --resume                (optional) resume navigating from your last session
   -s, --subscription string   (optional) specify a subscription to load
       --tenant-id string      (optional) specify the tenant id to get an access token for (see az account list -o json)
 ```
