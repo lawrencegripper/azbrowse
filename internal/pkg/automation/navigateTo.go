@@ -32,7 +32,7 @@ func NavigateTo(list *views.ListWidget, itemID string) {
 				}
 				nodeList := navigateState.NewNodes
 
-				if lastNavigatedNode != nil && lastNavigatedNode != list.CurrentExpandedItem() {
+				if lastNavigatedNode != nil && lastNavigatedNode == list.CurrentExpandedItem() {
 					navigateToInProgress = false
 					list.SetShouldRender(true)
 				} else {
