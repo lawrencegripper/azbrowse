@@ -100,12 +100,12 @@ func createRootCmd() *cobra.Command {
 					fmt.Println("Cannot resume: " + err.Error())
 					os.Exit(1)
 				}
-				tenantID, err := storage.GetCache(resumeTenantIDKey)
+				currentTenantID, err := storage.GetCache(resumeTenantIDKey)
 				if err != nil {
 					fmt.Println("Cannot resume: " + err.Error())
 					os.Exit(1)
 				}
-				settings.TenantID = tenantID
+				settings.TenantID = currentTenantID
 				settings.NavigateToID = nodeID
 				settings.ShouldRender = false
 			}
