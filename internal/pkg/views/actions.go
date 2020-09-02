@@ -77,7 +77,7 @@ func LoadActionsView(ctx context.Context, list *ListWidget) error {
 		}
 	}
 	if len(items) > 1 {
-		list.SetNodes(items)
+		list.SetNewNodes(items)
 	}
 
 	return nil

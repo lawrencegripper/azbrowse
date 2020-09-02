@@ -252,6 +252,10 @@ func (w *ListWidget) GoBack() {
 	w.contentView.SetContent(previousPage.ExpandedNodeItem, previousPage.Data, previousPage.DataType, "Response")
 	w.currentPage = previousPage
 
+	if w.currentPage.ExpandedNodeItem == nil {
+		w.currentPage.ExpandedNodeItem = &expanders.TreeNode{}
+	}
+
 	eventing.Publish("list.navigated", ListNavigatedEventState{
 		Success:      true,
 		NewNodes:     w.currentPage.Items,
@@ -296,21 +300,23 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 	}
 	currentItem := w.CurrentItem()
 
-	w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
 	if len(nodes) > 0 {
-		if w.currentPage != nil {
-			w.currentPage.ExpandedNodeItem = currentItem
-		}
-		w.SetNodes(nodes)
+		// Saves to current page to the nav stack and creates new current page.
+		w.SetNewNodes(nodes)
 
+		// Build out new current page item
+		w.currentPage.DataType = content.ResponseType
+		w.currentPage.Data = content.Response
 		if currentItem != nil {
 			w.currentPage.Title = titlePrefix + currentItem.Name
+			w.currentPage.ExpandedNodeItem = currentItem
 		}
 	}
+	w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
 
 	parentNodeID := "root"
 	nodeID := "root"
-	if w.currentPage.ExpandedNodeItem != nil {
+	if w.currentPage != nil && w.currentPage.ExpandedNodeItem != nil {
 		parentNodeID = w.currentPage.ExpandedNodeItem.ID
 		nodeID = currentItem.ID
 	}
@@ -332,7 +338,7 @@ func (w *ListWidget) GetNodes() []*expanders.TreeNode {
 }
 
 // SetNodes allows others to set the list nodes
-func (w *ListWidget) SetNodes(nodes []*expanders.TreeNode) {
+func (w *ListWidget) SetNewNodes(nodes []*expanders.TreeNode) {
 
 	// Capture current view to navstack
 	if w.HasCurrentItem() {
