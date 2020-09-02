@@ -14,9 +14,12 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/filesystem"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/spf13/cobra"
 	"github.com/spf13/cobra/doc"
@@ -24,6 +27,8 @@ import (
 
 const accountCacheKey = "accountCache"
 const navigateCacheKey = "navigateCache"
+const resumeNodeIDKey = "resumeNode"
+const resumeTenantIDKey = "resumeTenant"
 
 func handleCommandAndArgs() {
 
@@ -49,10 +54,24 @@ func handleCommandAndArgs() {
 func createRootCmd() *cobra.Command {
 	var demo bool
 	var debug bool
+	var resume bool
 	var navigateTo string
 	var fuzzerDurationMinutes int
 	var tenantID string
 	var subscription string
+
+	// Start tracking the last node navigated to in storage for the `resume` command
+	go func() {
+		defer errorhandling.RecoveryWithCleanup()
+
+		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+		for {
+			navigateStateInterface := <-navigatedChannel
+			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
+			storage.PutCache(resumeNodeIDKey, navigateState.NodeID) //nolint: errcheck
+			storage.PutCache(resumeTenantIDKey, tenantID)           //nolint: errcheck
+		}
+	}()
 
 	cmd := &cobra.Command{
 		Use:   "azbrowse",
@@ -74,6 +93,20 @@ func createRootCmd() *cobra.Command {
 
 			if navigateTo != "" {
 				settings.NavigateToID = navigateTo
+				settings.ShouldRender = false
+			} else if resume {
+				nodeID, err := storage.GetCache(resumeNodeIDKey)
+				if err != nil {
+					fmt.Println("Cannot resume: " + err.Error())
+					os.Exit(1)
+				}
+				currentTenantID, err := storage.GetCache(resumeTenantIDKey)
+				if err != nil {
+					fmt.Println("Cannot resume: " + err.Error())
+					os.Exit(1)
+				}
+				settings.TenantID = currentTenantID
+				settings.NavigateToID = nodeID
 				settings.ShouldRender = false
 			}
 
@@ -107,12 +140,17 @@ func createRootCmd() *cobra.Command {
 					settings.NavigateToID = "/subscriptions/" + strings.TrimSuffix(string(out), "\n")
 				}
 			}
+
+			// Hack: To allow resume to track tenant ud easily
+			tenantID = settings.TenantID
+
 			run(&settings)
 		},
 	}
 	cmd.Flags().StringVarP(&navigateTo, "navigate", "n", "", "(optional) navigate to resource by resource ID")
 	cmd.Flags().StringVar(&tenantID, "tenant-id", "", "(optional) specify the tenant id to get an access token for (see az account list -o json)")
 	cmd.Flags().StringVarP(&subscription, "subscription", "s", "", "(optional) specify a subscription to load")
+	cmd.Flags().BoolVarP(&resume, "resume", "r", false, "(optional) resume navigating from your last session")
 	cmd.Flags().BoolVar(&debug, "debug", false, "run in debug mode")
 	cmd.Flags().BoolVar(&demo, "demo", false, "run in demo mode to filter sensitive output")
 	cmd.Flags().IntVar(&fuzzerDurationMinutes, "fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
