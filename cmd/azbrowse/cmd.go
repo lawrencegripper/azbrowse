@@ -28,6 +28,7 @@ import (
 const accountCacheKey = "accountCache"
 const navigateCacheKey = "navigateCache"
 const resumeNodeIDKey = "resumeNode"
+const resumeTenantIDKey = "resumeTenant"
 
 func handleCommandAndArgs() {
 
@@ -68,6 +69,7 @@ func createRootCmd() *cobra.Command {
 			navigateStateInterface := <-navigatedChannel
 			navigateState := navigateStateInterface.(views.ListNavigatedEventState)
 			storage.PutCache(resumeNodeIDKey, navigateState.NodeID) //nolint: errcheck
+			storage.PutCache(resumeTenantIDKey, tenantID)           //nolint: errcheck
 		}
 	}()
 
@@ -98,6 +100,12 @@ func createRootCmd() *cobra.Command {
 					fmt.Println("Cannot resume: " + err.Error())
 					os.Exit(1)
 				}
+				tenantID, err := storage.GetCache(resumeTenantIDKey)
+				if err != nil {
+					fmt.Println("Cannot resume: " + err.Error())
+					os.Exit(1)
+				}
+				settings.TenantID = tenantID
 				settings.NavigateToID = nodeID
 				settings.ShouldRender = false
 			}
@@ -132,6 +140,10 @@ func createRootCmd() *cobra.Command {
 					settings.NavigateToID = "/subscriptions/" + strings.TrimSuffix(string(out), "\n")
 				}
 			}
+
+			// Hack: To allow resume to track tenant ud easily
+			tenantID = settings.TenantID
+
 			run(&settings)
 		},
 	}
