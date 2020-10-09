@@ -54,7 +54,13 @@ scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
 
-### Linux (via Releases tar.gz)
+### Linux
+
+#### via Snap Store
+
+[![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/azbrowse)
+
+#### via Releases tar.gz
 
 Grab the url to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
 
