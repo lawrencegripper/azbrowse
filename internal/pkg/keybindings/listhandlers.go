@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"time"
 
+	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
@@ -536,8 +537,12 @@ func (h *ListUpdateHandler) Invoke() error {
 		formattedContent = formattedBuf.String()
 	case expanders.ResponseYAML:
 		fileExtension = ".yaml"
-
 		formattedContent = content // TODO: add YAML formatter
+
+	case expanders.ResponseXML:
+		fileExtension = ".xml"
+		formattedContent = xmlfmt.FormatXML(content, "", "  ")
+
 	}
 
 	tempDir := editorConfig.TempDir

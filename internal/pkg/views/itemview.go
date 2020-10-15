@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/stuartleeks/colorjson"
@@ -97,6 +98,12 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 			} else {
 				fmt.Fprint(v, buf.String())
 			}
+
+		case expanders.ResponseXML:
+			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
+			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
+			fmt.Fprint(v, formattedContent)
+
 		default:
 			fmt.Fprint(v, w.content)
 		}
