@@ -58,6 +58,7 @@ func InitializeExpanders(client *armclient.Client) {
 		&JSONExpander{},
 		&StorageManagementPoliciesExpander{}, // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 		NewContainerRegistryExpander(client), // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewStorageBlobExpander(client),       // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 		&ContainerInstanceExpander{
 			client: client,
 		},

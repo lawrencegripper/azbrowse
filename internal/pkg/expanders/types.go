@@ -42,6 +42,8 @@ const (
 	ResponseJSON ExpanderResponseType = "JSON"
 	// ResponseYAML indicates the response type can be parsed and colourised as YAML
 	ResponseYAML ExpanderResponseType = "YAML"
+	// ResponseXML indicates the response type can be parsed and colourised as XML
+	ResponseXML ExpanderResponseType = "XML"
 )
 
 // ExpanderResponse captures the response text and formt of an expander response

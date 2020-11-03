@@ -18,6 +18,7 @@ require (
 	github.com/go-openapi/spec v0.18.0
 	github.com/go-openapi/strfmt v0.18.0 // indirect
 	github.com/go-openapi/swag v0.18.0 // indirect
+	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b
 	github.com/google/go-cmp v0.3.1 // indirect
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
