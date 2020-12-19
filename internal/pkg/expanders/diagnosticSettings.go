@@ -60,19 +60,12 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 		}
 
 		itemArray := json.GetArray("value")
-		if itemArray == nil {
-			return ExpanderResult{
-				Err:               fmt.Errorf("Error - JSON response not array"),
-				Response:          ExpanderResponse{Response: result},
-				SourceDescription: "DiagnosticSettingsExpander request",
-			}
-		}
 
 		for _, diagSetting := range itemArray {
 			expandUrl := strings.Replace(diagSetting.Get("id").String(), "\"", "", -1) + "?api-version=2017-05-01-preview"
 			diagnosticSettingsItems = append(diagnosticSettingsItems, &TreeNode{
 				Name:      "diagSetting",
-				Display:   style.Subtle("[microsoft.insights] \n  ") + diagSetting.Get("name").String(),
+				Display:   style.Subtle("[microsoft.insights] \n  ") + strings.Replace(diagSetting.Get("name").String(), "\"", "", -1),
 				ExpandURL: expandUrl,
 				DeleteURL: expandUrl,
 			})
