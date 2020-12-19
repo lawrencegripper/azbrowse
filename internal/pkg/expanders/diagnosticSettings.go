@@ -74,6 +74,7 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 				Name:      "diagSetting",
 				Display:   style.Subtle("[microsoft.insights] \n  ") + diagSetting.Get("name").String(),
 				ExpandURL: expandUrl,
+				DeleteURL: expandUrl,
 			})
 		}
 	}
