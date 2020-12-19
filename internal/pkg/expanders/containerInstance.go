@@ -129,7 +129,7 @@ func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem 
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          ExpanderResponse{Response: ""},
+			Response:          ExpanderResponse{Response: "", ResponseType: ResponsePlainText},
 			SourceDescription: "expandContainers logs",
 			IsPrimaryResponse: true,
 		}
@@ -143,7 +143,7 @@ func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem 
 
 	return ExpanderResult{
 		IsPrimaryResponse: true,
-		Response:          ExpanderResponse{Response: containerLogResponse.Content},
+		Response:          ExpanderResponse{Response: containerLogResponse.Content, ResponseType: ResponsePlainText},
 		SourceDescription: "ContainerInstanceExpander request",
 	}
 }

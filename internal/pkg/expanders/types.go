@@ -99,8 +99,12 @@ const (
 	deploymentOperationType = "deploymentOperation"
 	activityLogType         = "activityLog"
 	subActivityLogType      = "subActivityLog"
+	diagnosticSettingsType  = "diagnosticSettings"
 	// ActionType defines an action like `listkey` etc
 	ActionType = "action"
+
+	// Used to store resourceIds as CVS in TreeItem Metadata
+	resourceIdsMeta = "resourceIds"
 
 	// ExpandURLNotSupported is used to identify items which don't support generic expansion
 	ExpandURLNotSupported = "notsupported"
