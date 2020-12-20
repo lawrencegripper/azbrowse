@@ -69,12 +69,12 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 		for _, diagSetting := range itemArray {
 			itemId := string(diagSetting.GetStringBytes("id"))
 			if itemId == "" {
-				continue;
+				continue
 			}
 			expandUrl := itemId + "?api-version=2017-05-01-preview"
 			name := string(diagSetting.GetStringBytes("name"))
 			if name == "" {
-				continue;
+				continue
 			}
 			diagnosticSettingsItems = append(diagnosticSettingsItems, &TreeNode{
 				Name:      name,
