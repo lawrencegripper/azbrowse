@@ -70,7 +70,7 @@ export BUILD_NUMBER=99999
 make devcontainer-release
 ```
 
-If you would like to do a publish step of the assets set `IS_CI=1`, `BUILD_NUMBER`, `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `BRANCH=master` and `GITHUB_TOKEN` then run `make devcontainer-release`
+If you would like to do a publish step of the assets set `IS_CI=1`, `BUILD_NUMBER`, `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `BRANCH=main` and `GITHUB_TOKEN` then run `make devcontainer-release`
 
 ## Patterns
 

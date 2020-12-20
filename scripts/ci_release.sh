@@ -24,7 +24,7 @@ if [ -z ${IS_CI} ]; then
 else 
   echo "Publishing"
   if [ -z $IS_PR ] && [[ $BRANCH == "refs/heads/main" ]]; then
-    echo "On master setting PUBLISH=true"
+    echo "On main setting PUBLISH=true"
     export PUBLISH=true
     
     echo "Docker login"
@@ -36,7 +36,7 @@ else
     # cleanup login file
     rm snap.login
   else 
-    echo "Skipping publish as is from PR: $PR_NUMBER or not 'refs/heads/master' BRANCH: $BRANCH"
+    echo "Skipping publish as is from PR: $PR_NUMBER or not 'refs/heads/main' BRANCH: $BRANCH"
   fi
 fi
 

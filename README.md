@@ -5,7 +5,7 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 [![Go Report Card](https://goreportcard.com/badge/github.com/lawrencegripper/azbrowse?style=flat-square)](https://goreportcard.com/report/github.com/lawrencegripper/azbrowse)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/lawrencegripper/azbrowse)
 [![Release](https://img.shields.io/github/release/lawrencegripper/azbrowse.svg?style=flat-square)](https://github.com/lawrencegripper/azbrowse/releases/latest)
-[![release](https://github.com/lawrencegripper/azbrowse/workflows/release/badge.svg)](https://github.com/lawrencegripper/azbrowse/actions?query=workflow%3Arelease+branch%3Amaster)
+[![release](https://github.com/lawrencegripper/azbrowse/workflows/release/badge.svg)](https://github.com/lawrencegripper/azbrowse/actions?query=workflow%3Arelease+branch%3Amain)
 
 ## Status
 

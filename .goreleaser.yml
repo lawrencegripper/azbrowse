@@ -79,7 +79,7 @@ snapcrafts:
     name: azbrowse
     summary: An interactive CLI for browsing Azure, inspired by http://resources.azure.com/
     description: |
-      What can it do? Lots check out the guided tour here. https://github.com/lawrencegripper/azbrowse/blob/master/docs/getting-started.md
+      What can it do? Lots check out the guided tour here. https://github.com/lawrencegripper/azbrowse/blob/main/docs/getting-started.md
     grade: stable
     confinement: classic
     publish: true
