@@ -1,4 +1,4 @@
-FROM golang:1.14.4-stretch
+FROM golang:1.15.6-buster
 # Build required snapcraft snaps
 # https://snapcraft.io/docs/snapcraft-docker-images
 # Grab dependencies
@@ -119,15 +119,15 @@ RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/sta
 # Install Go tools
 RUN \
     # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v1.4.1 \
+    go get github.com/go-delve/delve/cmd/dlv@v1.5.1 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.4.1 \
+    && go get golang.org/x/tools/gopls@v0.6.1 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.33.0 \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.140.1"\
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.149.0"\
     # --> Go rich output for testing with colors
     && go get github.com/kyoh86/richgo@v0.3.3 \
     && rm -rf /go/src/ && rm -rf /go/pkg
