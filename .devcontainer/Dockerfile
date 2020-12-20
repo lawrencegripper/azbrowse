@@ -114,6 +114,7 @@ ENV XVFB_ARGS="${XARGS}"
 ENV DEVCONTAINER="TRUE"
 
 # Install docker used by go releaser
+ENV DOCKER_BUILDKIT=1
 RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-20.10.1.tgz && tar --strip-components=1 -xvzf docker-20.10.1.tgz -C /usr/local/bin"
 
 # Install Go tools
