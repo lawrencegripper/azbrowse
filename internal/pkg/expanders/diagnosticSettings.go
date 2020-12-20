@@ -78,7 +78,7 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 			}
 			diagnosticSettingsItems = append(diagnosticSettingsItems, &TreeNode{
 				Name:      name,
-				Display:   style.Subtle("[microsoft.insights] \n  ") + name,
+				Display:   style.Subtle("[Microsoft.Insights] \n  ") + name,
 				ExpandURL: expandUrl,
 				DeleteURL: expandUrl,
 			})
