@@ -138,7 +138,7 @@ devcontainer:
 	# Get cached layers by pulling previous version (leading dash means it's optional, will continue on failure)
 	-docker pull $(DEV_CONTAINER_TAG)
 	# Build the devcontainer: Hide output if it builds to keep things clean
-	docker build -f ./.devcontainer/Dockerfile ./.devcontainer --cache-from $(DEV_CONTAINER_TAG) -t $(DEV_CONTAINER_TAG)
+	docker build -f ./.devcontainer/Dockerfile ./.devcontainer --cache-from $(DEV_CONTAINER_TAG) -t $(DEV_CONTAINER_TAG) --build-arg BUILDKIT_INLINE_CACHE=1
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
