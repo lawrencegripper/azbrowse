@@ -23,7 +23,7 @@ if [ -z ${IS_CI} ]; then
   echo "Not running in circle, skipping CI setup"
 else 
   echo "Publishing"
-  if [ -z $IS_PR ] && [[ $BRANCH == "refs/heads/master" ]]; then
+  if [ -z $IS_PR ] && [[ $BRANCH == "refs/heads/main" ]]; then
     echo "On master setting PUBLISH=true"
     export PUBLISH=true
     
