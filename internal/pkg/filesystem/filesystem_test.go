@@ -223,7 +223,7 @@ func Test_Get_RG_WalkTree(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 13, len(files), "Expected 12 resources + index file from mock response")
+	assert.Equal(t, 14, len(files), "Expected 13 resources + index file from mock response")
 	checkPendingMocks(t)
 }
 

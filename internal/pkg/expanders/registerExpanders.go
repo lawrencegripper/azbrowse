@@ -74,6 +74,9 @@ func InitializeExpanders(client *armclient.Client) {
 		&AzureDatabricksExpander{
 			client: client,
 		},
+		&DiagnosticSettingsExpander{
+			client: client,
+		},
 	}
 }
 

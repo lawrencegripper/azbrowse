@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -184,26 +185,30 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		}
 	}
 
-	for _, rg := range resourceResponse.Resources {
-		resourceAPIVersion, err := armclient.GetAPIVersion(rg.Type)
+	resourceIds := []string{}
+	resourceTreeItems := []*TreeNode{}
+	for _, resource := range resourceResponse.Resources {
+		resourceAPIVersion, err := armclient.GetAPIVersion(resource.Type)
 		if err != nil {
 			eventing.SendStatusEvent(&eventing.StatusEvent{
 				Failure: true,
-				Message: "Failed to get resouceVersion for the Type:" + rg.Type,
+				Message: "Failed to get resouceVersion for the Type:" + resource.Type,
 				Timeout: time.Duration(time.Second * 5),
 			})
 		}
+		resourceIds = append(resourceIds, resource.ID)
+		resourceIdWithVersion := resource.ID + "?api-version=" + resourceAPIVersion
 		item := &TreeNode{
-			Display:          style.Subtle("["+rg.Type+"] \n  ") + rg.Name,
-			Name:             rg.Name,
+			Display:          style.Subtle("["+resource.Type+"] \n  ") + resource.Name,
+			Name:             resource.Name,
 			Parentid:         currentItem.ID,
-			Namespace:        getNamespaceFromARMType(rg.Type), // We just want the namespace not the subresource
-			ArmType:          rg.Type,
-			ID:               rg.ID,
-			ExpandURL:        rg.ID + "?api-version=" + resourceAPIVersion,
+			Namespace:        getNamespaceFromARMType(resource.Type), // We just want the namespace not the subresource
+			ArmType:          resource.Type,
+			ID:               resource.ID,
+			ExpandURL:        resourceIdWithVersion,
 			ExpandReturnType: "none",
 			ItemType:         ResourceType,
-			DeleteURL:        rg.ID + "?api-version=" + resourceAPIVersion,
+			DeleteURL:        resourceIdWithVersion,
 			SubscriptionID:   currentItem.SubscriptionID,
 		}
 
@@ -212,8 +217,27 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 			item.StatusIndicator = DrawStatus(state)
 		}
 
-		newItems = append(newItems, item)
+		resourceTreeItems = append(resourceTreeItems, item)
 	}
+
+	// Add Diagnostic settings
+	newItems = append(newItems, &TreeNode{
+		Parentid:       currentItem.ID,
+		Namespace:      "None",
+		Display:        style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
+		Name:           "Diagnostic Settings",
+		ID:             currentItem.ID + "/<diagsettings>",
+		ExpandURL:      ExpandURLNotSupported,
+		ItemType:       diagnosticSettingsType,
+		SubscriptionID: currentItem.SubscriptionID,
+		Metadata: map[string]string{
+			// Diagnostic settings hang off resources so a list is passed for the
+			// expander to use
+			resourceIdsMeta: strings.Join(resourceIds, ","),
+		},
+	})
+
+	newItems = append(newItems, resourceTreeItems...)
 
 	return ExpanderResult{
 		Nodes:             newItems,
@@ -254,13 +278,13 @@ func (e *ResourceGroupResourceExpander) testCases() (bool, *[]expanderTestCase) 
 			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
 				st.Expect(t, r.Err, nil)
 
-				// Logs and deployment always added to an RG
-				additionalItemsAddedToRG := 2
+				// Logs, Diagnostic settings and deployment always added to an RG
+				additionalItemsAddedToRG := 3
 
 				st.Expect(t, len(r.Nodes), 10+additionalItemsAddedToRG)
 
 				// Validate content
-				st.Expect(t, r.Nodes[2].Name, "1teststorageaccount")
+				st.Expect(t, r.Nodes[3].Name, "1teststorageaccount")
 			},
 		},
 	}
