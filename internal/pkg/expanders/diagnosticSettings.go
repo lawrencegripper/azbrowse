@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"testing"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/nbio/st"
 )
 
 // Check interface
@@ -49,7 +51,7 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 			// Expected some things won't have items
 			fmt.Printf("Missing diagnostic setting err %q", err)
 		}
-
+		
 		json, err := fastJSONParser.Parse(result)
 		if err != nil {
 			return ExpanderResult{
@@ -63,9 +65,10 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 
 		for _, diagSetting := range itemArray {
 			expandUrl := strings.Replace(diagSetting.Get("id").String(), "\"", "", -1) + "?api-version=2017-05-01-preview"
+			name := strings.Replace(diagSetting.Get("name").String(), "\"", "", -1)
 			diagnosticSettingsItems = append(diagnosticSettingsItems, &TreeNode{
-				Name:      "diagSetting",
-				Display:   style.Subtle("[microsoft.insights] \n  ") + strings.Replace(diagSetting.Get("name").String(), "\"", "", -1),
+				Name:      name,
+				Display:   style.Subtle("[microsoft.insights] \n  ") + name,
 				ExpandURL: expandUrl,
 				DeleteURL: expandUrl,
 			})
@@ -80,5 +83,34 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 }
 
 func (e *DiagnosticSettingsExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
+	return true, &[]expanderTestCase{
+		{
+			name: "diagnosticSettingsFound",
+			responseFile: "./testdata/armsamples/diagSettings/responseNormal.json",
+			statusCode: 200,
+			urlPath: "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry/providers/microsoft.insights/diagnosticSettings",
+			nodeToExpand: &TreeNode{
+				Parentid:       "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob",
+				Namespace:      "None",
+				Display:        style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
+				Name:           "Diagnostic Settings",
+				ID:             "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob/<diagsettings>",
+				ExpandURL:      ExpandURLNotSupported,
+				ItemType:       diagnosticSettingsType,
+				Metadata: map[string]string{
+					// Diagnostic settings hang off resources so a list is passed for the
+					// expander to use
+					resourceIdsMeta: "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry",
+				},
+			},
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+
+				st.Expect(t, len(r.Nodes), 1)
+
+				// Validate content
+				st.Expect(t, r.Nodes[0].Name, "d1")
+			},
+		},
+	}
 }

@@ -1,0 +1,49 @@
+{
+    "value": [
+        {
+            "id": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry/providers/microsoft.insights/diagnosticSettings/d1",
+            "type": "Microsoft.Insights/diagnosticSettings",
+            "name": "d1",
+            "location": null,
+            "kind": null,
+            "tags": null,
+            "properties": {
+                "storageAccountId": null,
+                "serviceBusRuleId": null,
+                "workspaceId": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.operationalinsights/workspaces/lgsub",
+                "eventHubAuthorizationRuleId": null,
+                "eventHubName": null,
+                "metrics": [
+                    {
+                        "category": "AllMetrics",
+                        "enabled": false,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    }
+                ],
+                "logs": [
+                    {
+                        "category": "ContainerRegistryRepositoryEvents",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    },
+                    {
+                        "category": "ContainerRegistryLoginEvents",
+                        "enabled": true,
+                        "retentionPolicy": {
+                            "enabled": false,
+                            "days": 0
+                        }
+                    }
+                ],
+                "logAnalyticsDestinationType": null
+            },
+            "identity": null
+        }
+    ]
+}

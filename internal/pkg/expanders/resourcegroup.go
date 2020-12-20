@@ -278,13 +278,13 @@ func (e *ResourceGroupResourceExpander) testCases() (bool, *[]expanderTestCase) 
 			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
 				st.Expect(t, r.Err, nil)
 
-				// Logs and deployment always added to an RG
-				additionalItemsAddedToRG := 2
+				// Logs, Diagnostic settings and deployment always added to an RG
+				additionalItemsAddedToRG := 3
 
 				st.Expect(t, len(r.Nodes), 10+additionalItemsAddedToRG)
 
 				// Validate content
-				st.Expect(t, r.Nodes[2].Name, "1teststorageaccount")
+				st.Expect(t, r.Nodes[3].Name, "1teststorageaccount")
 			},
 		},
 	}
