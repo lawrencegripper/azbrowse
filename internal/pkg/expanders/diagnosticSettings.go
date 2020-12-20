@@ -48,10 +48,13 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 		diagSettingListUrl := resourceId + "/providers/microsoft.insights/diagnosticSettings?api-version=2017-05-01-preview"
 		result, err := e.client.DoRequest(ctx, "GET", diagSettingListUrl)
 		if err != nil {
-			// Expected some things won't have items
-			fmt.Printf("Missing diagnostic setting err %q", err)
+			return ExpanderResult{
+				Err:               fmt.Errorf("Error - Failed retrieving diagnostic settings"),
+				Response:          ExpanderResponse{Response: result},
+				SourceDescription: "DiagnosticSettingsExpander request",
+			}
 		}
-		
+
 		json, err := fastJSONParser.Parse(result)
 		if err != nil {
 			return ExpanderResult{
@@ -64,8 +67,15 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 		itemArray := json.GetArray("value")
 
 		for _, diagSetting := range itemArray {
-			expandUrl := strings.Replace(diagSetting.Get("id").String(), "\"", "", -1) + "?api-version=2017-05-01-preview"
-			name := strings.Replace(diagSetting.Get("name").String(), "\"", "", -1)
+			itemId := string(diagSetting.GetStringBytes("id"))
+			if itemId == "" {
+				continue;
+			}
+			expandUrl := itemId + "?api-version=2017-05-01-preview"
+			name := string(diagSetting.GetStringBytes("name"))
+			if name == "" {
+				continue;
+			}
 			diagnosticSettingsItems = append(diagnosticSettingsItems, &TreeNode{
 				Name:      name,
 				Display:   style.Subtle("[microsoft.insights] \n  ") + name,
@@ -85,18 +95,18 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 func (e *DiagnosticSettingsExpander) testCases() (bool, *[]expanderTestCase) {
 	return true, &[]expanderTestCase{
 		{
-			name: "diagnosticSettingsFound",
+			name:         "diagnosticSettingsFound",
 			responseFile: "./testdata/armsamples/diagSettings/responseNormal.json",
-			statusCode: 200,
-			urlPath: "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry/providers/microsoft.insights/diagnosticSettings",
+			statusCode:   200,
+			urlPath:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry/providers/microsoft.insights/diagnosticSettings",
 			nodeToExpand: &TreeNode{
-				Parentid:       "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob",
-				Namespace:      "None",
-				Display:        style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
-				Name:           "Diagnostic Settings",
-				ID:             "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob/<diagsettings>",
-				ExpandURL:      ExpandURLNotSupported,
-				ItemType:       diagnosticSettingsType,
+				Parentid:  "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob",
+				Namespace: "None",
+				Display:   style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
+				Name:      "Diagnostic Settings",
+				ID:        "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob/<diagsettings>",
+				ExpandURL: ExpandURLNotSupported,
+				ItemType:  diagnosticSettingsType,
 				Metadata: map[string]string{
 					// Diagnostic settings hang off resources so a list is passed for the
 					// expander to use
@@ -110,6 +120,31 @@ func (e *DiagnosticSettingsExpander) testCases() (bool, *[]expanderTestCase) {
 
 				// Validate content
 				st.Expect(t, r.Nodes[0].Name, "d1")
+			},
+		},
+		{
+			name:         "diagnosticSettingsMissing",
+			responseFile: "./testdata/armsamples/diagSettings/responseMalformed.json",
+			statusCode:   200,
+			urlPath:      "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry/providers/microsoft.insights/diagnosticSettings",
+			nodeToExpand: &TreeNode{
+				Parentid:  "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob",
+				Namespace: "None",
+				Display:   style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
+				Name:      "Diagnostic Settings",
+				ID:        "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/bob/<diagsettings>",
+				ExpandURL: ExpandURLNotSupported,
+				ItemType:  diagnosticSettingsType,
+				Metadata: map[string]string{
+					// Diagnostic settings hang off resources so a list is passed for the
+					// expander to use
+					resourceIdsMeta: "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/stable/providers/microsoft.containerregistry/registries/aregistry",
+				},
+			},
+			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
+				st.Expect(t, r.Err, nil)
+
+				st.Expect(t, len(r.Nodes), 0)
 			},
 		},
 	}
