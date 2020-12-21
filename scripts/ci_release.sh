@@ -4,6 +4,9 @@ set -e
 cd `dirname $0`
 
 print_header () {
+  echo "::endgroup::"
+  echo "::group::$1"
+
   echo ""
   echo "$(tput setaf 12)$(tput bold)------------------------------------------------------- $(tput sgr0)"
   echo "$(tput setaf 12)$(tput bold)--------------->$(tput sgr0) $1 "

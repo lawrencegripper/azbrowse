@@ -1,49 +1,15 @@
-FROM golang:1.14.4-stretch
-# Build required snapcraft snaps
-# https://snapcraft.io/docs/snapcraft-docker-images
-# Grab dependencies
-RUN apt-get update
-RUN apt-get dist-upgrade --yes
-RUN apt-get install --yes \
-      curl \
-      jq \
-      squashfs-tools
+FROM lawrencegripper/azbrowse-snapbase:latest as builder
 
-# Grab the core snap (for backwards compatibility) from the stable channel and
-# unpack it in the proper place.
-RUN curl -L $(curl -H 'X-Ubuntu-Series: 16' 'https://api.snapcraft.io/api/v1/snaps/details/core' | jq '.download_url' -r) --output core.snap
-RUN mkdir -p /snap/core
-RUN unsquashfs -d /snap/core/current core.snap
+# Multi-stage build, only need the snaps from the builder. Copy them one at a
+# time so they can be cached.
+FROM golang:1.15.6-buster
 
-# Grab the core18 snap (which snapcraft uses as a base) from the stable channel
-# and unpack it in the proper place.
-RUN curl -L $(curl -H 'X-Ubuntu-Series: 16' 'https://api.snapcraft.io/api/v1/snaps/details/core18' | jq '.download_url' -r) --output core18.snap
-RUN mkdir -p /snap/core18
-RUN unsquashfs -d /snap/core18/current core18.snap
+COPY --from=builder /snap/core /snap/core
+COPY --from=builder /snap/core18 /snap/core18
+COPY --from=builder /snap/snapcraft /snap/snapcraft
+COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
 
-# Grab the snapcraft snap from the stable channel and unpack it in the proper
-# place.
-RUN curl -L $(curl -H 'X-Ubuntu-Series: 16' 'https://api.snapcraft.io/api/v1/snaps/details/snapcraft?channel=stable' | jq '.download_url' -r) --output snapcraft.snap
-RUN mkdir -p /snap/snapcraft
-RUN unsquashfs -d /snap/snapcraft/current snapcraft.snap
-
-# Create a snapcraft runner (TODO: move version detection to the core of
-# snapcraft).
-RUN mkdir -p /snap/bin
-RUN echo "#!/bin/sh" > /snap/bin/snapcraft
-RUN snap_version="$(awk '/^version:/{print $2}' /snap/snapcraft/current/meta/snap.yaml)" && echo "export SNAP_VERSION=\"$snap_version\"" >> /snap/bin/snapcraft
-RUN echo 'exec "$SNAP/usr/bin/python3" "$SNAP/bin/snapcraft" "$@"' >> /snap/bin/snapcraft
-RUN chmod +x /snap/bin/snapcraft
-
-# Set the proper environment.
-ENV LANG="en_US.UTF-8"
-ENV LANGUAGE="en_US:en"
-ENV LC_ALL="en_US.UTF-8"
-ENV PATH="/snap/bin:$PATH"
-ENV SNAP="/snap/snapcraft/current"
-ENV SNAP_NAME="snapcraft"
-ENV SNAP_ARCH="amd64"
-
+RUN apt-get update && apt-get install --yes snapd sudo locales && locale-gen en_US.UTF-8
 
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
@@ -114,20 +80,21 @@ ENV XVFB_ARGS="${XARGS}"
 ENV DEVCONTAINER="TRUE"
 
 # Install docker used by go releaser
-RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz && tar --strip-components=1 -xvzf docker-19.03.5.tgz -C /usr/local/bin"
+ENV DOCKER_BUILDKIT=1
+RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-20.10.1.tgz && tar --strip-components=1 -xvzf docker-20.10.1.tgz -C /usr/local/bin"
 
 # Install Go tools
 RUN \
     # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v1.4.1 \
+    go get github.com/go-delve/delve/cmd/dlv@v1.5.1 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.4.1 \
+    && go get golang.org/x/tools/gopls@v0.6.1 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sed 's/tar -/tar --no-same-owner -/g' | sh -s -- -b $(go env GOPATH)/bin \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.33.0 \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.140.1"\
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.149.0"\
     # --> Go rich output for testing with colors
     && go get github.com/kyoh86/richgo@v0.3.3 \
     && rm -rf /go/src/ && rm -rf /go/pkg
@@ -140,3 +107,13 @@ RUN python3 /tmp/get-pip.py
 
 # Install autocompletion for azbrowse
 RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
+
+# Set the proper environment.
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US:en"
+ENV LC_ALL="en_US.UTF-8"
+ENV PATH="/snap/bin:$PATH"
+
+ENV SNAP="/snap/snapcraft/current"
+ENV SNAP_NAME="snapcraft"
+ENV SNAP_ARCH="amd64"
