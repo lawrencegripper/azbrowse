@@ -46,15 +46,6 @@ COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
 
 RUN apt-get update && apt-get install --yes snapd sudo locales && locale-gen en_US.UTF-8
 
-# Set the proper environment.
-ENV LANG="en_US.UTF-8"
-ENV LANGUAGE="en_US:en"
-ENV LC_ALL="en_US.UTF-8"
-ENV PATH="/snap/bin:$PATH"
-ENV SNAP="/snap/snapcraft/current"
-ENV SNAP_NAME="snapcraft"
-ENV SNAP_ARCH="amd64"
-
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -189,5 +180,3 @@ RUN chmod +x /snap/bin/snapcraft
 ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
-
-RUN echo 'export SNAP="/snap/snapcraft/current"' >> "/root/.bashrc"
