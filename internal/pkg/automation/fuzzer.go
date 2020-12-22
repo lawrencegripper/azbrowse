@@ -38,7 +38,7 @@ func assertNavigationCorrect(expandedItem *expanders.TreeNode, resultingNodes []
 
 	// Assert container registry handled correctly
 	if r := regexp.MustCompile(".*/Microsoft.ContainerRegistry/registries/.*"); r.MatchString(expandedItem.ID) && itemIDSegmentLength == 9 {
-		expectedNodesInACR := 13
+		expectedNodesInACR := 5
 		st.Expect(testName("containerRegistry_root_assertExpandNodeCount"), len(resultingNodes), expectedNodesInACR)
 	}
 
