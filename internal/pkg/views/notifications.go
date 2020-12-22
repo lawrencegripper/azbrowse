@@ -251,7 +251,7 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 	}
 
 	v.Clear()
-	v.Title = "Notifications [ESC to clear]"
+	v.Title = "Notifications [" + strings.ToUpper(w.ClearPendingDeletesKeyBinding) + " to clear]"
 	v.Wrap = false
 
 	return w.layoutInternal(v)
@@ -278,6 +278,7 @@ func (w *NotificationWidget) layoutInternal(v io.Writer) error {
 		fmt.Fprintln(v, "Do you want to delete these items?")
 		fmt.Fprintln(v, style.Warning("Press "+strings.ToUpper(w.ConfirmDeleteKeyBinding)+" to DELETE"))
 		fmt.Fprintln(v, style.Highlight("Press "+strings.ToUpper(w.ClearPendingDeletesKeyBinding)+" to CANCEL"))
+		fmt.Fprintln(v, style.Subtle("Tip: You can add multiple items"))
 	}
 
 	return nil
