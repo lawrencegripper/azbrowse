@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -69,23 +70,34 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				}
 			}
 
-			// Set the current message to a non-expired message favor in-progress messages
-			if !widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
-				foundInProgress := false
-				for _, message := range widget.messages {
-					if message.InProgress {
-						foundInProgress = true
-						widget.currentMessage = message
-						break
-					}
+			messages := make([]*eventing.StatusEvent, 0, len(widget.messages))
+			for _, message := range widget.messages {
+				messages = append(messages, message)
+			}
+
+			sort.Slice(messages, func(i, j int) bool {
+				return messages[i].CreatedAt().After(messages[j].CreatedAt())
+			})
+
+			// Find the first message which isn't past it's timeout
+			// and is in progress
+			haveUpdatedMessage := false
+			for _, message := range messages {
+				if message.HasExpired() {
+					continue
+				}
+				if !message.InProgress {
+					continue
 				}
 
-				if !foundInProgress {
-					for _, message := range widget.messages {
-						widget.currentMessage = message
-						break
-					}
-				}
+				widget.currentMessage = message
+				haveUpdatedMessage = true
+				break
+			}
+
+			// If we didn't find one of those pick the most recent message
+			if !haveUpdatedMessage && len(messages) > 0 {
+				widget.currentMessage = messages[0]
 			}
 
 			g.Update(func(gui *gocui.Gui) error {
