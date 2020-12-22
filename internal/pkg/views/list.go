@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
@@ -30,6 +31,9 @@ type ListWidget struct {
 	lastTopIndex         int
 	shouldRender         bool
 	lastCalculatedHeight int
+	// To avoid blocking the "UI" thread opening items is done in a go routine. This lock prevents duplicates.
+	navLock      sync.Mutex
+	isNavigating bool
 }
 
 // ListNavigatedEventState captures the state when raising a `list.navigated` event
@@ -266,6 +270,12 @@ func (w *ListWidget) GoBack() {
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
+	if w.isNavigating {
+		// Skip if a navigation is already in progress
+		return
+	}
+	w.navLock.Lock()
+	w.isNavigating = true
 
 	suppressPreviousTitle := false
 	if w.currentPage != nil && w.currentPage.Title == "Subscriptions" {
@@ -278,14 +288,20 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	eventing.Publish("list.prenavigate", currentItem.ID)
 
-	newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
-	if err != nil { // Don't need to display error as expander emits status event on error
-		// Set parameters to trigger non-successful `list.navigated` event
-		newItems = []*expanders.TreeNode{}
-		newContent = nil
-		newTitle = ""
-	}
-	w.Navigate(newItems, newContent, newTitle, suppressPreviousTitle)
+	go func() {
+		defer func() {
+			w.navLock.Unlock()
+			w.isNavigating = false
+		}()
+		newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
+		if err != nil { // Don't need to display error as expander emits status event on error
+			// Set parameters to trigger non-successful `list.navigated` event
+			newItems = []*expanders.TreeNode{}
+			newContent = nil
+			newTitle = ""
+		}
+		w.Navigate(newItems, newContent, newTitle, suppressPreviousTitle)
+	}()
 }
 
 // Navigate updates the currently selected list nodes, title and details content

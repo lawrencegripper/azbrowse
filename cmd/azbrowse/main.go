@@ -178,25 +178,22 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 
 		done()
 
-		g.Update(func(gui *gocui.Gui) error {
-			g.SetCurrentView("listWidget")
+		g.SetCurrentView("listWidget")
 
-			// Create an empty tentant TreeNode. This by default expands
-			// to show the current tenants subscriptions
-			newContent, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
-				ItemType:  expanders.TentantItemType,
-				ID:        "AvailableSubscriptions",
-				ExpandURL: expanders.ExpandURLNotSupported,
-			})
-
-			if err != nil {
-				panic(err)
-			}
-
-			list.Navigate(newItems, newContent, "Subscriptions", false)
-
-			return nil
+		// Create an empty tentant TreeNode. This by default expands
+		// to show the current tenants subscriptions
+		newContent, newItems, err := expanders.ExpandItem(ctx, &expanders.TreeNode{
+			ItemType:  expanders.TentantItemType,
+			ID:        "AvailableSubscriptions",
+			ExpandURL: expanders.ExpandURLNotSupported,
 		})
+
+		if err != nil {
+			panic(err)
+		}
+
+		list.Navigate(newItems, newContent, "Subscriptions", false)
+
 	}()
 }
 

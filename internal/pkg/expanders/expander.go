@@ -66,7 +66,6 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 	timeout := time.After(time.Second * 45)
 	var newContent ExpanderResponse
 
-	observedError := false
 	for index := 0; index < handlerExpanding; index++ {
 		select {
 		case done := <-completedExpands:
@@ -79,7 +78,6 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 					Message: "Expander '" + result.SourceDescription + "' failed on resource: " + currentItem.ID + "Err: " + result.Err.Error(),
 					Timeout: time.Duration(time.Second * 15),
 				})
-				observedError = true
 			}
 			if result.IsPrimaryResponse {
 				if hasPrimaryResponse {
@@ -118,16 +116,12 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 		result := GetDefaultExpander().Expand(ctx, currentItem)
 		if result.Err != nil {
 			eventing.SendStatusEvent(&eventing.StatusEvent{
-				InProgress: true,
-				Message:    "Failed to expand resource: " + result.Err.Error(),
-				Timeout:    time.Duration(time.Second * 3),
+				Failure: true,
+				Message: "Failed to expand resource: " + result.Err.Error(),
+				Timeout: time.Duration(time.Second * 15),
 			})
 		}
 		newContent = result.Response
-	}
-
-	if !observedError {
-		done()
 	}
 
 	return &newContent, newItems, nil
