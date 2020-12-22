@@ -200,12 +200,14 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 		defer errorhandling.RecoveryWithCleanup()
 
 		for {
+			changesMade := false
 			// Wait for a second to see if we have any new messages
 			timeout := time.After(time.Second)
 			select {
 			case eventObjRaw := <-newEvents:
 				eventObj := eventObjRaw.(*eventing.StatusEvent)
 				if eventObj.IsToast {
+					changesMade = true
 					widget.toastNotifications[eventObj.ID()] = eventObj
 				}
 			case <-timeout:
@@ -213,13 +215,17 @@ func NewNotificationWidget(x, y, w int, g *gocui.Gui, client *armclient.Client) 
 			}
 			for ID, toast := range widget.toastNotifications {
 				if toast.HasExpired() {
+					changesMade = true
 					delete(widget.toastNotifications, ID)
 				}
 			}
 
-			g.Update(func(gui *gocui.Gui) error {
-				return nil
-			})
+			if changesMade {
+				// Force the UI to redraw
+				g.Update(func(gui *gocui.Gui) error {
+					return nil
+				})
+			}
 		}
 	}()
 

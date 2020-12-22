@@ -2,6 +2,7 @@ package views
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -43,6 +44,8 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 		defer errorhandling.RecoveryWithCleanup()
 
 		for {
+			// Track if we need to redraw UI
+			changesMade := false
 			// Wait for a second to see if we have any new messages
 			timeout := time.After(time.Second)
 			select {
@@ -69,33 +72,51 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				}
 			}
 
-			// Set the current message to a non-expired message favor in-progress messages
-			if !widget.currentMessage.HasExpired() || !widget.currentMessage.InProgress {
-				foundInProgress := false
-				for _, message := range widget.messages {
-					if message.InProgress {
-						foundInProgress = true
-						widget.currentMessage = message
-						break
-					}
-				}
-
-				if !foundInProgress {
-					for _, message := range widget.messages {
-						widget.currentMessage = message
-						break
-					}
-				}
+			messages := make([]*eventing.StatusEvent, 0, len(widget.messages))
+			for _, message := range widget.messages {
+				messages = append(messages, message)
 			}
 
-			g.Update(func(gui *gocui.Gui) error {
-				if widget.currentMessage.InProgress {
-					widget.messageAddition = widget.messageAddition + "."
-				} else {
-					widget.messageAddition = ""
-				}
-				return nil
+			sort.Slice(messages, func(i, j int) bool {
+				return messages[i].CreatedAt().After(messages[j].CreatedAt())
 			})
+
+			// Find the first message which isn't past it's timeout
+			// and is in progress
+			haveUpdatedMessage := false
+			for _, message := range messages {
+				if message.HasExpired() {
+					continue
+				}
+				if !message.InProgress {
+					continue
+				}
+
+				widget.currentMessage = message
+				widget.messageAddition = ""
+				haveUpdatedMessage = true
+				changesMade = true
+				break
+			}
+
+			// If we didn't find one of those pick the most recent message
+			if !haveUpdatedMessage && len(messages) > 0 && widget.currentMessage != messages[0] {
+				widget.currentMessage = messages[0]
+				widget.messageAddition = ""
+				changesMade = true
+			}
+
+			if widget.currentMessage.InProgress {
+				widget.messageAddition = widget.messageAddition + "."
+				changesMade = true
+			}
+
+			// If we're made some changes redraw the UI
+			if changesMade {
+				g.Update(func(gui *gocui.Gui) error {
+					return nil
+				})
+			}
 		}
 	}()
 	return widget
