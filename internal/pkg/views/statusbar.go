@@ -44,6 +44,8 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 		defer errorhandling.RecoveryWithCleanup()
 
 		for {
+			// Track if we need to redraw UI
+			changesMade := false
 			// Wait for a second to see if we have any new messages
 			timeout := time.After(time.Second)
 			select {
@@ -91,23 +93,30 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				}
 
 				widget.currentMessage = message
+				widget.messageAddition = ""
 				haveUpdatedMessage = true
+				changesMade = true
 				break
 			}
 
 			// If we didn't find one of those pick the most recent message
-			if !haveUpdatedMessage && len(messages) > 0 {
+			if !haveUpdatedMessage && len(messages) > 0 && widget.currentMessage != messages[0] {
 				widget.currentMessage = messages[0]
+				widget.messageAddition = ""
+				changesMade = true
 			}
 
-			g.Update(func(gui *gocui.Gui) error {
-				if widget.currentMessage.InProgress {
-					widget.messageAddition = widget.messageAddition + "."
-				} else {
-					widget.messageAddition = ""
-				}
-				return nil
-			})
+			if widget.currentMessage.InProgress {
+				widget.messageAddition = widget.messageAddition + "."
+				changesMade = true
+			}
+
+			// If we're made some changes redraw the UI
+			if changesMade {
+				g.Update(func(gui *gocui.Gui) error {
+					return nil
+				})
+			}
 		}
 	}()
 	return widget
