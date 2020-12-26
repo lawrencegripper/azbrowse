@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Capacity/preview/2019-07-19/quota.json", "Microsoft.Capacity/preview/2019-04-01/reservations.json"], "name": "package-preview-2019-07-19"}
+{"input_files": ["Microsoft.Capacity/stable/2017-11-01/reservations.json", "Microsoft.Capacity/stable/2020-10-25/quota.json"], "name": "package-2020-10-25"}

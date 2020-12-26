@@ -101,10 +101,6 @@ RUN \
 
 RUN echo "alias go=richgo" >> "/root/.bashrc"
 
-# Install pip
-COPY get-pip.py /tmp/get-pip.py
-RUN python3 /tmp/get-pip.py
-
 # Install autocompletion for azbrowse
 RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
 

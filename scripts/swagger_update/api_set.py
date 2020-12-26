@@ -202,8 +202,12 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
                 resource_provider_target,
                 api_version_folder + "/definitions",
             )
+
+            # find 'common.json' or ... 'Common.json'
             if os.path.exists(resource_provider_source + "/" + api_version_folder + "/common.json"):
                 file_helper.copy_file_ensure_paths(resource_provider_source, resource_provider_target, api_version_folder + "/common.json")
+            elif os.path.exists(resource_provider_source + "/" + api_version_folder + "/Common.json"):
+                file_helper.copy_file_ensure_paths(resource_provider_source, resource_provider_target, api_version_folder + "/Common.json")
 
         # Copy the files defined in the api version
         for file in api_version.get_input_files():
