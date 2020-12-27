@@ -79,16 +79,16 @@ class ApiSet:
         return self.api_version
 
 class ApiVersion:
-    def __init__(self, name, input_files, additional_include_paths):
+    def __init__(self, name, input_files, addition_input_file_paths):
         self.name = name
         self.input_files = input_files
-        self.additional_include_paths = additional_include_paths
+        self.addition_input_file_paths = addition_input_file_paths
 
     def get_name(self):
         return self.name
 
     def get_input_files(self):
-        return self.input_files + self.additional_include_paths
+        return self.input_files + self.addition_input_file_paths
 
     def to_json(self):
         return json.dumps(self.__dict__, ensure_ascii=False, sort_keys=True)
@@ -107,7 +107,7 @@ def get_api_version_tag(resource_provider_name, readme_contents, overrides):
     return tag
 
 
-def find_api_version(resource_provider_name, readme_contents, version_tag, include_additions):
+def find_api_version(resource_provider_name, readme_contents, version_tag, input_file_additions):
     code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 
     # Regex to match:   ```yaml $(tag) == 'the-version-tag`
@@ -129,17 +129,17 @@ def find_api_version(resource_provider_name, readme_contents, version_tag, inclu
     if yaml_data != None:
         input_files = [file.replace("\\", "/") for file in yaml_data["input-file"]]
     
-    additional_file_paths = get_additional_files_for_version(include_additions, resource_provider_name, version_tag)
+    additional_input_file_paths = get_additional_files_for_version(input_file_additions, resource_provider_name, version_tag)
     api_version = ApiVersion(
         version_tag, 
         input_files, 
-        additional_file_paths
+        additional_input_file_paths
     )
     
     return api_version
 
 
-def get_api_version_from_readme(resource_provider_name, readme_path, version_overrides, include_additions):
+def get_api_version_from_readme(resource_provider_name, readme_path, version_overrides, input_file_additions):
     if not os.path.isfile(readme_path):
         return None
     print("==> Opening: " + readme_path)
@@ -151,7 +151,7 @@ def get_api_version_from_readme(resource_provider_name, readme_path, version_ove
         print("==> no version tag found in readme: " + readme_path)
         return None
 
-    api_version = find_api_version(resource_provider_name, contents, version_tag, include_additions)
+    api_version = find_api_version(resource_provider_name, contents, version_tag, input_file_additions)
     return api_version
 
 def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
@@ -225,8 +225,8 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
         with open(api_set_filename, "w") as f:
             f.write(api_version.to_json())
 
-def get_api_set_for_folder(spec_folder, api_folder, resource_provider_name, version_overrides, include_additions):
-    api_version = get_api_version_from_readme(resource_provider_name, api_folder + "/readme.md", version_overrides, include_additions)
+def get_api_set_for_folder(spec_folder, api_folder, resource_provider_name, version_overrides, input_file_additions):
+    api_version = get_api_version_from_readme(resource_provider_name, api_folder + "/readme.md", version_overrides, input_file_additions)
     if api_version == None:
         return None
     spec_relative_folder = api_folder[len(spec_folder) + 1 :]
@@ -238,16 +238,16 @@ def get_api_set_for_folder(spec_folder, api_folder, resource_provider_name, vers
     )
     return api_set
 
-def get_additional_files_for_version(include_additions, resource_provider_name, api_version):
+def get_additional_files_for_version(input_file_additions, resource_provider_name, api_version):
     files_to_add = []
     try:
-        files_to_add = include_additions[resource_provider_name][api_version]
+        files_to_add = input_file_additions[resource_provider_name][api_version]
     except KeyError:
         pass
     return files_to_add
 
 
-def get_api_sets(spec_folder, version_overrides, include_additions):
+def get_api_sets(spec_folder, version_overrides, input_file_additions):
     rp_folders = sorted([f.path for f in os.scandir(spec_folder) if f.is_dir()])
     api_sets = []
     for folder in rp_folders:
@@ -263,7 +263,7 @@ def get_api_sets(spec_folder, version_overrides, include_additions):
             if not os.path.exists(qualified_api_type_folder):
                 continue
             
-            api_set = get_api_set_for_folder(spec_folder, qualified_api_type_folder, resource_provider_name, version_overrides, include_additions)
+            api_set = get_api_set_for_folder(spec_folder, qualified_api_type_folder, resource_provider_name, version_overrides, input_file_additions)
             if api_set != None:
                 api_sets.append(api_set)
                 got_api_set = True
@@ -276,7 +276,7 @@ def get_api_sets(spec_folder, version_overrides, include_additions):
                 sub_folders = [f.path for f in os.scandir(qualified_api_type_folder) if f.is_dir()]
                 for sub_folder in sub_folders:
                     print(sub_folder)
-                    api_set = get_api_set_for_folder(spec_folder, sub_folder, resource_provider_name, version_overrides, include_additions)
+                    api_set = get_api_set_for_folder(spec_folder, sub_folder, resource_provider_name, version_overrides, input_file_additions)
                     if api_set != None:
                         print("got api_set")
                         api_sets.append(api_set)
