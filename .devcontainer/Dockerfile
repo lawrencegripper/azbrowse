@@ -113,3 +113,6 @@ ENV PATH="/snap/bin:$PATH"
 ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
+
+# Install python deps for deving
+RUN pip3 install rope black
