@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.ManagedIdentity/stable/2018-11-30/ManagedIdentity.json"], "name": "package-2018-11-30"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ManagedIdentity/stable/2018-11-30/ManagedIdentity.json"], "name": "package-2018-11-30"}

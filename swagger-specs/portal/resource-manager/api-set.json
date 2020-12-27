@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Portal/preview/2019-01-01-preview/portal.json"], "name": "package-2019-01-01-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Portal/preview/2020-09-01-preview/portal.json", "Microsoft.Portal/preview/2020-09-01-preview/tenantConfiguration.json"], "name": "package-2020-09-01-preview"}

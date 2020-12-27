@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.TimeSeriesInsights/preview/2018-08-15-preview/timeseriesinsights.json"], "name": "package-2018-08-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.TimeSeriesInsights/stable/2020-05-15/timeseriesinsights.json"], "name": "package-2020-05-15"}

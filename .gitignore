@@ -11,3 +11,5 @@ scripts/swagger_update/__pycache__
 snap.login*
 .pytest_cache
 __debug_bin
+.vscode/.ropeproject/config.py
+.vscode/.ropeproject/objectdb

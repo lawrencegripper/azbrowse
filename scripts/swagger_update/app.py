@@ -17,6 +17,19 @@ if __name__ == "__main__":
         # frontdoor 2019-05 references 2019-03-01/network.json which is not listed in the input files
         # frontdoor 2019-04 references 2019-03-01/network.json which is not listed in the input files
         "frontdoor" : "",
+        # azureactivedirectory 2020-07-01-preview references files from 2020-03-01-preview which are not listed in the input files
+        "azureactivedirectory": "package-2020-03-01-preview",
+        # ./azsadmin seems very broken, lots of references to files cross versions
+        "azsadmin": "",
+    }
+
+    # This allows you to augment the included files for each README.MD for a specific tag
+    # this is useful when files which are needed are incorrectly left out of the 'input-file'
+    resource_provider_input_file_additions = {
+        # storage package-2019-06 references privatelinks.json which is not listed in the input files
+        "storage": { 
+            "package-2019-06": ["./Microsoft.Storage/stable/2019-06-01/privatelinks.json"] 
+        }
     }
 
     print(
@@ -40,7 +53,8 @@ if __name__ == "__main__":
     print("Discovering api-sets:")
     api_sets = api_set.get_api_sets(
         "./swagger-temp/azure-rest-api-specs/specification", 
-        resource_provider_version_overrides
+        resource_provider_version_overrides,
+        resource_provider_input_file_additions
     )
 
     print(

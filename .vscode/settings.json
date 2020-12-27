@@ -17,5 +17,8 @@
         "showGlobalVariables": true
     },
     "python.pythonPath": "/usr/bin/python3",
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    // This allows VSCode to handle import correctly by adding ./scripts/swagger_update to the 
+    // path searched for local modules
+    "python.envFile": "${workspaceFolder}/scripts/swagger_update/setpythonpath.env"
 }
