@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Cdn/stable/2020-09-01/cdn.json", "Microsoft.Cdn/stable/2020-09-01/afdx.json", "Microsoft.Cdn/stable/2020-09-01/cdnwebapplicationfirewall.json"], "name": "package-2020-09"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Cdn/stable/2020-09-01/cdn.json", "Microsoft.Cdn/stable/2020-09-01/afdx.json", "Microsoft.Cdn/stable/2020-09-01/cdnwebapplicationfirewall.json"], "name": "package-2020-09"}

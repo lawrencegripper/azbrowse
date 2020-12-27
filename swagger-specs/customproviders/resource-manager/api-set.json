@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.CustomProviders/preview/2018-09-01-preview/customproviders.json"], "name": "package-2018-09-01-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.CustomProviders/preview/2018-09-01-preview/customproviders.json"], "name": "package-2018-09-01-preview"}

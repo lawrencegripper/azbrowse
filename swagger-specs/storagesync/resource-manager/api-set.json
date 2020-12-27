@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.StorageSync/preview/2020-09-01/storagesync.json"], "name": "package-preview-2020-09-01"}
+{"additional_include_paths": [], "input_files": ["Microsoft.StorageSync/preview/2020-09-01/storagesync.json"], "name": "package-preview-2020-09-01"}

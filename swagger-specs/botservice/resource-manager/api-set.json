@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.BotService/stable/2020-06-02/botservice.json"], "name": "package-2020-06-02"}
+{"additional_include_paths": [], "input_files": ["Microsoft.BotService/stable/2020-06-02/botservice.json"], "name": "package-2020-06-02"}

@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.NotificationHubs/stable/2017-04-01/notificationhubs.json"], "name": "package-2017-04"}
+{"additional_include_paths": [], "input_files": ["Microsoft.NotificationHubs/stable/2017-04-01/notificationhubs.json"], "name": "package-2017-04"}

@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.ContainerRegistry/preview/2019-08-15/containerregistry.json"], "name": "package-2019-08"}
+{"additional_include_paths": [], "input_files": ["Microsoft.ContainerRegistry/preview/2019-08-15/containerregistry.json"], "name": "package-2019-08"}

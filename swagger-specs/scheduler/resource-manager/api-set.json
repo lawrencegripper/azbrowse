@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Scheduler/stable/2016-03-01/scheduler.json"], "name": "package-2016-03"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Scheduler/stable/2016-03-01/scheduler.json"], "name": "package-2016-03"}

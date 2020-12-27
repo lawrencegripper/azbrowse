@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.ContainerService/stable/2020-12-01/managedClusters.json"], "name": "package-2020-12"}
+{"additional_include_paths": [], "input_files": ["Microsoft.ContainerService/stable/2020-12-01/managedClusters.json"], "name": "package-2020-12"}

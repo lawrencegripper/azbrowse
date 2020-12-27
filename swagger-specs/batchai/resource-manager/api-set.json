@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.BatchAI/stable/2018-05-01/BatchAI.json"], "name": "package-2018-05"}
+{"additional_include_paths": [], "input_files": ["Microsoft.BatchAI/stable/2018-05-01/BatchAI.json"], "name": "package-2018-05"}

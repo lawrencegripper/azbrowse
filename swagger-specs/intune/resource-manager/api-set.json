@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Intune/preview/2015-01-14-preview/intune.json"], "name": "package-2015-01-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Intune/preview/2015-01-14-preview/intune.json"], "name": "package-2015-01-preview"}

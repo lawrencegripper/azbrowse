@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Cache/preview/2020-10-01-preview/redisenterprise.json"], "name": "package-2020-10-01-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Cache/preview/2020-10-01-preview/redisenterprise.json"], "name": "package-2020-10-01-preview"}

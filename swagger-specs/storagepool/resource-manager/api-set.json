@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.StoragePool/preview/2020-03-15-preview/storagepool.json"], "name": "package-2020-03-15-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.StoragePool/preview/2020-03-15-preview/storagepool.json"], "name": "package-2020-03-15-preview"}

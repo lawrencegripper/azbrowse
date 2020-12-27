@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Maintenance/preview/2020-07-01-preview/Maintenance.json"], "name": "package-preview-2020-07"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Maintenance/preview/2020-07-01-preview/Maintenance.json"], "name": "package-preview-2020-07"}

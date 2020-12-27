@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.AppPlatform/preview/2020-11-01-preview/appplatform.json"], "name": "package-preview-2020-11"}
+{"additional_include_paths": [], "input_files": ["Microsoft.AppPlatform/preview/2020-11-01-preview/appplatform.json"], "name": "package-preview-2020-11"}

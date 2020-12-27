@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.AppConfiguration/preview/2020-07-01-preview/appconfiguration.json"], "name": "package-2020-07-01-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.AppConfiguration/preview/2020-07-01-preview/appconfiguration.json"], "name": "package-2020-07-01-preview"}

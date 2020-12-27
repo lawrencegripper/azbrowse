@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.OperationalInsights/stable/v1/OperationalInsights.json"], "name": "v1"}
+{"additional_include_paths": [], "input_files": ["Microsoft.OperationalInsights/stable/v1/OperationalInsights.json"], "name": "v1"}

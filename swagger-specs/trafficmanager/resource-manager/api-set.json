@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Network/stable/2018-04-01/trafficmanager.json"], "name": "package-2018-04"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Network/stable/2018-04-01/trafficmanager.json"], "name": "package-2018-04"}

@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.ManagementPartner/preview/2018-02-01/ManagementPartner.json"], "name": "package-2018-02"}
+{"additional_include_paths": [], "input_files": ["Microsoft.ManagementPartner/preview/2018-02-01/ManagementPartner.json"], "name": "package-2018-02"}

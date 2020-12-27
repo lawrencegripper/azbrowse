@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.DevTestLab/stable/2018-09-15/DTL.json"], "name": "package-2018-09"}
+{"additional_include_paths": [], "input_files": ["Microsoft.DevTestLab/stable/2018-09-15/DTL.json"], "name": "package-2018-09"}

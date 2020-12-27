@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.IoTCentral/stable/2018-09-01/iotcentral.json"], "name": "package-2018-09-01"}
+{"additional_include_paths": [], "input_files": ["Microsoft.IoTCentral/stable/2018-09-01/iotcentral.json"], "name": "package-2018-09-01"}

@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Maps/preview/2020-02-01-preview/maps-management.json"], "name": "package-preview-2020-02"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Maps/preview/2020-02-01-preview/maps-management.json"], "name": "package-preview-2020-02"}

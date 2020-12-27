@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.CostManagement/stable/2020-06-01/costmanagement.json", "Microsoft.CostManagement/stable/2020-06-01/costmanagement.exports.json"], "name": "package-2020-06"}
+{"additional_include_paths": [], "input_files": ["Microsoft.CostManagement/stable/2020-06-01/costmanagement.json", "Microsoft.CostManagement/stable/2020-06-01/costmanagement.exports.json"], "name": "package-2020-06"}

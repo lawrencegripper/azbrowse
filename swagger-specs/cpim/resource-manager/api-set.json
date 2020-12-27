@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.AzureActiveDirectory/preview/2020-05-01-preview/cpim.json"], "name": "package-2020-05-01-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.AzureActiveDirectory/preview/2020-05-01-preview/cpim.json"], "name": "package-2020-05-01-preview"}

@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.HDInsight/preview/2018-11-01-preview/job.json", "Microsoft.HDInsight/preview/2018-11-01-preview/livySpark.json"], "name": "package-2018-11-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.HDInsight/preview/2018-11-01-preview/job.json", "Microsoft.HDInsight/preview/2018-11-01-preview/livySpark.json"], "name": "package-2018-11-preview"}

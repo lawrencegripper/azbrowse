@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.CustomerLockbox/preview/2018-02-28-preview/customerlockbox.json"], "name": "package-2018-02-28-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.CustomerLockbox/preview/2018-02-28-preview/customerlockbox.json"], "name": "package-2018-02-28-preview"}

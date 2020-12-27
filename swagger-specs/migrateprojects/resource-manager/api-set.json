@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.Migrate/preview/2018-09-01-preview/migrate.json"], "name": "package-2018-09"}
+{"additional_include_paths": [], "input_files": ["Microsoft.Migrate/preview/2018-09-01-preview/migrate.json"], "name": "package-2018-09"}

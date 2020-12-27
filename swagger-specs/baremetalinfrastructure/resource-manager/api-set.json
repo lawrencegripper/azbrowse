@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.BareMetalInfrastructure/preview/2020-08-06-preview/baremetalinfrastructure.json"], "name": "package-2020-08-06-preview"}
+{"additional_include_paths": [], "input_files": ["Microsoft.BareMetalInfrastructure/preview/2020-08-06-preview/baremetalinfrastructure.json"], "name": "package-2020-08-06-preview"}

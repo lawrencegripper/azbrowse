@@ -1,1 +1,1 @@
-{"input_files": ["Microsoft.ResourceGraph/preview/2020-04-01-preview/resourcegraph.json"], "name": "package-preview-2020-04"}
+{"additional_include_paths": [], "input_files": ["Microsoft.ResourceGraph/preview/2020-04-01-preview/resourcegraph.json"], "name": "package-preview-2020-04"}
