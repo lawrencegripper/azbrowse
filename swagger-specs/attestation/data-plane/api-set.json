@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.Attestation/stable/2018-09-01-preview/attestation.json"], "name": "package-2018-09-01"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Attestation/stable/2018-09-01-preview/attestation.json"], "name": "package-2018-09-01"}

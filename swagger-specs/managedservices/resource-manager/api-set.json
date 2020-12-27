@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.ManagedServices/preview/2020-02-01-preview/managedservices.json"], "name": "package-2020-02-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ManagedServices/preview/2020-02-01-preview/managedservices.json"], "name": "package-2020-02-preview"}

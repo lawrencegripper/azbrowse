@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.VirtualMachineImages/stable/2020-02-14/imagebuilder.json"], "name": "package-2020-02"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.VirtualMachineImages/stable/2020-02-14/imagebuilder.json"], "name": "package-2020-02"}

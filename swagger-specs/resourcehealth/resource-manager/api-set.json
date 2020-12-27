@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.ResourceHealth/stable/2017-07-01/resourcehealth.json"], "name": "package-2017-07"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ResourceHealth/stable/2017-07-01/resourcehealth.json"], "name": "package-2017-07"}

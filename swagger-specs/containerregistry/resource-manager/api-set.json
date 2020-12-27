@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.ContainerRegistry/preview/2020-11-01-preview/containerregistry.json", "Microsoft.ContainerRegistry/preview/2019-06-01-preview/containerregistry_build.json"], "name": "package-2020-11-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ContainerRegistry/preview/2020-11-01-preview/containerregistry.json", "Microsoft.ContainerRegistry/preview/2019-06-01-preview/containerregistry_build.json"], "name": "package-2020-11-preview"}

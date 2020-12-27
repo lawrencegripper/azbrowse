@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.Subscription/stable/2016-06-01/subscriptions.json", "Microsoft.Subscription/stable/2020-09-01/subscriptions.json"], "name": "package-2020-09"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Subscription/stable/2016-06-01/subscriptions.json", "Microsoft.Subscription/stable/2020-09-01/subscriptions.json"], "name": "package-2020-09"}

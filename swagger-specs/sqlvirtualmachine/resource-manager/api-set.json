@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.SqlVirtualMachine/preview/2017-03-01-preview/sqlvm.json"], "name": "package-2017-03-01-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.SqlVirtualMachine/preview/2017-03-01-preview/sqlvm.json"], "name": "package-2017-03-01-preview"}

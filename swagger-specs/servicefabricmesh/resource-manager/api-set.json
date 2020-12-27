@@ -1,1 +1,1 @@
-{"additional_include_paths": [], "input_files": ["Microsoft.ServiceFabricMesh/preview/2018-09-01-preview/servicefabricmesh.json"], "name": "package-2018-09-01-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ServiceFabricMesh/preview/2018-09-01-preview/servicefabricmesh.json"], "name": "package-2018-09-01-preview"}
