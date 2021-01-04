@@ -34,7 +34,7 @@ func (e *DefaultExpander) Name() string {
 
 // DoesExpand checks if this handler can expand this item
 func (e *DefaultExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ExpandURL == ExpandURLNotSupported || currentItem.Metadata["SuppressGenericExpand"] == "true" {
+	if currentItem.ExpandURL == ExpandURLNotSupported || currentItem.SuppressGenericExpand {
 		return false, nil
 	}
 	return true, nil

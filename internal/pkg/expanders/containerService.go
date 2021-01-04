@@ -90,17 +90,17 @@ func (e *AzureKubernetesServiceExpander) Expand(ctx context.Context, currentItem
 		swaggerResourceType.Endpoint.TemplateURL == clusterTemplateURL {
 		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
-			ID:        currentItem.ID + "/<k8sapi>",
-			Parentid:  currentItem.ID,
-			Namespace: "AzureKubernetesService",
-			Name:      "Kubernetes API",
-			Display:   "Kubernetes API",
-			ItemType:  SubResourceType,
-			ExpandURL: ExpandURLNotSupported,
+			ID:                    currentItem.ID + "/<k8sapi>",
+			Parentid:              currentItem.ID,
+			Namespace:             "AzureKubernetesService",
+			Name:                  "Kubernetes API",
+			Display:               "Kubernetes API",
+			ItemType:              SubResourceType,
+			ExpandURL:             ExpandURLNotSupported,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"ClusterID":             currentItem.ID, // save full URL to registry
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
+				"ClusterID": currentItem.ID, // save full URL to registry
 			},
 		})
 

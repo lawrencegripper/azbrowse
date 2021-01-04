@@ -71,18 +71,18 @@ func (e *AppInsightsExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		}
 
 		newItems = append(newItems, &TreeNode{
-			Parentid:  currentItem.ID,
-			ID:        currentItem.ID + "/analyticsItems",
-			Namespace: "AppInsights",
-			Name:      "Analytics Items",
-			Display:   "Analytics Items",
-			ItemType:  "AppInsights.AnalyticsItems",
-			ExpandURL: currentItem.ID + "/analyticsItems?api-version=" + resourceAPIVersion,
+			Parentid:              currentItem.ID,
+			ID:                    currentItem.ID + "/analyticsItems",
+			Namespace:             "AppInsights",
+			Name:                  "Analytics Items",
+			Display:               "Analytics Items",
+			ItemType:              "AppInsights.AnalyticsItems",
+			ExpandURL:             currentItem.ID + "/analyticsItems?api-version=" + resourceAPIVersion,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
-				"ResourceAPIVersion":    resourceAPIVersion,
-				"AppInsightsID":         currentItem.ID,
+				"ResourceAPIVersion": resourceAPIVersion,
+				"AppInsightsID":      currentItem.ID,
 			},
 		})
 

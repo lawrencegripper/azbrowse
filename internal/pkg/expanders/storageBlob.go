@@ -125,31 +125,31 @@ func (e *StorageBlobExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}" {
 		newItems := []*TreeNode{
 			{
-				Parentid:  currentItem.ID,
-				ID:        currentItem.ID + "/<blobs>",
-				Namespace: "storageBlob",
-				Name:      "Blob Metadata",
-				Display:   "Blob Metadata",
-				ItemType:  storageBlobNodeListBlobMetadata,
-				ExpandURL: ExpandURLNotSupported,
+				Parentid:              currentItem.ID,
+				ID:                    currentItem.ID + "/<blobs>",
+				Namespace:             "storageBlob",
+				Name:                  "Blob Metadata",
+				Display:               "Blob Metadata",
+				ItemType:              storageBlobNodeListBlobMetadata,
+				ExpandURL:             ExpandURLNotSupported,
+				SuppressSwaggerExpand: true,
+				SuppressGenericExpand: true,
 				Metadata: map[string]string{
-					"ContainerID":           currentItem.ExpandURL, // save resourceID of blob
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
+					"ContainerID": currentItem.ExpandURL, // save resourceID of blob
 				},
 			},
 			{
-				Parentid:  currentItem.ID,
-				ID:        currentItem.ID + "/<blobs>",
-				Namespace: "storageBlob",
-				Name:      "Blobs",
-				Display:   "Blobs",
-				ItemType:  storageBlobNodeListBlob,
-				ExpandURL: ExpandURLNotSupported,
+				Parentid:              currentItem.ID,
+				ID:                    currentItem.ID + "/<blobs>",
+				Namespace:             "storageBlob",
+				Name:                  "Blobs",
+				Display:               "Blobs",
+				ItemType:              storageBlobNodeListBlob,
+				ExpandURL:             ExpandURLNotSupported,
+				SuppressSwaggerExpand: true,
+				SuppressGenericExpand: true,
 				Metadata: map[string]string{
-					"ContainerID":           currentItem.ExpandURL, // save resourceID of blob
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
+					"ContainerID": currentItem.ExpandURL, // save resourceID of blob
 				},
 			},
 		}

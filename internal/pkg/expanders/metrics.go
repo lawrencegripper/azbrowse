@@ -98,12 +98,12 @@ func (e *MetricsExpander) expandMetricNamespace(ctx context.Context, currentItem
 			ExpandURL: currentItem.ID + "/providers/microsoft.insights/metricdefinitions?" +
 				"metricNamespace=" + url.QueryEscape(metricNamespace.Properties.MetricNamespaceName) +
 				"&api-version=2018-01-01",
-			ItemType:       "metrics.metricdefinition",
-			SubscriptionID: currentItem.SubscriptionID,
+			ItemType:              "metrics.metricdefinition",
+			SubscriptionID:        currentItem.SubscriptionID,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
-				"ResourceID":            currentItem.ID,
+				"ResourceID": currentItem.ID,
 			},
 		})
 	}
@@ -148,13 +148,13 @@ func (e *MetricsExpander) expandMetricDefinition(ctx context.Context, currentIte
 				url.QueryEscape(metric.PrimaryAggregationType) +
 				"&metricNamespace=" + url.QueryEscape(metric.Namespace) +
 				"&autoadjusttimegrain=true&validatedimensions=false&api-version=2018-01-01",
-			ItemType:       "metrics.graph",
-			SubscriptionID: currentItem.SubscriptionID,
+			ItemType:              "metrics.graph",
+			SubscriptionID:        currentItem.SubscriptionID,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
-				"AggregationType":       strings.ToLower(metric.PrimaryAggregationType),
-				"Units":                 strings.ToLower(metric.Unit),
+				"AggregationType": strings.ToLower(metric.PrimaryAggregationType),
+				"Units":           strings.ToLower(metric.Unit),
 			},
 		})
 	}

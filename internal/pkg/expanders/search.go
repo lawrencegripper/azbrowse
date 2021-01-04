@@ -56,17 +56,17 @@ func (e *AzureSearchServiceExpander) Expand(ctx context.Context, currentItem *Tr
 		swaggerResourceType.Endpoint.TemplateURL == azureSearchTemplateURL {
 		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
-			ID:        currentItem.ID + "/<service>",
-			Parentid:  currentItem.ID,
-			Namespace: "AzureSearchServiceExpander",
-			Name:      "Search Service",
-			Display:   "Search Service",
-			ItemType:  SubResourceType,
-			ExpandURL: ExpandURLNotSupported,
+			ID:                    currentItem.ID + "/<service>",
+			Parentid:              currentItem.ID,
+			Namespace:             "AzureSearchServiceExpander",
+			Name:                  "Search Service",
+			Display:               "Search Service",
+			ItemType:              SubResourceType,
+			ExpandURL:             ExpandURLNotSupported,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"SearchID":              currentItem.ID,
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
+				"SearchID": currentItem.ID,
 			},
 		})
 

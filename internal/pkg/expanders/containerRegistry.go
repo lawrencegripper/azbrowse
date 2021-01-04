@@ -69,17 +69,17 @@ func (e *ContainerRegistryExpander) Expand(ctx context.Context, currentItem *Tre
 		swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerRegistry/registries/{registryName}" {
 		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
-			Parentid:  currentItem.ID,
-			ID:        currentItem.ID + "/<repositories>",
-			Namespace: "containerRegistry",
-			Name:      "Repositories",
-			Display:   "Repositories",
-			ItemType:  SubResourceType,
-			ExpandURL: ExpandURLNotSupported,
+			Parentid:              currentItem.ID,
+			ID:                    currentItem.ID + "/<repositories>",
+			Namespace:             "containerRegistry",
+			Name:                  "Repositories",
+			Display:               "Repositories",
+			ItemType:              SubResourceType,
+			ExpandURL:             ExpandURLNotSupported,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"RegistryID":            currentItem.ExpandURL, // save full URL to registry
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
+				"RegistryID": currentItem.ExpandURL, // save full URL to registry
 			},
 		})
 
@@ -163,18 +163,18 @@ func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, curr
 		},
 		func(currentItem *TreeNode, lastItem string) *TreeNode {
 			return &TreeNode{
-				Parentid:  currentItem.ID,
-				ID:        currentItem.ID + "/<more>",
-				Namespace: "containerRegistry",
-				Name:      "more...",
-				Display:   "more...",
-				ItemType:  SubResourceType,
-				ExpandURL: ExpandURLNotSupported,
+				Parentid:              currentItem.ID,
+				ID:                    currentItem.ID + "/<more>",
+				Namespace:             "containerRegistry",
+				Name:                  "more...",
+				Display:               "more...",
+				ItemType:              SubResourceType,
+				ExpandURL:             ExpandURLNotSupported,
+				SuppressSwaggerExpand: true,
+				SuppressGenericExpand: true,
 				Metadata: map[string]string{
-					"RegistryID":            registryID,
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
-					"lastItem":              lastItem,
+					"RegistryID": registryID,
+					"lastItem":   lastItem,
 				},
 			}
 		})
