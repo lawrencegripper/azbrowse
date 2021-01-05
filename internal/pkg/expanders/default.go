@@ -152,6 +152,19 @@ func (e *DefaultExpander) ListActions(ctx context.Context, item *TreeNode) ListA
 	}
 }
 
+// ExecuteAction executes an action returned from ListActions
+func (e *DefaultExpander) ExecuteAction(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	method := "POST"
+	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
+
+	return ExpanderResult{
+		Err:               err,
+		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		SourceDescription: "Resource Group Request",
+		IsPrimaryResponse: true,
+	}
+}
+
 func (e *DefaultExpander) testCases() (bool, *[]expanderTestCase) {
 	const testPath = "subscriptions/thing"
 	itemToExpand := &TreeNode{
