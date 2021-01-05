@@ -81,8 +81,10 @@ type ExpanderResult struct {
 
 // ListActionsResult
 type ListActionsResult struct {
-	Nodes []*TreeNode // TODO - should this be nodes or metadata that something else renders as nodes?
-	Err   error
+	Nodes             []*TreeNode // TODO - should this be nodes or metadata that something else renders as nodes?
+	SourceDescription string
+	Err               error
+	IsPrimaryResponse bool // Causes nodes to be added at the top of the list
 }
 
 // TreeNode is an item in the ListWidget
