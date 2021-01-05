@@ -2,6 +2,7 @@ package expanders
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -19,6 +20,9 @@ type Expander interface {
 	Name() string
 	Delete(context context.Context, item *TreeNode) (bool, error)
 
+	HasActions(ctx context.Context, currentNode *TreeNode) (bool, error)
+	ListActions(ctx context.Context, currentNode *TreeNode) ListActionsResult
+
 	// Used for testing the expanders
 	testCases() (bool, *[]expanderTestCase)
 	setClient(c *armclient.Client)
@@ -30,6 +34,18 @@ type ExpanderBase struct{}
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
 func (e *ExpanderBase) Delete(context context.Context, item *TreeNode) (bool, error) {
 	return false, nil
+}
+
+// HasActions is a default implementation returning false to indicate no actions available
+func (e *ExpanderBase) HasActions(context context.Context, item *TreeNode) (bool, error) {
+	return false, nil
+}
+
+// ListActions returns an error as it should not be called as HasActions returns false
+func (e *ExpanderBase) ListActions(context context.Context, item *TreeNode) ListActionsResult {
+	return ListActionsResult{
+		Err: fmt.Errorf("ExpanderBase.ListActions should not be called"),
+	}
 }
 
 // ExpanderResponseType is used to indicate the text format of a response
@@ -61,6 +77,12 @@ type ExpanderResult struct {
 	// When set to true this causes the response
 	// in the result to be displayed in the content panel
 	IsPrimaryResponse bool
+}
+
+// ListActionsResult
+type ListActionsResult struct {
+	Nodes []*TreeNode // TODO - should this be nodes or metadata that something else renders as nodes?
+	Err   error
 }
 
 // TreeNode is an item in the ListWidget
