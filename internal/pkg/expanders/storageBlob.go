@@ -514,9 +514,39 @@ func (e *StorageBlobExpander) expandList(ctx context.Context, currentItem *TreeN
 
 func (e *StorageBlobExpander) expandMetadata(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
-	content := currentItem.Metadata["Content"]
+	containerName := currentItem.Metadata["ContainerName"]
+	accountName := currentItem.Metadata["AccountName"]
+	accountKey := currentItem.Metadata["AccountKey"]
+	blobName := currentItem.Metadata["BlobName"]
+	blobEndpoint := currentItem.Metadata["BlobEndpoint"]
+
+	// Blob Properties: https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob-properties
+	url := blobEndpoint + containerName + "/" + blobName
+	_, headers, err := e.doRequestWithHeadersIncludeResponseHeaders(ctx, "HEAD", url, accountName, accountKey, "/"+accountName+"/"+containerName, map[string]string{})
+
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error getting blob metadata: %s", err),
+			SourceDescription: "StorageBlobExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	simpleHeaders := map[string]string{}
+	for k := range headers {
+		simpleHeaders[k] = headers.Get(k)
+	}
+	buf, err := json.Marshal(simpleHeaders)
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error marshaling blob metadata to JSON: %s", err),
+			SourceDescription: "StorageBlobExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+	content := string(buf)
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: content, ResponseType: ResponseXML},
+		Response:          ExpanderResponse{Response: content, ResponseType: ResponseJSON},
 		SourceDescription: "StorageBlobExpander request",
 		Nodes:             []*TreeNode{},
 		IsPrimaryResponse: true,
@@ -650,13 +680,17 @@ func (e *StorageBlobExpander) doRequest(ctx context.Context, verb string, url st
 	return e.doRequestWithHeaders(ctx, verb, url, accountName, accountKey, accountAndPath, map[string]string{})
 }
 func (e *StorageBlobExpander) doRequestWithHeaders(ctx context.Context, verb string, url string, accountName string, accountKey string, accountAndPath string, headers map[string]string) ([]byte, error) {
+	buf, _, err := e.doRequestWithHeadersIncludeResponseHeaders(ctx, verb, url, accountName, accountKey, accountAndPath, headers)
+	return buf, err
+}
+func (e *StorageBlobExpander) doRequestWithHeadersIncludeResponseHeaders(ctx context.Context, verb string, url string, accountName string, accountKey string, accountAndPath string, headers map[string]string) ([]byte, http.Header, error) {
 
 	span, _ := tracing.StartSpanFromContext(ctx, "doRequest(blobexpnder):"+url, tracing.SetTag("url", url))
 	defer span.Finish()
 
 	req, err := http.NewRequest(verb, url, nil)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Failed to create request: %s", err)
+		return []byte{}, nil, fmt.Errorf("Failed to create request: %s", err)
 	}
 	if req.Header.Get("x-ms-version") == "" {
 		req.Header.Set("x-ms-version", "2018-03-28")
@@ -670,28 +704,28 @@ func (e *StorageBlobExpander) doRequestWithHeaders(ctx context.Context, verb str
 
 	err = e.addAuthHeader(req, accountName, accountKey)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Failed to add auth header: %s", err)
+		return []byte{}, nil, fmt.Errorf("Failed to add auth header: %s", err)
 	}
 
 	response, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
-		return []byte{}, fmt.Errorf("Request failed: %s", err)
+		return []byte{}, nil, fmt.Errorf("Request failed: %s", err)
 	}
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		defer response.Body.Close() //nolint: errcheck
-		return []byte{}, fmt.Errorf("DoRequest failed %v for '%s'", response.Status, url)
+		return []byte{}, nil, fmt.Errorf("DoRequest failed %v for '%s'", response.Status, url)
 	}
 
 	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Failed to read body: %s", err)
+		return []byte{}, nil, fmt.Errorf("Failed to read body: %s", err)
 	}
 
 	buf = e.stripBOM(buf)
 
-	return buf, nil
+	return buf, response.Header, nil
 }
 
 func (e *StorageBlobExpander) stripBOM(buf []byte) []byte {
