@@ -45,14 +45,16 @@ func (e *ExpanderBase) HasActions(context context.Context, item *TreeNode) (bool
 // ListActions returns an error as it should not be called as HasActions returns false
 func (e *ExpanderBase) ListActions(context context.Context, item *TreeNode) ListActionsResult {
 	return ListActionsResult{
-		Err: fmt.Errorf("ExpanderBase.ListActions should not be called"),
+		SourceDescription: "ExpanderBase",
+		Err:               fmt.Errorf("ExpanderBase.ListActions should not be called"),
 	}
 }
 
 // ExecuteAction returns an error as it should not be called as HasActions returns false
 func (e *ExpanderBase) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
 	return ExpanderResult{
-		Err: fmt.Errorf("ExpanderBase.ListActions should not be called"),
+		SourceDescription: "ExpanderBase",
+		Err:               fmt.Errorf("ExpanderBase.ListActions should not be called"),
 	}
 }
 

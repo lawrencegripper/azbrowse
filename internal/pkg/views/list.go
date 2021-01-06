@@ -328,7 +328,9 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 			w.currentPage.ExpandedNodeItem = currentItem
 		}
 	}
-	w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
+	if content != nil {
+		w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
+	}
 
 	parentNodeID := "root"
 	nodeID := "root"
