@@ -206,3 +206,31 @@ func (e *DefaultExpander) testCases() (bool, *[]expanderTestCase) {
 		},
 	}
 }
+
+// OperationsRequest list the actions that can be performed
+type OperationsRequest struct {
+	DisplayName string `json:"displayName"`
+	Operations  []struct {
+		Name         string      `json:"name"`
+		DisplayName  string      `json:"displayName"`
+		Description  string      `json:"description"`
+		Origin       interface{} `json:"origin"`
+		Properties   interface{} `json:"properties"`
+		IsDataAction bool        `json:"isDataAction"`
+	} `json:"operations"`
+	ResourceTypes []struct {
+		Name        string `json:"name"`
+		DisplayName string `json:"displayName"`
+		Operations  []struct {
+			Name         string      `json:"name"`
+			DisplayName  string      `json:"displayName"`
+			Description  string      `json:"description"`
+			Origin       interface{} `json:"origin"`
+			Properties   interface{} `json:"properties"`
+			IsDataAction bool        `json:"isDataAction"`
+		} `json:"operations"`
+	} `json:"resourceTypes"`
+	ID   string `json:"id"`
+	Type string `json:"type"`
+	Name string `json:"name"`
+}
