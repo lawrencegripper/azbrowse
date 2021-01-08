@@ -32,6 +32,21 @@ type Expander interface {
 // ExpanderBase provides nil implementations of Expander methods to avoid duplicating code
 type ExpanderBase struct{}
 
+func (e *ExpanderBase) setClient(c *armclient.Client) {
+}
+func (e *ExpanderBase) testCases() (bool, *[]expanderTestCase) {
+	return false, nil
+}
+func (e ExpanderBase) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	return false, nil
+}
+func (e *ExpanderBase) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	return ExpanderResult{
+		SourceDescription: "ExpanderBase",
+		Err:               fmt.Errorf("ExpanderBase.Expand should not be called"),
+	}
+}
+
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
 func (e *ExpanderBase) Delete(context context.Context, item *TreeNode) (bool, error) {
 	return false, nil
@@ -70,6 +85,8 @@ const (
 	ResponseYAML ExpanderResponseType = "YAML"
 	// ResponseXML indicates the response type can be parsed and colourised as XML
 	ResponseXML ExpanderResponseType = "XML"
+	// ResponseTerraform indicates the response type can be parsed and colourised as Terraform
+	ResponseTerraform ExpanderResponseType = "Terraform"
 )
 
 // ExpanderResponse captures the response text and formt of an expander response

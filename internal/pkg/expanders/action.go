@@ -41,7 +41,3 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 
 	return currentItem.Expander.ExecuteAction(ctx, currentItem)
 }
-
-func (e *ActionExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

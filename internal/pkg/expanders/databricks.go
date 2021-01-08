@@ -215,12 +215,3 @@ func (e *AzureDatabricksExpander) getWorkspaceUrl(ctx context.Context, workspace
 
 	return workspaceURL, nil
 }
-
-// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
-func (e AzureDatabricksExpander) Delete(ctx context.Context, item *TreeNode) (bool, error) {
-	return false, nil
-}
-
-func (e *AzureDatabricksExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

@@ -218,12 +218,3 @@ func (e *AzureSearchServiceExpander) getSearchEndpoint(ctx context.Context, sear
 
 	return searchServiceEndpoint, nil
 }
-
-// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
-func (e AzureSearchServiceExpander) Delete(ctx context.Context, item *TreeNode) (bool, error) {
-	return false, nil
-}
-
-func (e *AzureSearchServiceExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

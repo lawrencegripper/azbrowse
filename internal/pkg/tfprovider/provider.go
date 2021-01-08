@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	golog "log"
 	"os"
 	"path"
 
@@ -46,36 +47,43 @@ type TerraformProviderMetadata struct {
 	ChecksumSHA256 string
 }
 
+type TerraformProviderConfig struct {
+	ProviderName      string
+	ProviderPath      string
+	ProviderVersion   string
+	ProviderConfigHCL string
+}
+
 // SetupProvider will return an instance of the TF provider.
 // If the TF_PROVIDER_PATH env var is set and a Terraform provider exists at
 // that location, this provider will be used. This is the recommended approach of production.
 // If the TF_PROVIDER_PATH env var is not set, we will download and initialize the
 // provider using Hashicorp's Terraform Registry. This relies on internet access.
-func SetupProvider(log logr.Logger) (*TerraformProvider, error) {
-	providerName := os.Getenv(providerNameEnv)
-	if providerName == "" {
-		return nil, fmt.Errorf("Env %q not set and is required", providerNameEnv)
+func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProviderConfig) (*TerraformProvider, error) {
+	// NOTE: suppressing `log` output as GRPCProvider outputs a bunch of TRACE messages
+	golog.SetOutput(ioutil.Discard)
+
+	if config.ProviderName == "" {
+		return nil, fmt.Errorf("ProviderName not set and is required")
 	}
 
 	var err error
-	var providerVersion string
-	providerPath := os.Getenv(providerPathEnv)
+	providerPath := config.ProviderPath
 	if providerPath == "" {
 		log.Info("Downloading provider binary")
-		providerVersion = os.Getenv(providerVerionEnv)
-		if providerVersion == "" {
-			return nil, fmt.Errorf("Env %q not set and is required when path to provider binary isn't set with %q", providerVerionEnv, providerPathEnv)
+		if config.ProviderVersion == "" {
+			return nil, fmt.Errorf("ProviderVersion not set and is required when path to provider binary isn't set with ProviderPath")
 		}
-		providerPath, err = installProvider(providerName, providerVersion)
+		providerPath, err = installProvider(ctx, config.ProviderName, config.ProviderVersion)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to setup provider as provider install failed: %w", err)
 		}
 	}
-	providerInstance, err := getInstanceOfProvider(providerName, providerPath, providerVersion)
+	providerInstance, err := getInstanceOfProvider(config.ProviderName, providerPath, config.ProviderVersion)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting provider instance %w", err)
 	}
-	err = configureProvider(log, providerInstance.Plugin)
+	err = configureProvider(log, providerInstance.Plugin, config)
 	if err != nil {
 		return nil, err
 	}
@@ -83,14 +91,14 @@ func SetupProvider(log logr.Logger) (*TerraformProvider, error) {
 	return providerInstance, nil
 }
 
-func installProvider(name string, version string) (string, error) {
+func installProvider(ctx context.Context, name string, version string) (string, error) {
 	tmpDir, err := ioutil.TempDir("", "tfinstall")
 	if err != nil {
 		return "", fmt.Errorf("Failed to create temp dir. %w", err)
 	}
 	defer os.RemoveAll(tmpDir) //nolint: errcheck
 
-	execPath, err := tfinstall.Find(tfinstall.ExactVersion(tfVersion, tmpDir))
+	execPath, err := tfinstall.Find(ctx, tfinstall.ExactVersion(tfVersion, tmpDir))
 	if err != nil {
 		return "", fmt.Errorf("Failed to install Terraform %w", err)
 	}
@@ -219,8 +227,8 @@ func createEmptyProviderConfWithDefaults(provider *plugin.GRPCProvider, configBo
 	return &configFull, nil
 }
 
-func configureProvider(log logr.Logger, provider *plugin.GRPCProvider) error {
-	configWithDefaults, err := createEmptyProviderConfWithDefaults(provider, "")
+func configureProvider(log logr.Logger, provider *plugin.GRPCProvider, config TerraformProviderConfig) error {
+	configWithDefaults, err := createEmptyProviderConfWithDefaults(provider, config.ProviderConfigHCL)
 	if err != nil {
 		return err
 	}

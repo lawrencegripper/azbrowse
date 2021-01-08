@@ -176,7 +176,3 @@ type ActivityLogResource struct {
 		} `json:"httpRequest,omitempty"`
 	} `json:"value"`
 }
-
-func (e *ActivityLogExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}
