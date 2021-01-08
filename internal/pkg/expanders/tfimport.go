@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"os"
+	"os/user"
 	"regexp"
 	"sort"
 	"strings"
@@ -85,10 +87,21 @@ func (e *TerraformImportExpander) ensureTfProviderInitialized(context context.Co
 	}
 
 	// Get a provider instance by installing or using existing binary
+	azbPath := "/root/.azbrowse/terraform/"
+	user, err := user.Current()
+	if err == nil {
+		azbPath = user.HomeDir + "/.azbrowse/terraform/"
+	}
+	err = os.MkdirAll(azbPath, 0777)
+	if err != nil {
+		return err
+	}
+
 	config := tfprovider.TerraformProviderConfig{
 		ProviderName:      "azurerm",
 		ProviderVersion:   "2.38.0",
 		ProviderConfigHCL: "features {}",
+		ProviderPath:      azbPath,
 	}
 	provider, err := tfprovider.SetupProvider(context, e.nullLogger, config) // TODO - update to use azbrowse profile folder as cache
 	if err != nil {
@@ -177,13 +190,13 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 
 func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode) ExpanderResult {
 	err := e.ensureTfProviderInitialized(context)
-	if err != nil{
+	if err != nil {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
 			Err:               err,
 		}
 	}
-	
+
 	resourceTypeName := item.Metadata["ResourceTypeName"]
 	if resourceTypeName == "" {
 		return ExpanderResult{
@@ -199,7 +212,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 			Err:               err,
 		}
 	}
-	return ExpanderResult {
+	return ExpanderResult{
 		SourceDescription: "TerraformImportExpander",
 		Response: ExpanderResponse{
 			ResponseType: ResponseTerraform,
@@ -228,7 +241,7 @@ func (e *TerraformImportExpander) getTerraformFor(id string, resourceTypeName st
 		resourceSchema := terraformProviderSchema.ResourceTypes[resource.TypeName]
 
 		hclString, err := e.printState(readResponse.NewState, resource.TypeName, resourceSchema)
-		if err != nil		{
+		if err != nil {
 			return "", err
 		}
 		result += hclString

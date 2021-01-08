@@ -67,19 +67,24 @@ func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProvide
 		return nil, fmt.Errorf("ProviderName not set and is required")
 	}
 
+	if config.ProviderPath == "" {
+		return nil, fmt.Errorf("ProviderPath not set and is required")
+	}
+
 	var err error
 	providerPath := config.ProviderPath
-	if providerPath == "" {
+	providerInstance, err := getInstanceOfProvider(config.ProviderName, providerPath, config.ProviderVersion)
+	if err != nil {
 		log.Info("Downloading provider binary")
 		if config.ProviderVersion == "" {
 			return nil, fmt.Errorf("ProviderVersion not set and is required when path to provider binary isn't set with ProviderPath")
 		}
-		providerPath, err = installProvider(ctx, config.ProviderName, config.ProviderVersion)
+		err = installProvider(ctx, config.ProviderName, config.ProviderVersion, providerPath)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to setup provider as provider install failed: %w", err)
 		}
 	}
-	providerInstance, err := getInstanceOfProvider(config.ProviderName, providerPath, config.ProviderVersion)
+	providerInstance, err = getInstanceOfProvider(config.ProviderName, providerPath, config.ProviderVersion)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting provider instance %w", err)
 	}
@@ -91,21 +96,21 @@ func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProvide
 	return providerInstance, nil
 }
 
-func installProvider(ctx context.Context, name string, version string) (string, error) {
+func installProvider(ctx context.Context, name string, version string, providerPath string) error {
 	tmpDir, err := ioutil.TempDir("", "tfinstall")
 	if err != nil {
-		return "", fmt.Errorf("Failed to create temp dir. %w", err)
+		return fmt.Errorf("Failed to create temp dir. %w", err)
 	}
 	defer os.RemoveAll(tmpDir) //nolint: errcheck
 
 	execPath, err := tfinstall.Find(ctx, tfinstall.ExactVersion(tfVersion, tmpDir))
 	if err != nil {
-		return "", fmt.Errorf("Failed to install Terraform %w", err)
+		return fmt.Errorf("Failed to install Terraform %w", err)
 	}
 
-	workingDir, err := ioutil.TempDir("", "tfproviders")
+	workingDir := providerPath
 	if err != nil {
-		return "", fmt.Errorf("Failed create tfprovider dir %w", err)
+		return fmt.Errorf("Failed create tfprovider dir %w", err)
 	}
 
 	providerFileContent := fmt.Sprintf(`
@@ -116,19 +121,19 @@ func installProvider(ctx context.Context, name string, version string) (string, 
 
 	err = ioutil.WriteFile(path.Join(workingDir, "provider.tf"), []byte(providerFileContent), 0644)
 	if err != nil {
-		return "", fmt.Errorf("Failed to create provider.tf file %w", err)
+		return fmt.Errorf("Failed to create provider.tf file %w", err)
 	}
 	tf, err := tfexec.NewTerraform(workingDir, execPath)
 	if err != nil {
-		return "", fmt.Errorf("Failed to create TF context %w", err)
+		return fmt.Errorf("Failed to create TF context %w", err)
 	}
 
 	err = tf.Init(context.Background(), tfexec.Upgrade(true), tfexec.LockTimeout("60s"))
 	if err != nil {
-		return "", fmt.Errorf("Failed to init TF %w", err)
+		return fmt.Errorf("Failed to init TF %w", err)
 	}
 
-	return path.Join(workingDir, "/.terraform/plugins/linux_amd64/"), nil
+	return nil
 }
 
 func getSHA256Checksum(path string) (string, error) {
@@ -145,7 +150,8 @@ func getSHA256Checksum(path string) (string, error) {
 	return checksum, nil
 }
 
-func getInstanceOfProvider(name, path, version string) (*TerraformProvider, error) {
+func getInstanceOfProvider(name, basePath, version string) (*TerraformProvider, error) {
+	path := path.Join(basePath, ".terraform/plugins/linux_amd64/")
 	pluginMeta := discovery.FindPlugins(plugin.ProviderPluginName, []string{path}).WithName(name)
 
 	if pluginMeta.Count() < 1 {
