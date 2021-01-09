@@ -91,7 +91,7 @@ func (e *SwaggerResourceExpander) getAPISetForItem(currentItem *TreeNode) *Swagg
 
 // DoesExpand checks if this is an RG
 func (e *SwaggerResourceExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.Metadata["SuppressSwaggerExpand"] == "true" {
+	if currentItem.SuppressSwaggerExpand {
 		return false, nil
 	}
 	apiSetPtr := e.getAPISetForItem(currentItem)

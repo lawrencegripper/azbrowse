@@ -63,17 +63,17 @@ func (e *AzureDatabricksExpander) Expand(ctx context.Context, currentItem *TreeN
 		swaggerResourceType.Endpoint.TemplateURL == azureDatabricksTemplateURL {
 		newItems := []*TreeNode{}
 		newItems = append(newItems, &TreeNode{
-			ID:        currentItem.ID + "/<workspace>",
-			Parentid:  currentItem.ID,
-			Namespace: "AzureDatabricksExpander",
-			Name:      "Connect to Databricks workspace",
-			Display:   "Connect to Databricks workspace",
-			ItemType:  SubResourceType,
-			ExpandURL: ExpandURLNotSupported,
+			ID:                    currentItem.ID + "/<workspace>",
+			Parentid:              currentItem.ID,
+			Namespace:             "AzureDatabricksExpander",
+			Name:                  "Connect to Databricks workspace",
+			Display:               "Connect to Databricks workspace",
+			ItemType:              SubResourceType,
+			ExpandURL:             ExpandURLNotSupported,
+			SuppressSwaggerExpand: true,
+			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"WorkspaceID":           currentItem.ID,
-				"SuppressSwaggerExpand": "true",
-				"SuppressGenericExpand": "true",
+				"WorkspaceID": currentItem.ID,
 			},
 		})
 

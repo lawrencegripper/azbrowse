@@ -2,6 +2,7 @@ package expanders
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -19,6 +20,10 @@ type Expander interface {
 	Name() string
 	Delete(context context.Context, item *TreeNode) (bool, error)
 
+	HasActions(ctx context.Context, currentNode *TreeNode) (bool, error)
+	ListActions(ctx context.Context, currentNode *TreeNode) ListActionsResult
+	ExecuteAction(ctx context.Context, currentNode *TreeNode) ExpanderResult
+
 	// Used for testing the expanders
 	testCases() (bool, *[]expanderTestCase)
 	setClient(c *armclient.Client)
@@ -30,6 +35,27 @@ type ExpanderBase struct{}
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
 func (e *ExpanderBase) Delete(context context.Context, item *TreeNode) (bool, error) {
 	return false, nil
+}
+
+// HasActions is a default implementation returning false to indicate no actions available
+func (e *ExpanderBase) HasActions(context context.Context, item *TreeNode) (bool, error) {
+	return false, nil
+}
+
+// ListActions returns an error as it should not be called as HasActions returns false
+func (e *ExpanderBase) ListActions(context context.Context, item *TreeNode) ListActionsResult {
+	return ListActionsResult{
+		SourceDescription: "ExpanderBase",
+		Err:               fmt.Errorf("ExpanderBase.ListActions should not be called"),
+	}
+}
+
+// ExecuteAction returns an error as it should not be called as HasActions returns false
+func (e *ExpanderBase) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
+	return ExpanderResult{
+		SourceDescription: "ExpanderBase",
+		Err:               fmt.Errorf("ExpanderBase.ListActions should not be called"),
+	}
 }
 
 // ExpanderResponseType is used to indicate the text format of a response
@@ -63,23 +89,33 @@ type ExpanderResult struct {
 	IsPrimaryResponse bool
 }
 
+// ListActionsResult
+type ListActionsResult struct {
+	Nodes             []*TreeNode // TODO - should this be nodes or metadata that something else renders as nodes?
+	SourceDescription string
+	Err               error
+	IsPrimaryResponse bool // Causes nodes to be added at the top of the list
+}
+
 // TreeNode is an item in the ListWidget
 type TreeNode struct {
-	Parentid            string                // The ID of the parent resource
-	ID                  string                // The ID of the resource in ARM
-	Name                string                // The name of the object returned by the API
-	Display             string                // The Text used to draw the object in the list
-	ExpandURL           string                // The URL to call to expand the item
-	ItemType            string                // The type of item either subscription, resourcegroup, resource, deployment or action
-	ExpandReturnType    string                // The type of the items returned by the expandURL
-	DeleteURL           string                // The URL to call to delete the current resource
-	Namespace           string                // The ARM Namespace of the item eg StorageAccount
-	ArmType             string                // The ARM type of the item eg Microsoft.Storage/StorageAccount
-	Metadata            map[string]string     // Metadata is used to pass arbritray data between `Expander`'s
-	SubscriptionID      string                // The SubId of this item
-	StatusIndicator     string                // Displays the resources status
-	SwaggerResourceType *swagger.ResourceType // caches the swagger ResourceType to avoid repeated lookups
-	Expander            Expander              // The Expander that created the node (set automatically by the list)
+	Parentid              string                // The ID of the parent resource
+	ID                    string                // The ID of the resource in ARM
+	Name                  string                // The name of the object returned by the API
+	Display               string                // The Text used to draw the object in the list
+	ExpandURL             string                // The URL to call to expand the item
+	ItemType              string                // The type of item either subscription, resourcegroup, resource, deployment or action
+	ExpandReturnType      string                // The type of the items returned by the expandURL
+	DeleteURL             string                // The URL to call to delete the current resource
+	Namespace             string                // The ARM Namespace of the item eg StorageAccount
+	ArmType               string                // The ARM type of the item eg Microsoft.Storage/StorageAccount
+	Metadata              map[string]string     // Metadata is used to pass arbritray data between `Expander`'s
+	SubscriptionID        string                // The SubId of this item
+	StatusIndicator       string                // Displays the resources status
+	SwaggerResourceType   *swagger.ResourceType // caches the swagger ResourceType to avoid repeated lookups
+	Expander              Expander              // The Expander that created the node (set automatically by the list)
+	SuppressSwaggerExpand bool                  // Prevent the SwaggerResourceExpander attempting to expand the node
+	SuppressGenericExpand bool                  // Prevent the DefaultExpander (aka GenericExpander) attempting to expand the node
 }
 
 const (

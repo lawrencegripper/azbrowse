@@ -86,6 +86,11 @@ const (
 	storageBlobNodeListBlob         = "blob-list"
 )
 
+const (
+	storageBlobActionLeaseAcquire = "lease-acquire"
+	storageBlobActionLeaseBreak   = "lease-break"
+)
+
 func (e *StorageBlobExpander) setClient(c *armclient.Client) {
 	e.armClient = c
 }
@@ -125,31 +130,31 @@ func (e *StorageBlobExpander) Expand(ctx context.Context, currentItem *TreeNode)
 		swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}" {
 		newItems := []*TreeNode{
 			{
-				Parentid:  currentItem.ID,
-				ID:        currentItem.ID + "/<blobs>",
-				Namespace: "storageBlob",
-				Name:      "Blob Metadata",
-				Display:   "Blob Metadata",
-				ItemType:  storageBlobNodeListBlobMetadata,
-				ExpandURL: ExpandURLNotSupported,
+				Parentid:              currentItem.ID,
+				ID:                    currentItem.ID + "/<blobs>",
+				Namespace:             "storageBlob",
+				Name:                  "Blob Metadata",
+				Display:               "Blob Metadata",
+				ItemType:              storageBlobNodeListBlobMetadata,
+				ExpandURL:             ExpandURLNotSupported,
+				SuppressSwaggerExpand: true,
+				SuppressGenericExpand: true,
 				Metadata: map[string]string{
-					"ContainerID":           currentItem.ExpandURL, // save resourceID of blob
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
+					"ContainerID": currentItem.ExpandURL, // save resourceID of blob
 				},
 			},
 			{
-				Parentid:  currentItem.ID,
-				ID:        currentItem.ID + "/<blobs>",
-				Namespace: "storageBlob",
-				Name:      "Blobs",
-				Display:   "Blobs",
-				ItemType:  storageBlobNodeListBlob,
-				ExpandURL: ExpandURLNotSupported,
+				Parentid:              currentItem.ID,
+				ID:                    currentItem.ID + "/<blobs>",
+				Namespace:             "storageBlob",
+				Name:                  "Blobs",
+				Display:               "Blobs",
+				ItemType:              storageBlobNodeListBlob,
+				ExpandURL:             ExpandURLNotSupported,
+				SuppressSwaggerExpand: true,
+				SuppressGenericExpand: true,
 				Metadata: map[string]string{
-					"ContainerID":           currentItem.ExpandURL, // save resourceID of blob
-					"SuppressSwaggerExpand": "true",
-					"SuppressGenericExpand": "true",
+					"ContainerID": currentItem.ExpandURL, // save resourceID of blob
 				},
 			},
 		}
@@ -188,6 +193,167 @@ func (e *StorageBlobExpander) Delete(ctx context.Context, currentItem *TreeNode)
 		return e.deleteBlob(ctx, currentItem)
 	}
 	return false, nil
+}
+
+// HasActions is a default implementation returning false to indicate no actions available
+func (e *StorageBlobExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
+	switch item.ItemType {
+	case storageBlobNodeBlob,
+		storageBlobNodeBlobMetadata:
+		return true, nil
+	}
+	return false, nil
+
+}
+
+// ListActions returns an error as it should not be called as HasActions returns false
+func (e *StorageBlobExpander) ListActions(context context.Context, item *TreeNode) ListActionsResult {
+	nodes := []*TreeNode{}
+	switch item.ItemType {
+	case storageBlobNodeBlob,
+		storageBlobNodeBlobMetadata:
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              item.ID,
+				ID:                    item.ID + "?lease-acquire",
+				Namespace:             "storageBlob",
+				Name:                  "Acquire Lease",
+				Display:               "Acquire Lease",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+				Metadata: map[string]string{
+					"ActionID":      storageBlobActionLeaseAcquire,
+					"BlobName":      item.Metadata["BlobName"],
+					"ContainerID":   item.Metadata["ContainerID"],
+					"ContainerName": item.Metadata["ContainerName"],
+					"AccountName":   item.Metadata["AccountName"],
+					"AccountKey":    item.Metadata["AccountKey"],
+					"BlobEndpoint":  item.Metadata["BlobEndpoint"],
+				},
+			},
+			&TreeNode{
+				Parentid:              item.ID,
+				ID:                    item.ID + "?lease-break",
+				Namespace:             "storageBlob",
+				Name:                  "Break Lease",
+				Display:               "Break Lease",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+				Metadata: map[string]string{
+					"ActionID":      storageBlobActionLeaseBreak,
+					"BlobName":      item.Metadata["BlobName"],
+					"ContainerID":   item.Metadata["ContainerID"],
+					"ContainerName": item.Metadata["ContainerName"],
+					"AccountName":   item.Metadata["AccountName"],
+					"AccountKey":    item.Metadata["AccountKey"],
+					"BlobEndpoint":  item.Metadata["BlobEndpoint"],
+				},
+			},
+		)
+	default:
+		return ListActionsResult{
+			SourceDescription: "StorageBlobExpander",
+			Err:               fmt.Errorf("ListActions not supported for ItemType %q", item.ItemType),
+		}
+	}
+	return ListActionsResult{
+		Nodes:             nodes,
+		SourceDescription: "StorageBlobExpander",
+		IsPrimaryResponse: true,
+	}
+}
+
+// ExecuteAction returns an error as it should not be called as HasActions returns false
+func (e *StorageBlobExpander) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
+	actionID := item.Metadata["ActionID"]
+
+	switch actionID {
+	case storageBlobActionLeaseAcquire:
+		return e.storageBlobLeaseAcquire(context, item)
+	case storageBlobActionLeaseBreak:
+		return e.storageBlobLeaseBreak(context, item)
+	case "":
+		return ExpanderResult{
+			SourceDescription: "StorageBlobExpander",
+			Err:               fmt.Errorf("ActionID metadata not set: %q", item.ID),
+		}
+	default:
+		return ExpanderResult{
+			SourceDescription: "StorageBlobExpander",
+			Err:               fmt.Errorf("Unhandled ActionID: %q", actionID),
+		}
+	}
+}
+
+func (e *StorageBlobExpander) storageBlobLeaseBreak(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	containerName := currentItem.Metadata["ContainerName"]
+	accountName := currentItem.Metadata["AccountName"]
+	accountKey := currentItem.Metadata["AccountKey"]
+	blobName := currentItem.Metadata["BlobName"]
+	blobEndpoint := currentItem.Metadata["BlobEndpoint"]
+
+	// Lease Blob docs: https://docs.microsoft.com/en-us/rest/api/storageservices/lease-blob
+	url := blobEndpoint + containerName + "/" + blobName + "?comp=lease"
+	headers := map[string]string{
+		"x-ms-lease-action":       "break",
+		"x-ms-lease-break-period": "0",
+	}
+	_, err := e.doRequestWithHeaders(ctx, "PUT", url, accountName, accountKey, "/"+accountName+"/"+containerName, headers)
+
+	if err != nil {
+		return ExpanderResult{
+			Response: ExpanderResponse{
+				ResponseType: ResponsePlainText,
+				Response:     fmt.Sprintf("Error breaking blob lease: %s", err),
+			},
+			SourceDescription: "StorageBlobExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	return ExpanderResult{
+		Response: ExpanderResponse{
+			ResponseType: ResponsePlainText,
+			Response:     "Success",
+		},
+		SourceDescription: "StorageBlobExpander request",
+		IsPrimaryResponse: true,
+	}
+}
+func (e *StorageBlobExpander) storageBlobLeaseAcquire(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	containerName := currentItem.Metadata["ContainerName"]
+	accountName := currentItem.Metadata["AccountName"]
+	accountKey := currentItem.Metadata["AccountKey"]
+	blobName := currentItem.Metadata["BlobName"]
+	blobEndpoint := currentItem.Metadata["BlobEndpoint"]
+
+	// Lease Blob docs: https://docs.microsoft.com/en-us/rest/api/storageservices/lease-blob
+	url := blobEndpoint + containerName + "/" + blobName + "?comp=lease"
+	headers := map[string]string{
+		"x-ms-lease-action":   "acquire",
+		"x-ms-lease-duration": "-1",
+	}
+	_, err := e.doRequestWithHeaders(ctx, "PUT", url, accountName, accountKey, "/"+accountName+"/"+containerName, headers)
+
+	if err != nil {
+		return ExpanderResult{
+			Response: ExpanderResponse{
+				ResponseType: ResponsePlainText,
+				Response:     fmt.Sprintf("Error acquiring blob lease: %s", err),
+			},
+			SourceDescription: "StorageBlobExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	return ExpanderResult{
+		Response: ExpanderResponse{
+			ResponseType: ResponsePlainText,
+			Response:     "Success",
+		},
+		SourceDescription: "StorageBlobExpander request",
+		IsPrimaryResponse: true,
+	}
 }
 
 func (e *StorageBlobExpander) expandMetadataList(ctx context.Context, currentItem *TreeNode) ExpanderResult {
@@ -308,8 +474,10 @@ func (e *StorageBlobExpander) expandList(ctx context.Context, currentItem *TreeN
 			}
 		}
 		node.Metadata["ContainerID"] = containerID
+		node.Metadata["ContainerName"] = containerName
 		node.Metadata["AccountName"] = accountName
 		node.Metadata["AccountKey"] = accountKey
+		node.Metadata["BlobEndpoint"] = blobEndpoint
 
 		nodes = append(nodes, node)
 	}
@@ -323,10 +491,12 @@ func (e *StorageBlobExpander) expandList(ctx context.Context, currentItem *TreeN
 			ItemType:  continuationItemType,
 			ExpandURL: ExpandURLNotSupported,
 			Metadata: map[string]string{
-				"ContainerID": containerID, // save resourceID of blob
-				"AccountName": accountName,
-				"AccountKey":  accountKey,
-				"Marker":      response.NextMarker,
+				"ContainerID":   containerID, // save resourceID of blob
+				"ContainerName": containerName,
+				"AccountName":   accountName,
+				"AccountKey":    accountKey,
+				"BlobEndpoint":  blobEndpoint,
+				"Marker":        response.NextMarker,
 			},
 		}
 
@@ -344,9 +514,39 @@ func (e *StorageBlobExpander) expandList(ctx context.Context, currentItem *TreeN
 
 func (e *StorageBlobExpander) expandMetadata(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
-	content := currentItem.Metadata["Content"]
+	containerName := currentItem.Metadata["ContainerName"]
+	accountName := currentItem.Metadata["AccountName"]
+	accountKey := currentItem.Metadata["AccountKey"]
+	blobName := currentItem.Metadata["BlobName"]
+	blobEndpoint := currentItem.Metadata["BlobEndpoint"]
+
+	// Blob Properties: https://docs.microsoft.com/en-us/rest/api/storageservices/get-blob-properties
+	url := blobEndpoint + containerName + "/" + blobName
+	_, headers, err := e.doRequestWithHeadersIncludeResponseHeaders(ctx, "HEAD", url, accountName, accountKey, "/"+accountName+"/"+containerName, map[string]string{})
+
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error getting blob metadata: %s", err),
+			SourceDescription: "StorageBlobExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	simpleHeaders := map[string]string{}
+	for k := range headers {
+		simpleHeaders[k] = headers.Get(k)
+	}
+	buf, err := json.Marshal(simpleHeaders)
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error marshaling blob metadata to JSON: %s", err),
+			SourceDescription: "StorageBlobExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+	content := string(buf)
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: content, ResponseType: ResponseXML},
+		Response:          ExpanderResponse{Response: content, ResponseType: ResponseJSON},
 		SourceDescription: "StorageBlobExpander request",
 		Nodes:             []*TreeNode{},
 		IsPrimaryResponse: true,
@@ -383,7 +583,7 @@ func (e *StorageBlobExpander) expandBlob(ctx context.Context, currentItem *TreeN
 
 	result := string(buf)
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: result, ResponseType: ResponseXML},
+		Response:          ExpanderResponse{Response: result, ResponseType: ResponsePlainText},
 		SourceDescription: "StorageBlobExpander request",
 		Nodes:             []*TreeNode{},
 		IsPrimaryResponse: true,
@@ -477,12 +677,20 @@ func (e *StorageBlobExpander) getStorageBlobEndpoint(ctx context.Context, contai
 }
 
 func (e *StorageBlobExpander) doRequest(ctx context.Context, verb string, url string, accountName string, accountKey string, accountAndPath string) ([]byte, error) {
+	return e.doRequestWithHeaders(ctx, verb, url, accountName, accountKey, accountAndPath, map[string]string{})
+}
+func (e *StorageBlobExpander) doRequestWithHeaders(ctx context.Context, verb string, url string, accountName string, accountKey string, accountAndPath string, headers map[string]string) ([]byte, error) {
+	buf, _, err := e.doRequestWithHeadersIncludeResponseHeaders(ctx, verb, url, accountName, accountKey, accountAndPath, headers)
+	return buf, err
+}
+func (e *StorageBlobExpander) doRequestWithHeadersIncludeResponseHeaders(ctx context.Context, verb string, url string, accountName string, accountKey string, accountAndPath string, headers map[string]string) ([]byte, http.Header, error) {
+
 	span, _ := tracing.StartSpanFromContext(ctx, "doRequest(blobexpnder):"+url, tracing.SetTag("url", url))
 	defer span.Finish()
 
 	req, err := http.NewRequest(verb, url, nil)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Failed to create request: %s", err)
+		return []byte{}, nil, fmt.Errorf("Failed to create request: %s", err)
 	}
 	if req.Header.Get("x-ms-version") == "" {
 		req.Header.Set("x-ms-version", "2018-03-28")
@@ -490,30 +698,34 @@ func (e *StorageBlobExpander) doRequest(ctx context.Context, verb string, url st
 	dateString := time.Now().UTC().Format(http.TimeFormat)
 	req.Header.Set("x-ms-date", dateString)
 
+	for header, value := range headers {
+		req.Header.Set(header, value)
+	}
+
 	err = e.addAuthHeader(req, accountName, accountKey)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Failed to add auth header: %s", err)
+		return []byte{}, nil, fmt.Errorf("Failed to add auth header: %s", err)
 	}
 
 	response, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
-		return []byte{}, fmt.Errorf("Request failed: %s", err)
+		return []byte{}, nil, fmt.Errorf("Request failed: %s", err)
 	}
 
 	if response.StatusCode < 200 || response.StatusCode >= 300 {
 		defer response.Body.Close() //nolint: errcheck
-		return []byte{}, fmt.Errorf("DoRequest failed %v for '%s'", response.Status, url)
+		return []byte{}, nil, fmt.Errorf("DoRequest failed %v for '%s'", response.Status, url)
 	}
 
 	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return []byte{}, fmt.Errorf("Failed to read body: %s", err)
+		return []byte{}, nil, fmt.Errorf("Failed to read body: %s", err)
 	}
 
 	buf = e.stripBOM(buf)
 
-	return buf, nil
+	return buf, response.Header, nil
 }
 
 func (e *StorageBlobExpander) stripBOM(buf []byte) []byte {
