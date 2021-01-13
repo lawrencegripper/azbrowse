@@ -17,15 +17,23 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tfprovider"
+	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
 // lookup mapping of resource type to regexp expression to match resource IDs
-var tfimportBaseConfig = map[string]string{
-	"azurerm_resource_group":   "/subscriptions/[^/]*/resourceGroups/[^/]*",
-	"azurerm_storage_account":  "/subscriptions/[^/]*/resourceGroups/[^/]*/providers/Microsoft.Storage/storageAccounts/[^/]*",
-	"azurerm_mssql_server":     "/subscriptions/[^/]*/resourceGroups/[^/]*/providers/Microsoft.Sql/servers/[^/]*",
-	"azurerm_private_endpoint": "/subscriptions/[^/]*/resourceGroups/[^/]*/providers/Microsoft.Network/privateEndpoints/[^/]*",
+var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
+	"azurerm_resource_group":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}", ""),
+	"azurerm_app_service_plan": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{farmName}", ""),
+	"azurerm_app_service":      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}", ""),
+	"azurerm_storage_account":  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", ""),
+	"azurerm_mssql_server":     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}", ""),
+	"azurerm_private_endpoint": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints/{endpointName}", ""),
 }
+
+// TODO
+//  - expand the list of mapped resource types
+//  - handle VMs - need more than the ID to determine Windows/Linux VM
+//  - handle non ARM resources (e.g. storage containers)
 
 // TfImportResourceType represents a mapping of resource name to resource ID regexp
 type TfImportResourceType struct {
@@ -50,9 +58,8 @@ var _ Expander = &TerraformImportExpander{}
 // TerraformImportExpander provides actions
 type TerraformImportExpander struct {
 	ExpanderBase
-	resourceTypes *[]*TfImportResourceType
-	tfProvider    *tfprovider.TerraformProvider
-	nullLogger    logr.Logger
+	tfProvider *tfprovider.TerraformProvider
+	nullLogger logr.Logger
 }
 
 // Name returns the name of the expander
@@ -60,27 +67,6 @@ func (e *TerraformImportExpander) Name() string {
 	return "TerraformImportExpander"
 }
 
-func (e *TerraformImportExpander) ensureResourceTypeLookupInitialized() error {
-	if e.resourceTypes != nil {
-		return nil
-	}
-
-	resourceTypes := []*TfImportResourceType{}
-	for name, regexString := range tfimportBaseConfig {
-		re, err := regexp.Compile("^" + regexString + "$")
-		if err != nil {
-			return err
-		}
-
-		resourceType := &TfImportResourceType{
-			ResourceName: name,
-			IDRegexp:     re,
-		}
-		resourceTypes = append(resourceTypes, resourceType)
-	}
-	e.resourceTypes = &resourceTypes
-	return nil
-}
 func (e *TerraformImportExpander) ensureTfProviderInitialized(context context.Context) error {
 	if e.tfProvider != nil {
 		return nil
@@ -112,13 +98,10 @@ func (e *TerraformImportExpander) ensureTfProviderInitialized(context context.Co
 }
 
 func (e *TerraformImportExpander) getResourceTypeNameFromResourceID(resourceID string) (string, error) {
-	if err := e.ensureResourceTypeLookupInitialized(); err != nil {
-		return "", err
-	}
-
-	for _, resourceType := range *e.resourceTypes {
-		if resourceType.IDRegexp.MatchString(resourceID) {
-			return resourceType.ResourceName, nil
+	for resourceTypeName, resourceEndpoint := range tfimportBaseConfig {
+		result := resourceEndpoint.Match(resourceID)
+		if result.IsMatch {
+			return resourceTypeName, nil
 		}
 	}
 	return "", nil
@@ -172,19 +155,18 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
 	actionID := item.Metadata["ActionID"]
 
+	var err error
 	switch actionID {
 	case tfimportActionGetTerraform:
 		return e.getTerraformForNode(context, item)
 	case "":
-		return ExpanderResult{
-			SourceDescription: "TerraformImportExpander",
-			Err:               fmt.Errorf("ActionID metadata not set: %q", item.ID),
-		}
+		err = fmt.Errorf("ActionID metadata not set: %q", item.ID)
 	default:
-		return ExpanderResult{
-			SourceDescription: "TerraformImportExpander",
-			Err:               fmt.Errorf("Unhandled ActionID: %q", actionID),
-		}
+		err = fmt.Errorf("Unhandled ActionID: %q", actionID)
+	}
+	return ExpanderResult{
+		SourceDescription: "TerraformImportExpander",
+		Err:               err,
 	}
 }
 
@@ -205,7 +187,25 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 		}
 	}
 
-	terraform, err := e.getTerraformFor(item.ID, resourceTypeName)
+	id := item.ID
+	endpoint := tfimportBaseConfig[resourceTypeName]
+	endpointMatch := endpoint.Match(id)
+	if !endpointMatch.IsMatch {
+		return ExpanderResult{
+			SourceDescription: "TerraformImportExpander",
+			Err:               fmt.Errorf("Failed to match resource type name"),
+		}
+	}
+	// use the endpoint to rebuild the ID URL to ensure the case matches what the azurerm provider expects
+	id, err = endpoint.BuildURL(endpointMatch.Values)
+	if !endpointMatch.IsMatch {
+		return ExpanderResult{
+			SourceDescription: "TerraformImportExpander",
+			Err:               err,
+		}
+	}
+
+	terraform, err := e.getTerraformFor(id, resourceTypeName)
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
