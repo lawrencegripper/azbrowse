@@ -17,6 +17,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tfprovider"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
@@ -33,7 +34,8 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 // TODO
 //  - expand the list of mapped resource types
 //  - handle VMs - need more than the ID to determine Windows/Linux VM
-//  - handle non ARM resources (e.g. storage containers)
+//  - handle Azure data-plane resources (e.g. storage containers)
+//  - handle non-Azure resources? (e.g. databricks cluster)
 
 // TfImportResourceType represents a mapping of resource name to resource ID regexp
 type TfImportResourceType struct {
@@ -171,6 +173,8 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 }
 
 func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode) ExpanderResult {
+	span, context := tracing.StartSpanFromContext(context, "terraform:get-for-node:"+item.ItemType+":"+item.Name, tracing.SetTag("item", item))
+	defer span.Finish()
 	err := e.ensureTfProviderInitialized(context)
 	if err != nil {
 		return ExpanderResult{
@@ -205,7 +209,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 		}
 	}
 
-	terraform, err := e.getTerraformFor(id, resourceTypeName)
+	terraform, err := e.getTerraformFor(context, id, resourceTypeName)
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
@@ -222,21 +226,27 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 	}
 }
 
-func (e *TerraformImportExpander) getTerraformFor(id string, resourceTypeName string) (string, error) {
+func (e *TerraformImportExpander) getTerraformFor(context context.Context, id string, resourceTypeName string) (string, error) {
+	span, context := tracing.StartSpanFromContext(context, "terraform:get-schema:"+resourceTypeName)
+	defer span.Finish()
 	terraformProviderSchema := e.tfProvider.Plugin.GetSchema()
 	importRequest := providers.ImportResourceStateRequest{
 		TypeName: resourceTypeName,
 		ID:       id,
 	}
+	spanImport, context := tracing.StartSpanFromContext(context, "terraform:import:"+resourceTypeName)
+	defer spanImport.Finish()
 	importResponse := e.tfProvider.Plugin.ImportResourceState(importRequest)
 
 	result := ""
 	for _, resource := range importResponse.ImportedResources {
+		span, _ := tracing.StartSpanFromContext(context, "terraform:read:"+resource.TypeName)
 		readRequest := providers.ReadResourceRequest{
 			TypeName:   resource.TypeName,
 			PriorState: resource.State,
 		}
 		readResponse := e.tfProvider.Plugin.ReadResource(readRequest)
+		span.Finish()
 
 		resourceSchema := terraformProviderSchema.ResourceTypes[resource.TypeName]
 

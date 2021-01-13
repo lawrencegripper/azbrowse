@@ -14,6 +14,7 @@ import (
 	"github.com/go-logr/logr"
 	"github.com/hashicorp/go-hclog"
 	goplugin "github.com/hashicorp/go-plugin"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -73,7 +74,7 @@ func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProvide
 
 	var err error
 	providerPath := config.ProviderPath
-	providerInstance, err := getInstanceOfProvider(config.ProviderName, providerPath, config.ProviderVersion)
+	providerInstance, err := getInstanceOfProvider(ctx, config.ProviderName, providerPath, config.ProviderVersion)
 	if err != nil {
 		log.Info("Downloading provider binary")
 		if config.ProviderVersion == "" {
@@ -84,11 +85,11 @@ func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProvide
 			return nil, fmt.Errorf("Failed to setup provider as provider install failed: %w", err)
 		}
 	}
-	providerInstance, err = getInstanceOfProvider(config.ProviderName, providerPath, config.ProviderVersion)
+	providerInstance, err = getInstanceOfProvider(ctx, config.ProviderName, providerPath, config.ProviderVersion)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting provider instance %w", err)
 	}
-	err = configureProvider(log, providerInstance.Plugin, config)
+	err = configureProvider(ctx, log, providerInstance.Plugin, config)
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,9 @@ func installProvider(ctx context.Context, name string, version string, providerP
 	}
 	defer os.RemoveAll(tmpDir) //nolint: errcheck
 
+	span, ctx := tracing.StartSpanFromContext(ctx, "tfprovider:install")
 	execPath, err := tfinstall.Find(ctx, tfinstall.ExactVersion(tfVersion, tmpDir))
+	span.Finish()
 	if err != nil {
 		return fmt.Errorf("Failed to install Terraform %w", err)
 	}
@@ -123,12 +126,16 @@ func installProvider(ctx context.Context, name string, version string, providerP
 	if err != nil {
 		return fmt.Errorf("Failed to create provider.tf file %w", err)
 	}
+	span, ctx = tracing.StartSpanFromContext(ctx, "tfprovider:new-terraform")
 	tf, err := tfexec.NewTerraform(workingDir, execPath)
+	span.Finish()
 	if err != nil {
 		return fmt.Errorf("Failed to create TF context %w", err)
 	}
 
+	span, ctx = tracing.StartSpanFromContext(ctx, "tfprovider:init")
 	err = tf.Init(context.Background(), tfexec.Upgrade(true), tfexec.LockTimeout("60s"))
+	span.Finish()
 	if err != nil {
 		return fmt.Errorf("Failed to init TF %w", err)
 	}
@@ -150,10 +157,11 @@ func getSHA256Checksum(path string) (string, error) {
 	return checksum, nil
 }
 
-func getInstanceOfProvider(name, basePath, version string) (*TerraformProvider, error) {
+func getInstanceOfProvider(ctx context.Context, name, basePath, version string) (*TerraformProvider, error) {
 	path := path.Join(basePath, ".terraform/plugins/linux_amd64/")
+	span, ctx := tracing.StartSpanFromContext(ctx, "tfprovider:getInstance:find")
 	pluginMeta := discovery.FindPlugins(plugin.ProviderPluginName, []string{path}).WithName(name)
-
+	span.Finish()
 	if pluginMeta.Count() < 1 {
 		return nil, fmt.Errorf("Provide:%q not found at path:%q", name, path)
 	}
@@ -172,7 +180,9 @@ func getInstanceOfProvider(name, basePath, version string) (*TerraformProvider, 
 	}
 
 	// create a new resource provisioner.
+	span, ctx = tracing.StartSpanFromContext(ctx, "tfprovider:getInstance:dispense")
 	raw, err := rpcClient.Dispense(plugin.ProviderPluginName)
+	span.Finish()
 	if err != nil {
 		panic(fmt.Errorf("Failed to dispense plugin: %s", err))
 	}
@@ -233,7 +243,9 @@ func createEmptyProviderConfWithDefaults(provider *plugin.GRPCProvider, configBo
 	return &configFull, nil
 }
 
-func configureProvider(log logr.Logger, provider *plugin.GRPCProvider, config TerraformProviderConfig) error {
+func configureProvider(ctx context.Context, log logr.Logger, provider *plugin.GRPCProvider, config TerraformProviderConfig) error {
+	span, _ := tracing.StartSpanFromContext(ctx, "tfprovider:configureProvider")
+	defer span.Finish()
 	configWithDefaults, err := createEmptyProviderConfWithDefaults(provider, config.ProviderConfigHCL)
 	if err != nil {
 		return err
