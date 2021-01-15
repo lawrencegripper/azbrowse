@@ -61,7 +61,12 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 	"azurerm_linux_virtual_machine":     vmEndpoint,
 
 	// "":              endpoints.MustGetEndpointInfoFromURL("", ""),
+}
 
+var resourceIDIgnoreSuffices = []string{
+	"/<diagsettings>",
+	"/<activitylog>",
+	"/providers/Microsoft.Resources/deployments",
 }
 
 // TODO
@@ -70,7 +75,8 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 //  - handle non-Azure resources? (e.g. databricks cluster)
 
 const (
-	tfimportActionGetTerraform = "GetTerraform"
+	tfimportActionGetTerraform          = "GetTerraform"
+	tfimportActionGetTerraformRecursive = "GetTerraformRecursive"
 )
 
 // NewTerraformImportExpander creates a new instance of TerraformImportExpander
@@ -222,7 +228,7 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 	nodes := []*TreeNode{
 		{
 			Parentid:              item.ID,
-			ID:                    item.ID + "?terraform-import",
+			ID:                    item.ID + "?" + tfimportActionGetTerraform,
 			Namespace:             "tfimport",
 			Name:                  "Get Terraform",
 			Display:               "Get Terraform",
@@ -230,6 +236,19 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 			SuppressGenericExpand: true,
 			Metadata: map[string]string{
 				"ActionID":         tfimportActionGetTerraform,
+				"ResourceTypeName": resourceTypeName,
+			},
+		},
+		{
+			Parentid:              item.ID,
+			ID:                    item.ID + "?" + tfimportActionGetTerraformRecursive,
+			Namespace:             "tfimport",
+			Name:                  "Get Terraform (recursive)",
+			Display:               "Get Terraform (recursive)",
+			ItemType:              ActionType,
+			SuppressGenericExpand: true,
+			Metadata: map[string]string{
+				"ActionID":         tfimportActionGetTerraformRecursive,
 				"ResourceTypeName": resourceTypeName,
 			},
 		},
@@ -247,7 +266,16 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 	var err error
 	switch actionID {
 	case tfimportActionGetTerraform:
-		return e.getTerraformForNode(context, item)
+		resourceTypeName := item.Metadata["ResourceTypeName"]
+		if resourceTypeName == "" {
+			return ExpanderResult{
+				SourceDescription: "TerraformImportExpander",
+				Err:               fmt.Errorf("ResourceTypeName not set"),
+			}
+		}
+		return e.getTerraformForNode(context, item.Parent, resourceTypeName) // Item refers to the Action node - it's parent is the node it is the action for
+	case tfimportActionGetTerraformRecursive:
+		return e.getTerraformForNodeRecursive(context, item.Parent) // Item refers to the Action node - it's parent is the node it is the action for
 	case "":
 		err = fmt.Errorf("ActionID metadata not set: %q", item.ID)
 	default:
@@ -258,8 +286,60 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 		Err:               err,
 	}
 }
+func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, item *TreeNode) ExpanderResult {
 
-func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode) ExpanderResult {
+	// Get Terraform for the current node...
+	result := e.getTerraformForNode(context, item, "")
+	if result.Err != nil {
+		return result
+	}
+
+	terraform := result.Response.Response
+
+	_, childItems, err := ExpandItem(context, item)
+	if err != nil {
+		terraform = fmt.Sprintf("%s\n\n#Error expanding %q: %s", terraform, item.ID, err)
+		return ExpanderResult{
+			SourceDescription: "TerraformImportExpander",
+			Response: ExpanderResponse{
+				ResponseType: ResponseTerraform,
+				Response:     terraform,
+			},
+			IsPrimaryResponse: true,
+		}
+	}
+
+	for _, childItem := range childItems {
+		// TODO - change this to getTerraformForNodeRecursive.... need to figure out how to avoid a massive tree crawl though!
+		ignore := false
+		for _, suffix := range resourceIDIgnoreSuffices {
+			if strings.HasSuffix(childItem.ID, suffix) {
+				ignore = true
+				break
+			}
+		}
+		if ignore {
+			continue
+		}
+		result = e.getTerraformForNode(context, childItem, "")
+		if result.Err != nil {
+			terraform = fmt.Sprintf("%s\n\n#Error getting Tf for %q: %s\n", terraform, childItem.ID, result.Err)
+		} else {
+			terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
+		}
+	}
+
+	return ExpanderResult{
+		SourceDescription: "TerraformImportExpander",
+		Response: ExpanderResponse{
+			ResponseType: ResponseTerraform,
+			Response:     terraform,
+		},
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode, resourceTypeName string) ExpanderResult {
 	span, context := tracing.StartSpanFromContext(context, "terraform:get-for-node:"+item.ItemType+":"+item.Name, tracing.SetTag("item", item))
 	defer span.Finish()
 	err := e.ensureTfProviderInitialized(context)
@@ -270,16 +350,30 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 		}
 	}
 
-	resourceTypeName := item.Metadata["ResourceTypeName"]
+	if resourceTypeName == "" {
+		resourceTypeName, err = e.getResourceTypeNameFromResourceID(context, item.ID)
+		if err != nil {
+			return ExpanderResult{
+				SourceDescription: "TerraformImportExpander",
+				Err:               err,
+			}
+		}
+	}
 	if resourceTypeName == "" {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
-			Err:               fmt.Errorf("ResourceTypeName not set"),
+			Err:               fmt.Errorf("No ResourceTypeName for %q", item.ID),
 		}
 	}
 
 	id := item.ID
 	endpoint := tfimportBaseConfig[resourceTypeName]
+	if endpoint == nil {
+		return ExpanderResult{
+			SourceDescription: "TerraformImportExpander",
+			Err:               fmt.Errorf("Endpoint not found for resourceTypeName %q", resourceTypeName),
+		}
+	}
 	endpointMatch := endpoint.Match(id)
 	if !endpointMatch.IsMatch {
 		return ExpanderResult{
@@ -337,6 +431,9 @@ func (e *TerraformImportExpander) getTerraformFor(context context.Context, id st
 
 		resourceSchema := terraformProviderSchema.ResourceTypes[resource.TypeName]
 
+		if readResponse.NewState.IsNull() {
+			return "", fmt.Errorf("Null state on read for %q", id)
+		}
 		hclString, err := e.printState(readResponse.NewState, resource.TypeName, resourceSchema)
 		if err != nil {
 			return "", err

@@ -92,6 +92,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 			}
 			for _, node := range result.Nodes {
 				node.Expander = done.Expander
+				node.Parent = currentItem
 			}
 			// Add the items it found
 			if result.IsPrimaryResponse {

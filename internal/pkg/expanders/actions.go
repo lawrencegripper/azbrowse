@@ -91,6 +91,7 @@ func GetActions(ctx context.Context, item *TreeNode) ([]*TreeNode, error) {
 			for _, node := range result.Nodes {
 				node.Expander = done.Expander
 				node.ItemType = ActionType
+				node.Parent = item
 			}
 			// Add the items it found
 			if result.IsPrimaryResponse {

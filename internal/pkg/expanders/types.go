@@ -117,6 +117,7 @@ type ListActionsResult struct {
 // TreeNode is an item in the ListWidget
 type TreeNode struct {
 	Parentid              string                // The ID of the parent resource
+	Parent                *TreeNode             // Reference to the parent node
 	ID                    string                // The ID of the resource in ARM
 	Name                  string                // The name of the object returned by the API
 	Display               string                // The Text used to draw the object in the list
