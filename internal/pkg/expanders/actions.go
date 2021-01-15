@@ -39,7 +39,7 @@ func GetActions(ctx context.Context, item *TreeNode) ([]*TreeNode, error) {
 		doesExpand, err := h.HasActions(ctx, item)
 		spanQuery.SetTag(h.Name(), doesExpand)
 		if err != nil {
-			panic(err)
+			return []*TreeNode{}, err
 		}
 		if !doesExpand {
 			continue

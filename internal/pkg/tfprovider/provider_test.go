@@ -1,12 +1,14 @@
 package tfprovider
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/tfprovider"
 	ctrl "sigs.k8s.io/controller-runtime"
 )
 
@@ -58,7 +60,7 @@ func Test_PrepareProviderConfigWithDefaults_expectNoError(t *testing.T) {
 					panic(err)
 				}
 			}
-			provider, err := getInstanceOfProvider(tt.name, providerInstallPath, "")
+			provider, err := getInstanceOfProvider(context.Background(), tt.name, providerInstallPath, "")
 			if err != nil {
 				t.Errorf("failed to get instance of provider. error = %v", err)
 			}
@@ -75,7 +77,7 @@ func Test_PrepareProviderConfigWithDefaults_expectNoError(t *testing.T) {
 func Test_installProvider(t *testing.T) {
 	for _, tt := range testedProviders {
 		t.Run(tt.name, func(t *testing.T) {
-			installedToPath, err := installProvider(tt.name, tt.version)
+			installedToPath, err := installProvider(context.Background(), tt.name, tt.version)
 			if err != nil {
 				t.Errorf("installProvider() error = %v, no error expected", err)
 			}
@@ -105,44 +107,44 @@ func Test_installProvider(t *testing.T) {
 func TestSetupProvider(t *testing.T) {
 	tests := []struct {
 		purpose string
-		envs    map[string]string
+		config  tfprovider.TerraformProviderConfig
 		wantErr bool
 	}{
 		{
 			purpose: "Error_When_OnlyNameSet",
-			envs: map[string]string{
-				"TF_PROVIDER_NAME":    "azurerm",
-				"TF_PROVIDER_VERSION": "",
-				"TF_PROVIDER_PATH":    "",
+			config: tfprovider.TerraformProviderConfig{
+				ProviderName:    "azurerm",
+				ProviderVersion: "",
+				ProviderPath:    "",
 			},
 			wantErr: true,
 		},
 		{
 			purpose: "Error_When_PathIsMissingProviderBinary",
-			envs: map[string]string{
-				"TF_PROVIDER_NAME":    "azurerm",
-				"TF_PROVIDER_PATH":    "/tmp",
-				"TF_PROVIDER_VERSION": "",
+			config: tfprovider.TerraformProviderConfig{
+				ProviderName:    "azurerm",
+				ProviderVersion: "",
+				ProviderPath:    "/tmp",
 			},
 			wantErr: true,
 		},
 		{
 			purpose: "Succeed_When_ValidProviderPathAndNameSet",
-			envs: map[string]string{
-				"TF_PROVIDER_NAME":    "azurerm",
-				"TF_PROVIDER_VERSION": "",
-				"TF_PROVIDER_PATH":    providerInstallPath,
-				"PROVIDER_CONFIG_HCL": "features {}",
+			config: tfprovider.TerraformProviderConfig{
+				ProviderName:      "azurerm",
+				ProviderVersion:   "",
+				ProviderPath:      providerInstallPath,
+				ProviderConfigHCL: "features {}",
 			},
 			wantErr: false,
 		},
 		{
 			purpose: "Succeed_When_ValidProviderNameAndVersionSet",
-			envs: map[string]string{
-				"TF_PROVIDER_NAME":    "azurerm",
-				"TF_PROVIDER_VERSION": "2.22.0",
-				"TF_PROVIDER_PATH":    "",
-				"PROVIDER_CONFIG_HCL": "features {}",
+			config: tfprovider.TerraformProviderConfig{
+				ProviderName:      "azurerm",
+				ProviderVersion:   "2.22.0",
+				ProviderPath:      "",
+				ProviderConfigHCL: "features {}",
 			},
 			wantErr: false,
 		},
@@ -156,7 +158,7 @@ func TestSetupProvider(t *testing.T) {
 					t.Errorf("failed to set environment vars for test. error = %v", err)
 				}
 			}
-			got, err := SetupProvider(ctrl.Log.WithName("tester"))
+			got, err := SetupProvider(context.Background(), ctrl.Log.WithName("tester"), tt.config)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SetupProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return

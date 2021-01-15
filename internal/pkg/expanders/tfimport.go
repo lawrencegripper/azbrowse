@@ -3,10 +3,10 @@ package expanders
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/user"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -18,39 +18,66 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tfprovider"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
+	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 )
 
+var vmEndpoint = endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}", "2020-06-01")
+
 // lookup mapping of resource type to regexp expression to match resource IDs
 var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
-	"azurerm_resource_group":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}", ""),
+	"azurerm_resource_group": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}", ""),
+
+	// App Service
 	"azurerm_app_service_plan": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/serverfarms/{farmName}", ""),
 	"azurerm_app_service":      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}", ""),
-	"azurerm_storage_account":  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", ""),
-	"azurerm_mssql_server":     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}", ""),
-	"azurerm_private_endpoint": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints/{endpointName}", ""),
+
+	// Storage
+	"azurerm_storage_account": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", ""),
+
+	// SQL Database
+	"azurerm_mssql_server":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}", ""),
+	"azurerm_mssql_database": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}", ""),
+
+	// Networking
+	"azurerm_private_endpoint":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints/{endpointName}", ""),
+	"azurerm_network_interface":                     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", ""),
+	"azurerm_network_security_group":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", ""),
+	"azurerm_network_security_rule":                 endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/securityRules/{securityRuleName}", ""),
+	"azurerm_private_dns_zone":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", ""),
+	"azurerm_private_dns_zone_virtual_network_link": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/virtualNetworkLinks/{virtualNetworkLinkName}", ""),
+	"azurerm_public_ip":                             endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}", ""),
+	"azurerm_virtual_network_gateway":               endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", ""),
+	"azurerm_virtual_network":                       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", ""),
+	"azurerm_subnet":                                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", ""),
+
+	// KeyVault
+	"azurerm_key_vault": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}", ""),
+
+	// Virtual machines
+	"azurerm_virtual_machine_extension": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/extensions/{vmExtensionName}", ""),
+	"azurerm_managed_disk":              endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/disks/{diskName}", ""),
+	"azurerm_windows_virtual_machine":   vmEndpoint,
+	"azurerm_linux_virtual_machine":     vmEndpoint,
+
+	// "":              endpoints.MustGetEndpointInfoFromURL("", ""),
+
 }
 
 // TODO
 //  - expand the list of mapped resource types
-//  - handle VMs - need more than the ID to determine Windows/Linux VM
 //  - handle Azure data-plane resources (e.g. storage containers)
 //  - handle non-Azure resources? (e.g. databricks cluster)
-
-// TfImportResourceType represents a mapping of resource name to resource ID regexp
-type TfImportResourceType struct {
-	ResourceName string
-	IDRegexp     *regexp.Regexp
-}
 
 const (
 	tfimportActionGetTerraform = "GetTerraform"
 )
 
 // NewTerraformImportExpander creates a new instance of TerraformImportExpander
-func NewTerraformImportExpander() *TerraformImportExpander {
+func NewTerraformImportExpander(armclient *armclient.Client) *TerraformImportExpander {
 	return &TerraformImportExpander{
 		nullLogger: NewNullLogger(),
+		client:     armclient,
 	}
 }
 
@@ -62,6 +89,11 @@ type TerraformImportExpander struct {
 	ExpanderBase
 	tfProvider *tfprovider.TerraformProvider
 	nullLogger logr.Logger
+	client     *armclient.Client
+}
+
+func (e *TerraformImportExpander) setClient(c *armclient.Client) {
+	e.client = c
 }
 
 // Name returns the name of the expander
@@ -99,7 +131,29 @@ func (e *TerraformImportExpander) ensureTfProviderInitialized(context context.Co
 	return nil
 }
 
-func (e *TerraformImportExpander) getResourceTypeNameFromResourceID(resourceID string) (string, error) {
+func (e *TerraformImportExpander) getResourceTypeNameFromResourceID(context context.Context, resourceID string) (string, error) {
+	result := vmEndpoint.Match(resourceID)
+	if result.IsMatch {
+		body, err := e.client.DoRequest(context, "GET", resourceID+"?api-version="+vmEndpoint.APIVersion)
+		if err != nil {
+			return "", err
+		}
+		value, err := getJSONPropertyFromString(body, "properties", "storageProfile", "osDisk", "osType")
+		if err != nil {
+			return "", err
+		}
+		osType, ok := value.(string)
+		if !ok {
+			return "", err
+		}
+		switch osType {
+		case "Windows":
+			return "azurerm_windows_virtual_machine", nil
+		case "Linux":
+			return "azurerm_linux_virtual_machine", nil
+		}
+	}
+
 	for resourceTypeName, resourceEndpoint := range tfimportBaseConfig {
 		result := resourceEndpoint.Match(resourceID)
 		if result.IsMatch {
@@ -109,26 +163,59 @@ func (e *TerraformImportExpander) getResourceTypeNameFromResourceID(resourceID s
 	return "", nil
 }
 
+func getJSONPropertyFromString(jsonString string, properties ...string) (interface{}, error) {
+	var jsonData map[string]interface{}
+
+	if err := json.Unmarshal([]byte(jsonString), &jsonData); err != nil {
+		return nil, err
+	}
+
+	return getJSONProperty(jsonData, properties...)
+}
+func getJSONProperty(jsonData interface{}, properties ...string) (interface{}, error) {
+	switch jsonData.(type) {
+	case map[string]interface{}:
+		jsonMap := jsonData.(map[string]interface{})
+		name := properties[0]
+		jsonSubtree, ok := jsonMap[name]
+		if ok {
+			if len(properties) == 1 {
+				return jsonSubtree, nil
+			}
+			return getJSONProperty(jsonSubtree, properties[1:]...)
+		} else {
+			return nil, nil // TODO - error if not found?
+		}
+	default:
+		return nil, nil // TODO - error if not able to walk the tree?
+	}
+
+}
+
 // HasActions is a default implementation returning false to indicate no actions available
 func (e *TerraformImportExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
-	resourceTypeName, err := e.getResourceTypeNameFromResourceID(item.ID)
+	resourceTypeName, err := e.getResourceTypeNameFromResourceID(context, item.ID)
 	if err != nil {
 		return false, err
 	}
 	if resourceTypeName == "" {
 		return false, nil
 	}
+	if item.Metadata == nil {
+		item.Metadata = map[string]string{}
+	}
+	item.Metadata["TerraformImportExpander_ResourceTypeName"] = resourceTypeName // cache to avoid repeating lookup (avoids ARM call in VM case)
 	return true, nil
 }
 
 // ListActions returns an error as it should not be called as HasActions returns false
 func (e *TerraformImportExpander) ListActions(context context.Context, item *TreeNode) ListActionsResult {
 
-	resourceTypeName, err := e.getResourceTypeNameFromResourceID(item.ID)
-	if err != nil {
+	resourceTypeName := item.Metadata["TerraformImportExpander_ResourceTypeName"]
+	if resourceTypeName == "" {
 		return ListActionsResult{
 			SourceDescription: "TerraformImportExpander",
-			Err:               err,
+			Err:               fmt.Errorf("ResourceTypeName not set"),
 		}
 	}
 
