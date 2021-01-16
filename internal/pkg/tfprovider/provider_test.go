@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	providerInstallPath = "/workspaces/azbrowse/hack/"
+	providerInstallPath = "../../../hack/"
 )
 
 type providerTestDef struct {
