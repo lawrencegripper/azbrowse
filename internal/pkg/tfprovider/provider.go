@@ -29,10 +29,7 @@ import (
 )
 
 const (
-	providerNameEnv   = "TF_PROVIDER_NAME"
-	providerVerionEnv = "TF_PROVIDER_VERSION"
-	providerPathEnv   = "TF_PROVIDER_PATH"
-	tfVersion         = "0.12.29"
+	tfVersion = "0.12.29"
 )
 
 // TerraformProvider represents a terraform provider install
@@ -48,6 +45,7 @@ type TerraformProviderMetadata struct {
 	ChecksumSHA256 string
 }
 
+// TerraformProviderConfig defines the config for a terraform provider
 type TerraformProviderConfig struct {
 	ProviderName      string
 	ProviderPath      string
@@ -84,8 +82,8 @@ func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProvide
 		if err != nil {
 			return nil, fmt.Errorf("Failed to setup provider as provider install failed: %w", err)
 		}
+		providerInstance, err = getInstanceOfProvider(ctx, config.ProviderName, providerPath, config.ProviderVersion)
 	}
-	providerInstance, err = getInstanceOfProvider(ctx, config.ProviderName, providerPath, config.ProviderVersion)
 	if err != nil {
 		return nil, fmt.Errorf("failed getting provider instance %w", err)
 	}
@@ -133,7 +131,7 @@ func installProvider(ctx context.Context, name string, version string, providerP
 		return fmt.Errorf("Failed to create TF context %w", err)
 	}
 
-	span, ctx = tracing.StartSpanFromContext(ctx, "tfprovider:init")
+	span, _ = tracing.StartSpanFromContext(ctx, "tfprovider:init")
 	err = tf.Init(context.Background(), tfexec.Upgrade(true), tfexec.LockTimeout("60s"))
 	span.Finish()
 	if err != nil {
@@ -180,7 +178,7 @@ func getInstanceOfProvider(ctx context.Context, name, basePath, version string) 
 	}
 
 	// create a new resource provisioner.
-	span, ctx = tracing.StartSpanFromContext(ctx, "tfprovider:getInstance:dispense")
+	span, _ = tracing.StartSpanFromContext(ctx, "tfprovider:getInstance:dispense")
 	raw, err := rpcClient.Dispense(plugin.ProviderPluginName)
 	span.Finish()
 	if err != nil {

@@ -181,9 +181,9 @@ func getJSONPropertyFromString(jsonString string, properties ...string) (interfa
 	return getJSONProperty(jsonData, properties...)
 }
 func getJSONProperty(jsonData interface{}, properties ...string) (interface{}, error) {
-	switch jsonData.(type) {
+	switch jsonData := jsonData.(type) {
 	case map[string]interface{}:
-		jsonMap := jsonData.(map[string]interface{})
+		jsonMap := jsonData
 		name := properties[0]
 		jsonSubtree, ok := jsonMap[name]
 		if ok {
