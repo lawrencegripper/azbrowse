@@ -116,3 +116,13 @@ ENV SNAP_ARCH="amd64"
 
 # Install python deps for deving
 RUN pip3 install rope black
+
+ARG TERRAFORM_VERSION=0.12.26
+RUN \
+    # Install Terraform
+    apt-get update && \
+    apt-get -y install --no-install-recommends unzip && \
+    mkdir -p /tmp/docker-downloads \
+    && curl -sSL -o /tmp/docker-downloads/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
+    && unzip /tmp/docker-downloads/terraform.zip \
+    && mv terraform /usr/local/bin

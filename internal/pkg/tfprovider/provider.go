@@ -163,7 +163,7 @@ func getInstanceOfProvider(ctx context.Context, name, basePath, version string) 
 	pluginMeta := discovery.FindPlugins(plugin.ProviderPluginName, []string{path}).WithName(name)
 	span.Finish()
 	if pluginMeta.Count() < 1 {
-		return nil, fmt.Errorf("Provide:%q not found at path:%q", name, path)
+		return nil, fmt.Errorf("Provider:%q not found at path:%q", name, path)
 	}
 	versionedPlugin := pluginMeta.Newest()
 	clientConfig := plugin.ClientConfig(versionedPlugin)

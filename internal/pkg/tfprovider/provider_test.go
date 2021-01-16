@@ -5,15 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 	"testing"
-
-	"github.com/lawrencegripper/azbrowse/internal/pkg/tfprovider"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 const (
-	providerInstallPath = "../hack/.terraform/plugins/linux_amd64/"
+	providerInstallPath = "/workspaces/azbrowse/hack/"
 )
 
 type providerTestDef struct {
@@ -77,10 +75,17 @@ func Test_PrepareProviderConfigWithDefaults_expectNoError(t *testing.T) {
 func Test_installProvider(t *testing.T) {
 	for _, tt := range testedProviders {
 		t.Run(tt.name, func(t *testing.T) {
-			installedToPath, err := installProvider(context.Background(), tt.name, tt.version)
+
+			workingDir, err := ioutil.TempDir("", "tfinstall-test")
+			if err != nil {
+				t.Errorf("installProvider() error = %v, failed to create temp dir", err)
+			}
+
+			err = installProvider(context.Background(), tt.name, tt.version, workingDir)
 			if err != nil {
 				t.Errorf("installProvider() error = %v, no error expected", err)
 			}
+			installedToPath := path.Join(workingDir, "/.terraform/plugins/linux_amd64/")
 
 			expectedProviderFilename := fmt.Sprintf("terraform-provider-%s_v%s", tt.name, tt.version)
 
@@ -107,12 +112,12 @@ func Test_installProvider(t *testing.T) {
 func TestSetupProvider(t *testing.T) {
 	tests := []struct {
 		purpose string
-		config  tfprovider.TerraformProviderConfig
+		config  TerraformProviderConfig
 		wantErr bool
 	}{
 		{
 			purpose: "Error_When_OnlyNameSet",
-			config: tfprovider.TerraformProviderConfig{
+			config: TerraformProviderConfig{
 				ProviderName:    "azurerm",
 				ProviderVersion: "",
 				ProviderPath:    "",
@@ -121,7 +126,7 @@ func TestSetupProvider(t *testing.T) {
 		},
 		{
 			purpose: "Error_When_PathIsMissingProviderBinary",
-			config: tfprovider.TerraformProviderConfig{
+			config: TerraformProviderConfig{
 				ProviderName:    "azurerm",
 				ProviderVersion: "",
 				ProviderPath:    "/tmp",
@@ -130,7 +135,7 @@ func TestSetupProvider(t *testing.T) {
 		},
 		{
 			purpose: "Succeed_When_ValidProviderPathAndNameSet",
-			config: tfprovider.TerraformProviderConfig{
+			config: TerraformProviderConfig{
 				ProviderName:      "azurerm",
 				ProviderVersion:   "",
 				ProviderPath:      providerInstallPath,
@@ -140,10 +145,10 @@ func TestSetupProvider(t *testing.T) {
 		},
 		{
 			purpose: "Succeed_When_ValidProviderNameAndVersionSet",
-			config: tfprovider.TerraformProviderConfig{
+			config: TerraformProviderConfig{
 				ProviderName:      "azurerm",
 				ProviderVersion:   "2.22.0",
-				ProviderPath:      "",
+				ProviderPath:      providerInstallPath,
 				ProviderConfigHCL: "features {}",
 			},
 			wantErr: false,
@@ -151,14 +156,7 @@ func TestSetupProvider(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.purpose, func(t *testing.T) {
-			// Set required envs
-			for name, value := range tt.envs {
-				err := os.Setenv(name, value)
-				if err != nil {
-					t.Errorf("failed to set environment vars for test. error = %v", err)
-				}
-			}
-			got, err := SetupProvider(context.Background(), ctrl.Log.WithName("tester"), tt.config)
+			got, err := SetupProvider(context.Background(), NewNullLogger(), tt.config)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SetupProvider() error = %v, wantErr %v", err, tt.wantErr)
 				return

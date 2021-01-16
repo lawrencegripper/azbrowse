@@ -67,6 +67,8 @@ var resourceIDIgnoreSuffices = []string{
 	"/<diagsettings>",
 	"/<activitylog>",
 	"/providers/Microsoft.Resources/deployments",
+	"/providers/microsoft.Insights/metrics",
+	"/providers/microsoft.insights/metricdefinitions",
 }
 
 // TODO
@@ -82,7 +84,7 @@ const (
 // NewTerraformImportExpander creates a new instance of TerraformImportExpander
 func NewTerraformImportExpander(armclient *armclient.Client) *TerraformImportExpander {
 	return &TerraformImportExpander{
-		nullLogger: NewNullLogger(),
+		nullLogger: tfprovider.NewNullLogger(),
 		client:     armclient,
 	}
 }
@@ -225,6 +227,8 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 		}
 	}
 
+	timeoutOverride := 300
+
 	nodes := []*TreeNode{
 		{
 			Parentid:              item.ID,
@@ -251,6 +255,7 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 				"ActionID":         tfimportActionGetTerraformRecursive,
 				"ResourceTypeName": resourceTypeName,
 			},
+			TimeoutOverrideSeconds: &timeoutOverride,
 		},
 	}
 	return ListActionsResult{
@@ -275,7 +280,7 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 		}
 		return e.getTerraformForNode(context, item.Parent, resourceTypeName) // Item refers to the Action node - it's parent is the node it is the action for
 	case tfimportActionGetTerraformRecursive:
-		return e.getTerraformForNodeRecursive(context, item.Parent) // Item refers to the Action node - it's parent is the node it is the action for
+		return e.getTerraformForNodeRecursive(context, item.Parent, 0) // Item refers to the Action node - it's parent is the node it is the action for
 	case "":
 		err = fmt.Errorf("ActionID metadata not set: %q", item.ID)
 	default:
@@ -286,46 +291,48 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 		Err:               err,
 	}
 }
-func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, item *TreeNode) ExpanderResult {
+func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, item *TreeNode, depth int) ExpanderResult {
 
 	// Get Terraform for the current node...
+	terraform := ""
 	result := e.getTerraformForNode(context, item, "")
 	if result.Err != nil {
-		return result
+		terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
+	} else {
+		terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
 	}
 
-	terraform := result.Response.Response
-
-	_, childItems, err := ExpandItem(context, item)
-	if err != nil {
-		terraform = fmt.Sprintf("%s\n\n#Error expanding %q: %s", terraform, item.ID, err)
-		return ExpanderResult{
-			SourceDescription: "TerraformImportExpander",
-			Response: ExpanderResponse{
-				ResponseType: ResponseTerraform,
-				Response:     terraform,
-			},
-			IsPrimaryResponse: true,
-		}
-	}
-
-	for _, childItem := range childItems {
-		// TODO - change this to getTerraformForNodeRecursive.... need to figure out how to avoid a massive tree crawl though!
-		ignore := false
-		for _, suffix := range resourceIDIgnoreSuffices {
-			if strings.HasSuffix(childItem.ID, suffix) {
-				ignore = true
-				break
+	if depth < 5 { // TODO - need to figure out a better way to avoid a massive tree crawl!
+		_, childItems, err := ExpandItem(context, item)
+		if err != nil {
+			terraform = fmt.Sprintf("%s\n#Error expanding %q: %s", terraform, item.ID, err)
+			return ExpanderResult{
+				SourceDescription: "TerraformImportExpander",
+				Response: ExpanderResponse{
+					ResponseType: ResponseTerraform,
+					Response:     terraform,
+				},
+				IsPrimaryResponse: true,
 			}
 		}
-		if ignore {
-			continue
-		}
-		result = e.getTerraformForNode(context, childItem, "")
-		if result.Err != nil {
-			terraform = fmt.Sprintf("%s\n\n#Error getting Tf for %q: %s\n", terraform, childItem.ID, result.Err)
-		} else {
-			terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
+
+		for _, childItem := range childItems {
+			ignore := false
+			for _, suffix := range resourceIDIgnoreSuffices {
+				if strings.HasSuffix(childItem.ID, suffix) {
+					ignore = true
+					break
+				}
+			}
+			if ignore {
+				continue
+			}
+			result = e.getTerraformForNodeRecursive(context, childItem, depth+1)
+			if result.Err != nil {
+				terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
+			} else {
+				terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
+			}
 		}
 	}
 
@@ -518,45 +525,4 @@ func (e *TerraformImportExpander) printState(state cty.Value, resourceTypeName s
 		return "", err
 	}
 	return buf.String(), nil
-}
-
-// ************************************************************************************** TODO put in a separate file
-type NullLogger struct {
-}
-
-var _ logr.Logger = &NullLogger{}
-
-// Info implements Logger.Info
-func (l *NullLogger) Info(msg string, kvs ...interface{}) {
-}
-
-// Enabled implements Logger.Enabled
-func (*NullLogger) Enabled() bool {
-	return false
-}
-
-// Error implements Logger.Error
-func (l *NullLogger) Error(err error, msg string, kvs ...interface{}) {
-	kvs = append(kvs, "error", err)
-	l.Info(msg, kvs...)
-}
-
-// V implements Logger.V
-func (l *NullLogger) V(_ int) logr.Logger {
-	return l
-}
-
-// WithName implements Logger.WithName
-func (l *NullLogger) WithName(name string) logr.Logger {
-	return l
-}
-
-// WithValues implements Logger.WithValues
-func (l *NullLogger) WithValues(kvs ...interface{}) logr.Logger {
-	return l
-}
-
-// NewNullLogger creates a new NullLogger
-func NewNullLogger() logr.Logger {
-	return &NullLogger{}
 }

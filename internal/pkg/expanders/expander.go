@@ -17,6 +17,7 @@ type expanderAndResponse struct {
 
 // ExpandItem finds child nodes of the item and their content
 func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, []*TreeNode, error) {
+
 	newItems := []*TreeNode{}
 
 	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
@@ -63,7 +64,12 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 
 	// Lets give all the expanders 45secs to completed (unless debugging)
 	hasPrimaryResponse := false
-	timeout := time.After(time.Second * 45)
+	timeoutSeconds := 45
+	if currentItem.TimeoutOverrideSeconds != nil {
+		timeoutSeconds = *currentItem.TimeoutOverrideSeconds
+	}
+
+	timeout := time.After(time.Second * time.Duration(timeoutSeconds))
 	var newContent ExpanderResponse
 
 	for index := 0; index < handlerExpanding; index++ {
