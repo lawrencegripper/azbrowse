@@ -34,6 +34,8 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 
 	// Storage
 	"azurerm_storage_account": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}", ""),
+	// TODO - add a check to the storage account and conditionally use azurerm_storage_data_lake_gen2_filesystem instead of azurerm_storage_container if isHnsEnabled is true
+	"azurerm_storage_container": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}", ""),
 
 	// SQL Database
 	"azurerm_mssql_server":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}", ""),
@@ -63,12 +65,52 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 	// "":              endpoints.MustGetEndpointInfoFromURL("", ""),
 }
 
+// Global ignore rules based on resource ID suffix
 var resourceIDIgnoreSuffices = []string{
 	"/<diagsettings>",
 	"/<activitylog>",
 	"/providers/Microsoft.Resources/deployments",
 	"/providers/microsoft.Insights/metrics",
 	"/providers/microsoft.insights/metricdefinitions",
+}
+
+// Rules to ignore resource IDs, specified as EndpointInfos keyed on the parent resource type
+var endpointsToIgnore = map[string][]*endpoints.EndpointInfo{
+	"azurerm_app_service": {
+		endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/instances", ""),
+		endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/processes", ""),
+	},
+	"azurerm_storage_container": {
+		endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/blobServices/default/containers/{containerName}/{path}", ""),
+	},
+	"azurerm_mssql_database": {
+		endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}/{placeholder}", ""),
+	},
+}
+
+// EndpointMatchTOResourceIDFunc is used to override the ID used for importing a resource
+type EndpointMatchToResourceIDFunc func(matchingEndpoint *endpoints.EndpointInfo, matchValues map[string]string) (string, error)
+
+var defaultEndpointMatchTOResourceIDFunc = func(matchingEndpoint *endpoints.EndpointInfo, matchValues map[string]string) (string, error) {
+	return matchingEndpoint.BuildURL(matchValues)
+}
+
+// Map of functions to use to override the import URL if it needs to be different to the TreeNode ID
+var resourceIDOverrides = map[string]EndpointMatchToResourceIDFunc{
+	"azurerm_storage_container": func(matchingEndpoint *endpoints.EndpointInfo, matchValues map[string]string) (string, error) {
+		overriddenEndpoint, err := endpoints.GetEndpointInfoFromURL("/{containerName}", "")
+		if err != nil {
+			return "", err
+		}
+		path, err := overriddenEndpoint.BuildURL(matchValues)
+		if err != nil {
+			return "", err
+		}
+		if accountName, ok := matchValues["accountName"]; ok {
+			return fmt.Sprintf("https://%s.blob.core.windows.net%s", accountName, path), nil
+		}
+		return "", fmt.Errorf("accountName not found in match values")
+	},
 }
 
 // TODO
@@ -239,8 +281,8 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 			ItemType:              ActionType,
 			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"ActionID":         tfimportActionGetTerraform,
-				"ResourceTypeName": resourceTypeName,
+				"ActionID": tfimportActionGetTerraform,
+				"TerraformImportExpander_ResourceTypeName": resourceTypeName,
 			},
 		},
 		{
@@ -252,8 +294,8 @@ func (e *TerraformImportExpander) ListActions(context context.Context, item *Tre
 			ItemType:              ActionType,
 			SuppressGenericExpand: true,
 			Metadata: map[string]string{
-				"ActionID":         tfimportActionGetTerraformRecursive,
-				"ResourceTypeName": resourceTypeName,
+				"ActionID": tfimportActionGetTerraformRecursive,
+				"TerraformImportExpander_ResourceTypeName": resourceTypeName,
 			},
 			TimeoutOverrideSeconds: &timeoutOverride,
 		},
@@ -271,16 +313,16 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 	var err error
 	switch actionID {
 	case tfimportActionGetTerraform:
-		resourceTypeName := item.Metadata["ResourceTypeName"]
+		resourceTypeName := item.Metadata["TerraformImportExpander_ResourceTypeName"]
 		if resourceTypeName == "" {
 			return ExpanderResult{
 				SourceDescription: "TerraformImportExpander",
 				Err:               fmt.Errorf("ResourceTypeName not set"),
 			}
 		}
-		return e.getTerraformForNode(context, item.Parent, resourceTypeName) // Item refers to the Action node - it's parent is the node it is the action for
+		return e.getTerraformForNode(context, item.Parent) // Item refers to the Action node - it's parent is the node it is the action for
 	case tfimportActionGetTerraformRecursive:
-		return e.getTerraformForNodeRecursive(context, item.Parent, 0) // Item refers to the Action node - it's parent is the node it is the action for
+		return e.getTerraformForNodeRecursive(context, item.Parent, 50, "") // Item refers to the Action node - it's parent is the node it is the action for
 	case "":
 		err = fmt.Errorf("ActionID metadata not set: %q", item.ID)
 	default:
@@ -291,19 +333,19 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 		Err:               err,
 	}
 }
-func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, item *TreeNode, depth int) ExpanderResult {
+func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, item *TreeNode, remainingDepth int, lastResourceTypeName string) ExpanderResult {
 
 	// Get Terraform for the current node...
 	terraform := ""
-	result := e.getTerraformForNode(context, item, "")
+	result := e.getTerraformForNode(context, item)
 	if result.Err != nil {
 		terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
 	} else {
 		terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
 	}
 
-	if depth < 5 { // TODO - need to figure out a better way to avoid a massive tree crawl!
-		_, childItems, err := ExpandItem(context, item)
+	if remainingDepth > 0 { // TODO - need to figure out a better way to avoid a massive tree crawl!
+		_, childItems, err := ExpandItemAllowDefaultExpander(context, item, false)
 		if err != nil {
 			terraform = fmt.Sprintf("%s\n#Error expanding %q: %s", terraform, item.ID, err)
 			return ExpanderResult{
@@ -327,11 +369,28 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 			if ignore {
 				continue
 			}
-			result = e.getTerraformForNodeRecursive(context, childItem, depth+1)
+
+			resourceTypeName := item.Metadata["TerraformImportExpander_ResourceTypeName"]
+			if resourceTypeName == "" {
+				resourceTypeName = lastResourceTypeName
+			}
+			ignoreRules := endpointsToIgnore[resourceTypeName]
+			for _, ignoreEndpoint := range ignoreRules {
+				result := ignoreEndpoint.Match(childItem.ID)
+				if result.IsMatch {
+					ignore = true
+					break
+				}
+			}
+			if ignore {
+				continue
+			}
+
+			result = e.getTerraformForNodeRecursive(context, childItem, remainingDepth-1, lastResourceTypeName)
 			if result.Err != nil {
 				terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
 			} else {
-				terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
+				terraform = fmt.Sprintf("%s%s", terraform, result.Response.Response)
 			}
 		}
 	}
@@ -346,7 +405,7 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 	}
 }
 
-func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode, resourceTypeName string) ExpanderResult {
+func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode) ExpanderResult {
 	span, context := tracing.StartSpanFromContext(context, "terraform:get-for-node:"+item.ItemType+":"+item.Name, tracing.SetTag("item", item))
 	defer span.Finish()
 	err := e.ensureTfProviderInitialized(context)
@@ -357,6 +416,10 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 		}
 	}
 
+	if item.Metadata == nil {
+		item.Metadata = map[string]string{}
+	}
+	resourceTypeName := item.Metadata["TerraformImportExpander_ResourceTypeName"]
 	if resourceTypeName == "" {
 		resourceTypeName, err = e.getResourceTypeNameFromResourceID(context, item.ID)
 		if err != nil {
@@ -365,6 +428,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 				Err:               err,
 			}
 		}
+		item.Metadata["TerraformImportExpander_ResourceTypeName"] = resourceTypeName
 	}
 	if resourceTypeName == "" {
 		return ExpanderResult{
@@ -388,9 +452,13 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 			Err:               fmt.Errorf("Failed to match resource type name"),
 		}
 	}
-	// use the endpoint to rebuild the ID URL to ensure the case matches what the azurerm provider expects
-	id, err = endpoint.BuildURL(endpointMatch.Values)
-	if !endpointMatch.IsMatch {
+	getResourceIDFunc := resourceIDOverrides[resourceTypeName] // use override endpoint to build custom ID for import
+	if getResourceIDFunc == nil {
+		// use the endpoint to rebuild the ID URL to ensure the case matches what the azurerm provider expects
+		getResourceIDFunc = defaultEndpointMatchTOResourceIDFunc
+	}
+	id, err = getResourceIDFunc(endpoint, endpointMatch.Values)
+	if err != nil {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
 			Err:               err,
@@ -482,7 +550,7 @@ func (e *TerraformImportExpander) writeBlock(outputBlock *hclwrite.Block, terraf
 	for _, k := range keys {
 		attributeName := k[1:]
 		attributeSchema := terraformBlock.Attributes[attributeName]
-		if !attributeSchema.Computed {
+		if !attributeSchema.Computed || attributeSchema.Optional {
 			attributeValue := state.GetAttr(attributeName)
 			outputBlock.Body().SetAttributeValue(attributeName, attributeValue)
 		}
@@ -495,8 +563,7 @@ func (e *TerraformImportExpander) writeBlock(outputBlock *hclwrite.Block, terraf
 		if newState.Type().IsObjectType() {
 			newBlock := outputBlock.Body().AppendNewBlock(blockName, []string{})
 			e.writeBlock(newBlock, &blockSchema.Block, newState)
-		}
-		if newState.CanIterateElements() {
+		} else if newState.CanIterateElements() {
 			iterator := newState.ElementIterator()
 			for iterator.Next() {
 				_, value := iterator.Element()
@@ -505,6 +572,8 @@ func (e *TerraformImportExpander) writeBlock(outputBlock *hclwrite.Block, terraf
 					e.writeBlock(newBlock, &blockSchema.Block, value)
 				}
 			}
+		} else {
+			fmt.Printf("")
 		}
 	}
 }

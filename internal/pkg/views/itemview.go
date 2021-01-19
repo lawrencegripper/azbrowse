@@ -245,6 +245,7 @@ func configureYAMLHighlighting() {
 			chroma.LiteralStringBoolean: "#b3760e",
 			chroma.LiteralNumber:        "#0099ff",
 			chroma.Keyword:              "#0099ff",
+			chroma.Comment:              "#006600",
 		},
 	)
 	styles.Register(style)

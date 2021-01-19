@@ -17,6 +17,11 @@ type expanderAndResponse struct {
 
 // ExpandItem finds child nodes of the item and their content
 func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, []*TreeNode, error) {
+	return ExpandItemAllowDefaultExpander(ctx, currentItem, true)
+}
+
+// ExpandItemAllowDefaultExpander finds child nodes of the item and their content and allows the default expander to be suppressed
+func ExpandItemAllowDefaultExpander(ctx context.Context, currentItem *TreeNode, allowDefaultExpander bool) (*ExpanderResponse, []*TreeNode, error) {
 
 	newItems := []*TreeNode{}
 
@@ -117,18 +122,20 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 		}
 	}
 
-	// Use the default handler to get the resource JSON for display
-	defaultExpanderWorksOnThisItem, _ := GetDefaultExpander().DoesExpand(ctx, currentItem)
-	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
-		result := GetDefaultExpander().Expand(ctx, currentItem)
-		if result.Err != nil {
-			eventing.SendStatusEvent(&eventing.StatusEvent{
-				Failure: true,
-				Message: "Failed to expand resource: " + result.Err.Error(),
-				Timeout: time.Duration(time.Second * 15),
-			})
+	if allowDefaultExpander {
+		// Use the default handler to get the resource JSON for display
+		defaultExpanderWorksOnThisItem, _ := GetDefaultExpander().DoesExpand(ctx, currentItem)
+		if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
+			result := GetDefaultExpander().Expand(ctx, currentItem)
+			if result.Err != nil {
+				eventing.SendStatusEvent(&eventing.StatusEvent{
+					Failure: true,
+					Message: "Failed to expand resource: " + result.Err.Error(),
+					Timeout: time.Duration(time.Second * 15),
+				})
+			}
+			newContent = result.Response
 		}
-		newContent = result.Response
 	}
 
 	return &newContent, newItems, nil
