@@ -65,8 +65,17 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 	// "":              endpoints.MustGetEndpointInfoFromURL("", ""),
 }
 
+// Since some handlers can go deep (e.g. storage data plane) or endlessly recurse (container registry data plane),
+// only recurse into handlers that are on this list
+// Typically, anything other than the SwaggerResourceExpander will need special handling via the resourceIDOverrides anyway
+var handledNodeExpanders = map[string]bool{
+	"ResourceGroupExpander":   true,
+	"SwaggerResourceExpander": true,
+	"StorageBlobExpander":     true, // ok to include as we have an ignoreEndpoints entry to prevent recursion into the container paths
+}
+
 // Global ignore rules based on resource ID suffix
-var resourceIDIgnoreSuffices = []string{
+var ignoreResourceIDSuffices = []string{
 	"/<diagsettings>",
 	"/<activitylog>",
 	"/providers/Microsoft.Resources/deployments",
@@ -75,7 +84,7 @@ var resourceIDIgnoreSuffices = []string{
 }
 
 // Rules to ignore resource IDs, specified as EndpointInfos keyed on the parent resource type
-var endpointsToIgnore = map[string][]*endpoints.EndpointInfo{
+var ignoreEndpoints = map[string][]*endpoints.EndpointInfo{
 	"azurerm_app_service": {
 		endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/instances", ""),
 		endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Web/sites/{siteName}/processes", ""),
@@ -88,10 +97,10 @@ var endpointsToIgnore = map[string][]*endpoints.EndpointInfo{
 	},
 }
 
-// EndpointMatchTOResourceIDFunc is used to override the ID used for importing a resource
+// EndpointMatchToResourceIDFunc is used to override the ID used for importing a resource
 type EndpointMatchToResourceIDFunc func(matchingEndpoint *endpoints.EndpointInfo, matchValues map[string]string) (string, error)
 
-var defaultEndpointMatchTOResourceIDFunc = func(matchingEndpoint *endpoints.EndpointInfo, matchValues map[string]string) (string, error) {
+var defaultEndpointMatchToResourceIDFunc = func(matchingEndpoint *endpoints.EndpointInfo, matchValues map[string]string) (string, error) {
 	return matchingEndpoint.BuildURL(matchValues)
 }
 
@@ -113,15 +122,12 @@ var resourceIDOverrides = map[string]EndpointMatchToResourceIDFunc{
 	},
 }
 
-// TODO
-//  - expand the list of mapped resource types
-//  - handle Azure data-plane resources (e.g. storage containers)
-//  - handle non-Azure resources? (e.g. databricks cluster)
-
 const (
 	tfimportActionGetTerraform          = "GetTerraform"
 	tfimportActionGetTerraformRecursive = "GetTerraformRecursive"
 )
+
+const MaximumTerraformResourceRecursionDepth = 100 // Safety net in case of issues with the resource ignore rules
 
 // NewTerraformImportExpander creates a new instance of TerraformImportExpander
 func NewTerraformImportExpander(armclient *armclient.Client) *TerraformImportExpander {
@@ -322,7 +328,7 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 		}
 		return e.getTerraformForNode(context, item.Parent) // Item refers to the Action node - it's parent is the node it is the action for
 	case tfimportActionGetTerraformRecursive:
-		return e.getTerraformForNodeRecursive(context, item.Parent, 50, "") // Item refers to the Action node - it's parent is the node it is the action for
+		return e.getTerraformForNodeRecursive(context, item.Parent, MaximumTerraformResourceRecursionDepth, "") // Item refers to the Action node - it's parent is the node it is the action for
 	case "":
 		err = fmt.Errorf("ActionID metadata not set: %q", item.ID)
 	default:
@@ -344,7 +350,7 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 		terraform = fmt.Sprintf("%s\n%s", terraform, result.Response.Response)
 	}
 
-	if remainingDepth > 0 { // TODO - need to figure out a better way to avoid a massive tree crawl!
+	if remainingDepth > 0 {
 		_, childItems, err := ExpandItemAllowDefaultExpander(context, item, false)
 		if err != nil {
 			terraform = fmt.Sprintf("%s\n#Error expanding %q: %s", terraform, item.ID, err)
@@ -359,38 +365,13 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 		}
 
 		for _, childItem := range childItems {
-			ignore := false
-			for _, suffix := range resourceIDIgnoreSuffices {
-				if strings.HasSuffix(childItem.ID, suffix) {
-					ignore = true
-					break
+			if e.shouldRecurseInto(childItem, item, lastResourceTypeName) {
+				result = e.getTerraformForNodeRecursive(context, childItem, remainingDepth-1, lastResourceTypeName)
+				if result.Err != nil {
+					terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
+				} else {
+					terraform = fmt.Sprintf("%s%s", terraform, result.Response.Response)
 				}
-			}
-			if ignore {
-				continue
-			}
-
-			resourceTypeName := item.Metadata["TerraformImportExpander_ResourceTypeName"]
-			if resourceTypeName == "" {
-				resourceTypeName = lastResourceTypeName
-			}
-			ignoreRules := endpointsToIgnore[resourceTypeName]
-			for _, ignoreEndpoint := range ignoreRules {
-				result := ignoreEndpoint.Match(childItem.ID)
-				if result.IsMatch {
-					ignore = true
-					break
-				}
-			}
-			if ignore {
-				continue
-			}
-
-			result = e.getTerraformForNodeRecursive(context, childItem, remainingDepth-1, lastResourceTypeName)
-			if result.Err != nil {
-				terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
-			} else {
-				terraform = fmt.Sprintf("%s%s", terraform, result.Response.Response)
 			}
 		}
 	}
@@ -403,6 +384,35 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 		},
 		IsPrimaryResponse: true,
 	}
+}
+
+func (e *TerraformImportExpander) shouldRecurseInto(item *TreeNode, parentItem *TreeNode, lastResourceTypeName string) bool {
+
+	// reject handlers that aren't listed
+	if !handledNodeExpanders[item.Expander.Name()] {
+		return false
+	}
+
+	// reject IDs that end with globally matched suffices
+	for _, suffix := range ignoreResourceIDSuffices {
+		if strings.HasSuffix(item.ID, suffix) {
+			return false
+		}
+	}
+
+	// reject IDs that match excluded endpoints for the last TF resource type
+	resourceTypeName := parentItem.Metadata["TerraformImportExpander_ResourceTypeName"]
+	if resourceTypeName == "" {
+		resourceTypeName = lastResourceTypeName
+	}
+	ignoreRules := ignoreEndpoints[resourceTypeName]
+	for _, ignoreEndpoint := range ignoreRules {
+		result := ignoreEndpoint.Match(item.ID)
+		if result.IsMatch {
+			return false
+		}
+	}
+	return true
 }
 
 func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode) ExpanderResult {
@@ -455,7 +465,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 	getResourceIDFunc := resourceIDOverrides[resourceTypeName] // use override endpoint to build custom ID for import
 	if getResourceIDFunc == nil {
 		// use the endpoint to rebuild the ID URL to ensure the case matches what the azurerm provider expects
-		getResourceIDFunc = defaultEndpointMatchTOResourceIDFunc
+		getResourceIDFunc = defaultEndpointMatchToResourceIDFunc
 	}
 	id, err = getResourceIDFunc(endpoint, endpointMatch.Values)
 	if err != nil {
