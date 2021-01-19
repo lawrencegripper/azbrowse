@@ -42,26 +42,39 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 	"azurerm_mssql_database": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/databases/{databaseName}", ""),
 
 	// Networking
-	"azurerm_private_endpoint":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints/{endpointName}", ""),
-	"azurerm_network_interface":                     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", ""),
-	"azurerm_network_security_group":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", ""),
-	"azurerm_network_security_rule":                 endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/securityRules/{securityRuleName}", ""),
+	"azurerm_private_endpoint":        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateEndpoints/{endpointName}", ""),
+	"azurerm_network_interface":       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkInterfaces/{networkInterfaceName}", ""),
+	"azurerm_network_security_group":  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}", ""),
+	"azurerm_network_security_rule":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/networkSecurityGroups/{networkSecurityGroupName}/securityRules/{securityRuleName}", ""),
+	"azurerm_public_ip":               endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}", ""),
+	"azurerm_virtual_network_gateway": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", ""),
+	"azurerm_virtual_network":         endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", ""),
+	"azurerm_subnet":                  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", ""),
+
+	// Private DNS
 	"azurerm_private_dns_zone":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", ""),
 	"azurerm_private_dns_zone_virtual_network_link": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/virtualNetworkLinks/{virtualNetworkLinkName}", ""),
-	"azurerm_public_ip":                             endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/publicIPAddresses/{publicIpAddressName}", ""),
-	"azurerm_virtual_network_gateway":               endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", ""),
-	"azurerm_virtual_network":                       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", ""),
-	"azurerm_subnet":                                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", ""),
-	"azurerm_dns_zone":                              endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}", ""),
-	"azurerm_dns_a_record":                          endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/A/{relativeRecordSetName}", ""),
-	"azurerm_dns_aaaa_record":                       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/AAAA/{relativeRecordSetName}", ""),
-	"azurerm_dns_caa_record":                        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/CAA/{relativeRecordSetName}", ""),
-	"azurerm_dns_cname_record":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/CNAME/{relativeRecordSetName}", ""),
-	"azurerm_dns_mx_record":                         endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/MX/{relativeRecordSetName}", ""),
-	"azurerm_dns_ns_record":                         endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/NS/{relativeRecordSetName}", ""),
-	"azurerm_dns_ptr_record":                        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/PTR/{relativeRecordSetName}", ""),
-	"azurerm_dns_srv_record":                        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/SRV/{relativeRecordSetName}", ""),
-	"azurerm_dns_txt_record":                        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/TXT/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_a_record":                  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/A/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_aaaa_record":               endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/AAAA/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_caa_record":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/CAA/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_cname_record":              endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/CNAME/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_mx_record":                 endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/MX/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_ns_record":                 endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/NS/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_ptr_record":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/PTR/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_srv_record":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/SRV/{relativeRecordSetName}", ""),
+	"azurerm_private_dns_txt_record":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}/TXT/{relativeRecordSetName}", ""),
+
+	// DNS
+	"azurerm_dns_zone":         endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}", ""),
+	"azurerm_dns_a_record":     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/A/{relativeRecordSetName}", ""),
+	"azurerm_dns_aaaa_record":  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/AAAA/{relativeRecordSetName}", ""),
+	"azurerm_dns_caa_record":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/CAA/{relativeRecordSetName}", ""),
+	"azurerm_dns_cname_record": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/CNAME/{relativeRecordSetName}", ""),
+	"azurerm_dns_mx_record":    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/MX/{relativeRecordSetName}", ""),
+	"azurerm_dns_ns_record":    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/NS/{relativeRecordSetName}", ""),
+	"azurerm_dns_ptr_record":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/PTR/{relativeRecordSetName}", ""),
+	"azurerm_dns_srv_record":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/SRV/{relativeRecordSetName}", ""),
+	"azurerm_dns_txt_record":   endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/dnszones/{zoneName}/TXT/{relativeRecordSetName}", ""),
 
 	// KeyVault
 	"azurerm_key_vault": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}", ""),
@@ -152,8 +165,9 @@ const MaximumTerraformResourceRecursionDepth = 100 // Safety net in case of issu
 // NewTerraformImportExpander creates a new instance of TerraformImportExpander
 func NewTerraformImportExpander(armclient *armclient.Client) *TerraformImportExpander {
 	return &TerraformImportExpander{
-		nullLogger: tfprovider.NewNullLogger(),
-		client:     armclient,
+		nullLogger:  tfprovider.NewNullLogger(),
+		client:      armclient,
+		tfProviders: map[string]*tfprovider.TerraformProvider{},
 	}
 }
 
@@ -163,9 +177,9 @@ var _ Expander = &TerraformImportExpander{}
 // TerraformImportExpander provides actions
 type TerraformImportExpander struct {
 	ExpanderBase
-	tfProvider *tfprovider.TerraformProvider
-	nullLogger logr.Logger
-	client     *armclient.Client
+	tfProviders map[string]*tfprovider.TerraformProvider // keyed on subscriptionId
+	nullLogger  logr.Logger
+	client      *armclient.Client
 }
 
 func (e *TerraformImportExpander) setClient(c *armclient.Client) {
@@ -177,9 +191,9 @@ func (e *TerraformImportExpander) Name() string {
 	return "TerraformImportExpander"
 }
 
-func (e *TerraformImportExpander) ensureTfProviderInitialized(context context.Context) error {
-	if e.tfProvider != nil {
-		return nil
+func (e *TerraformImportExpander) getTfProvider(context context.Context, subscriptionId string) (*tfprovider.TerraformProvider, error) {
+	if provider, ok := e.tfProviders[subscriptionId]; ok {
+		return provider, nil
 	}
 
 	// Get a provider instance by installing or using existing binary
@@ -190,21 +204,21 @@ func (e *TerraformImportExpander) ensureTfProviderInitialized(context context.Co
 	}
 	err = os.MkdirAll(azbPath, 0777)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	config := tfprovider.TerraformProviderConfig{
 		ProviderName:      "azurerm",
 		ProviderVersion:   "2.38.0",
-		ProviderConfigHCL: "features {}",
+		ProviderConfigHCL: fmt.Sprintf("features {}\nsubscription_id = \"%s\"", subscriptionId),
 		ProviderPath:      azbPath,
 	}
 	provider, err := tfprovider.SetupProvider(context, e.nullLogger, config) // TODO - update to use azbrowse profile folder as cache
 	if err != nil {
-		return err
+		return nil, err
 	}
-	e.tfProvider = provider
-	return nil
+	e.tfProviders[subscriptionId] = provider
+	return provider, nil
 }
 
 func (e *TerraformImportExpander) getResourceTypeNameFromResourceID(context context.Context, resourceID string) (string, error) {
@@ -346,9 +360,23 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 				Err:               fmt.Errorf("ResourceTypeName not set"),
 			}
 		}
-		return e.getTerraformForNode(context, item.Parent) // Item refers to the Action node - it's parent is the node it is the action for
+		subscriptionID := e.getSubscriptionFromResourceID(item.ID)
+		if subscriptionID == "" {
+			return ExpanderResult{
+				SourceDescription: "TerraformImportExpander",
+				Err:               fmt.Errorf("Couldn't determine SubscriptionID"),
+			}
+		}
+		return e.getTerraformForNode(context, subscriptionID, item.Parent) // Item refers to the Action node - it's parent is the node it is the action for
 	case tfimportActionGetTerraformRecursive:
-		return e.getTerraformForNodeRecursive(context, item.Parent, MaximumTerraformResourceRecursionDepth, "") // Item refers to the Action node - it's parent is the node it is the action for
+		subscriptionID := e.getSubscriptionFromResourceID(item.ID)
+		if subscriptionID == "" {
+			return ExpanderResult{
+				SourceDescription: "TerraformImportExpander",
+				Err:               fmt.Errorf("Couldn't determine SubscriptionID"),
+			}
+		}
+		return e.getTerraformForNodeRecursive(context, subscriptionID, item.Parent, MaximumTerraformResourceRecursionDepth, "") // Item refers to the Action node - it's parent is the node it is the action for
 	case "":
 		err = fmt.Errorf("ActionID metadata not set: %q", item.ID)
 	default:
@@ -359,11 +387,25 @@ func (e *TerraformImportExpander) ExecuteAction(context context.Context, item *T
 		Err:               err,
 	}
 }
-func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, item *TreeNode, remainingDepth int, lastResourceTypeName string) ExpanderResult {
+
+func (e *TerraformImportExpander) getSubscriptionFromResourceID(resourceID string) string {
+	const prefix = "/subscriptions/"
+	if !strings.HasPrefix(resourceID, prefix) {
+		return ""
+	}
+	temp := strings.TrimPrefix(resourceID, prefix)
+	separatorIndex := strings.Index(temp, "/")
+	if separatorIndex < 0 {
+		return temp
+	}
+	return temp[:separatorIndex]
+}
+
+func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.Context, subscriptionID string, item *TreeNode, remainingDepth int, lastResourceTypeName string) ExpanderResult {
 
 	// Get Terraform for the current node...
 	terraform := ""
-	result := e.getTerraformForNode(context, item)
+	result := e.getTerraformForNode(context, subscriptionID, item)
 	if result.Err != nil {
 		terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
 	} else {
@@ -386,7 +428,7 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 
 		for _, childItem := range childItems {
 			if e.shouldRecurseInto(childItem, item, lastResourceTypeName) {
-				result = e.getTerraformForNodeRecursive(context, childItem, remainingDepth-1, lastResourceTypeName)
+				result = e.getTerraformForNodeRecursive(context, subscriptionID, childItem, remainingDepth-1, lastResourceTypeName)
 				if result.Err != nil {
 					terraform = fmt.Sprintf("%s\n#Error: %s", terraform, result.Err)
 				} else {
@@ -435,22 +477,16 @@ func (e *TerraformImportExpander) shouldRecurseInto(item *TreeNode, parentItem *
 	return true
 }
 
-func (e *TerraformImportExpander) getTerraformForNode(context context.Context, item *TreeNode) ExpanderResult {
+func (e *TerraformImportExpander) getTerraformForNode(context context.Context, subscriptionID string, item *TreeNode) ExpanderResult {
 	span, context := tracing.StartSpanFromContext(context, "terraform:get-for-node:"+item.ItemType+":"+item.Name, tracing.SetTag("item", item))
 	defer span.Finish()
-	err := e.ensureTfProviderInitialized(context)
-	if err != nil {
-		return ExpanderResult{
-			SourceDescription: "TerraformImportExpander",
-			Err:               err,
-		}
-	}
 
 	if item.Metadata == nil {
 		item.Metadata = map[string]string{}
 	}
 	resourceTypeName := item.Metadata["TerraformImportExpander_ResourceTypeName"]
 	if resourceTypeName == "" {
+		var err error
 		resourceTypeName, err = e.getResourceTypeNameFromResourceID(context, item.ID)
 		if err != nil {
 			return ExpanderResult{
@@ -487,7 +523,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 		// use the endpoint to rebuild the ID URL to ensure the case matches what the azurerm provider expects
 		getResourceIDFunc = defaultEndpointMatchToResourceIDFunc
 	}
-	id, err = getResourceIDFunc(endpoint, endpointMatch.Values)
+	id, err := getResourceIDFunc(endpoint, endpointMatch.Values)
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
@@ -495,7 +531,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 		}
 	}
 
-	terraform, err := e.getTerraformFor(context, id, resourceTypeName)
+	terraform, err := e.getTerraformFor(context, subscriptionID, id, resourceTypeName)
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: "TerraformImportExpander",
@@ -512,17 +548,23 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, i
 	}
 }
 
-func (e *TerraformImportExpander) getTerraformFor(context context.Context, id string, resourceTypeName string) (string, error) {
+func (e *TerraformImportExpander) getTerraformFor(context context.Context, subscriptionID string, id string, resourceTypeName string) (string, error) {
 	span, context := tracing.StartSpanFromContext(context, "terraform:get-schema:"+resourceTypeName)
 	defer span.Finish()
-	terraformProviderSchema := e.tfProvider.Plugin.GetSchema()
+
+	provider, err := e.getTfProvider(context, subscriptionID)
+	if err != nil {
+		return "", err
+	}
+
+	terraformProviderSchema := provider.Plugin.GetSchema()
 	importRequest := providers.ImportResourceStateRequest{
 		TypeName: resourceTypeName,
 		ID:       id,
 	}
 	spanImport, context := tracing.StartSpanFromContext(context, "terraform:import:"+resourceTypeName)
 	defer spanImport.Finish()
-	importResponse := e.tfProvider.Plugin.ImportResourceState(importRequest)
+	importResponse := provider.Plugin.ImportResourceState(importRequest)
 	if err := importResponse.Diagnostics.Err(); err != nil {
 		return "", fmt.Errorf("Error on import for %q: %s", id, err)
 	}
@@ -534,7 +576,7 @@ func (e *TerraformImportExpander) getTerraformFor(context context.Context, id st
 			TypeName:   resource.TypeName,
 			PriorState: resource.State,
 		}
-		readResponse := e.tfProvider.Plugin.ReadResource(readRequest)
+		readResponse := provider.Plugin.ReadResource(readRequest)
 		span.Finish()
 		if err := importResponse.Diagnostics.Err(); err != nil {
 			return "", fmt.Errorf("Error on read for %q: %s", id, err)
