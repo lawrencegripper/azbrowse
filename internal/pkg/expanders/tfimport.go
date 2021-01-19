@@ -23,6 +23,7 @@ import (
 )
 
 var vmEndpoint = endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}", "2020-06-01")
+var vmssEndpoint = endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}", "2020-06-01")
 
 // lookup mapping of resource type to regexp expression to match resource IDs
 var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
@@ -50,6 +51,12 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 	"azurerm_virtual_network_gateway": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworkGateways/{virtualNetworkGatewayName}", ""),
 	"azurerm_virtual_network":         endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}", ""),
 	"azurerm_subnet":                  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}", ""),
+	"azurerm_lb":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}", ""),
+	"azurerm_lb_backend_address_pool": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/backendAddressPools/{backendAddressPoolName}", ""),
+	"azurerm_lb_nat_rule":             endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/inboundNatRules/{inboundNatRuleName}", ""),
+	"azurerm_lb_outbound_rule":        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/outboundRules/{outboundRuleName}", ""),
+	"azurerm_lb_probe":                endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/probes/{probeName}", ""),
+	"azurerm_lb_rule":                 endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/loadBalancers/{loadBalancerName}/loadBalancingRules/{loadBalancingRuleName}", ""),
 
 	// Private DNS
 	"azurerm_private_dns_zone":                      endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/privateDnsZones/{privateZoneName}", ""),
@@ -87,10 +94,13 @@ var tfimportBaseConfig = map[string]*endpoints.EndpointInfo{
 	"azurerm_kubernetes_cluster_node_pool": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/agentPools/{agentPoolName}", ""),
 
 	// Virtual machines
-	"azurerm_virtual_machine_extension": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/extensions/{vmExtensionName}", ""),
-	"azurerm_managed_disk":              endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/disks/{diskName}", ""),
-	"azurerm_windows_virtual_machine":   vmEndpoint,
-	"azurerm_linux_virtual_machine":     vmEndpoint,
+	"azurerm_virtual_machine_extension":           endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/extensions/{vmExtensionName}", ""),
+	"azurerm_virtual_machine_scale_set_extension": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/extensions/{vmssExtensionName}", ""),
+	"azurerm_managed_disk":                        endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/disks/{diskName}", ""),
+	"azurerm_linux_virtual_machine":               vmEndpoint,
+	"azurerm_windows_virtual_machine":             vmEndpoint,
+	"azurerm_linux_virtual_machine_scale_set":     vmssEndpoint,
+	"azurerm_windows_virtual_machine_scale_set":   vmssEndpoint,
 
 	// Dashboards
 	"azurerm_dashboard": endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Portal/dashboards/{dashboardName}", ""),
@@ -242,6 +252,22 @@ func (e *TerraformImportExpander) getResourceTypeNameFromResourceID(context cont
 		case "Linux":
 			return "azurerm_linux_virtual_machine", nil
 		}
+	}
+
+	result = vmssEndpoint.Match(resourceID)
+	if result.IsMatch {
+		body, err := e.client.DoRequest(context, "GET", resourceID+"?api-version="+vmssEndpoint.APIVersion)
+		if err != nil {
+			return "", err
+		}
+		value, err := getJSONPropertyFromString(body, "properties", "virtualMachineProfile", "osProfile", "windowsConfiguration")
+		if err != nil {
+			return "", err
+		}
+		if value == nil {
+			return "azurerm_linux_virtual_machine_scale_set", nil
+		}
+		return "azurerm_windows_virtual_machine_scale_set", nil
 	}
 
 	for resourceTypeName, resourceEndpoint := range tfimportBaseConfig {
