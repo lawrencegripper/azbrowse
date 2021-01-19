@@ -42,7 +42,7 @@ build: swagger-codegen checks test
 ## debug:
 ##		Starts azbrowse using Delve ready for debugging from VSCode.
 debug:
-	dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2
+	dlv debug ./cmd/azbrowse --headless --listen localhost:2345 --api-version 2 -- ${ARGS}
 
 ## debug-fuzzer:
 ##		Starts azbrowse using Delve ready for debugging from VSCode and running the fuzzer.
