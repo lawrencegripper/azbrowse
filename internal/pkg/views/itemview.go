@@ -65,48 +65,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		if w.hideGuids {
 			w.content = StripSecretVals(w.content)
 		}
-		switch w.contentType {
-		case expanders.ResponseJSON:
-			d := json.NewDecoder(strings.NewReader(w.content))
-			d.UseNumber()
-			var obj interface{}
-			err = d.Decode(&obj)
-			if err != nil {
-				eventing.SendStatusEvent(&eventing.StatusEvent{
-					InProgress: false,
-					Failure:    true,
-					Message:    "Failed to display as JSON: " + err.Error(),
-					Timeout:    time.Duration(time.Second * 4),
-				})
-				fmt.Fprint(v, w.content)
-				return nil
-			}
-
-			f := colorjson.NewFormatter()
-			f.Indent = 2
-			s, err := f.Marshal(obj)
-			if err != nil {
-				fmt.Fprint(v, w.content)
-			} else {
-				fmt.Fprint(v, string(s))
-			}
-		case expanders.ResponseYAML:
-			var buf bytes.Buffer
-			err = quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
-			if err != nil {
-				fmt.Fprint(v, w.content)
-			} else {
-				fmt.Fprint(v, buf.String())
-			}
-
-		case expanders.ResponseXML:
-			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
-			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
-			fmt.Fprint(v, formattedContent)
-
-		default:
-			fmt.Fprint(v, w.content)
-		}
+		fmt.Fprint(v, w.content)
 	}
 
 	return nil
@@ -163,6 +122,44 @@ func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, conten
 		w.node = node
 		w.content = content
 		w.contentType = contentType
+
+		if w.hideGuids {
+			w.content = StripSecretVals(w.content)
+		}
+		switch w.contentType {
+		case expanders.ResponseJSON:
+			d := json.NewDecoder(strings.NewReader(w.content))
+			d.UseNumber()
+			var obj interface{}
+			err := d.Decode(&obj)
+			if err != nil {
+				eventing.SendStatusEvent(&eventing.StatusEvent{
+					InProgress: false,
+					Failure:    true,
+					Message:    "Failed to display as JSON: " + err.Error(),
+					Timeout:    time.Duration(time.Second * 4),
+				})
+			}
+
+			f := colorjson.NewFormatter()
+			f.Indent = 2
+			s, err := f.Marshal(obj)
+			if err == nil {
+				w.content = string(s)
+			}
+		case expanders.ResponseYAML:
+			var buf bytes.Buffer
+			err := quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
+			if err == nil {
+				w.content = buf.String()
+			}
+
+		case expanders.ResponseXML:
+			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
+			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
+			w.content = formattedContent
+		}
+
 		// Reset the cursor and origin (scroll poisition)
 		// so we don't start at the bottom of a new doc
 		w.view.SetCursor(0, 0) //nolint: errcheck
