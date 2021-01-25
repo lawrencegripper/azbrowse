@@ -246,11 +246,12 @@ var resourceAPIVersionPreviewLookup map[string]string
 
 // GetAPIVersion returns the most recent API version for a resource
 func GetAPIVersion(armType string) (string, error) {
-	value, exists := resourceAPIVersionLookup[armType]
+	armTypeKey := strings.ToLower(armType)
+	value, exists := resourceAPIVersionLookup[armTypeKey]
 	if exists {
 		return value, nil
 	}
-	value, exists = resourceAPIVersionPreviewLookup[armType]
+	value, exists = resourceAPIVersionPreviewLookup[armTypeKey]
 	if exists {
 		return value, nil
 	}
@@ -264,11 +265,11 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 	if resourceAPIVersionLookup == nil {
 		span, ctx := tracing.StartSpanFromContext(ctx, "populateResCache")
 		// Get data from cache
-		providerData, err := storage.GetCache(providerCacheKey)
+		valid, providerData, err := storage.GetCacheWithTTL(providerCacheKey, time.Hour*24)
 
 		// w.statusView.Status("Getting provider data from cache: Completed", false)
 
-		if err != nil || providerData == "" {
+		if err != nil || providerData == "" || !valid {
 			// w.statusView.Status("Getting provider data from API", true)
 			span.SetTag("error: failed getting cached data", err)
 			span.SetTag("cacheData", providerData)
@@ -289,13 +290,15 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 			for _, provider := range providerResponse.Providers {
 				for _, resourceType := range provider.ResourceTypes {
 					for _, apiVersion := range resourceType.APIVersions {
+						armType := provider.Namespace + "/" + resourceType.ResourceType
+						armTypeKey := strings.ToLower(armType)
 						if strings.Contains(apiVersion, "preview") {
 							// don't break here as we want to allow non-preview version to be set, instead check to avoid overwriting
-							if resourceAPIVersionPreviewLookup[provider.Namespace+"/"+resourceType.ResourceType] == "" {
-								resourceAPIVersionPreviewLookup[provider.Namespace+"/"+resourceType.ResourceType] = apiVersion
+							if resourceAPIVersionPreviewLookup[armTypeKey] == "" {
+								resourceAPIVersionPreviewLookup[armTypeKey] = apiVersion
 							}
 						} else {
-							resourceAPIVersionLookup[provider.Namespace+"/"+resourceType.ResourceType] = apiVersion
+							resourceAPIVersionLookup[armTypeKey] = apiVersion
 							break
 						}
 					}
