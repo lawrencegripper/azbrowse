@@ -192,7 +192,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		if err != nil {
 			eventing.SendStatusEvent(&eventing.StatusEvent{
 				Failure: true,
-				Message: "Failed to get resouceVersion for the Type:" + resource.Type,
+				Message: "Failed to get resourceVersion for the Type:" + resource.Type,
 				Timeout: time.Duration(time.Second * 5),
 			})
 		}
