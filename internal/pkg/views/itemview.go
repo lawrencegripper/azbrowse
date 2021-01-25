@@ -21,15 +21,16 @@ import (
 
 // ItemWidget is response for showing the text response from the Rest requests
 type ItemWidget struct {
-	x, y         int
-	w, h         int
-	hideGuids    bool
-	node         *expanders.TreeNode
-	content      string
-	contentType  expanders.ExpanderResponseType
-	view         *gocui.View
-	shouldRender bool
-	g            *gocui.Gui
+	x, y            int
+	w, h            int
+	hideGuids       bool
+	node            *expanders.TreeNode
+	originalContent string // unformatted - for copying
+	content         string
+	contentType     expanders.ExpanderResponseType
+	view            *gocui.View
+	shouldRender    bool
+	g               *gocui.Gui
 }
 
 // NewItemWidget creates a new instance of ItemWidget
@@ -120,6 +121,7 @@ func (w *ItemWidget) PageUp() {
 func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, contentType expanders.ExpanderResponseType, title string) {
 	w.g.Update(func(g *gocui.Gui) error {
 		w.node = node
+		w.originalContent = content
 		w.content = content
 		w.contentType = contentType
 
@@ -178,7 +180,7 @@ func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, conten
 
 // GetContent returns the current content
 func (w *ItemWidget) GetContent() string {
-	return w.content
+	return w.originalContent
 }
 
 // GetContentType returns the current content type
