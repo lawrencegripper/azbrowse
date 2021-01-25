@@ -111,9 +111,10 @@ func Test_installProvider(t *testing.T) {
 
 func TestSetupProvider(t *testing.T) {
 	tests := []struct {
-		purpose string
-		config  TerraformProviderConfig
-		wantErr bool
+		purpose  string
+		config   TerraformProviderConfig
+		wantErr  bool
+		skipInCI bool // some tests require az credentials - re-enable once added to CI build
 	}{
 		{
 			purpose: "Error_When_OnlyNameSet",
@@ -141,7 +142,8 @@ func TestSetupProvider(t *testing.T) {
 				ProviderPath:      providerInstallPath,
 				ProviderConfigHCL: "features {}",
 			},
-			wantErr: false,
+			wantErr:  false,
+			skipInCI: true,
 		},
 		{
 			purpose: "Succeed_When_ValidProviderNameAndVersionSet",
@@ -151,11 +153,16 @@ func TestSetupProvider(t *testing.T) {
 				ProviderPath:      providerInstallPath,
 				ProviderConfigHCL: "features {}",
 			},
-			wantErr: false,
+			wantErr:  false,
+			skipInCI: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.purpose, func(t *testing.T) {
+			if tt.skipInCI && os.Getenv("IS_CI") != "" {
+				t.Skip("Skipping test in CI")
+			}
+
 			got, err := SetupProvider(context.Background(), NewNullLogger(), tt.config)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SetupProvider() error = %v, wantErr %v", err, tt.wantErr)
