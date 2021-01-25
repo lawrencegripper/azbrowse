@@ -25,7 +25,7 @@ def clone_swagger_specs(target_folder):
     print("Cloning specs...")
     repo = Repo()
     repo.clone_from(
-        "git@github.com:azure/azure-rest-api-specs",
+        "https://github.com/azure/azure-rest-api-specs",
         target_folder + "/azure-rest-api-specs",
         progress=show_git_progress,
         multi_options=["--depth=1"],
