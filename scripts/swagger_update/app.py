@@ -29,6 +29,9 @@ if __name__ == "__main__":
         # storage package-2019-06 references privatelinks.json which is not listed in the input files
         "storage": { 
             "package-2019-06": ["./Microsoft.Storage/stable/2019-06-01/privatelinks.json"] 
+        },
+        "cosmos-db" : {
+            "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
         }
     }
 
