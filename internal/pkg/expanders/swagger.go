@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -262,12 +261,4 @@ func substituteValues(fmtString string, values map[string]string) string {
 		fmtString = strings.Replace(fmtString, "{"+name+"}", value, -1)
 	}
 	return fmtString
-}
-
-func (e *SwaggerResourceExpander) setClient(c *armclient.Client) {
-	// noop
-}
-
-func (e *SwaggerResourceExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
 }

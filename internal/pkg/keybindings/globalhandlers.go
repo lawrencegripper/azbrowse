@@ -87,6 +87,9 @@ func (h *CopyHandler) Invoke() error {
 		formattedContent = formattedBuf.String()
 	case expanders.ResponseYAML:
 		formattedContent = content // TODO: add YAML formatter
+
+	default:
+		formattedContent = content
 	}
 
 	if err := copyToClipboard(formattedContent); err != nil {

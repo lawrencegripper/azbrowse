@@ -678,7 +678,3 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 
 	return accessToken, nil
 }
-
-func (e *ContainerRegistryExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

@@ -219,7 +219,3 @@ func (e *MetricsExpander) expandGraph(ctx context.Context, currentItem *TreeNode
 		SourceDescription: "MetricsExpander build graph",
 	}
 }
-
-func (e *MetricsExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

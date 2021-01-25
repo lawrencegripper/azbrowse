@@ -154,6 +154,13 @@ func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, conten
 				w.content = buf.String()
 			}
 
+		case expanders.ResponseTerraform:
+			var buf bytes.Buffer
+			err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
+			if err == nil {
+				w.content = buf.String()
+			}
+
 		case expanders.ResponseXML:
 			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
 			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
@@ -237,6 +244,8 @@ func configureYAMLHighlighting() {
 			chroma.LiteralString:        "#00aa00",
 			chroma.LiteralStringBoolean: "#b3760e",
 			chroma.LiteralNumber:        "#0099ff",
+			chroma.Keyword:              "#0099ff",
+			chroma.Comment:              "#006600",
 		},
 	)
 	styles.Register(style)

@@ -183,7 +183,3 @@ func (e *AppInsightsExpander) expandAnalyticsItem(ctx context.Context, currentIt
 		SourceDescription: "AppInsightsExpander request",
 	}
 }
-
-func (e *AppInsightsExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

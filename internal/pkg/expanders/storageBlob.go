@@ -737,9 +737,6 @@ func (e *StorageBlobExpander) stripBOM(buf []byte) []byte {
 	}
 	return buf
 }
-func (e *StorageBlobExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}
 
 // Auth helper code based on https://github.com/Azure/azure-storage-blob-go
 // (https://github.com/Azure/azure-storage-blob-go/blob/3efca72bd11c050222deab57e25ea90df03b9692/azblob/zc_credential_shared_key.go#L55)

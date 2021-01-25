@@ -19,7 +19,7 @@ help : Makefile
 
 ## test:
 ## 		Run quick executing unit tests
-test: swagger-update-requirements
+test: swagger-update-requirements terraform-hack-init
 	echo ${go}
 	pytest ./scripts/swagger_update/test_swagger_update.py
 	$(GO_BINARY) test -p 1 -short ./...
@@ -79,6 +79,11 @@ fuzz-from: checks install
 ##		Build and install azbrowse on this machine
 install:
 	$(GO_BINARY) install ./cmd/azbrowse
+
+## terraform-hack-init:
+##		Install terraform providers for tests
+terraform-hack-init:
+	./hack/init.sh
 
 ## ----------Advanced Targets------------
 ## docs-update:

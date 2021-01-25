@@ -194,7 +194,3 @@ type DeploymentOperationsResponse struct {
 		} `json:"properties"`
 	} `json:"value"`
 }
-
-func (e *DeploymentsExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}
