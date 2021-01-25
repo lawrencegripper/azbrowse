@@ -55,17 +55,17 @@ GO_BINARY=richgo make build
 
 print_header "Check codegen results haven't changed checkedin code"
 if [[ $(git diff --stat) != '' ]]; then
-  echo "--> Ditry GIT: Failing as swagger-generated caused changes, please run 'make swagger-update' and 'make swagger-generate' and commit changes for build to pass"
+  echo "--> Dirty GIT: Failing as swagger-codegen caused changes, please run 'make swagger-update' and 'make swagger-codegen' and commit changes for build to pass"
   git status -vv
   sleep 1
   exit 1
 else
-  echo "'swagger-gen' ran and no changes detected in code: Success"
+  echo "'swagger-codegen' ran and no changes detected in code: Success"
 fi
 
 make docs-update
 if [[ $(git diff --stat) != '' ]]; then
-  echo "--> Ditry GIT: Commandline args changed but 'make docs-update' hasn't been run. Please run it and commit changes."
+  echo "--> Dirty GIT: Commandline args changed but 'make docs-update' hasn't been run. Please run it and commit changes."
   git status
   sleep 1
   exit 1
