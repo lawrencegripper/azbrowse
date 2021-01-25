@@ -10,7 +10,7 @@ import os
 if __name__ == "__main__":
     # resource_provider_version_overrides is keyed on RP name with the value being the tag to force
     resource_provider_version_overrides = {
-        "cosmos-db": "package-2019-08-preview",  # the 2019-12 version includes 2019-08-preview files that reference files not in the 2019-12 list!
+        "cosmos-db": "package-2020-04",
         # frontdoor 2020-01 references 2019-11-01/network.json which is not listed in the input files
         # frontdoor 2019-11 references 2019-05-01/network.json which is not listed in the input files
         # frontdoor 2019-10 references 2019-10-01/network.json which is not listed in the input files
@@ -29,6 +29,9 @@ if __name__ == "__main__":
         # storage package-2019-06 references privatelinks.json which is not listed in the input files
         "storage": { 
             "package-2019-06": ["./Microsoft.Storage/stable/2019-06-01/privatelinks.json"] 
+        },
+        "cosmos-db" : {
+            "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
         }
     }
 
