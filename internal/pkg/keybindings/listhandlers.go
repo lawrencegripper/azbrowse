@@ -539,10 +539,13 @@ func (h *ListUpdateHandler) Invoke() error {
 		fileExtension = ".yaml"
 		formattedContent = content // TODO: add YAML formatter
 
+	case expanders.ResponseTerraform:
+		fileExtension = ".tf"
+		formattedContent = content // TODO: add Terraform formatter
+
 	case expanders.ResponseXML:
 		fileExtension = ".xml"
 		formattedContent = xmlfmt.FormatXML(content, "", "  ")
-
 	}
 
 	tempDir := editorConfig.TempDir

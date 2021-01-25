@@ -362,7 +362,3 @@ func (e *AzureKubernetesServiceExpander) getClusterConfig(ctx context.Context, c
 
 	return kubeConfig, nil
 }
-
-func (e *AzureKubernetesServiceExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

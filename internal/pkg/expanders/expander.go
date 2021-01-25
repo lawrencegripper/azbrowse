@@ -17,6 +17,12 @@ type expanderAndResponse struct {
 
 // ExpandItem finds child nodes of the item and their content
 func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, []*TreeNode, error) {
+	return ExpandItemAllowDefaultExpander(ctx, currentItem, true)
+}
+
+// ExpandItemAllowDefaultExpander finds child nodes of the item and their content and allows the default expander to be suppressed
+func ExpandItemAllowDefaultExpander(ctx context.Context, currentItem *TreeNode, allowDefaultExpander bool) (*ExpanderResponse, []*TreeNode, error) {
+
 	newItems := []*TreeNode{}
 
 	_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
@@ -63,7 +69,12 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 
 	// Lets give all the expanders 45secs to completed (unless debugging)
 	hasPrimaryResponse := false
-	timeout := time.After(time.Second * 45)
+	timeoutSeconds := 45
+	if currentItem.TimeoutOverrideSeconds != nil {
+		timeoutSeconds = *currentItem.TimeoutOverrideSeconds
+	}
+
+	timeout := time.After(time.Second * time.Duration(timeoutSeconds))
 	var newContent ExpanderResponse
 
 	for index := 0; index < handlerExpanding; index++ {
@@ -92,6 +103,7 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 			}
 			for _, node := range result.Nodes {
 				node.Expander = done.Expander
+				node.Parent = currentItem
 			}
 			// Add the items it found
 			if result.IsPrimaryResponse {
@@ -110,18 +122,20 @@ func ExpandItem(ctx context.Context, currentItem *TreeNode) (*ExpanderResponse, 
 		}
 	}
 
-	// Use the default handler to get the resource JSON for display
-	defaultExpanderWorksOnThisItem, _ := GetDefaultExpander().DoesExpand(ctx, currentItem)
-	if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
-		result := GetDefaultExpander().Expand(ctx, currentItem)
-		if result.Err != nil {
-			eventing.SendStatusEvent(&eventing.StatusEvent{
-				Failure: true,
-				Message: "Failed to expand resource: " + result.Err.Error(),
-				Timeout: time.Duration(time.Second * 15),
-			})
+	if allowDefaultExpander {
+		// Use the default handler to get the resource JSON for display
+		defaultExpanderWorksOnThisItem, _ := GetDefaultExpander().DoesExpand(ctx, currentItem)
+		if !hasPrimaryResponse && defaultExpanderWorksOnThisItem {
+			result := GetDefaultExpander().Expand(ctx, currentItem)
+			if result.Err != nil {
+				eventing.SendStatusEvent(&eventing.StatusEvent{
+					Failure: true,
+					Message: "Failed to expand resource: " + result.Err.Error(),
+					Timeout: time.Duration(time.Second * 15),
+				})
+			}
+			newContent = result.Response
 		}
-		newContent = result.Response
 	}
 
 	return &newContent, newItems, nil

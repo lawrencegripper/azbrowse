@@ -222,7 +222,3 @@ type ContainerGroupResponse struct {
 	} `json:"properties"`
 	Type string `json:"type"`
 }
-
-func (e *ContainerInstanceExpander) testCases() (bool, *[]expanderTestCase) {
-	return false, nil
-}

@@ -135,10 +135,14 @@ func (e *DefaultExpander) ListActions(ctx context.Context, item *TreeNode) ListA
 					}
 				}
 				stripArmType := strings.Replace(op.Name, item.ArmType, "", -1)
+				name := op.DisplayName
+				if name == "" {
+					name = strings.Replace(stripArmType, "/action", "", -1)
+				}
 				actionURL := strings.Replace(stripArmType, "/action", "", -1) + "?api-version=" + resourceAPIVersion
 				items = append(items, &TreeNode{
-					Name:             op.DisplayName,
-					Display:          op.DisplayName,
+					Name:             name,
+					Display:          name,
 					ExpandURL:        item.ID + "/" + actionURL,
 					ExpandReturnType: ActionType,
 					ItemType:         "action",

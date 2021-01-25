@@ -77,6 +77,7 @@ func InitializeExpanders(client *armclient.Client) {
 		&DiagnosticSettingsExpander{
 			client: client,
 		},
+		NewTerraformImportExpander(client),
 	}
 }
 
