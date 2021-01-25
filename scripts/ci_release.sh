@@ -56,7 +56,7 @@ GO_BINARY=richgo make build
 print_header "Check codegen results haven't changed checkedin code"
 if [[ $(git diff --stat) != '' ]]; then
   echo "--> Ditry GIT: Failing as swagger-generated caused changes, please run 'make swagger-update' and 'make swagger-generate' and commit changes for build to pass"
-  git status
+  git status -vv
   sleep 1
   exit 1
 else
