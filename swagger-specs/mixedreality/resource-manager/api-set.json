@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.MixedReality/stable/2020-05-01/proxy.json", "Microsoft.MixedReality/stable/2020-05-01/spatial-anchors.json", "Microsoft.MixedReality/preview/2020-04-06-preview/remote-rendering.json"], "name": "package-2020-05"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.MixedReality/stable/2021-01-01/proxy.json", "Microsoft.MixedReality/stable/2021-01-01/spatial-anchors.json", "Microsoft.MixedReality/stable/2021-01-01/remote-rendering.json"], "name": "package-2021-01"}
