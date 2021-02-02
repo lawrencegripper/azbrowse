@@ -100,6 +100,11 @@ func (w *NotificationWidget) ConfirmDelete() {
 	pending := make([]*expanders.TreeNode, len(w.pendingDeletes))
 	copy(pending, w.pendingDeletes)
 
+	// Force UI to re-render to pickup
+	w.gui.Update(func(g *gocui.Gui) error {
+		return nil
+	})
+
 	w.deleteMutex.Unlock()
 
 	go func() {
