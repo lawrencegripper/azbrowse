@@ -52,9 +52,16 @@ type CosmosDbContainer struct {
 	} `json:"partitionKey"`
 }
 
+type doRequestResponse struct {
+	Data       []byte
+	StatusCode int
+	Headers    http.Header
+}
+
 const (
-	cosmosdbListSQLDocuments = "sql-listdocs"
-	cosmosdbSQLDocument      = "sql-document"
+	cosmosdbListSQLDocuments             = "sql-listdocs"
+	cosmosdbListSQLDocumentsContinuation = "sql-listdocs-continue"
+	cosmosdbSQLDocument                  = "sql-document"
 )
 
 const (
@@ -132,6 +139,8 @@ func (e *CosmosDbExpander) Expand(ctx context.Context, currentItem *TreeNode) Ex
 	switch currentItem.ItemType {
 	case cosmosdbListSQLDocuments:
 		return e.expandSQLDocuments(ctx, currentItem)
+	case cosmosdbListSQLDocumentsContinuation:
+		return e.expandSQLDocumentsContinuation(ctx, currentItem)
 	case cosmosdbSQLDocument:
 		return e.expandSQLDocument(ctx, currentItem)
 	}
@@ -164,7 +173,6 @@ func (e *CosmosDbExpander) Update(ctx context.Context, item *TreeNode, updatedCo
 }
 
 func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNode) ExpanderResult {
-
 	accountName := item.Metadata["AccountName"]
 	databaseName := item.Metadata["DatabaseName"]
 	containerName := item.Metadata["ContainerName"]
@@ -189,10 +197,29 @@ func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNod
 	if partitionKey != "" && partitionKey[0] == '/' {
 		partitionKey = partitionKey[1:]
 	}
+	return e.expandSQLDocumentsCommon(ctx, item, accountName, databaseName, containerName, accountKey, partitionKey, "")
+}
+
+func (e *CosmosDbExpander) expandSQLDocumentsContinuation(ctx context.Context, item *TreeNode) ExpanderResult {
+	accountName := item.Metadata["AccountName"]
+	databaseName := item.Metadata["DatabaseName"]
+	containerName := item.Metadata["ContainerName"]
+	accountKey := item.Metadata["AccountKey"]
+	partitionKey := item.Metadata["PartitionKey"]
+	continuationToken := item.Metadata["ContinuationToken"]
+
+	return e.expandSQLDocumentsCommon(ctx, item, accountName, databaseName, containerName, accountKey, partitionKey, continuationToken)
+}
+
+func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *TreeNode, accountName string, databaseName string, containerName string, accountKey string, partitionKey string, continuationToken string) ExpanderResult {
 	partitionKeySegments := strings.Split(partitionKey, "/")
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs", databaseName, containerName)
-	data, statusCode, err := e.doRequest(ctx, "GET", accountName, requestURL, accountKey)
+	headers := map[string]string{}
+	if continuationToken != "" {
+		headers["x-ms-continuation"] = continuationToken
+	}
+	response, err := e.doRequestWithHeaders(ctx, "GET", accountName, requestURL, accountKey, headers)
 	if err != nil {
 		return ExpanderResult{
 			Err:               fmt.Errorf("Error getting documents: %s", err),
@@ -200,17 +227,21 @@ func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNod
 			SourceDescription: "CosmosDbExpander request",
 		}
 	}
-	if !e.isSuccessCode(statusCode) {
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
+		}
 		return ExpanderResult{
-			Err:               fmt.Errorf("Error listing documents. StatusCode=%d, Response=%s", statusCode, string(data)),
+			Err:               fmt.Errorf("Error listing documents. StatusCode=%d, Response=%s", response.StatusCode, data),
 			IsPrimaryResponse: true,
 			SourceDescription: "CosmosDbExpander request",
 		}
 	}
 
 	// TODO - parse nodes
-	var response CosmosDbListDocumentResponse
-	if err = json.Unmarshal(data, &response); err != nil {
+	var list CosmosDbListDocumentResponse
+	if err = json.Unmarshal(response.Data, &list); err != nil {
 		return ExpanderResult{
 			Err:               fmt.Errorf("Error unmarshalling response: %s", err),
 			IsPrimaryResponse: true,
@@ -219,7 +250,7 @@ func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNod
 	}
 
 	nodes := []*TreeNode{}
-	for _, document := range response.Documents {
+	for _, document := range list.Documents {
 		document := document.(map[string]interface{})
 		partitionKeyValue := ""
 		if partitionKey != "" {
@@ -256,8 +287,30 @@ func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNod
 		nodes = append(nodes, &node)
 	}
 
+	if continuationToken := response.Headers.Get("x-ms-continuation"); continuationToken != "" {
+		node := TreeNode{
+			Parentid:  item.ID,
+			Namespace: "cosmosdb",
+			ID:        item.ID + "/" + "...more",
+			Name:      "more...",
+			Display:   "more...",
+			ItemType:  cosmosdbListSQLDocumentsContinuation,
+			ExpandURL: ExpandURLNotSupported,
+			Metadata: map[string]string{
+				"AccountName":       accountName,
+				"DatabaseName":      databaseName,
+				"ContainerName":     containerName,
+				"AccountKey":        accountKey,
+				"PartitionKey":      partitionKey,
+				"ContinuationToken": continuationToken,
+			},
+		}
+
+		nodes = append(nodes, &node)
+	}
+
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(response.Data), ResponseType: ResponseJSON},
 		Nodes:             nodes,
 		IsPrimaryResponse: true,
 	}
@@ -279,7 +332,7 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode
 	}
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
-	data, statusCode, err := e.doRequestWithHeaders(ctx, "GET", accountName, requestURL, accountKey, headers)
+	response, err := e.doRequestWithHeaders(ctx, "GET", accountName, requestURL, accountKey, headers)
 	if err != nil {
 		return ExpanderResult{
 			Err:               fmt.Errorf("Error getting documents: %s", err),
@@ -287,26 +340,20 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode
 			SourceDescription: "CosmosDbExpander request",
 		}
 	}
-	if !e.isSuccessCode(statusCode) {
-		return ExpanderResult{
-			Err:               fmt.Errorf("Error getting document. StatusCode=%d, Response=%s", statusCode, string(data)),
-			IsPrimaryResponse: true,
-			SourceDescription: "CosmosDbExpander request",
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
 		}
-	}
-
-	// TODO - parse nodes
-	var response CosmosDbListDocumentResponse
-	if err = json.Unmarshal(data, &response); err != nil {
 		return ExpanderResult{
-			Err:               fmt.Errorf("Error unmarshalling response: %s", err),
+			Err:               fmt.Errorf("Error getting document. StatusCode=%d, Response=%s", response.StatusCode, data),
 			IsPrimaryResponse: true,
 			SourceDescription: "CosmosDbExpander request",
 		}
 	}
 
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(response.Data), ResponseType: ResponseJSON},
 		IsPrimaryResponse: true,
 	}
 }
@@ -326,12 +373,16 @@ func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode
 	}
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
-	data, statusCode, err := e.doRequestWithHeadersAndBody(ctx, "PUT", accountName, requestURL, accountKey, headers, strings.NewReader(updatedContent))
+	response, err := e.doRequestWithHeadersAndBody(ctx, "PUT", accountName, requestURL, accountKey, headers, strings.NewReader(updatedContent))
 	if err != nil {
 		return fmt.Errorf("Error updating documents: %s", err)
 	}
-	if !e.isSuccessCode(statusCode) {
-		return fmt.Errorf("Error updating document. StatusCode=%d, Response=%s", statusCode, string(data))
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
+		}
+		return fmt.Errorf("Error updating document. StatusCode=%d, Response=%s", response.StatusCode, data)
 	}
 
 	return nil
@@ -340,23 +391,27 @@ func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode
 func (e *CosmosDbExpander) getCollectionPartitionKey(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string) (string, error) {
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s", databaseName, containerName)
-	data, statusCode, err := e.doRequest(ctx, "GET", accountName, requestURL, accountKey)
+	response, err := e.doRequest(ctx, "GET", accountName, requestURL, accountKey)
 	if err != nil {
 		return "", fmt.Errorf("Error getting documents: %s", err)
 	}
-	if !e.isSuccessCode(statusCode) {
-		return "", fmt.Errorf("Error getting collection partition key. StatusCode=%d, Response=%s", statusCode, string(data))
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
+		}
+		return "", fmt.Errorf("Error getting collection partition key. StatusCode=%d, Response=%s", response.StatusCode, data)
 	}
 
-	var response CosmosDbContainer
-	if err = json.Unmarshal(data, &response); err != nil {
+	var container CosmosDbContainer
+	if err = json.Unmarshal(response.Data, &container); err != nil {
 		return "", fmt.Errorf("Error unmarshalling response: %s", err)
 	}
 
-	if response.PartitionKey == nil {
+	if container.PartitionKey == nil {
 		return "", nil
 	}
-	return response.PartitionKey.Paths[0], nil
+	return container.PartitionKey.Paths[0], nil
 }
 
 // // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
@@ -492,13 +547,13 @@ func (e *CosmosDbExpander) isSuccessCode(statusCode int) bool {
 	return statusCode >= 200 && statusCode <= 299
 }
 
-func (e *CosmosDbExpander) doRequest(ctx context.Context, verb string, accountName string, requestURL string, accountKey string) ([]byte, int, error) {
+func (e *CosmosDbExpander) doRequest(ctx context.Context, verb string, accountName string, requestURL string, accountKey string) (*doRequestResponse, error) {
 	return e.doRequestWithHeaders(ctx, verb, accountName, requestURL, accountKey, map[string]string{})
 }
-func (e *CosmosDbExpander) doRequestWithHeaders(ctx context.Context, verb string, accountName string, requestURL string, accountKey string, headers map[string]string) ([]byte, int, error) {
+func (e *CosmosDbExpander) doRequestWithHeaders(ctx context.Context, verb string, accountName string, requestURL string, accountKey string, headers map[string]string) (*doRequestResponse, error) {
 	return e.doRequestWithHeadersAndBody(ctx, verb, accountName, requestURL, accountKey, headers, nil)
 }
-func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb string, accountName string, requestURL string, accountKey string, headers map[string]string, body io.Reader) ([]byte, int, error) {
+func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb string, accountName string, requestURL string, accountKey string, headers map[string]string, body io.Reader) (*doRequestResponse, error) {
 
 	span, _ := tracing.StartSpanFromContext(ctx, "doRequest(cosmosexpander):"+requestURL, tracing.SetTag("url", requestURL))
 	defer span.Finish()
@@ -511,7 +566,7 @@ func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb
 
 	req, err := http.NewRequestWithContext(ctx, verb, fullURL, body)
 	if err != nil {
-		return []byte{}, -1, fmt.Errorf("Failed to create request: %s", err)
+		return nil, fmt.Errorf("Failed to create request: %s", err)
 	}
 
 	for header, value := range headers {
@@ -532,7 +587,7 @@ func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb
 
 	sig, err := signString(stringToSign, accountKey)
 	if err != nil {
-		return []byte{}, -1, err
+		return nil, err
 	}
 
 	header := url.QueryEscape("type=" + masterToken + "&ver=" + tokenVersion + "&sig=" + sig)
@@ -540,16 +595,20 @@ func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb
 
 	response, err := e.client.Do(req.WithContext(ctx))
 	if err != nil {
-		return []byte{}, -1, fmt.Errorf("Request failed: %s", err)
+		return nil, fmt.Errorf("Request failed: %s", err)
 	}
 
 	defer response.Body.Close() //nolint: errcheck
 	buf, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return []byte{}, -1, fmt.Errorf("Failed to read body: %s", err)
+		return nil, fmt.Errorf("Failed to read body: %s", err)
 	}
 
-	return buf, response.StatusCode, nil
+	return &doRequestResponse{
+		Data:       buf,
+		StatusCode: response.StatusCode,
+		Headers:    response.Header,
+	}, nil
 }
 
 func parseResource(resourcePath string) (resourceID string, resourceType string) {
