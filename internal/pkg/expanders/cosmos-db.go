@@ -274,6 +274,7 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 			Display:               id,
 			ItemType:              cosmosdbSQLDocument,
 			ExpandURL:             ExpandURLNotSupported,
+			DeleteURL:             "placeholder",
 			SuppressSwaggerExpand: true,
 			SuppressGenericExpand: true,
 			Metadata: map[string]string{
@@ -328,7 +329,6 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode
 
 	if partitionKeyValue != "" {
 		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
-		headers["x-ms-partitionkey"] = partitionKeyValue
 	}
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
@@ -414,14 +414,44 @@ func (e *CosmosDbExpander) getCollectionPartitionKey(ctx context.Context, accoun
 	return container.PartitionKey.Paths[0], nil
 }
 
-// // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
-// func (e *CosmosDbExpander) Delete(ctx context.Context, currentItem *TreeNode) (bool, error) {
-// 	switch currentItem.ItemType {
-// 	case storageBlobNodeBlob, storageBlobNodeBlobMetadata:
-// 		return e.deleteBlob(ctx, currentItem)
-// 	}
-// 	return false, nil
-// }
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (e *CosmosDbExpander) Delete(ctx context.Context, item *TreeNode) (bool, error) {
+	switch item.ItemType {
+	case cosmosdbSQLDocument:
+		return e.deleteSqlDocument(ctx, item)
+	}
+	return false, nil
+}
+
+func (e *CosmosDbExpander) deleteSqlDocument(ctx context.Context, item *TreeNode) (bool, error) {
+
+	accountName := item.Metadata["AccountName"]
+	databaseName := item.Metadata["DatabaseName"]
+	containerName := item.Metadata["ContainerName"]
+	accountKey := item.Metadata["AccountKey"]
+	partitionKeyValue := item.Metadata["PartitionKeyValue"]
+
+	headers := map[string]string{}
+
+	if partitionKeyValue != "" {
+		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
+	}
+
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
+	response, err := e.doRequestWithHeaders(ctx, "DELETE", accountName, requestURL, accountKey, headers)
+	if err != nil {
+		return false, fmt.Errorf("Error getting documents: %s", err)
+	}
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
+		}
+		return false, fmt.Errorf("Error getting document. StatusCode=%d, Response=%s", response.StatusCode, data)
+	}
+
+	return true, nil
+}
 
 // HasActions is a default implementation returning false to indicate no actions available
 func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
