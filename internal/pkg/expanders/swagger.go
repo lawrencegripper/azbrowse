@@ -243,6 +243,34 @@ func (e *SwaggerResourceExpander) copyMetadata(target map[string]string, source 
 	}
 }
 
+// CanUpdate indicates if the item can be updated
+func (e SwaggerResourceExpander) CanUpdate(ctx context.Context, item *TreeNode) (bool, error) {
+	if item == nil ||
+		item.SwaggerResourceType == nil ||
+		item.SwaggerResourceType.PutEndpoint == nil ||
+		item.Metadata == nil ||
+		item.Metadata["SwaggerAPISetID"] == "" {
+		return false, nil
+	}
+	return true, nil
+}
+
+// Update updates the item
+func (e *SwaggerResourceExpander) Update(ctx context.Context, item *TreeNode, updatedContent string) error {
+	apiSetID := item.Metadata["SwaggerAPISetID"]
+	apiSetPtr := e.GetAPISet(apiSetID)
+	if apiSetPtr == nil {
+		return nil
+	}
+	apiSet := *apiSetPtr
+
+	err := apiSet.Update(ctx, item, updatedContent)
+	if err != nil {
+		return fmt.Errorf("Error updating: %s", err)
+	}
+	return nil
+}
+
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
 func (e *SwaggerResourceExpander) Delete(context context.Context, item *TreeNode) (bool, error) {
 

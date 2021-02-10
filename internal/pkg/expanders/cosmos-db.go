@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"strings"
 	"time"
@@ -142,6 +143,26 @@ func (e *CosmosDbExpander) Expand(ctx context.Context, currentItem *TreeNode) Ex
 	}
 }
 
+// CanUpdate indicates if the item can be updated
+func (e CosmosDbExpander) CanUpdate(ctx context.Context, item *TreeNode) (bool, error) {
+	switch item.ItemType {
+	case cosmosdbSQLDocument:
+		return true, nil
+	default:
+		return false, nil
+	}
+}
+
+// Update updates the item
+func (e *CosmosDbExpander) Update(ctx context.Context, item *TreeNode, updatedContent string) error {
+	switch item.ItemType {
+	case cosmosdbSQLDocument:
+		return e.updateSQLDocument(ctx, item, updatedContent)
+	default:
+		return fmt.Errorf("Unsupported item type: %s", item.ItemType)
+	}
+}
+
 func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNode) ExpanderResult {
 
 	accountName := item.Metadata["AccountName"]
@@ -254,6 +275,7 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode
 
 	if partitionKeyValue != "" {
 		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
+		headers["x-ms-partitionkey"] = partitionKeyValue
 	}
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
@@ -287,6 +309,32 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode
 		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
 		IsPrimaryResponse: true,
 	}
+}
+
+func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode, updatedContent string) error {
+
+	accountName := item.Metadata["AccountName"]
+	databaseName := item.Metadata["DatabaseName"]
+	containerName := item.Metadata["ContainerName"]
+	accountKey := item.Metadata["AccountKey"]
+	partitionKeyValue := item.Metadata["PartitionKeyValue"]
+
+	headers := map[string]string{}
+
+	if partitionKeyValue != "" {
+		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
+	}
+
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
+	data, statusCode, err := e.doRequestWithHeadersAndBody(ctx, "PUT", accountName, requestURL, accountKey, headers, strings.NewReader(updatedContent))
+	if err != nil {
+		return fmt.Errorf("Error updating documents: %s", err)
+	}
+	if !e.isSuccessCode(statusCode) {
+		return fmt.Errorf("Error updating document. StatusCode=%d, Response=%s", statusCode, string(data))
+	}
+
+	return nil
 }
 
 func (e *CosmosDbExpander) getCollectionPartitionKey(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string) (string, error) {
@@ -448,6 +496,9 @@ func (e *CosmosDbExpander) doRequest(ctx context.Context, verb string, accountNa
 	return e.doRequestWithHeaders(ctx, verb, accountName, requestURL, accountKey, map[string]string{})
 }
 func (e *CosmosDbExpander) doRequestWithHeaders(ctx context.Context, verb string, accountName string, requestURL string, accountKey string, headers map[string]string) ([]byte, int, error) {
+	return e.doRequestWithHeadersAndBody(ctx, verb, accountName, requestURL, accountKey, headers, nil)
+}
+func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb string, accountName string, requestURL string, accountKey string, headers map[string]string, body io.Reader) ([]byte, int, error) {
 
 	span, _ := tracing.StartSpanFromContext(ctx, "doRequest(cosmosexpander):"+requestURL, tracing.SetTag("url", requestURL))
 	defer span.Finish()
@@ -458,7 +509,7 @@ func (e *CosmosDbExpander) doRequestWithHeaders(ctx context.Context, verb string
 
 	fullURL := fmt.Sprintf("https://%s.documents.azure.com/%s", accountName, requestURL)
 
-	req, err := http.NewRequestWithContext(ctx, verb, fullURL, nil)
+	req, err := http.NewRequestWithContext(ctx, verb, fullURL, body)
 	if err != nil {
 		return []byte{}, -1, fmt.Errorf("Failed to create request: %s", err)
 	}

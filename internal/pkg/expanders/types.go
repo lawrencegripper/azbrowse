@@ -24,6 +24,9 @@ type Expander interface {
 	ListActions(ctx context.Context, currentNode *TreeNode) ListActionsResult
 	ExecuteAction(ctx context.Context, currentNode *TreeNode) ExpanderResult
 
+	CanUpdate(context context.Context, item *TreeNode) (bool, error)
+	Update(context context.Context, item *TreeNode, updatedContent string) error
+
 	// Used for testing the expanders
 	testCases() (bool, *[]expanderTestCase)
 	setClient(c *armclient.Client)
@@ -45,6 +48,12 @@ func (e *ExpanderBase) Expand(ctx context.Context, currentItem *TreeNode) Expand
 		SourceDescription: "ExpanderBase",
 		Err:               fmt.Errorf("ExpanderBase.Expand should not be called"),
 	}
+}
+func (e ExpanderBase) CanUpdate(ctx context.Context, currentItem *TreeNode) (bool, error) {
+	return false, nil
+}
+func (e *ExpanderBase) Update(ctx context.Context, currentItem *TreeNode, updatedContent string) error {
+	return fmt.Errorf("ExpanderBase.Update should not be called")
 }
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
