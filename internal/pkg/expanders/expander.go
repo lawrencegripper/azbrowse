@@ -96,7 +96,11 @@ func ExpandItemAllowDefaultExpander(ctx context.Context, currentItem *TreeNode, 
 				}
 				// Log that we have a primary response
 				hasPrimaryResponse = true
-				newContent = result.Response
+				if result.Response.Response != "" || result.Err == nil {
+					newContent = result.Response
+				} else {
+					newContent = ExpanderResponse{Response: result.Err.Error(), ResponseType: ResponsePlainText}
+				}
 			}
 			if result.Nodes == nil {
 				continue
