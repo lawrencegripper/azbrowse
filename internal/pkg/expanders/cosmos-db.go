@@ -674,11 +674,14 @@ func signString(value, key string) (string, error) {
 
 	salt, err := enc.DecodeString(key)
 	if err != nil {
-		return ret, err
+		return "", err
 	}
 
 	hmac := hmac.New(sha256.New, salt)
-	hmac.Write([]byte(value))
+	_, err = hmac.Write([]byte(value))
+	if err != nil {
+		return "", err
+	}
 	b := hmac.Sum(nil)
 
 	ret = enc.EncodeToString(b)
