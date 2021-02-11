@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.KubernetesConfiguration/preview/2020-10-01-preview/kubernetesconfiguration.json"], "name": "package-preview-2020-10"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.KubernetesConfiguration/stable/2021-03-01/kubernetesconfiguration.json"], "name": "package-2021-03"}

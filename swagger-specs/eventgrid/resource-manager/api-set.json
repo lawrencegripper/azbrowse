@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.EventGrid/stable/2020-06-01/EventGrid.json"], "name": "package-2020-06"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.EventGrid/preview/2020-10-15-preview/EventGrid.json"], "name": "package-2020-10-preview"}
