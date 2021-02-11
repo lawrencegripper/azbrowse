@@ -290,13 +290,14 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 
 	if continuationToken := response.Headers.Get("x-ms-continuation"); continuationToken != "" {
 		node := TreeNode{
-			Parentid:  item.ID,
-			Namespace: "cosmosdb",
-			ID:        item.ID + "/" + "...more",
-			Name:      "more...",
-			Display:   "more...",
-			ItemType:  cosmosdbListSQLDocumentsContinuation,
-			ExpandURL: ExpandURLNotSupported,
+			Parentid:      item.ID,
+			Namespace:     "cosmosdb",
+			ID:            item.ID + "/" + "...more",
+			Name:          "more...",
+			Display:       "more...",
+			ItemType:      cosmosdbListSQLDocumentsContinuation,
+			ExpandURL:     ExpandURLNotSupported,
+			ExpandInPlace: true,
 			Metadata: map[string]string{
 				"AccountName":       accountName,
 				"DatabaseName":      databaseName,

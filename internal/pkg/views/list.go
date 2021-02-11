@@ -317,8 +317,13 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 	currentItem := w.CurrentItem()
 
 	if len(nodes) > 0 {
-		// Saves to current page to the nav stack and creates new current page.
-		w.SetNewNodes(nodes)
+
+		if currentItem != nil && currentItem.ExpandInPlace {
+			w.replaceNode(currentItem, nodes)
+		} else {
+			// Saves to current page to the nav stack and creates new current page.
+			w.SetNewNodes(nodes)
+		}
 
 		// Build out new current page item
 		w.currentPage.DataType = content.ResponseType
@@ -355,7 +360,18 @@ func (w *ListWidget) GetNodes() []*expanders.TreeNode {
 	return w.currentPage.Items
 }
 
-// SetNodes allows others to set the list nodes
+func (w *ListWidget) replaceNode(nodeToReplace *expanders.TreeNode, nodes []*expanders.TreeNode) {
+	existingNodes := w.GetNodes()
+	if existingNodes[len(existingNodes)-1] != nodeToReplace {
+		panic("replaceNode can only be used on the last node in the list")
+	}
+	existingNodes = existingNodes[0 : len(existingNodes)-1]
+	existingNodes = append(existingNodes, nodes...)
+
+	w.currentPage.Items = existingNodes
+}
+
+// SetNewNodes allows others to set the list nodes
 func (w *ListWidget) SetNewNodes(nodes []*expanders.TreeNode) {
 
 	// Capture current view to navstack

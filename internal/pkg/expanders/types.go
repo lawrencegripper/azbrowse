@@ -144,6 +144,7 @@ type TreeNode struct {
 	SuppressSwaggerExpand  bool                  // Prevent the SwaggerResourceExpander attempting to expand the node
 	SuppressGenericExpand  bool                  // Prevent the DefaultExpander (aka GenericExpander) attempting to expand the node
 	TimeoutOverrideSeconds *int                  // Override the default expand timeout for a node
+	ExpandInPlace          bool                  // Indicates that the node is a "More..." node. Must be the last in the list and will be removed and replaced with the expanded nodes
 }
 
 const (

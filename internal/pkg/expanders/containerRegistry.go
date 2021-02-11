@@ -172,6 +172,7 @@ func (e *ContainerRegistryExpander) expandRepositories(ctx context.Context, curr
 				ExpandURL:             ExpandURLNotSupported,
 				SuppressSwaggerExpand: true,
 				SuppressGenericExpand: true,
+				ExpandInPlace:         true,
 				Metadata: map[string]string{
 					"RegistryID": registryID,
 					"lastItem":   lastItem,
