@@ -172,6 +172,79 @@ func (e *CosmosDbExpander) Update(ctx context.Context, item *TreeNode, updatedCo
 	}
 }
 
+// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
+func (e *CosmosDbExpander) Delete(ctx context.Context, item *TreeNode) (bool, error) {
+	switch item.ItemType {
+	case cosmosdbSQLDocument:
+		return e.deleteSQLDocument(ctx, item)
+	}
+	return false, nil
+}
+
+// HasActions is a default implementation returning false to indicate no actions available
+func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
+	swaggerResourceType := item.SwaggerResourceType
+	if item.ItemType == ResourceType && swaggerResourceType != nil {
+		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// ListActions returns an action for listing keys on the cosmos db
+func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) ListActionsResult {
+
+	nodes := []*TreeNode{}
+
+	swaggerResourceType := item.SwaggerResourceType
+	if item.ItemType == ResourceType && swaggerResourceType != nil {
+		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
+			nodes = append(nodes,
+				&TreeNode{
+					Parentid:              item.ID,
+					ID:                    item.ID + "?list-keys",
+					Namespace:             "cosmos-db",
+					Name:                  "List Keys",
+					Display:               "List Keys",
+					ItemType:              ActionType,
+					SuppressGenericExpand: true,
+					Metadata: map[string]string{
+						"ActionID": cosmosdbActionListKeys,
+					},
+				})
+		}
+	}
+
+	return ListActionsResult{
+		Nodes:             nodes,
+		SourceDescription: "CosmosDbExpander",
+		IsPrimaryResponse: true,
+	}
+}
+
+// ExecuteAction implements action for listing keys
+func (e *CosmosDbExpander) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
+	actionID := item.Metadata["ActionID"]
+
+	switch actionID {
+	case cosmosdbActionListKeys:
+		return e.cosmosdbActionListKeys(context, item)
+	case "":
+		return ExpanderResult{
+			SourceDescription: "CosmosDbExpander",
+			IsPrimaryResponse: true,
+			Err:               fmt.Errorf("ActionID metadata not set: %q", item.ID),
+		}
+	default:
+		return ExpanderResult{
+			SourceDescription: "CosmosDbExpander",
+			IsPrimaryResponse: true,
+			Err:               fmt.Errorf("Unhandled ActionID: %q", actionID),
+		}
+	}
+}
+
 func (e *CosmosDbExpander) expandSQLDocuments(ctx context.Context, item *TreeNode) ExpanderResult {
 	accountName := item.Metadata["AccountName"]
 	databaseName := item.Metadata["DatabaseName"]
@@ -389,42 +462,7 @@ func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode
 	return nil
 }
 
-func (e *CosmosDbExpander) getCollectionPartitionKey(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string) (string, error) {
-
-	requestURL := fmt.Sprintf("/dbs/%s/colls/%s", databaseName, containerName)
-	response, err := e.doRequest(ctx, "GET", accountName, requestURL, accountKey)
-	if err != nil {
-		return "", fmt.Errorf("Error getting documents: %s", err)
-	}
-	if !e.isSuccessCode(response.StatusCode) {
-		data := ""
-		if response != nil {
-			data = string(response.Data)
-		}
-		return "", fmt.Errorf("Error getting collection partition key. StatusCode=%d, Response=%s", response.StatusCode, data)
-	}
-
-	var container CosmosDbContainer
-	if err = json.Unmarshal(response.Data, &container); err != nil {
-		return "", fmt.Errorf("Error unmarshalling response: %s", err)
-	}
-
-	if container.PartitionKey == nil {
-		return "", nil
-	}
-	return container.PartitionKey.Paths[0], nil
-}
-
-// Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
-func (e *CosmosDbExpander) Delete(ctx context.Context, item *TreeNode) (bool, error) {
-	switch item.ItemType {
-	case cosmosdbSQLDocument:
-		return e.deleteSqlDocument(ctx, item)
-	}
-	return false, nil
-}
-
-func (e *CosmosDbExpander) deleteSqlDocument(ctx context.Context, item *TreeNode) (bool, error) {
+func (e *CosmosDbExpander) deleteSQLDocument(ctx context.Context, item *TreeNode) (bool, error) {
 
 	accountName := item.Metadata["AccountName"]
 	databaseName := item.Metadata["DatabaseName"]
@@ -454,69 +492,30 @@ func (e *CosmosDbExpander) deleteSqlDocument(ctx context.Context, item *TreeNode
 	return true, nil
 }
 
-// HasActions returns true if this is a cosmosdb account
-func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
-	swaggerResourceType := item.SwaggerResourceType
-	if item.ItemType == ResourceType && swaggerResourceType != nil {
-		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
-			return true, nil
+func (e *CosmosDbExpander) getCollectionPartitionKey(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string) (string, error) {
+
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s", databaseName, containerName)
+	response, err := e.doRequest(ctx, "GET", accountName, requestURL, accountKey)
+	if err != nil {
+		return "", fmt.Errorf("Error getting documents: %s", err)
+	}
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
 		}
+		return "", fmt.Errorf("Error getting collection partition key. StatusCode=%d, Response=%s", response.StatusCode, data)
 	}
 
-	return false, nil
-}
-
-// ListActions returns an action for listing keys on the cosmos db
-func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) ListActionsResult {
-
-	nodes := []*TreeNode{}
-
-	swaggerResourceType := item.SwaggerResourceType
-	if item.ItemType == ResourceType && swaggerResourceType != nil {
-		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
-			nodes = append(nodes,
-				&TreeNode{
-					Parentid:              item.ID,
-					ID:                    item.ID + "?list-keys",
-					Namespace:             "cosmos-db",
-					Name:                  "List Keys",
-					Display:               "List Keys",
-					ItemType:              ActionType,
-					SuppressGenericExpand: true,
-					Metadata: map[string]string{
-						"ActionID": cosmosdbActionListKeys,
-					},
-				})
-		}
+	var container CosmosDbContainer
+	if err = json.Unmarshal(response.Data, &container); err != nil {
+		return "", fmt.Errorf("Error unmarshalling response: %s", err)
 	}
 
-	return ListActionsResult{
-		Nodes:             nodes,
-		SourceDescription: "CosmosDbExpander",
-		IsPrimaryResponse: true,
+	if container.PartitionKey == nil {
+		return "", nil
 	}
-}
-
-// ExecuteAction implements action for listing keys
-func (e *CosmosDbExpander) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
-	actionID := item.Metadata["ActionID"]
-
-	switch actionID {
-	case cosmosdbActionListKeys:
-		return e.cosmosdbActionListKeys(context, item)
-	case "":
-		return ExpanderResult{
-			SourceDescription: "CosmosDbExpander",
-			IsPrimaryResponse: true,
-			Err:               fmt.Errorf("ActionID metadata not set: %q", item.ID),
-		}
-	default:
-		return ExpanderResult{
-			SourceDescription: "CosmosDbExpander",
-			IsPrimaryResponse: true,
-			Err:               fmt.Errorf("Unhandled ActionID: %q", actionID),
-		}
-	}
+	return container.PartitionKey.Paths[0], nil
 }
 
 func (e *CosmosDbExpander) cosmosdbActionListKeys(ctx context.Context, item *TreeNode) ExpanderResult {
