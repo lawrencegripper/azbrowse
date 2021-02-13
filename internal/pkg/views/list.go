@@ -474,21 +474,33 @@ func (w *ListWidget) MovePageUp() {
 
 // MoveHome changes the selection to the top of the list
 func (w *ListWidget) MoveHome() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(0)
 }
 
 // MoveEnd changes the selection to the bottom of the list
 func (w *ListWidget) MoveEnd() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(w.itemCount() - 1)
 }
 
 // MoveUp moves the selection up one item
 func (w *ListWidget) MoveUp() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(w.CurrentSelection() - 1)
 }
 
 // MoveDown moves the selection down one item
 func (w *ListWidget) MoveDown() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(w.CurrentSelection() + 1)
 }
 
