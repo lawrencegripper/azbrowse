@@ -275,6 +275,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		return
 	}
 	w.navLock.Lock()
+	if w.isNavigating { //double-check pattern
+		// Skip if a navigation is already in progress
+		return
+	}
 	w.isNavigating = true
 
 	suppressPreviousTitle := false
@@ -290,8 +294,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	go func() {
 		defer func() {
-			w.navLock.Unlock()
 			w.isNavigating = false
+			w.navLock.Unlock()
 		}()
 		newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
 		if err != nil { // Don't need to display error as expander emits status event on error
