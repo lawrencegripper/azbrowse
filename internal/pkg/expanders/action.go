@@ -39,5 +39,13 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	})
 	defer done()
 
-	return currentItem.Expander.ExecuteAction(ctx, currentItem)
+	result := currentItem.Expander.ExecuteAction(ctx, currentItem)
+
+	// // Set the action handler as the expander for
+	// if result.Nodes != nil {
+	// 	for _, node := range result.Nodes {
+	// 		node.Expander = currentItem.Expander
+	// 	}
+	// }
+	return result
 }

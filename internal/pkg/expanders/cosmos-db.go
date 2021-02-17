@@ -17,15 +17,17 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
 
 // NewCosmosDbExpander creates a new instance of CosmosDbExpander
-func NewCosmosDbExpander(armclient *armclient.Client) *CosmosDbExpander {
+func NewCosmosDbExpander(armclient *armclient.Client, commandPanel interfaces.CommandPanel) *CosmosDbExpander {
 	return &CosmosDbExpander{
-		client:    &http.Client{},
-		armClient: armclient,
+		client:       &http.Client{},
+		armClient:    armclient,
+		commandPanel: commandPanel,
 	}
 }
 
@@ -65,7 +67,8 @@ const (
 )
 
 const (
-	cosmosdbActionListKeys = "list-keys"
+	cosmosdbActionListKeys    = "list-keys"
+	cosmosdbActionGetDocument = "get-document"
 )
 
 func (e *CosmosDbExpander) setClient(c *armclient.Client) {
@@ -75,8 +78,9 @@ func (e *CosmosDbExpander) setClient(c *armclient.Client) {
 // CosmosDbExpander expands the blob  data-plane aspects of a Storage Account
 type CosmosDbExpander struct {
 	ExpanderBase
-	client    *http.Client
-	armClient *armclient.Client
+	client       *http.Client
+	armClient    *armclient.Client
+	commandPanel interfaces.CommandPanel
 }
 
 // Name returns the name of the expander
@@ -142,7 +146,7 @@ func (e *CosmosDbExpander) Expand(ctx context.Context, currentItem *TreeNode) Ex
 	case cosmosdbListSQLDocumentsContinuation:
 		return e.expandSQLDocumentsContinuation(ctx, currentItem)
 	case cosmosdbSQLDocument:
-		return e.expandSQLDocument(ctx, currentItem)
+		return e.expandSQLDocumentNode(ctx, currentItem)
 	}
 
 	return ExpanderResult{
@@ -184,8 +188,11 @@ func (e *CosmosDbExpander) Delete(ctx context.Context, item *TreeNode) (bool, er
 // HasActions is a default implementation returning false to indicate no actions available
 func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
 	swaggerResourceType := item.SwaggerResourceType
-	if item.ItemType == ResourceType && swaggerResourceType != nil {
+	if swaggerResourceType != nil {
 		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
+			return true, nil
+		}
+		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/containers/{containerName}" {
 			return true, nil
 		}
 	}
@@ -198,7 +205,7 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 	nodes := []*TreeNode{}
 
 	swaggerResourceType := item.SwaggerResourceType
-	if item.ItemType == ResourceType && swaggerResourceType != nil {
+	if swaggerResourceType != nil {
 		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
 			nodes = append(nodes,
 				&TreeNode{
@@ -211,6 +218,21 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 					SuppressGenericExpand: true,
 					Metadata: map[string]string{
 						"ActionID": cosmosdbActionListKeys,
+					},
+				})
+		}
+		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/containers/{containerName}" {
+			nodes = append(nodes,
+				&TreeNode{
+					Parentid:              item.ID,
+					ID:                    item.ID + "?get-document",
+					Namespace:             "cosmos-db",
+					Name:                  "Get Document",
+					Display:               "Get Document",
+					ItemType:              ActionType,
+					SuppressGenericExpand: true,
+					Metadata: map[string]string{
+						"ActionID": cosmosdbActionGetDocument,
 					},
 				})
 		}
@@ -230,6 +252,8 @@ func (e *CosmosDbExpander) ExecuteAction(context context.Context, item *TreeNode
 	switch actionID {
 	case cosmosdbActionListKeys:
 		return e.cosmosdbActionListKeys(context, item)
+	case cosmosdbActionGetDocument:
+		return e.cosmosdbActionGetDocument(context, item)
 	case "":
 		return ExpanderResult{
 			SourceDescription: "CosmosDbExpander",
@@ -391,13 +415,17 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 	}
 }
 
-func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode) ExpanderResult {
-
+func (e *CosmosDbExpander) expandSQLDocumentNode(ctx context.Context, item *TreeNode) ExpanderResult {
 	accountName := item.Metadata["AccountName"]
 	databaseName := item.Metadata["DatabaseName"]
 	containerName := item.Metadata["ContainerName"]
 	accountKey := item.Metadata["AccountKey"]
 	partitionKeyValue := item.Metadata["PartitionKeyValue"]
+
+	return e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, item.ID)
+}
+
+func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string, partitionKeyValue string, id string) ExpanderResult {
 
 	headers := map[string]string{}
 
@@ -405,7 +433,7 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, item *TreeNode
 		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
 	}
 
-	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, id)
 	response, err := e.doRequestWithHeaders(ctx, "GET", accountName, requestURL, accountKey, headers)
 	if err != nil {
 		return ExpanderResult{
@@ -528,10 +556,7 @@ func (e *CosmosDbExpander) cosmosdbActionListKeys(ctx context.Context, item *Tre
 
 	if err != nil {
 		return ExpanderResult{
-			Response: ExpanderResponse{
-				ResponseType: ResponsePlainText,
-				Response:     fmt.Sprintf("Error getting keys: %s", err),
-			},
+			Err:               fmt.Errorf("Error getting keys: %s", err),
 			SourceDescription: "CosmosDbExpander request",
 			IsPrimaryResponse: true,
 		}
@@ -544,6 +569,90 @@ func (e *CosmosDbExpander) cosmosdbActionListKeys(ctx context.Context, item *Tre
 		},
 		SourceDescription: "CosmosDbExpander request",
 		IsPrimaryResponse: true,
+	}
+}
+
+func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *TreeNode) ExpanderResult {
+
+	swaggerResourceType := item.Parent.SwaggerResourceType // item is action node, item.Parent is the node the action relates to
+	matchResult := swaggerResourceType.Endpoint.Match(item.Parentid)
+	if !matchResult.IsMatch {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Endpoint should match"),
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	accountName := matchResult.Values["accountName"]
+	databaseName := matchResult.Values["databaseName"]
+	containerName := matchResult.Values["containerName"]
+
+	accountKey, err := e.getAccountKey(ctx, item.Parent)
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error getting account key: %s", err),
+			IsPrimaryResponse: true,
+			SourceDescription: "CosmosDbExpander request",
+		}
+	}
+
+	partitionKey, err := e.getCollectionPartitionKey(ctx, accountName, databaseName, containerName, accountKey)
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error getting partition key: %s", err),
+			IsPrimaryResponse: true,
+			SourceDescription: "CosmosDbExpander request",
+		}
+	}
+
+	commandChannel := make(chan string, 1)
+	commandPanelNotification := func(state interfaces.CommandPanelNotification) {
+		if state.EnterPressed {
+			commandChannel <- state.CurrentText
+			e.commandPanel.Hide()
+		}
+	}
+	partitionKeyValue := ""
+	if partitionKey != "" {
+		e.commandPanel.ShowWithText("partition key:", "", nil, commandPanelNotification)
+		partitionKeyValue = <-commandChannel
+		partitionKeyValue = fmt.Sprintf("[\"%s\"]", partitionKeyValue)
+	}
+	e.commandPanel.ShowWithText("id:", "", nil, commandPanelNotification)
+	id := <-commandChannel
+
+	response := e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, id)
+
+	if response.Err != nil {
+		return response
+	}
+
+	node := TreeNode{
+		Parentid:              item.ID,
+		ID:                    id,
+		Namespace:             "cosmosdb",
+		Name:                  id,
+		Display:               id,
+		ItemType:              cosmosdbSQLDocument,
+		ExpandURL:             ExpandURLNotSupported,
+		DeleteURL:             "placeholder",
+		SuppressSwaggerExpand: true,
+		SuppressGenericExpand: true,
+		Metadata: map[string]string{
+			"AccountName":       accountName,
+			"DatabaseName":      databaseName,
+			"ContainerName":     containerName,
+			"AccountKey":        accountKey,
+			"PartitionKeyValue": partitionKeyValue,
+		},
+	}
+
+	return ExpanderResult{
+		Response:          ExpanderResponse{Response: "<-- Open the node to view the document :-)", ResponseType: ResponsePlainText},
+		Nodes:             []*TreeNode{&node},
+		IsPrimaryResponse: true,
+		SourceDescription: "CosmosDbExpander request",
 	}
 }
 

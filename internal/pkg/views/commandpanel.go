@@ -4,24 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/stuartleeks/gocui"
 )
 
-// CommandPanelListOption represents a list item that can be displayed in the CommandPanel
-type CommandPanelListOption struct {
-	ID          string
-	DisplayText string
-}
-
-// CommandPanelNotification holds the event state for a panel changed notification
-type CommandPanelNotification struct {
-	CurrentText  string
-	SelectedID   string
-	EnterPressed bool
-}
-
-// CommandPanelNotificationHandler is the function signature for a panel changed notification handler
-type CommandPanelNotificationHandler func(state CommandPanelNotification)
+var _ interfaces.CommandPanel = &CommandPanelWidget{}
 
 // CommandPanelWidget controls the notifications windows in the top right
 type CommandPanelWidget struct {
@@ -35,10 +22,10 @@ type CommandPanelWidget struct {
 	prepopulate         string
 	previousViewName    string
 	title               string
-	options             *[]CommandPanelListOption
-	filteredOptions     *[]CommandPanelListOption
+	options             *[]interfaces.CommandPanelListOption
+	filteredOptions     *[]interfaces.CommandPanelListOption
 	selectedIndex       int
-	notificationHandler CommandPanelNotificationHandler
+	notificationHandler interfaces.CommandPanelNotificationHandler
 	lastTopIndex        int
 }
 
@@ -63,7 +50,7 @@ func (w *CommandPanelWidget) Hide() {
 }
 
 // ShowWithText launches the command panel pre-populated with some text
-func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]CommandPanelListOption, handler CommandPanelNotificationHandler) {
+func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]interfaces.CommandPanelListOption, handler interfaces.CommandPanelNotificationHandler) {
 	// Ensure we put things back how we found them before the panel was launched
 	w.trackPreviousView()
 
@@ -256,7 +243,7 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 		return
 	}
 
-	state := CommandPanelNotification{
+	state := interfaces.CommandPanelNotification{
 		EnterPressed: w.contentHasNewLine(content),
 		CurrentText:  strings.ReplaceAll(content, "\n", ""),
 	}
@@ -274,7 +261,7 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 			selectedID = (*w.filteredOptions)[w.selectedIndex].ID
 		}
 		w.selectedIndex = -1
-		filterOptions := []CommandPanelListOption{}
+		filterOptions := []interfaces.CommandPanelListOption{}
 		loweredCurrentText := strings.ToLower(state.CurrentText)
 		for i, option := range *w.options {
 			if strings.Contains(strings.ToLower(option.DisplayText), loweredCurrentText) {

@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
@@ -305,6 +306,13 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newTitle = ""
 		}
 		w.Navigate(newItems, newContent, newTitle, suppressPreviousTitle)
+
+		time.Sleep(time.Second)
+		// Force UI to re-render to pickup
+		w.g.Update(func(g *gocui.Gui) error {
+			return nil
+		})
+
 	}()
 }
 

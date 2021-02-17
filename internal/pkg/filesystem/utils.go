@@ -71,7 +71,7 @@ func createFS(mountpoint string, filterToSub string, editMode bool, demoMode boo
 	armClient := armclient.NewClientFromCLI("", responseLogge)
 	armclient.LegacyInstance = armClient
 
-	expanders.InitializeExpanders(armClient)
+	expanders.InitializeExpanders(armClient, nil)
 	armClient.PopulateResourceAPILookup(ctx)
 
 	// print status messages

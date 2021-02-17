@@ -59,10 +59,6 @@ func run(settings *config.Settings) {
 	armClient := armclient.NewClientFromCLI(settings.TenantID, responseProcessor)
 	armclient.LegacyInstance = armClient
 
-	// Initialize the expanders which will let the user walk the tree of
-	// resources in Azure
-	expanders.InitializeExpanders(armClient)
-
 	// Start up gocui and configure some settings
 	g, err := gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
@@ -99,7 +95,11 @@ func run(settings *config.Settings) {
 
 	// Create the views we'll use to display information and
 	// bind up all the keys use to interact with the views
-	list := setupViewsAndKeybindings(ctx, g, settings, armClient)
+	list, commandPanel := setupViewsAndKeybindings(ctx, g, settings, armClient)
+
+	// Initialize the expanders which will let the user walk the tree of
+	// resources in Azure
+	expanders.InitializeExpanders(armClient, commandPanel)
 
 	// Start a go routine to populate the list with root of the nodes
 	startPopulatingList(ctx, g, list, armClient)
@@ -197,7 +197,7 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 	}()
 }
 
-func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *config.Settings, client *armclient.Client) *views.ListWidget {
+func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *config.Settings, client *armclient.Client) (*views.ListWidget, *views.CommandPanelWidget) {
 	maxX, _ := g.Size()
 	// Padding
 	maxX = maxX - 2
@@ -317,5 +317,5 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	notifications.ConfirmDeleteKeyBinding = strings.Join(keyBindings["confirmdelete"], ",")
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 
-	return list
+	return list, commandPanel
 }

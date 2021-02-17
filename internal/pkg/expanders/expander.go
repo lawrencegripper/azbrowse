@@ -106,7 +106,9 @@ func ExpandItemAllowDefaultExpander(ctx context.Context, currentItem *TreeNode, 
 				continue
 			}
 			for _, node := range result.Nodes {
-				node.Expander = done.Expander
+				if node.Expander == nil { // action expander sets this to the underlying expander - don't overwrite
+					node.Expander = done.Expander
+				}
 				node.Parent = currentItem
 			}
 			// Add the items it found
