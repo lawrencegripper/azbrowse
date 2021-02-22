@@ -20,14 +20,16 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/stuartleeks/gocui"
 )
 
 // NewCosmosDbExpander creates a new instance of CosmosDbExpander
-func NewCosmosDbExpander(armclient *armclient.Client, commandPanel interfaces.CommandPanel) *CosmosDbExpander {
+func NewCosmosDbExpander(armclient *armclient.Client, commandPanel interfaces.CommandPanel, gui *gocui.Gui) *CosmosDbExpander {
 	return &CosmosDbExpander{
 		client:       &http.Client{},
 		armClient:    armclient,
 		commandPanel: commandPanel,
+		gui:          gui,
 	}
 }
 
@@ -81,6 +83,7 @@ type CosmosDbExpander struct {
 	client       *http.Client
 	armClient    *armclient.Client
 	commandPanel interfaces.CommandPanel
+	gui          *gocui.Gui
 }
 
 // Name returns the name of the expander
@@ -616,10 +619,18 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 	partitionKeyValue := ""
 	if partitionKey != "" {
 		e.commandPanel.ShowWithText("partition key:", "", nil, commandPanelNotification)
+		// Force UI to re-render to pickup
+		e.gui.Update(func(g *gocui.Gui) error {
+			return nil
+		})
 		partitionKeyValue = <-commandChannel
 		partitionKeyValue = fmt.Sprintf("[\"%s\"]", partitionKeyValue)
 	}
 	e.commandPanel.ShowWithText("id:", "", nil, commandPanelNotification)
+	// Force UI to re-render to pickup
+	e.gui.Update(func(g *gocui.Gui) error {
+		return nil
+	})
 	id := <-commandChannel
 
 	response := e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, id)

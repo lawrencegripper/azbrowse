@@ -99,7 +99,7 @@ func run(settings *config.Settings) {
 
 	// Initialize the expanders which will let the user walk the tree of
 	// resources in Azure
-	expanders.InitializeExpanders(armClient, commandPanel)
+	expanders.InitializeExpanders(armClient, commandPanel, g)
 
 	// Start a go routine to populate the list with root of the nodes
 	startPopulatingList(ctx, g, list, armClient)

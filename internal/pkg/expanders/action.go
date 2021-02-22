@@ -2,15 +2,18 @@ package expanders
 
 import (
 	"context"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/stuartleeks/gocui"
 )
 
 // ActionExpander handles actions
 type ActionExpander struct {
 	ExpanderBase
 	client *armclient.Client
+	gui    *gocui.Gui
 }
 
 func (e *ActionExpander) setClient(c *armclient.Client) {
@@ -41,11 +44,19 @@ func (e *ActionExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 
 	result := currentItem.Expander.ExecuteAction(ctx, currentItem)
 
-	// // Set the action handler as the expander for
-	// if result.Nodes != nil {
-	// 	for _, node := range result.Nodes {
-	// 		node.Expander = currentItem.Expander
-	// 	}
-	// }
+	// Set the action handler as the expander for
+	if result.Nodes != nil {
+		for _, node := range result.Nodes {
+			node.Expander = currentItem.Expander
+		}
+	}
+
+	go func() {
+		time.Sleep(time.Second)
+		// Force UI to re-render to pickup
+		e.gui.Update(func(g *gocui.Gui) error {
+			return nil
+		})
+	}()
 	return result
 }
