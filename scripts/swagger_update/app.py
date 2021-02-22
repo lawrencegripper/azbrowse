@@ -21,6 +21,11 @@ if __name__ == "__main__":
         "azureactivedirectory": "package-2020-03-01-preview",
         # ./azsadmin seems very broken, lots of references to files cross versions
         "azsadmin": "",
+        # recovery service and recoveryservicebackup list the same templateurls with different api version
+        # this causes indeterminate behaviour when generating swagger apisets
+        "recoveryservices": "",
+        "recoveryservicesbackup": "",
+        "recoveryservicessiterecovery": "",
     }
 
     # This allows you to augment the included files for each README.MD for a specific tag
@@ -28,7 +33,7 @@ if __name__ == "__main__":
     resource_provider_input_file_additions = {
         # storage package-2019-06 references privatelinks.json which is not listed in the input files
         "storage": { 
-            "package-2019-06": ["./Microsoft.Storage/stable/2019-06-01/privatelinks.json"] 
+            "package-2021-01": ["./Microsoft.Storage/stable/2021-01-01/privatelinks.json"] 
         },
         "cosmos-db" : {
             "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
