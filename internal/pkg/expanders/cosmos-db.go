@@ -454,7 +454,7 @@ func (e *CosmosDbExpander) deleteSqlDocument(ctx context.Context, item *TreeNode
 	return true, nil
 }
 
-// HasActions is a default implementation returning false to indicate no actions available
+// HasActions returns true if this is a cosmosdb account
 func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
 	swaggerResourceType := item.SwaggerResourceType
 	if item.ItemType == ResourceType && swaggerResourceType != nil {
