@@ -497,7 +497,7 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 	}
 }
 
-// ExecuteAction returns an error as it should not be called as HasActions returns false
+// ExecuteAction implements action for listing keys
 func (e *CosmosDbExpander) ExecuteAction(context context.Context, item *TreeNode) ExpanderResult {
 	actionID := item.Metadata["ActionID"]
 
