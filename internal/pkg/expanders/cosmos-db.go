@@ -463,11 +463,6 @@ func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (
 		}
 	}
 
-	// switch item.ItemType {
-	// case storageBlobNodeBlob,
-	// 	storageBlobNodeBlobMetadata:
-	// 	return true, nil
-	// }
 	return false, nil
 }
 
