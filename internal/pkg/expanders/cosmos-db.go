@@ -466,7 +466,7 @@ func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (
 	return false, nil
 }
 
-// ListActions returns an error as it should not be called as HasActions returns false
+// ListActions returns an action for listing keys on the cosmos db
 func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) ListActionsResult {
 
 	nodes := []*TreeNode{}
