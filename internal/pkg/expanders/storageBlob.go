@@ -483,13 +483,14 @@ func (e *StorageBlobExpander) expandList(ctx context.Context, currentItem *TreeN
 	}
 	if response.NextMarker != "" {
 		node := TreeNode{
-			Parentid:  currentItem.ID,
-			Namespace: "storageBlob",
-			ID:        currentItem.ID + "/" + "...more",
-			Name:      "more...",
-			Display:   "more...",
-			ItemType:  continuationItemType,
-			ExpandURL: ExpandURLNotSupported,
+			Parentid:      currentItem.ID,
+			Namespace:     "storageBlob",
+			ID:            currentItem.ID + "/" + "...more",
+			Name:          "more...",
+			Display:       "more...",
+			ItemType:      continuationItemType,
+			ExpandURL:     ExpandURLNotSupported,
+			ExpandInPlace: true,
 			Metadata: map[string]string{
 				"ContainerID":   containerID, // save resourceID of blob
 				"ContainerName": containerName,

@@ -487,14 +487,8 @@ func (h *ListUpdateHandler) DisplayText() string {
 }
 func (h *ListUpdateHandler) IsEnabled() bool {
 	item := h.Content.GetNode()
-	if item == nil ||
-		item.SwaggerResourceType == nil ||
-		item.SwaggerResourceType.PutEndpoint == nil ||
-		item.Metadata == nil ||
-		item.Metadata["SwaggerAPISetID"] == "" {
-		return false
-	}
-	return true
+	enable, err := item.Expander.CanUpdate(h.Context, item)
+	return enable && err == nil
 }
 func (h *ListUpdateHandler) Invoke() error {
 	item := h.Content.GetNode()
@@ -630,14 +624,7 @@ func (h *ListUpdateHandler) Invoke() error {
 		return nil
 	}
 
-	apiSetID := item.Metadata["SwaggerAPISetID"]
-	apiSetPtr := expanders.GetSwaggerResourceExpander().GetAPISet(apiSetID)
-	if apiSetPtr == nil {
-		return nil
-	}
-	apiSet := *apiSetPtr
-
-	err = apiSet.Update(h.Context, item, updatedJSON)
+	err = item.Expander.Update(h.Context, item, updatedJSON)
 	if err != nil {
 		h.status.Status(fmt.Sprintf("Error updating: %s", err), false)
 		return nil
