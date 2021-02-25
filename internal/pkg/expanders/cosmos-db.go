@@ -71,7 +71,6 @@ type CosmosDbQuery struct {
 const (
 	cosmosdbListSQLDocuments             = "sql-listdocs"
 	cosmosdbListSQLDocumentsContinuation = "sql-listdocs-continue"
-	cosmosdbListSQLQuery                 = "sql-query"
 	cosmosdbSQLDocument                  = "sql-document"
 )
 
@@ -774,7 +773,7 @@ func (e *CosmosDbExpander) executeQuery(ctx context.Context, accountName string,
 	}
 	buf, err := json.Marshal(query)
 	if err != nil {
-		return "", fmt.Errorf("Error marshalling query as JSON: %s", err)
+		return "", fmt.Errorf("Error marshaling query as JSON: %s", err)
 	}
 
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs", databaseName, containerName)
