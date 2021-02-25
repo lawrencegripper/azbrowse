@@ -627,11 +627,12 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 		partitionKeyValue = fmt.Sprintf("[\"%s\"]", partitionKeyValue)
 	}
 	e.commandPanel.ShowWithText("id:", "", nil, commandPanelNotification)
+	id := <-commandChannel
+	e.gui.SetCurrentView("listWidget")
 	// Force UI to re-render to pickup
 	e.gui.Update(func(g *gocui.Gui) error {
 		return nil
 	})
-	id := <-commandChannel
 
 	response := e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, id)
 
