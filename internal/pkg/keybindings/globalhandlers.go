@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
-	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
@@ -72,7 +71,7 @@ func (h *CopyHandler) Invoke() error {
 
 	var formattedContent string
 	switch contentType {
-	case expanders.ResponseJSON:
+	case interfaces.ResponseJSON:
 		if !json.Valid([]byte(content)) {
 			h.StatusBar.Status("Resource content is not valid JSON", false)
 			return fmt.Errorf("Resource content is not valid JSON: %s", content)
@@ -86,7 +85,7 @@ func (h *CopyHandler) Invoke() error {
 		}
 
 		formattedContent = formattedBuf.String()
-	case expanders.ResponseYAML:
+	case interfaces.ResponseYAML:
 		formattedContent = content // TODO: add YAML formatter
 
 	default:

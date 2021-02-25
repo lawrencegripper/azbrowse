@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -129,7 +130,7 @@ func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem 
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          ExpanderResponse{Response: "", ResponseType: ResponsePlainText},
+			Response:          ExpanderResponse{Response: "", ResponseType: interfaces.ResponsePlainText},
 			SourceDescription: "expandContainers logs",
 			IsPrimaryResponse: true,
 		}
@@ -143,7 +144,7 @@ func (e *ContainerInstanceExpander) expandLogs(ctx context.Context, currentItem 
 
 	return ExpanderResult{
 		IsPrimaryResponse: true,
-		Response:          ExpanderResponse{Response: containerLogResponse.Content, ResponseType: ResponsePlainText},
+		Response:          ExpanderResponse{Response: containerLogResponse.Content, ResponseType: interfaces.ResponsePlainText},
 		SourceDescription: "ContainerInstanceExpander request",
 	}
 }

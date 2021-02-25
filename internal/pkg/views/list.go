@@ -254,7 +254,7 @@ func (w *ListWidget) GoBack() {
 		eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
 		return
 	}
-	w.contentView.SetContent(previousPage.ExpandedNodeItem, previousPage.Data, previousPage.DataType, "Response")
+	w.contentView.SetContentWithNode(previousPage.ExpandedNodeItem, previousPage.Data, previousPage.DataType, "Response")
 	w.currentPage = previousPage
 
 	if w.currentPage.ExpandedNodeItem == nil {
@@ -346,7 +346,7 @@ func (w *ListWidget) Navigate(nodes []*expanders.TreeNode, content *expanders.Ex
 		}
 	}
 	if content != nil {
-		w.contentView.SetContent(currentItem, content.Response, content.ResponseType, title)
+		w.contentView.SetContentWithNode(currentItem, content.Response, content.ResponseType, title)
 	}
 
 	parentNodeID := "root"

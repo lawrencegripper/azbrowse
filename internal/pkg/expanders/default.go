@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/nbio/st"
 
@@ -50,7 +51,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+			Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 			SourceDescription: "Default Expander Request",
 		}
 	}
@@ -60,7 +61,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+			Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 			SourceDescription: "Default Expander Request",
 		}
 	}
@@ -78,7 +79,7 @@ func (e *DefaultExpander) Expand(ctx context.Context, currentItem *TreeNode) Exp
 
 	return ExpanderResult{
 		Err:               err,
-		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "Default Expander Request",
 	}
 }
@@ -163,7 +164,7 @@ func (e *DefaultExpander) ExecuteAction(ctx context.Context, currentItem *TreeNo
 
 	return ExpanderResult{
 		Err:               err,
-		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "Resource Group Request",
 		IsPrimaryResponse: true,
 	}

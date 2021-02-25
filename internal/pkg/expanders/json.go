@@ -2,6 +2,8 @@ package expanders
 
 import (
 	"context"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 )
 
 // Check interface
@@ -29,7 +31,7 @@ func (e *JSONExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (b
 func (e *JSONExpander) Expand(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: currentItem.Metadata["jsonItem"], ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: currentItem.Metadata["jsonItem"], ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "Deployments Subdeployment",
 		IsPrimaryResponse: true,
 	}

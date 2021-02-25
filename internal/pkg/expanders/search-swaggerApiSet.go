@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
@@ -196,7 +197,7 @@ func (c SwaggerAPISetSearch) ExpandResource(ctx context.Context, currentItem *Tr
 
 	return APISetExpandResponse{
 		Response:     data,
-		ResponseType: ResponseJSON,
+		ResponseType: interfaces.ResponseJSON,
 		SubResources: subResources,
 		ChildMetadata: map[string]string{
 			"IndexKey": indexKey,

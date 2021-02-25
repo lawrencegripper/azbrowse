@@ -7,6 +7,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
@@ -37,7 +38,7 @@ type SubResource struct {
 // APISetExpandResponse returns the result of expanding a Resource
 type APISetExpandResponse struct {
 	Response      string
-	ResponseType  ExpanderResponseType
+	ResponseType  interfaces.ExpanderResponseType
 	SubResources  []SubResource
 	ChildMetadata map[string]string
 }

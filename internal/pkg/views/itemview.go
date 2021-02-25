@@ -10,6 +10,7 @@ import (
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/stuartleeks/colorjson"
 	"github.com/stuartleeks/gocui"
 
@@ -27,11 +28,13 @@ type ItemWidget struct {
 	node            *expanders.TreeNode
 	originalContent string // unformatted - for copying
 	content         string
-	contentType     expanders.ExpanderResponseType
+	contentType     interfaces.ExpanderResponseType
 	view            *gocui.View
 	shouldRender    bool
 	g               *gocui.Gui
 }
+
+var _ interfaces.ItemWidget = &ItemWidget{}
 
 // NewItemWidget creates a new instance of ItemWidget
 func NewItemWidget(x, y, w, h int, hideGuids bool, shouldRender bool, content string) *ItemWidget {
@@ -118,7 +121,12 @@ func (w *ItemWidget) PageUp() {
 }
 
 // SetContent displays the string in the itemview
-func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, contentType expanders.ExpanderResponseType, title string) {
+func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderResponseType, title string) {
+	w.SetContentWithNode(nil, content, contentType, title)
+}
+
+// SetContentWithNode displays the string in the itemview and tracks the associated node
+func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string, contentType interfaces.ExpanderResponseType, title string) {
 	w.g.Update(func(g *gocui.Gui) error {
 		w.node = node
 		w.originalContent = content
@@ -129,7 +137,7 @@ func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, conten
 			w.content = StripSecretVals(w.content)
 		}
 		switch w.contentType {
-		case expanders.ResponseJSON:
+		case interfaces.ResponseJSON:
 			d := json.NewDecoder(strings.NewReader(w.content))
 			d.UseNumber()
 			var obj interface{}
@@ -149,21 +157,21 @@ func (w *ItemWidget) SetContent(node *expanders.TreeNode, content string, conten
 			if err == nil {
 				w.content = string(s)
 			}
-		case expanders.ResponseYAML:
+		case interfaces.ResponseYAML:
 			var buf bytes.Buffer
 			err := quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
 			if err == nil {
 				w.content = buf.String()
 			}
 
-		case expanders.ResponseTerraform:
+		case interfaces.ResponseTerraform:
 			var buf bytes.Buffer
 			err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
 			if err == nil {
 				w.content = buf.String()
 			}
 
-		case expanders.ResponseXML:
+		case interfaces.ResponseXML:
 			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
 			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
 			w.content = formattedContent
@@ -184,7 +192,7 @@ func (w *ItemWidget) GetContent() string {
 }
 
 // GetContentType returns the current content type
-func (w *ItemWidget) GetContentType() expanders.ExpanderResponseType {
+func (w *ItemWidget) GetContentType() interfaces.ExpanderResponseType {
 	return w.contentType
 }
 

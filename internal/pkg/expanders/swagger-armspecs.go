@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
@@ -56,7 +57,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 	data, err := c.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
 		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
-		return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
+		return APISetExpandResponse{Response: data, ResponseType: interfaces.ResponseJSON}, err
 	}
 	subResources := []SubResource{}
 
@@ -67,7 +68,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 		err = json.Unmarshal([]byte(data), &resourceResponse)
 		if err != nil {
 			err = fmt.Errorf("Error unmarshalling response: %s\nURL:%s", err, currentItem.ExpandURL)
-			return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
+			return APISetExpandResponse{Response: data, ResponseType: interfaces.ResponseJSON}, err
 		}
 
 		for _, resource := range resourceResponse.Resources {
@@ -80,7 +81,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 			subResourceType := resourceType.GetSubResourceTypeForURL(ctx, subResourceURL)
 			if subResourceType == nil {
 				err = fmt.Errorf("SubResource type not found! %s", subResourceURL)
-				return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
+				return APISetExpandResponse{Response: data, ResponseType: interfaces.ResponseJSON}, err
 			}
 			subResourceTemplateValues := subResourceType.Endpoint.Match(subResourceURL).Values
 			name := substituteValues(subResourceType.Display, subResourceTemplateValues)
@@ -90,7 +91,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 				deleteURL, err = subResourceType.DeleteEndpoint.BuildURL(subResourceTemplateValues)
 				if err != nil {
 					err = fmt.Errorf("Error building subresource delete url '%s': %s", subResourceType.DeleteEndpoint.TemplateURL, err)
-					return APISetExpandResponse{Response: data, ResponseType: ResponseJSON}, err
+					return APISetExpandResponse{Response: data, ResponseType: interfaces.ResponseJSON}, err
 				}
 			}
 
@@ -107,7 +108,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 
 	return APISetExpandResponse{
 		Response:     data,
-		ResponseType: ResponseJSON,
+		ResponseType: interfaces.ResponseJSON,
 		SubResources: subResources,
 	}, nil
 }

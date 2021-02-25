@@ -26,7 +26,7 @@ var register []Expander
 
 // InitializeExpanders create instances of all the expanders
 // needed by the app
-func InitializeExpanders(client *armclient.Client, commandPanel interfaces.CommandPanel, gui *gocui.Gui) {
+func InitializeExpanders(client *armclient.Client, gui *gocui.Gui, commandPanel interfaces.CommandPanel, contentPanel interfaces.ItemWidget) {
 	swaggerResourceExpander = NewSwaggerResourcesExpander()
 	swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources(client))
 
@@ -59,10 +59,10 @@ func InitializeExpanders(client *armclient.Client, commandPanel interfaces.Comma
 			client: client,
 		},
 		&JSONExpander{},
-		&StorageManagementPoliciesExpander{},           // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
-		NewContainerRegistryExpander(client),           // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
-		NewStorageBlobExpander(client),                 // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
-		NewCosmosDbExpander(client, commandPanel, gui), // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		&StorageManagementPoliciesExpander{},                         // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewContainerRegistryExpander(client),                         // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewStorageBlobExpander(client),                               // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewCosmosDbExpander(client, gui, commandPanel, contentPanel), // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 		&ContainerInstanceExpander{
 			client: client,
 		},

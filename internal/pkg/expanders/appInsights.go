@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -157,7 +158,7 @@ func (e *AppInsightsExpander) expandAnalyticsItems(ctx context.Context, currentI
 	return ExpanderResult{
 		IsPrimaryResponse: true,
 		Nodes:             newItems,
-		Response:          ExpanderResponse{Response: data, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "AppInsightsExpander request",
 	}
 }
@@ -179,7 +180,7 @@ func (e *AppInsightsExpander) expandAnalyticsItem(ctx context.Context, currentIt
 	return ExpanderResult{
 		IsPrimaryResponse: true,
 		Nodes:             newItems,
-		Response:          ExpanderResponse{Response: data, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "AppInsightsExpander request",
 	}
 }

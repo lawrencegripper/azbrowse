@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
@@ -56,7 +57,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 			Err:               err,
 			Response: ExpanderResponse{
 				Response:     data,
-				ResponseType: ResponsePlainText,
+				ResponseType: interfaces.ResponsePlainText,
 			},
 			IsPrimaryResponse: true,
 		}
@@ -71,7 +72,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 			Err:               fmt.Errorf("Failed to load subscriptions: %s", err),
 			Response: ExpanderResponse{
 				Response:     data,
-				ResponseType: ResponsePlainText,
+				ResponseType: interfaces.ResponsePlainText,
 			},
 			IsPrimaryResponse: true,
 		}
@@ -90,13 +91,13 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	}
 
 	var newContent string
-	var newContentType ExpanderResponseType
+	var newContentType interfaces.ExpanderResponseType
 	if err != nil {
 		newContent = err.Error()
-		newContentType = ResponsePlainText
+		newContentType = interfaces.ResponsePlainText
 	} else {
 		newContent = data
-		newContentType = ResponseJSON
+		newContentType = interfaces.ResponseJSON
 	}
 
 	return ExpanderResult{

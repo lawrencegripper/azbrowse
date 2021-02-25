@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -303,7 +304,7 @@ func (e *StorageBlobExpander) storageBlobLeaseBreak(ctx context.Context, current
 	if err != nil {
 		return ExpanderResult{
 			Response: ExpanderResponse{
-				ResponseType: ResponsePlainText,
+				ResponseType: interfaces.ResponsePlainText,
 				Response:     fmt.Sprintf("Error breaking blob lease: %s", err),
 			},
 			SourceDescription: "StorageBlobExpander request",
@@ -313,7 +314,7 @@ func (e *StorageBlobExpander) storageBlobLeaseBreak(ctx context.Context, current
 
 	return ExpanderResult{
 		Response: ExpanderResponse{
-			ResponseType: ResponsePlainText,
+			ResponseType: interfaces.ResponsePlainText,
 			Response:     "Success",
 		},
 		SourceDescription: "StorageBlobExpander request",
@@ -338,7 +339,7 @@ func (e *StorageBlobExpander) storageBlobLeaseAcquire(ctx context.Context, curre
 	if err != nil {
 		return ExpanderResult{
 			Response: ExpanderResponse{
-				ResponseType: ResponsePlainText,
+				ResponseType: interfaces.ResponsePlainText,
 				Response:     fmt.Sprintf("Error acquiring blob lease: %s", err),
 			},
 			SourceDescription: "StorageBlobExpander request",
@@ -348,7 +349,7 @@ func (e *StorageBlobExpander) storageBlobLeaseAcquire(ctx context.Context, curre
 
 	return ExpanderResult{
 		Response: ExpanderResponse{
-			ResponseType: ResponsePlainText,
+			ResponseType: interfaces.ResponsePlainText,
 			Response:     "Success",
 		},
 		SourceDescription: "StorageBlobExpander request",
@@ -506,7 +507,7 @@ func (e *StorageBlobExpander) expandList(ctx context.Context, currentItem *TreeN
 
 	result := string(buf)
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: result, ResponseType: ResponseXML},
+		Response:          ExpanderResponse{Response: result, ResponseType: interfaces.ResponseXML},
 		SourceDescription: "StorageBlobExpander request",
 		Nodes:             nodes,
 		IsPrimaryResponse: true,
@@ -547,7 +548,7 @@ func (e *StorageBlobExpander) expandMetadata(ctx context.Context, currentItem *T
 	}
 	content := string(buf)
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: content, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: content, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "StorageBlobExpander request",
 		Nodes:             []*TreeNode{},
 		IsPrimaryResponse: true,
@@ -584,7 +585,7 @@ func (e *StorageBlobExpander) expandBlob(ctx context.Context, currentItem *TreeN
 
 	result := string(buf)
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: result, ResponseType: ResponsePlainText},
+		Response:          ExpanderResponse{Response: result, ResponseType: interfaces.ResponsePlainText},
 		SourceDescription: "StorageBlobExpander request",
 		Nodes:             []*TreeNode{},
 		IsPrimaryResponse: true,

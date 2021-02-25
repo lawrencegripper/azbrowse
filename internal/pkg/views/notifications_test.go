@@ -76,7 +76,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 	time.Sleep(time.Second * 5)
 
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
-	expanders.InitializeExpanders(client, nil, nil)
+	expanders.InitializeExpanders(client, nil, nil, nil)
 
 	g, err := gocui.NewGui(gocui.Output256)
 	if err != nil {

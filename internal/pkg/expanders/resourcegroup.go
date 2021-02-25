@@ -15,6 +15,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -169,7 +170,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 	if err != nil {
 		return ExpanderResult{
 			Nodes:    nil,
-			Response: ExpanderResponse{Response: armResponse.Result, ResponseType: ResponseJSON},
+			Response: ExpanderResponse{Response: armResponse.Result, ResponseType: interfaces.ResponseJSON},
 			Err:      fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
 		}
 	}
@@ -179,7 +180,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 		return ExpanderResult{
 			Nodes:             nil,
-			Response:          ExpanderResponse{Response: armResponse.Result, ResponseType: ResponseJSON},
+			Response:          ExpanderResponse{Response: armResponse.Result, ResponseType: interfaces.ResponseJSON},
 			IsPrimaryResponse: true,
 			Err:               fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL),
 		}
@@ -241,7 +242,7 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 
 	return ExpanderResult{
 		Nodes:             newItems,
-		Response:          ExpanderResponse{Response: armResponse.Result, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: armResponse.Result, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "Resources Request",
 		IsPrimaryResponse: true,
 	}
