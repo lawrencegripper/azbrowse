@@ -191,11 +191,16 @@ func (e *CosmosDbExpander) Delete(ctx context.Context, item *TreeNode) (bool, er
 // HasActions is a default implementation returning false to indicate no actions available
 func (e *CosmosDbExpander) HasActions(context context.Context, item *TreeNode) (bool, error) {
 	swaggerResourceType := item.SwaggerResourceType
+
+	for tempItem := item; swaggerResourceType == nil && tempItem.Parent != nil; {
+		tempItem = tempItem.Parent
+		swaggerResourceType = tempItem.SwaggerResourceType
+	}
 	if swaggerResourceType != nil {
 		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
 			return true, nil
 		}
-		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/containers/{containerName}" {
+		if strings.HasPrefix(swaggerResourceType.Endpoint.TemplateURL, "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/containers/{containerName}") {
 			return true, nil
 		}
 	}
@@ -208,6 +213,10 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 	nodes := []*TreeNode{}
 
 	swaggerResourceType := item.SwaggerResourceType
+	for tempItem := item; swaggerResourceType == nil && tempItem.Parent != nil; {
+		tempItem = tempItem.Parent
+		swaggerResourceType = tempItem.SwaggerResourceType
+	}
 	if swaggerResourceType != nil {
 		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}" {
 			nodes = append(nodes,
@@ -224,7 +233,7 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 					},
 				})
 		}
-		if swaggerResourceType.Endpoint.TemplateURL == "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/containers/{containerName}" {
+		if strings.HasPrefix(swaggerResourceType.Endpoint.TemplateURL, "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/containers/{containerName}") {
 			nodes = append(nodes,
 				&TreeNode{
 					Parentid:              item.ID,
@@ -578,7 +587,12 @@ func (e *CosmosDbExpander) cosmosdbActionListKeys(ctx context.Context, item *Tre
 func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *TreeNode) ExpanderResult {
 
 	swaggerResourceType := item.Parent.SwaggerResourceType // item is action node, item.Parent is the node the action relates to
-	matchResult := swaggerResourceType.Endpoint.Match(item.Parentid)
+	tempItem := item
+	for swaggerResourceType == nil && tempItem.Parent != nil {
+		tempItem = tempItem.Parent
+		swaggerResourceType = tempItem.SwaggerResourceType
+	}
+	matchResult := swaggerResourceType.Endpoint.Match(tempItem.ID)
 	if !matchResult.IsMatch {
 		return ExpanderResult{
 			Err:               fmt.Errorf("Endpoint should match"),
@@ -591,7 +605,7 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 	databaseName := matchResult.Values["databaseName"]
 	containerName := matchResult.Values["containerName"]
 
-	accountKey, err := e.getAccountKey(ctx, item.Parent)
+	accountKey, err := e.getAccountKey(ctx, tempItem)
 	if err != nil {
 		return ExpanderResult{
 			Err:               fmt.Errorf("Error getting account key: %s", err),
