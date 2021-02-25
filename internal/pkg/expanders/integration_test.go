@@ -13,7 +13,7 @@ import (
 
 func Test_Expanders(t *testing.T) {
 
-	InitializeExpanders(nil)
+	InitializeExpanders(nil, nil, nil)
 	expanders := getRegisteredExpanders()
 
 	// Add special case of default expander

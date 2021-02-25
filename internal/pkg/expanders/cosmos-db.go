@@ -642,7 +642,7 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 	}
 	e.commandPanel.ShowWithText("id:", "", nil, commandPanelNotification)
 	id := <-commandChannel
-	e.gui.SetCurrentView("listWidget")
+	_, _ = e.gui.SetCurrentView("listWidget")
 	// Force UI to re-render to pickup
 	e.gui.Update(func(g *gocui.Gui) error {
 		return nil

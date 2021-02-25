@@ -51,7 +51,7 @@ func Title(s string) string {
 
 // Loading make the text red and blink
 func Loading(s string) string {
-	return color.New(color.BlinkSlow, color.FgRed).Sprint(s)
+	return color.New(color.BlinkSlow, color.FgYellow).Sprint(s)
 }
 
 // Completed make the text green
