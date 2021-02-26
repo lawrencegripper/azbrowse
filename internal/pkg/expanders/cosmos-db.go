@@ -764,9 +764,7 @@ func (e *CosmosDbExpander) executeQuery(ctx context.Context, accountName string,
 	headers := map[string]string{}
 	headers["x-ms-documentdb-isquery"] = "true"
 	headers["Content-Type"] = "application/query+json"
-
-	// TODO - shoould we set this to true? Or add another action that sets it true?
-	// headers["x-ms-documentdb-query-enablecrosspartition"] = "true"
+	headers["x-ms-documentdb-query-enablecrosspartition"] = "true" // enable cross-parition queries - can be restricted to single-partition via WHERE clause
 
 	query := CosmosDbQuery{
 		Query: queryText,
