@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
@@ -275,6 +276,10 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		return
 	}
 	w.navLock.Lock()
+	if w.isNavigating { //double-check pattern
+		// Skip if a navigation is already in progress
+		return
+	}
 	w.isNavigating = true
 
 	suppressPreviousTitle := false
@@ -290,8 +295,8 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	go func() {
 		defer func() {
-			w.navLock.Unlock()
 			w.isNavigating = false
+			w.navLock.Unlock()
 		}()
 		newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
 		if err != nil { // Don't need to display error as expander emits status event on error
@@ -301,6 +306,13 @@ func (w *ListWidget) ExpandCurrentSelection() {
 			newTitle = ""
 		}
 		w.Navigate(newItems, newContent, newTitle, suppressPreviousTitle)
+
+		time.Sleep(time.Second)
+		// Force UI to re-render to pickup
+		w.g.Update(func(g *gocui.Gui) error {
+			return nil
+		})
+
 	}()
 }
 
@@ -470,21 +482,33 @@ func (w *ListWidget) MovePageUp() {
 
 // MoveHome changes the selection to the top of the list
 func (w *ListWidget) MoveHome() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(0)
 }
 
 // MoveEnd changes the selection to the bottom of the list
 func (w *ListWidget) MoveEnd() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(w.itemCount() - 1)
 }
 
 // MoveUp moves the selection up one item
 func (w *ListWidget) MoveUp() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(w.CurrentSelection() - 1)
 }
 
 // MoveDown moves the selection down one item
 func (w *ListWidget) MoveDown() {
+	if w.isNavigating {
+		return
+	}
 	w.ChangeSelection(w.CurrentSelection() + 1)
 }
 

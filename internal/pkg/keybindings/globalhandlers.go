@@ -8,6 +8,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/stuartleeks/gocui"
@@ -307,7 +308,7 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		keyBindings := GetKeyBindingsAsStrings()
 
 		paletteWidth := h.commandPanelWidget.Width() - 4
-		options := []views.CommandPanelListOption{}
+		options := []interfaces.CommandPanelListOption{}
 		for _, command := range h.commands {
 			if command.IsEnabled() {
 				commandID := command.ID()
@@ -329,7 +330,7 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 					padAmount = 0 // TODO - we should also look at truncating the DisplayText
 				}
 
-				option := views.CommandPanelListOption{
+				option := interfaces.CommandPanelListOption{
 					ID:          commandID,
 					DisplayText: command.DisplayText() + strings.Repeat(" ", padAmount) + bindingString,
 				}
@@ -342,7 +343,7 @@ func (h *OpenCommandPanelHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 	}
 }
 
-func (h *OpenCommandPanelHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+func (h *OpenCommandPanelHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
 	if state.EnterPressed {
 		h.commandPanelWidget.Hide()
 		for _, command := range h.commands {
@@ -392,7 +393,7 @@ func (h *CommandPanelFilterHandler) Invoke() error {
 	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
 	return nil
 }
-func (h *CommandPanelFilterHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+func (h *CommandPanelFilterHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
 	h.list.SetFilter(state.CurrentText)
 	if state.EnterPressed {
 		h.commandPanelWidget.Hide()

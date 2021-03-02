@@ -1,7 +1,9 @@
 package expanders
 
 import (
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
+	"github.com/stuartleeks/gocui"
 )
 
 var swaggerResourceExpander *SwaggerResourceExpander
@@ -24,7 +26,7 @@ var register []Expander
 
 // InitializeExpanders create instances of all the expanders
 // needed by the app
-func InitializeExpanders(client *armclient.Client) {
+func InitializeExpanders(client *armclient.Client, commandPanel interfaces.CommandPanel, gui *gocui.Gui) {
 	swaggerResourceExpander = NewSwaggerResourcesExpander()
 	swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources(client))
 
@@ -44,6 +46,7 @@ func InitializeExpanders(client *armclient.Client) {
 		},
 		&ActionExpander{
 			client: client,
+			gui:    gui,
 		},
 		&MetricsExpander{
 			client: client,
@@ -56,10 +59,10 @@ func InitializeExpanders(client *armclient.Client) {
 			client: client,
 		},
 		&JSONExpander{},
-		&StorageManagementPoliciesExpander{}, // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
-		NewContainerRegistryExpander(client), // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
-		NewStorageBlobExpander(client),       // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
-		NewCosmosDbExpander(client),          // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		&StorageManagementPoliciesExpander{},           // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewContainerRegistryExpander(client),           // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewStorageBlobExpander(client),                 // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
+		NewCosmosDbExpander(client, commandPanel, gui), // Needs to be registered after SwaggerResourceExpander as it depends on SwaggerResourceType being set
 		&ContainerInstanceExpander{
 			client: client,
 		},

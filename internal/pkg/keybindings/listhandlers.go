@@ -14,6 +14,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
@@ -487,6 +488,9 @@ func (h *ListUpdateHandler) DisplayText() string {
 }
 func (h *ListUpdateHandler) IsEnabled() bool {
 	item := h.Content.GetNode()
+	if item == nil || item.Expander == nil {
+		return false
+	}
 	enable, err := item.Expander.CanUpdate(h.Context, item)
 	return enable && err == nil
 }
@@ -718,7 +722,7 @@ func (h *CommandPanelAzureSearchQueryHandler) Invoke() error {
 	return nil
 }
 
-func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state views.CommandPanelNotification) {
+func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
 
 	if state.EnterPressed {
 		queryString := state.CurrentText
