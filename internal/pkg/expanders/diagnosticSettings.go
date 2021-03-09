@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
@@ -31,7 +32,7 @@ func (e *DiagnosticSettingsExpander) Name() string {
 
 // DoesExpand checks if this is an RG
 func (e *DiagnosticSettingsExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ItemType == diagnosticSettingsType {
+	if currentItem.ItemType == diagnosticSettingsType && len(strings.Split(currentItem.Metadata[resourceIdsMeta], ",")) > 0 {
 		return true, nil
 	}
 
@@ -85,10 +86,22 @@ func (e *DiagnosticSettingsExpander) Expand(ctx context.Context, currentItem *Tr
 		}
 	}
 
+	if len(diagnosticSettingsItems) == 0 {
+		return ExpanderResult{
+			Response: ExpanderResponse{
+				Response:     "No diagnostic settings found",
+				ResponseType: interfaces.ResponsePlainText,
+			},
+			Nodes:             diagnosticSettingsItems,
+			SourceDescription: "DiagnosticSettingsExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
 	return ExpanderResult{
-		IsPrimaryResponse: true,
 		Nodes:             diagnosticSettingsItems,
 		SourceDescription: "DiagnosticSettingsExpander request",
+		IsPrimaryResponse: true,
 	}
 }
 
