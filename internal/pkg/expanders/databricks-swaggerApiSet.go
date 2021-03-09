@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/endpoints"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
@@ -252,7 +253,7 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 	if currentItem.SwaggerResourceType.FixedContent != "" {
 		return APISetExpandResponse{
 			Response:      currentItem.SwaggerResourceType.FixedContent,
-			ResponseType:  ResponsePlainText,
+			ResponseType:  interfaces.ResponsePlainText,
 			ChildMetadata: currentItem.Metadata,
 		}, nil
 	}
@@ -279,15 +280,15 @@ func (c SwaggerAPISetDatabricks) ExpandResource(ctx context.Context, currentItem
 	}
 
 	// unpack content responses that are wrapped in JSON/Base64 encoded
-	responseType := ResponseJSON
+	responseType := interfaces.ResponseJSON
 	if currentItemTemplateURL == "/api/2.0/dbfs/read" {
-		responseType = ResponsePlainText
+		responseType = interfaces.ResponsePlainText
 		if data, err = c.unpackFileContents(data, "data"); err != nil {
 			return APISetExpandResponse{}, err
 		}
 	}
 	if currentItemTemplateURL == "/api/2.0/workspace/export" {
-		responseType = ResponsePlainText
+		responseType = interfaces.ResponsePlainText
 		if data, err = c.unpackFileContents(data, "content"); err != nil {
 			return APISetExpandResponse{}, err
 		}

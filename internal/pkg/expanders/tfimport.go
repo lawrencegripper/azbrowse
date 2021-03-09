@@ -16,6 +16,7 @@ import (
 	"github.com/hashicorp/terraform/providers"
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tfprovider"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -457,7 +458,7 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 			return ExpanderResult{
 				SourceDescription: "TerraformImportExpander",
 				Response: ExpanderResponse{
-					ResponseType: ResponseTerraform,
+					ResponseType: interfaces.ResponseTerraform,
 					Response:     terraform,
 				},
 				IsPrimaryResponse: true,
@@ -479,7 +480,7 @@ func (e *TerraformImportExpander) getTerraformForNodeRecursive(context context.C
 	return ExpanderResult{
 		SourceDescription: "TerraformImportExpander",
 		Response: ExpanderResponse{
-			ResponseType: ResponseTerraform,
+			ResponseType: interfaces.ResponseTerraform,
 			Response:     terraform,
 		},
 		IsPrimaryResponse: true,
@@ -579,7 +580,7 @@ func (e *TerraformImportExpander) getTerraformForNode(context context.Context, s
 	return ExpanderResult{
 		SourceDescription: "TerraformImportExpander",
 		Response: ExpanderResponse{
-			ResponseType: ResponseTerraform,
+			ResponseType: interfaces.ResponseTerraform,
 			Response:     terraform,
 		},
 		IsPrimaryResponse: true,

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -209,7 +210,7 @@ func (e *ContainerRegistryExpander) expandRepository(ctx context.Context, curren
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: response, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: response, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "ContainerRegistryExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
@@ -284,7 +285,7 @@ func (e *ContainerRegistryExpander) expandRepositoryTag(ctx context.Context, cur
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: response, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: response, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "ContainerRegistryExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,
@@ -497,7 +498,7 @@ func (e *ContainerRegistryExpander) expandNode(
 
 	return ExpanderResult{
 		Err:               nil,
-		Response:          ExpanderResponse{Response: response, ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: response, ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "ContainerRegistryExpander request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,

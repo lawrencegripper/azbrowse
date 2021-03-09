@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
@@ -82,26 +83,10 @@ func (e *ExpanderBase) ExecuteAction(context context.Context, item *TreeNode) Ex
 	}
 }
 
-// ExpanderResponseType is used to indicate the text format of a response
-type ExpanderResponseType string
-
-const (
-	// ResponsePlainText indicates the response type should not be parsed or colourised
-	ResponsePlainText ExpanderResponseType = "Text"
-	// ResponseJSON indicates the response type can be parsed and colourised as JSON
-	ResponseJSON ExpanderResponseType = "JSON"
-	// ResponseYAML indicates the response type can be parsed and colourised as YAML
-	ResponseYAML ExpanderResponseType = "YAML"
-	// ResponseXML indicates the response type can be parsed and colourised as XML
-	ResponseXML ExpanderResponseType = "XML"
-	// ResponseTerraform indicates the response type can be parsed and colourised as Terraform
-	ResponseTerraform ExpanderResponseType = "Terraform"
-)
-
 // ExpanderResponse captures the response text and formt of an expander response
 type ExpanderResponse struct {
-	Response     string               // the response text
-	ResponseType ExpanderResponseType // the response
+	Response     string                          // the response text
+	ResponseType interfaces.ExpanderResponseType // the response
 }
 
 // ExpanderResult used to wrap mult-value return for use in channels

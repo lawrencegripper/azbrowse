@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
 )
@@ -66,7 +67,7 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 	return ExpanderResult{
 		Err:               err,
 		Nodes:             newItems,
-		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "Resource Group Request",
 		IsPrimaryResponse: true,
 	}

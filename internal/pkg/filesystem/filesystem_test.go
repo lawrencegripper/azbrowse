@@ -101,7 +101,7 @@ func configureExpandersAndGock(t *testing.T) {
 	client := armclient.NewClientFromConfig(httpClient, expanders.DummyTokenFunc(), 5000, createResponseLogger(t))
 	armclient.LegacyInstance = client
 
-	expanders.InitializeExpanders(client, nil, nil)
+	expanders.InitializeExpanders(client, nil, nil, nil)
 	providerData, err := storage.GetCache("providerCache")
 	if err != nil || providerData == "" {
 		gock.New(testServer).

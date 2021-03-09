@@ -3,6 +3,7 @@ package expanders
 import (
 	// "bytes"
 
+	"bytes"
 	"context"
 	"crypto/hmac"
 	"crypto/sha256"
@@ -24,12 +25,13 @@ import (
 )
 
 // NewCosmosDbExpander creates a new instance of CosmosDbExpander
-func NewCosmosDbExpander(armclient *armclient.Client, commandPanel interfaces.CommandPanel, gui *gocui.Gui) *CosmosDbExpander {
+func NewCosmosDbExpander(armclient *armclient.Client, gui *gocui.Gui, commandPanel interfaces.CommandPanel, contentPanel interfaces.ItemWidget) *CosmosDbExpander {
 	return &CosmosDbExpander{
 		client:       &http.Client{},
 		armClient:    armclient,
-		commandPanel: commandPanel,
 		gui:          gui,
+		commandPanel: commandPanel,
+		contentPanel: contentPanel,
 	}
 }
 
@@ -62,6 +64,10 @@ type doRequestResponse struct {
 	Headers    http.Header
 }
 
+type CosmosDbQuery struct {
+	Query string `json:"query"`
+}
+
 const (
 	cosmosdbListSQLDocuments             = "sql-listdocs"
 	cosmosdbListSQLDocumentsContinuation = "sql-listdocs-continue"
@@ -71,6 +77,7 @@ const (
 const (
 	cosmosdbActionListKeys    = "list-keys"
 	cosmosdbActionGetDocument = "get-document"
+	cosmosdbActionSQLQuery    = "sql-query"
 )
 
 func (e *CosmosDbExpander) setClient(c *armclient.Client) {
@@ -82,8 +89,9 @@ type CosmosDbExpander struct {
 	ExpanderBase
 	client       *http.Client
 	armClient    *armclient.Client
-	commandPanel interfaces.CommandPanel
 	gui          *gocui.Gui
+	commandPanel interfaces.CommandPanel
+	contentPanel interfaces.ItemWidget
 }
 
 // Name returns the name of the expander
@@ -246,6 +254,18 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 					Metadata: map[string]string{
 						"ActionID": cosmosdbActionGetDocument,
 					},
+				},
+				&TreeNode{
+					Parentid:              item.ID,
+					ID:                    item.ID + "?sql-query",
+					Namespace:             "cosmos-db",
+					Name:                  "Execute Query",
+					Display:               "Execute Query",
+					ItemType:              ActionType,
+					SuppressGenericExpand: true,
+					Metadata: map[string]string{
+						"ActionID": cosmosdbActionSQLQuery,
+					},
 				})
 		}
 	}
@@ -266,6 +286,8 @@ func (e *CosmosDbExpander) ExecuteAction(context context.Context, item *TreeNode
 		return e.cosmosdbActionListKeys(context, item)
 	case cosmosdbActionGetDocument:
 		return e.cosmosdbActionGetDocument(context, item)
+	case cosmosdbActionSQLQuery:
+		return e.cosmosdbActionExecuteQuery(context, item)
 	case "":
 		return ExpanderResult{
 			SourceDescription: "CosmosDbExpander",
@@ -421,7 +443,7 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 	}
 
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: string(response.Data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(response.Data), ResponseType: interfaces.ResponseJSON},
 		Nodes:             nodes,
 		IsPrimaryResponse: true,
 	}
@@ -467,7 +489,7 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, accountName st
 	}
 
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: string(response.Data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(response.Data), ResponseType: interfaces.ResponseJSON},
 		IsPrimaryResponse: true,
 	}
 }
@@ -576,7 +598,7 @@ func (e *CosmosDbExpander) cosmosdbActionListKeys(ctx context.Context, item *Tre
 
 	return ExpanderResult{
 		Response: ExpanderResponse{
-			ResponseType: ResponseJSON,
+			ResponseType: interfaces.ResponseJSON,
 			Response:     data,
 		},
 		SourceDescription: "CosmosDbExpander request",
@@ -675,11 +697,97 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 	}
 
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: "<-- Open the node to view the document :-)", ResponseType: ResponsePlainText},
+		Response:          ExpanderResponse{Response: "<-- Open the node to view the document :-)", ResponseType: interfaces.ResponsePlainText},
 		Nodes:             []*TreeNode{&node},
 		IsPrimaryResponse: true,
 		SourceDescription: "CosmosDbExpander request",
 	}
+}
+
+func (e *CosmosDbExpander) cosmosdbActionExecuteQuery(ctx context.Context, item *TreeNode) ExpanderResult {
+
+	swaggerResourceType := item.Parent.SwaggerResourceType // item is action node, item.Parent is the node the action relates to
+	tempItem := item
+	for swaggerResourceType == nil && tempItem.Parent != nil {
+		tempItem = tempItem.Parent
+		swaggerResourceType = tempItem.SwaggerResourceType
+	}
+	matchResult := swaggerResourceType.Endpoint.Match(tempItem.ID)
+	if !matchResult.IsMatch {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Endpoint should match"),
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	accountName := matchResult.Values["accountName"]
+	databaseName := matchResult.Values["databaseName"]
+	containerName := matchResult.Values["containerName"]
+
+	accountKey, err := e.getAccountKey(ctx, tempItem)
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error getting account key: %s", err),
+			IsPrimaryResponse: true,
+			SourceDescription: "CosmosDbExpander request",
+		}
+	}
+
+	commandPanelNotification := func(state interfaces.CommandPanelNotification) {
+		if state.EnterPressed {
+			queryText := state.CurrentText
+			result, err := e.executeQuery(ctx, accountName, databaseName, containerName, accountKey, queryText)
+			if err != nil {
+				e.contentPanel.SetContent("\n\n\n\n"+err.Error(), interfaces.ResponsePlainText, "Error executing query")
+			} else {
+				e.contentPanel.SetContent(result, interfaces.ResponseJSON, "Results")
+			}
+		}
+	}
+	e.commandPanel.ShowWithText("query:", "SELECT * FROM c", nil, commandPanelNotification)
+	// Force UI to re-render to pickup
+	e.gui.Update(func(g *gocui.Gui) error {
+		return nil
+	})
+
+	return ExpanderResult{
+		Response:          ExpanderResponse{Response: "", ResponseType: interfaces.ResponsePlainText},
+		SourceDescription: "CosmosDbExpander request",
+		IsPrimaryResponse: true,
+	}
+
+}
+
+func (e *CosmosDbExpander) executeQuery(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string, queryText string) (string, error) {
+
+	headers := map[string]string{}
+	headers["x-ms-documentdb-isquery"] = "true"
+	headers["Content-Type"] = "application/query+json"
+	headers["x-ms-documentdb-query-enablecrosspartition"] = "true" // enable cross-parition queries - can be restricted to single-partition via WHERE clause
+
+	query := CosmosDbQuery{
+		Query: queryText,
+	}
+	buf, err := json.Marshal(query)
+	if err != nil {
+		return "", fmt.Errorf("Error marshaling query as JSON: %s", err)
+	}
+
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs", databaseName, containerName)
+	response, err := e.doRequestWithHeadersAndBody(ctx, "POST", accountName, requestURL, accountKey, headers, bytes.NewBuffer(buf))
+	if err != nil {
+		return "", fmt.Errorf("Error getting documents: %s", err)
+	}
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
+		}
+		return "", fmt.Errorf("Error getting document. StatusCode=%d, Response=%s", response.StatusCode, data)
+	}
+
+	return string(response.Data), nil
 }
 
 func (e *CosmosDbExpander) getAccountKey(ctx context.Context, item *TreeNode) (string, error) {

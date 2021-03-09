@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -40,7 +41,7 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 	if err != nil {
 		return ExpanderResult{
 			Err:               err,
-			Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+			Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 			SourceDescription: "Activity Log",
 			IsPrimaryResponse: true,
 		}
@@ -82,7 +83,7 @@ func (e *ActivityLogExpander) Expand(ctx context.Context, currentItem *TreeNode)
 
 	return ExpanderResult{
 		Err:               err,
-		Response:          ExpanderResponse{Response: string(data), ResponseType: ResponseJSON},
+		Response:          ExpanderResponse{Response: string(data), ResponseType: interfaces.ResponseJSON},
 		SourceDescription: "Deployments request",
 		Nodes:             newItems,
 		IsPrimaryResponse: true,

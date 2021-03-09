@@ -7,6 +7,7 @@ import (
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
@@ -99,7 +100,7 @@ func ExpandItemAllowDefaultExpander(ctx context.Context, currentItem *TreeNode, 
 				if result.Response.Response != "" || result.Err == nil {
 					newContent = result.Response
 				} else {
-					newContent = ExpanderResponse{Response: result.Err.Error(), ResponseType: ResponsePlainText}
+					newContent = ExpanderResponse{Response: result.Err.Error(), ResponseType: interfaces.ResponsePlainText}
 				}
 			}
 			if result.Nodes == nil {

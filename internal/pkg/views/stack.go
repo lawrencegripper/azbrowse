@@ -1,12 +1,15 @@
 package views
 
-import "github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
+import (
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+)
 
 // Page represents a previous view in the nav stack
 type Page struct {
 	Items            []*expanders.TreeNode
 	Data             string
-	DataType         expanders.ExpanderResponseType
+	DataType         interfaces.ExpanderResponseType
 	Title            string
 	Selection        int
 	FilterString     string

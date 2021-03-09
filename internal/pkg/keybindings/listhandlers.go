@@ -517,7 +517,7 @@ func (h *ListUpdateHandler) Invoke() error {
 	formattedContent := content
 
 	switch contentType {
-	case expanders.ResponseJSON:
+	case interfaces.ResponseJSON:
 		fileExtension = ".json"
 
 		if !json.Valid([]byte(content)) {
@@ -533,15 +533,15 @@ func (h *ListUpdateHandler) Invoke() error {
 		}
 
 		formattedContent = formattedBuf.String()
-	case expanders.ResponseYAML:
+	case interfaces.ResponseYAML:
 		fileExtension = ".yaml"
 		formattedContent = content // TODO: add YAML formatter
 
-	case expanders.ResponseTerraform:
+	case interfaces.ResponseTerraform:
 		fileExtension = ".tf"
 		formattedContent = content // TODO: add Terraform formatter
 
-	case expanders.ResponseXML:
+	case interfaces.ResponseXML:
 		fileExtension = ".xml"
 		formattedContent = xmlfmt.FormatXML(content, "", "  ")
 	}
@@ -738,9 +738,9 @@ func (h *CommandPanelAzureSearchQueryHandler) CommandPanelNotification(state int
 
 		data, err := searchApiSet.DoRequest("GET", currentItem.ExpandURL+"&"+queryString)
 		if err != nil {
-			h.content.SetContent(nil, fmt.Sprintf("%s", err), expanders.ResponseJSON, queryString)
+			h.content.SetContent(fmt.Sprintf("%s", err), interfaces.ResponseJSON, queryString)
 		} else {
-			h.content.SetContent(nil, data, expanders.ResponseJSON, queryString)
+			h.content.SetContent(data, interfaces.ResponseJSON, queryString)
 		}
 	}
 }

@@ -11,6 +11,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/swagger"
 )
 
@@ -207,7 +208,7 @@ func (c SwaggerAPISetContainerService) ExpandResource(ctx context.Context, curre
 
 	return APISetExpandResponse{
 		Response:     data,
-		ResponseType: ResponseYAML,
+		ResponseType: interfaces.ResponseYAML,
 		SubResources: subResources,
 	}, nil
 }
