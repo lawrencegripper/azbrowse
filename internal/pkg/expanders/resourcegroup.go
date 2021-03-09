@@ -221,22 +221,24 @@ func (e *ResourceGroupResourceExpander) Expand(ctx context.Context, currentItem 
 		resourceTreeItems = append(resourceTreeItems, item)
 	}
 
-	// Add Diagnostic settings
-	newItems = append(newItems, &TreeNode{
-		Parentid:       currentItem.ID,
-		Namespace:      "None",
-		Display:        style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
-		Name:           "Diagnostic Settings",
-		ID:             currentItem.ID + "/<diagsettings>",
-		ExpandURL:      ExpandURLNotSupported,
-		ItemType:       diagnosticSettingsType,
-		SubscriptionID: currentItem.SubscriptionID,
-		Metadata: map[string]string{
-			// Diagnostic settings hang off resources so a list is passed for the
-			// expander to use
-			resourceIdsMeta: strings.Join(resourceIds, ","),
-		},
-	})
+	if len(resourceIds) > 0 {
+		// Add Diagnostic settings
+		newItems = append(newItems, &TreeNode{
+			Parentid:       currentItem.ID,
+			Namespace:      "None",
+			Display:        style.Subtle("[Microsoft.Insights]") + "\n  Diagnostic Settings",
+			Name:           "Diagnostic Settings",
+			ID:             currentItem.ID + "/<diagsettings>",
+			ExpandURL:      ExpandURLNotSupported,
+			ItemType:       diagnosticSettingsType,
+			SubscriptionID: currentItem.SubscriptionID,
+			Metadata: map[string]string{
+				// Diagnostic settings hang off resources so a list is passed for the
+				// expander to use
+				resourceIdsMeta: strings.Join(resourceIds, ","),
+			},
+		})
+	}
 
 	newItems = append(newItems, resourceTreeItems...)
 
