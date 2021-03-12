@@ -3,8 +3,8 @@ package keybindings
 import (
 	"fmt"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
-	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////

@@ -21,8 +21,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
+	"github.com/awesome-gocui/gocui"
 	opentracing "github.com/opentracing/opentracing-go"
-	"github.com/stuartleeks/gocui"
 )
 
 // Overridden via ldflags
@@ -59,7 +59,7 @@ func run(settings *config.Settings) {
 	armclient.LegacyInstance = armClient
 
 	// Start up gocui and configure some settings
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	g, err := gocui.NewGui(gocui.OutputNormal, false)
 	if err != nil {
 		log.Panicln(err)
 	}

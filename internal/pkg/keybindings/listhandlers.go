@@ -20,9 +20,9 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/nsf/termbox-go"
 	"github.com/skratchdot/open-golang/open"
-	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////
@@ -596,17 +596,17 @@ func (h *ListUpdateHandler) Invoke() error {
 	}
 
 	editorErr := openEditor(editorConfig.Command, editorTmpFile)
-	if editorConfig.RevertToStandardBuffer {
-		// Init termbox to switch back to alternate buffer and Flush content
-		err = termbox.Init()
-		if err != nil {
-			return fmt.Errorf("Failed to reinitialise termbox: %v", err)
-		}
-		err = h.Gui.Flush()
-		if err != nil {
-			return fmt.Errorf("Failed to reinitialise termbox: %v", err)
-		}
-	}
+	// if editorConfig.RevertToStandardBuffer {
+	// 	// Init termbox to switch back to alternate buffer and Flush content
+	// 	err = termbox.Init()
+	// 	if err != nil {
+	// 		return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+	// 	}
+	// 	err = h.Gui.Flush()
+	// 	if err != nil {
+	// 		return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+	// 	}
+	// }
 	if editorErr != nil {
 		h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr), false)
 		return nil

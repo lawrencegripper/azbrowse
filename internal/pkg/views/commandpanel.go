@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
-	"github.com/stuartleeks/gocui"
 )
 
 var _ interfaces.CommandPanel = &CommandPanelWidget{}
@@ -142,13 +142,13 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	var vList *gocui.View
 	if w.options != nil {
-		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight)
+		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight, 0)
 		if err != nil && err != gocui.ErrUnknownView {
 			return err
 		}
 	}
 
-	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height)
+	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

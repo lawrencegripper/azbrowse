@@ -1,6 +1,6 @@
 package keybindings
 
-import "github.com/stuartleeks/gocui"
+import "github.com/awesome-gocui/gocui"
 
 // HandlerID is used as the ID for Key Handlers
 type HandlerID string

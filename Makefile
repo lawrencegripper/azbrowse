@@ -133,7 +133,7 @@ autocomplete-clear:
 
 ## selfupdate-test:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
-selfupdate-test: checks
+selfupdate-test:
 	$(GO_BINARY) install -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
 	AZBROWSE_FORCE_UPDATE=true azbrowse
 

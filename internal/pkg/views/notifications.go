@@ -13,8 +13,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
-	"github.com/stuartleeks/gocui"
 )
 
 // NotificationWidget controls the notifications windows in the top right
@@ -256,7 +256,7 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, height)
 
-	v, err := g.SetView(w.name, x0, y0, x1, y1)
+	v, err := g.SetView(w.name, x0, y0, x1, y1, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

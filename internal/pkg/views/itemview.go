@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/stuartleeks/colorjson"
-	"github.com/stuartleeks/gocui"
 
 	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/lexers"
@@ -49,7 +49,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
 
-	v, err := g.SetView("itemWidget", x0, y0, x1, y1)
+	v, err := g.SetView("itemWidget", x0, y0, x1, y1, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

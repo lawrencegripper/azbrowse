@@ -18,10 +18,10 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"github.com/stuartleeks/gocui"
 )
 
 // NewCosmosDbExpander creates a new instance of CosmosDbExpander

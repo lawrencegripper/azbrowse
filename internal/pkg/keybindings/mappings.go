@@ -1,7 +1,7 @@
 package keybindings
 
 import (
-	"github.com/stuartleeks/gocui"
+	"github.com/awesome-gocui/gocui"
 )
 
 // StrToGocuiKey maps a string representing they key to a gocui key

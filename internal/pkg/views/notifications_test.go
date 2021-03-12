@@ -7,10 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"github.com/stuartleeks/gocui"
 )
 
 func Test_Delete_AddPendingDelete(t *testing.T) {
@@ -18,7 +18,7 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 		t.Log("Skipping integration test")
 		return
 	}
-	g, err := gocui.NewGui(gocui.Output256)
+	g, err := gocui.NewGui(gocui.Output256, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -78,7 +78,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 	expanders.InitializeExpanders(client, nil, nil, nil)
 
-	g, err := gocui.NewGui(gocui.Output256)
+	g, err := gocui.NewGui(gocui.Output256, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -120,7 +120,7 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
-	g, err := gocui.NewGui(gocui.Output256)
+	g, err := gocui.NewGui(gocui.Output256, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -163,7 +163,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
-	g, err := gocui.NewGui(gocui.Output256)
+	g, err := gocui.NewGui(gocui.Output256, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -211,7 +211,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
-	g, err := gocui.NewGui(gocui.Output256)
+	g, err := gocui.NewGui(gocui.Output256, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
