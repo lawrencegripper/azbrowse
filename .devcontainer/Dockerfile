@@ -2,7 +2,7 @@ FROM lawrencegripper/azbrowse-snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
-FROM golang:1.15.6-buster
+FROM golang:1.16.2-buster
 
 COPY --from=builder /snap/core /snap/core
 COPY --from=builder /snap/core18 /snap/core18
@@ -86,17 +86,17 @@ RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/sta
 # Install Go tools
 RUN \
     # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v1.5.1 \
+    go get github.com/go-delve/delve/cmd/dlv@v1.6.0 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.6.1 \
+    && go get golang.org/x/tools/gopls@v0.6.6 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.33.0 \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.38.0 \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.149.0"\
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.159.0"\
     # --> Go rich output for testing with colors
-    && go get github.com/kyoh86/richgo@v0.3.3 \
+    && go get github.com/kyoh86/richgo@v0.3.6 \
     && rm -rf /go/src/ && rm -rf /go/pkg
 
 RUN echo "alias go=richgo" >> "/root/.bashrc"
