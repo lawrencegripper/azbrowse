@@ -2,6 +2,7 @@ package views
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -257,7 +258,7 @@ func (w *NotificationWidget) Layout(g *gocui.Gui) error {
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, height)
 
 	v, err := g.SetView(w.name, x0, y0, x1, y1, 0)
-	if err != nil && err != gocui.ErrUnknownView {
+	if err != nil && errors.Is(err, gocui.ErrUnknownView) {
 		return err
 	}
 

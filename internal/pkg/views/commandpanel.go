@@ -1,6 +1,7 @@
 package views
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -120,7 +121,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	// If we're not visible then do any clean-up needed
 	if !w.visible {
-		if _, err := g.View(optionsViewName); err != gocui.ErrUnknownView {
+		if _, err := g.View(optionsViewName); errors.Is(err, gocui.ErrUnknownView) {
 			g.DeleteView(optionsViewName)
 		}
 		if viewExists {
@@ -133,7 +134,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	if w.options == nil {
 		// delete options view if now options
-		if _, err := g.View(optionsViewName); err != gocui.ErrUnknownView {
+		if _, err := g.View(optionsViewName); errors.Is(err, gocui.ErrUnknownView) {
 			g.DeleteView(optionsViewName)
 		}
 	}
@@ -143,13 +144,13 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	var vList *gocui.View
 	if w.options != nil {
 		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight, 0)
-		if err != nil && err != gocui.ErrUnknownView {
+		if err != nil && errors.Is(err, gocui.ErrUnknownView) {
 			return err
 		}
 	}
 
 	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height, 0)
-	if err != nil && err != gocui.ErrUnknownView {
+	if err != nil && errors.Is(err, gocui.ErrUnknownView) {
 		return err
 	}
 
