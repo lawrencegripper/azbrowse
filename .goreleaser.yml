@@ -57,7 +57,7 @@ dockers:
       - "--label=org.label-schema.name={{.ProjectName}}"
 
 brews:
-  - github:
+  - tap:
       owner: lawrencegripper
       name: homebrew-tap
     folder: Formula
