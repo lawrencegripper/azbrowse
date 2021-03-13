@@ -47,6 +47,7 @@ func NewCommandPanelWidget(x, y, w int, g *gocui.Gui) *CommandPanelWidget {
 func (w *CommandPanelWidget) Hide() {
 	// hide
 	w.prepopulate = ""
+	w.options = nil
 	w.visible = false
 }
 
@@ -115,16 +116,14 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	// set the content to the value from prepopulate
 	viewExists := true
 	_, err := g.View(inputViewName)
-	if err == gocui.ErrUnknownView {
+	if gocui.IsUnknownView(err) {
 		viewExists = false
 	}
 
 	// If we're not visible then do any clean-up needed
 	if !w.visible {
-		if _, err := g.View(optionsViewName); errors.Is(err, gocui.ErrUnknownView) {
-			g.DeleteView(optionsViewName)
-		}
 		if viewExists {
+			g.DeleteView(optionsViewName)
 			g.DeleteView(inputViewName)
 			g.SetCurrentView(w.previousViewName) //nolint: errcheck
 			g.Cursor = false
@@ -134,7 +133,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	if w.options == nil {
 		// delete options view if now options
-		if _, err := g.View(optionsViewName); errors.Is(err, gocui.ErrUnknownView) {
+		if _, err := g.View(optionsViewName); gocui.IsUnknownView(err) {
 			g.DeleteView(optionsViewName)
 		}
 	}
@@ -166,7 +165,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 		for i, option := range *w.filteredOptions {
 			itemToShow := ""
 			if i == w.selectedIndex {
-				itemToShow = "▶ "
+				itemToShow = "▶"
 			} else {
 				itemToShow = "  "
 			}
