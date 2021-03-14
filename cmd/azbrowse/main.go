@@ -9,7 +9,6 @@ import (
 	"runtime/debug"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/automation"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
@@ -166,8 +165,6 @@ func configureTracing(settings *config.Settings) (context.Context, opentracing.S
 func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidget, armClient *armclient.Client) {
 	go func() {
 		defer errorhandling.RecoveryWithCleanup()
-
-		time.Sleep(time.Second * 1)
 
 		_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 			Message:    "Updating API Version details",
