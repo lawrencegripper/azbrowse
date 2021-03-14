@@ -260,7 +260,7 @@ func GetAPIVersion(armType string) (string, error) {
 
 // PopulateResourceAPILookup is used to build a cache of resourcetypes -> api versions
 // this is needed when requesting details from a resource as APIVersion isn't known and is required
-func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
+func (c *Client) PopulateResourceAPILookup(ctx context.Context, msg *eventing.StatusEvent) {
 	// w.statusView.Status("Getting provider data from cache", true)
 	if resourceAPIVersionLookup == nil {
 		span, ctx := tracing.StartSpanFromContext(ctx, "populateResCache")
@@ -270,6 +270,9 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 		// w.statusView.Status("Getting provider data from cache: Completed", false)
 
 		if err != nil || providerData == "" || !valid {
+			msg.Message = "Getting provider data from Azure API"
+			msg.Update()
+
 			// w.statusView.Status("Getting provider data from API", true)
 			span.SetTag("error: failed getting cached data", err)
 			span.SetTag("cacheData", providerData)
@@ -311,9 +314,16 @@ func (c *Client) PopulateResourceAPILookup(ctx context.Context) {
 			}
 			providerData = string(bytes)
 
-			storage.PutCache(providerCacheKey, providerData) //nolint: errcheck
+			err = storage.PutCacheForTTL(providerCacheKey, providerData)
+			if err != nil {
+				msg.Failure = true
+				msg.Message = "Failed to save provider data to cache"
+				msg.Update()
+			}
 
 		} else {
+			msg.Message = "Got provider data from cache"
+			msg.Update()
 			span.SetTag("Data read from cache", true)
 			var providerCache map[string]string
 			err = json.Unmarshal([]byte(providerData), &providerCache)

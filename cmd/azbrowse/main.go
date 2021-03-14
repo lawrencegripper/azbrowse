@@ -166,12 +166,12 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 	go func() {
 		defer errorhandling.RecoveryWithCleanup()
 
-		_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
+		msg, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 			Message:    "Updating API Version details",
 			InProgress: true,
 		})
 
-		armClient.PopulateResourceAPILookup(ctx)
+		armClient.PopulateResourceAPILookup(ctx, msg)
 
 		done()
 
