@@ -138,7 +138,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		for i, s := range w.itemsToShow() {
 			var itemToShow string
 			if i == w.currentPage.Selection {
-				itemToShow = "▶"
+				itemToShow = "▶ "
 			} else {
 				itemToShow = "  "
 			}

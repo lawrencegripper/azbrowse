@@ -65,6 +65,7 @@ func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]int
 	w.visible = true
 	w.selectedIndex = -1
 	w.lastTopIndex = 0
+	w.gui.Update(func(g *gocui.Gui) error { return nil })
 }
 
 // MoveDown moves down a list item if options are displayed
@@ -115,7 +116,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	// set the content to the value from prepopulate
 	viewExists := true
 	_, err := g.View(inputViewName)
-	if err.Error() == "unknown view" {
+	if err == gocui.ErrUnknownView {
 		viewExists = false
 	}
 
@@ -142,13 +143,13 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	var vList *gocui.View
 	if w.options != nil {
 		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight, 0)
-		if err != nil && err.Error() == "unknown view" {
+		if err != nil && err != gocui.ErrUnknownView {
 			return err
 		}
 	}
 
 	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height, 0)
-	if err != nil && err.Error() == "unknown view" {
+	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 
@@ -164,7 +165,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 		for i, option := range *w.filteredOptions {
 			itemToShow := ""
 			if i == w.selectedIndex {
-				itemToShow = "▶"
+				itemToShow = "▶ "
 			} else {
 				itemToShow = "  "
 			}
