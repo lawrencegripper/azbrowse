@@ -59,7 +59,6 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	width, height := v.Size()
 	expanders.ItemWidgetHeight = height
 	expanders.ItemWidgetWidth = width
-	v.Clear()
 
 	if w.shouldRender {
 		if w.content == "" {
@@ -127,63 +126,64 @@ func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderR
 
 // SetContentWithNode displays the string in the itemview and tracks the associated node
 func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string, contentType interfaces.ExpanderResponseType, title string) {
-	w.g.Update(func(g *gocui.Gui) error {
-		w.node = node
-		w.originalContent = content
-		w.content = content
-		w.contentType = contentType
+	w.view.Clear()
+	w.node = node
+	w.originalContent = content
+	w.content = content
+	w.contentType = contentType
 
-		if w.hideGuids {
-			w.content = StripSecretVals(w.content)
-		}
-		switch w.contentType {
-		case interfaces.ResponseJSON:
-			d := json.NewDecoder(strings.NewReader(w.content))
-			d.UseNumber()
-			var obj interface{}
-			err := d.Decode(&obj)
-			if err != nil {
-				eventing.SendStatusEvent(&eventing.StatusEvent{
-					InProgress: false,
-					Failure:    true,
-					Message:    "Failed to display as JSON: " + err.Error(),
-					Timeout:    time.Duration(time.Second * 4),
-				})
-			}
-
-			f := colorjson.NewFormatter()
-			f.Indent = 2
-			s, err := f.Marshal(obj)
-			if err == nil {
-				w.content = string(s)
-			}
-		case interfaces.ResponseYAML:
-			var buf bytes.Buffer
-			err := quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
-			if err == nil {
-				w.content = buf.String()
-			}
-
-		case interfaces.ResponseTerraform:
-			var buf bytes.Buffer
-			err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
-			if err == nil {
-				w.content = buf.String()
-			}
-
-		case interfaces.ResponseXML:
-			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
-			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
-			w.content = formattedContent
+	if w.hideGuids {
+		w.content = StripSecretVals(w.content)
+	}
+	switch w.contentType {
+	case interfaces.ResponseJSON:
+		d := json.NewDecoder(strings.NewReader(w.content))
+		d.UseNumber()
+		var obj interface{}
+		err := d.Decode(&obj)
+		if err != nil {
+			eventing.SendStatusEvent(&eventing.StatusEvent{
+				InProgress: false,
+				Failure:    true,
+				Message:    "Failed to display as JSON: " + err.Error(),
+				Timeout:    time.Duration(time.Second * 4),
+			})
 		}
 
-		// Reset the cursor and origin (scroll poisition)
-		// so we don't start at the bottom of a new doc
-		w.view.SetCursor(0, 0) //nolint: errcheck
-		w.view.SetOrigin(0, 0) //nolint: errcheck
-		w.view.Title = title
-		return nil
-	})
+		f := colorjson.NewFormatter()
+		f.Indent = 2
+		s, err := f.Marshal(obj)
+		if err == nil {
+			w.content = string(s)
+		}
+	case interfaces.ResponseYAML:
+		var buf bytes.Buffer
+		err := quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
+		if err == nil {
+			w.content = buf.String()
+		}
+
+	case interfaces.ResponseTerraform:
+		var buf bytes.Buffer
+		err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
+		if err == nil {
+			w.content = buf.String()
+		}
+
+	case interfaces.ResponseXML:
+		formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
+		formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
+		w.content = formattedContent
+	}
+
+	// Reset the cursor and origin (scroll poisition)
+	// so we don't start at the bottom of a new doc
+	w.view.SetCursor(0, 0) //nolint: errcheck
+	w.view.SetOrigin(0, 0) //nolint: errcheck
+	w.view.Title = title
+
+	// Update the view
+	w.g.Update(func(*gocui.Gui) error { return nil })
 }
 
 // GetContent returns the current content
