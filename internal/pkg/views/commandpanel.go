@@ -65,7 +65,6 @@ func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]int
 	w.visible = true
 	w.selectedIndex = -1
 	w.lastTopIndex = 0
-	w.gui.Update(func(g *gocui.Gui) error { return nil })
 }
 
 // MoveDown moves down a list item if options are displayed
