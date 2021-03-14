@@ -31,7 +31,9 @@ type ItemWidget struct {
 	contentType     interfaces.ExpanderResponseType
 	view            *gocui.View
 	shouldRender    bool
-	g               *gocui.Gui
+	// track if we need to re-render the layout or is it the same content?
+	hasChanged bool
+	g          *gocui.Gui
 }
 
 var _ interfaces.ItemWidget = &ItemWidget{}
@@ -60,7 +62,12 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	expanders.ItemWidgetHeight = height
 	expanders.ItemWidgetWidth = width
 
-	if w.shouldRender {
+	// only update the content if we should render
+	// and there has been a change to the content
+	// SetContentWithNode sets hasChanged = true when
+	// called we reset it to false after doing a layout
+	if w.shouldRender && w.hasChanged {
+		w.hasChanged = false
 		if w.content == "" {
 			return nil
 		}
@@ -78,7 +85,6 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 func (w *ItemWidget) PageDown() {
 	_, maxHeight := w.view.Size()
 	x, y := w.view.Origin()
-	w.view.SetCursor(0, 0) //nolint: errcheck
 
 	maxY := strings.Count(w.content, "\n")
 	y = y + maxHeight
@@ -86,7 +92,8 @@ func (w *ItemWidget) PageDown() {
 		y = maxY
 	}
 
-	err := w.view.SetOrigin(x, y)
+	w.view.SetOrigin(x, y) //nolint: errcheck
+	err := w.view.SetCursor(x, y)
 	if err != nil {
 		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
@@ -101,14 +108,15 @@ func (w *ItemWidget) PageDown() {
 func (w *ItemWidget) PageUp() {
 	_, maxHeight := w.view.Size()
 	x, y := w.view.Origin()
-	w.view.SetCursor(0, 0) //nolint: errcheck
 
 	y = y - maxHeight
 	// Check we haven't overshot
 	if y < 0 {
 		y = 0
 	}
-	err := w.view.SetOrigin(x, y)
+
+	w.view.SetOrigin(x, y) //nolint: errcheck
+	err := w.view.SetCursor(x, y)
 	if err != nil {
 		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
@@ -126,6 +134,7 @@ func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderR
 
 // SetContentWithNode displays the string in the itemview and tracks the associated node
 func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string, contentType interfaces.ExpanderResponseType, title string) {
+	w.hasChanged = true
 	w.view.Clear()
 	w.node = node
 	w.originalContent = content
