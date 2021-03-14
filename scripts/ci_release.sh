@@ -48,10 +48,10 @@ git tag -f v2.0.$BUILD_NUMBER
 
 export GOVERSION=$(go version)
 
-print_header "Use make build to codegen, lint and check"
+print_header "Use make to codegen, lint and check"
 
 cd ../
-GO_BINARY=richgo make build
+GO_BINARY=richgo make ci
 
 print_header "Check codegen results haven't changed checkedin code"
 if [[ $(git diff --stat) != '' ]]; then
