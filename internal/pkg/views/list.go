@@ -2,7 +2,6 @@ package views
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -117,7 +116,7 @@ func highlightText(displayText string, highlight string) string {
 func (w *ListWidget) Layout(g *gocui.Gui) error {
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
 	v, err := g.SetView("listWidget", x0, y0, x1, y1, 0)
-	if err != nil && errors.Is(err, gocui.ErrUnknownView) {
+	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 	v.Clear()

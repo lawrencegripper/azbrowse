@@ -1,7 +1,6 @@
 package views
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
@@ -116,7 +115,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	// set the content to the value from prepopulate
 	viewExists := true
 	_, err := g.View(inputViewName)
-	if gocui.IsUnknownView(err) {
+	if err.Error() == "unknown view" {
 		viewExists = false
 	}
 
@@ -133,7 +132,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	if w.options == nil {
 		// delete options view if now options
-		if _, err := g.View(optionsViewName); gocui.IsUnknownView(err) {
+		if _, err := g.View(optionsViewName); err != gocui.ErrUnknownView {
 			g.DeleteView(optionsViewName)
 		}
 	}
@@ -143,13 +142,13 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 	var vList *gocui.View
 	if w.options != nil {
 		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight, 0)
-		if err != nil && errors.Is(err, gocui.ErrUnknownView) {
+		if err != nil && err.Error() == "unknown view" {
 			return err
 		}
 	}
 
 	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height, 0)
-	if err != nil && errors.Is(err, gocui.ErrUnknownView) {
+	if err != nil && err.Error() == "unknown view" {
 		return err
 	}
 

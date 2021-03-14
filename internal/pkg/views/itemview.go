@@ -3,7 +3,6 @@ package views
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -51,7 +50,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
 
 	v, err := g.SetView("itemWidget", x0, y0, x1, y1, 0)
-	if err != nil && errors.Is(err, gocui.ErrUnknownView) {
+	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
 	v.Editable = true

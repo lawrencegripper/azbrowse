@@ -8,7 +8,7 @@ require (
 	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296 // indirect
 	github.com/alecthomas/chroma v0.6.7
 	github.com/atotto/clipboard v0.1.1
-	github.com/awesome-gocui/gocui v0.6.0
+	github.com/awesome-gocui/gocui v1.0.0-beta-3
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cskr/pubsub v1.0.1
 	github.com/fatih/color v1.7.0

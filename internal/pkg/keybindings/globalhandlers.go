@@ -3,7 +3,6 @@ package keybindings
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -174,7 +173,7 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		if *h.ShowHelp {
 			v, err := g.SetView("helppopup", 1, 1, 145, 45, 0)
 			g.SetCurrentView("helppopup")
-			if err != nil && errors.Is(err, gocui.ErrUnknownView) {
+			if err != nil && err != gocui.ErrUnknownView {
 				panic(err)
 			}
 			keyBindings := GetKeyBindingsAsStrings()
