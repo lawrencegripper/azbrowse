@@ -109,7 +109,7 @@ func configureExpandersAndGock(t *testing.T) {
 			Reply(200).
 			File("../expanders/testdata/armsamples/providers/response.json")
 
-		client.PopulateResourceAPILookup(ctx)
+		client.PopulateResourceAPILookup(ctx, &eventing.StatusEvent{})
 	}
 
 	// print status messages

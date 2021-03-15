@@ -9,7 +9,6 @@ import (
 	"runtime/debug"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/automation"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
@@ -167,14 +166,12 @@ func startPopulatingList(ctx context.Context, g *gocui.Gui, list *views.ListWidg
 	go func() {
 		defer errorhandling.RecoveryWithCleanup()
 
-		time.Sleep(time.Second * 1)
-
-		_, done := eventing.SendStatusEvent(&eventing.StatusEvent{
+		msg, done := eventing.SendStatusEvent(&eventing.StatusEvent{
 			Message:    "Updating API Version details",
 			InProgress: true,
 		})
 
-		armClient.PopulateResourceAPILookup(ctx)
+		armClient.PopulateResourceAPILookup(ctx, msg)
 
 		done()
 

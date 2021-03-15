@@ -72,7 +72,7 @@ func createFS(mountpoint string, filterToSub string, editMode bool, demoMode boo
 	armclient.LegacyInstance = armClient
 
 	expanders.InitializeExpanders(armClient, nil, nil, nil)
-	armClient.PopulateResourceAPILookup(ctx)
+	armClient.PopulateResourceAPILookup(ctx, &eventing.StatusEvent{})
 
 	// print status messages
 	go func() {
