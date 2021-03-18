@@ -592,7 +592,7 @@ func (h *ListUpdateHandler) Invoke() error {
 
 	if editorConfig.RevertToStandardBuffer {
 		// Close termbox to revert to normal buffer
-		gocui.TCellClose()
+		gocui.TcellClose()
 	}
 
 	editorErr := openEditor(editorConfig.Command, editorTmpFile)
@@ -621,6 +621,7 @@ func (h *ListUpdateHandler) Invoke() error {
 		return nil
 	}
 
+	// Handle the updating of the item asyncronously to allow tcell to update and redraw UI
 	go func() {
 		errorhandling.RecoveryWithCleanup()
 
