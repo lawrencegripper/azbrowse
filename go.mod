@@ -12,6 +12,7 @@ require (
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cskr/pubsub v1.0.1
 	github.com/fatih/color v1.7.0
+	github.com/gdamore/tcell/v2 v2.0.0
 	github.com/go-logr/logr v0.3.0
 	github.com/go-openapi/jsonreference v0.19.3 // indirect
 	github.com/go-openapi/loads v0.19.4
@@ -29,7 +30,6 @@ require (
 	github.com/kr/pretty v0.2.0 // indirect
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
-	github.com/nsf/termbox-go v0.0.0-20181027232701-60ab7e3d12ed
 	github.com/onsi/ginkgo v1.14.1 // indirect
 	github.com/onsi/gomega v1.10.2 // indirect
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
