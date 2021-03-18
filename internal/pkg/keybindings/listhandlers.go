@@ -598,7 +598,10 @@ func (h *ListUpdateHandler) Invoke() error {
 	editorErr := openEditor(editorConfig.Command, editorTmpFile)
 	if editorConfig.RevertToStandardBuffer {
 		// Init termbox to switch back to alternate buffer and Flush content
-		gocui.TcellInit()
+		err := gocui.TcellInit()
+		if err != nil {
+			panic(err)
+		}
 	}
 	if editorErr != nil {
 		h.status.Status(fmt.Sprintf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr), false)
