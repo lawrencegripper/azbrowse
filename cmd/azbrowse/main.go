@@ -59,7 +59,7 @@ func run(settings *config.Settings) {
 	armclient.LegacyInstance = armClient
 
 	// Start up gocui and configure some settings
-	g, err := gocui.NewGui(gocui.OutputNormal, false)
+	g, err := gocui.NewGui(gocui.OutputTrue, false)
 	if err != nil {
 		log.Panicln(err)
 	}
