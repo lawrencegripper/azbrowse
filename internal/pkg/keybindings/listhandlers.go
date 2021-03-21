@@ -592,13 +592,13 @@ func (h *ListUpdateHandler) Invoke() error {
 
 	if editorConfig.RevertToStandardBuffer {
 		// Close termbox to revert to normal buffer
-		gocui.TcellClose()
+		gocui.Suspend()
 	}
 
 	editorErr := openEditor(editorConfig.Command, editorTmpFile)
 	if editorConfig.RevertToStandardBuffer {
 		// Init termbox to switch back to alternate buffer and Flush content
-		err := gocui.TcellInit()
+		err := gocui.Resume()
 		if err != nil {
 			panic(err)
 		}

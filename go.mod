@@ -3,7 +3,7 @@ module github.com/lawrencegripper/azbrowse
 go 1.16
 
 // Temp replacement to fork which allows init/close on tcell screen
-replace github.com/awesome-gocui/gocui v1.0.0-beta-3 => github.com/lawrencegripper/gocui v1.0.0-beta-3-lghack
+replace github.com/awesome-gocui/gocui v1.0.0-beta-3 => github.com/lawrencegripper/gocui v1.0.0-beta-3-lghack2
 
 require (
 	bazil.org/fuse v0.0.0-20200117225306-7b5117fecadc

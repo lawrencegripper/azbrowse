@@ -199,8 +199,8 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	// Padding
 	maxX = maxX - 2
 
-	if maxX < 72 {
-		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
+	if maxX < 60 {
+		panic("I can't run in a terminal less than 60 wide ... it's tooooo small!!!")
 	}
 
 	leftColumnWidth := 45
