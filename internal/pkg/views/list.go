@@ -7,10 +7,10 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
-	"github.com/stuartleeks/gocui"
 )
 
 // ListWidget hosts the left panel showing resources and controls the navigation
@@ -115,7 +115,7 @@ func highlightText(displayText string, highlight string) string {
 // Layout draws the widget in the gocui view
 func (w *ListWidget) Layout(g *gocui.Gui) error {
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
-	v, err := g.SetView("listWidget", x0, y0, x1, y1)
+	v, err := g.SetView("listWidget", x0, y0, x1, y1, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

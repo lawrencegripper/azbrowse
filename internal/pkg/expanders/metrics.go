@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/guptarohit/asciigraph"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -160,7 +161,7 @@ func (e *MetricsExpander) expandMetricDefinition(ctx context.Context, currentIte
 	}
 
 	return ExpanderResult{
-		Response:          ExpanderResponse{Response: data},
+		Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
 		IsPrimaryResponse: true,
 		Nodes:             newItems,
 		SourceDescription: "MetricsExpander build response metric namespaces",

@@ -10,7 +10,7 @@ GO_BINARY?=go
 ## ----------Targets------------
 ## all:
 ##		Default action - check, test and build
-all: checks test build
+all: ci
 
 ## help: 
 ## 		Show this help
@@ -36,7 +36,12 @@ checks:
 
 ## build: 
 ##		Build azbrowse binary
-build: swagger-codegen checks test  
+build:
+	$(GO_BINARY) build ./cmd/azbrowse
+
+## ci: 
+##		Build lint and check
+ci: swagger-codegen checks test
 	$(GO_BINARY) build ./cmd/azbrowse
 
 ## debug:
@@ -61,7 +66,7 @@ fmt:
 
 ## run:
 ##		Quick command to lint and then launch azbrowse
-run: checks install
+run: install
 	azbrowse --debug
 
 ## fuzz-from:
@@ -133,7 +138,7 @@ autocomplete-clear:
 
 ## selfupdate-test:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
-selfupdate-test: checks
+selfupdate-test:
 	$(GO_BINARY) install -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
 	AZBROWSE_FORCE_UPDATE=true azbrowse
 

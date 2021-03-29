@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/stuartleeks/colorjson"
-	"github.com/stuartleeks/gocui"
 
 	"github.com/alecthomas/chroma"
 	"github.com/alecthomas/chroma/lexers"
@@ -31,7 +31,9 @@ type ItemWidget struct {
 	contentType     interfaces.ExpanderResponseType
 	view            *gocui.View
 	shouldRender    bool
-	g               *gocui.Gui
+	// track if we need to re-render the layout or is it the same content?
+	hasChanged bool
+	g          *gocui.Gui
 }
 
 var _ interfaces.ItemWidget = &ItemWidget{}
@@ -49,7 +51,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, w.h)
 
-	v, err := g.SetView("itemWidget", x0, y0, x1, y1)
+	v, err := g.SetView("itemWidget", x0, y0, x1, y1, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
@@ -59,9 +61,13 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 	width, height := v.Size()
 	expanders.ItemWidgetHeight = height
 	expanders.ItemWidgetWidth = width
-	v.Clear()
 
-	if w.shouldRender {
+	// only update the content if we should render
+	// and there has been a change to the content
+	// SetContentWithNode sets hasChanged = true when
+	// called we reset it to false after doing a layout
+	if w.shouldRender && w.hasChanged {
+		w.hasChanged = false
 		if w.content == "" {
 			return nil
 		}
@@ -79,7 +85,6 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 func (w *ItemWidget) PageDown() {
 	_, maxHeight := w.view.Size()
 	x, y := w.view.Origin()
-	w.view.SetCursor(0, 0) //nolint: errcheck
 
 	maxY := strings.Count(w.content, "\n")
 	y = y + maxHeight
@@ -87,7 +92,8 @@ func (w *ItemWidget) PageDown() {
 		y = maxY
 	}
 
-	err := w.view.SetOrigin(x, y)
+	w.view.SetOrigin(x, y) //nolint: errcheck
+	err := w.view.SetCursor(x, y)
 	if err != nil {
 		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
@@ -102,14 +108,15 @@ func (w *ItemWidget) PageDown() {
 func (w *ItemWidget) PageUp() {
 	_, maxHeight := w.view.Size()
 	x, y := w.view.Origin()
-	w.view.SetCursor(0, 0) //nolint: errcheck
 
 	y = y - maxHeight
 	// Check we haven't overshot
 	if y < 0 {
 		y = 0
 	}
-	err := w.view.SetOrigin(x, y)
+
+	w.view.SetOrigin(x, y) //nolint: errcheck
+	err := w.view.SetCursor(x, y)
 	if err != nil {
 		eventing.SendStatusEvent(&eventing.StatusEvent{
 			InProgress: false,
@@ -127,63 +134,65 @@ func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderR
 
 // SetContentWithNode displays the string in the itemview and tracks the associated node
 func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string, contentType interfaces.ExpanderResponseType, title string) {
-	w.g.Update(func(g *gocui.Gui) error {
-		w.node = node
-		w.originalContent = content
-		w.content = content
-		w.contentType = contentType
+	w.hasChanged = true
+	w.view.Clear()
+	w.node = node
+	w.originalContent = content
+	w.content = content
+	w.contentType = contentType
 
-		if w.hideGuids {
-			w.content = StripSecretVals(w.content)
-		}
-		switch w.contentType {
-		case interfaces.ResponseJSON:
-			d := json.NewDecoder(strings.NewReader(w.content))
-			d.UseNumber()
-			var obj interface{}
-			err := d.Decode(&obj)
-			if err != nil {
-				eventing.SendStatusEvent(&eventing.StatusEvent{
-					InProgress: false,
-					Failure:    true,
-					Message:    "Failed to display as JSON: " + err.Error(),
-					Timeout:    time.Duration(time.Second * 4),
-				})
-			}
-
-			f := colorjson.NewFormatter()
-			f.Indent = 2
-			s, err := f.Marshal(obj)
-			if err == nil {
-				w.content = string(s)
-			}
-		case interfaces.ResponseYAML:
-			var buf bytes.Buffer
-			err := quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
-			if err == nil {
-				w.content = buf.String()
-			}
-
-		case interfaces.ResponseTerraform:
-			var buf bytes.Buffer
-			err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
-			if err == nil {
-				w.content = buf.String()
-			}
-
-		case interfaces.ResponseXML:
-			formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
-			formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
-			w.content = formattedContent
+	if w.hideGuids {
+		w.content = StripSecretVals(w.content)
+	}
+	switch w.contentType {
+	case interfaces.ResponseJSON:
+		d := json.NewDecoder(strings.NewReader(w.content))
+		d.UseNumber()
+		var obj interface{}
+		err := d.Decode(&obj)
+		if err != nil {
+			eventing.SendStatusEvent(&eventing.StatusEvent{
+				InProgress: false,
+				Failure:    true,
+				Message:    "Failed to display as JSON: " + err.Error(),
+				Timeout:    time.Duration(time.Second * 4),
+			})
 		}
 
-		// Reset the cursor and origin (scroll poisition)
-		// so we don't start at the bottom of a new doc
-		w.view.SetCursor(0, 0) //nolint: errcheck
-		w.view.SetOrigin(0, 0) //nolint: errcheck
-		w.view.Title = title
-		return nil
-	})
+		f := colorjson.NewFormatter()
+		f.Indent = 2
+		s, err := f.Marshal(obj)
+		if err == nil {
+			w.content = string(s)
+		}
+	case interfaces.ResponseYAML:
+		var buf bytes.Buffer
+		err := quick.Highlight(&buf, w.content, "YAML-azbrowse", "terminal", "azbrowse")
+		if err == nil {
+			w.content = buf.String()
+		}
+
+	case interfaces.ResponseTerraform:
+		var buf bytes.Buffer
+		err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
+		if err == nil {
+			w.content = buf.String()
+		}
+
+	case interfaces.ResponseXML:
+		formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
+		formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
+		w.content = formattedContent
+	}
+
+	// Reset the cursor and origin (scroll poisition)
+	// so we don't start at the bottom of a new doc
+	w.view.SetCursor(0, 0) //nolint: errcheck
+	w.view.SetOrigin(0, 0) //nolint: errcheck
+	w.view.Title = title
+
+	// Update the view
+	w.g.Update(func(*gocui.Gui) error { return nil })
 }
 
 // GetContent returns the current content

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
-	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ func (h FullscreenHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		if *h.IsFullscreen {
 			g.Cursor = true
 			maxX, maxY := g.Size()
-			v, _ := g.SetView("fullscreenContent", 0, 0, maxX, maxY)
+			v, _ := g.SetView("fullscreenContent", 0, 0, maxX, maxY, 0)
 			v.Editable = true
 			v.Frame = false
 			v.Wrap = true
@@ -171,7 +171,7 @@ func (h HelpHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
 		// If we're up and running clear and redraw the view
 		// if w.g != nil {
 		if *h.ShowHelp {
-			v, err := g.SetView("helppopup", 1, 1, 145, 45)
+			v, err := g.SetView("helppopup", 1, 1, 145, 45, 0)
 			g.SetCurrentView("helppopup")
 			if err != nil && err != gocui.ErrUnknownView {
 				panic(err)

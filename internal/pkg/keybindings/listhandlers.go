@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-xmlfmt/xmlfmt"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
@@ -20,9 +21,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
-	"github.com/nsf/termbox-go"
+	"github.com/awesome-gocui/gocui"
 	"github.com/skratchdot/open-golang/open"
-	"github.com/stuartleeks/gocui"
 )
 
 ////////////////////////////////////////////////////////////////////
@@ -592,19 +592,15 @@ func (h *ListUpdateHandler) Invoke() error {
 
 	if editorConfig.RevertToStandardBuffer {
 		// Close termbox to revert to normal buffer
-		termbox.Close()
+		gocui.Suspend()
 	}
 
 	editorErr := openEditor(editorConfig.Command, editorTmpFile)
 	if editorConfig.RevertToStandardBuffer {
 		// Init termbox to switch back to alternate buffer and Flush content
-		err = termbox.Init()
+		err := gocui.Resume()
 		if err != nil {
-			return fmt.Errorf("Failed to reinitialise termbox: %v", err)
-		}
-		err = h.Gui.Flush()
-		if err != nil {
-			return fmt.Errorf("Failed to reinitialise termbox: %v", err)
+			panic(err)
 		}
 	}
 	if editorErr != nil {
@@ -628,13 +624,27 @@ func (h *ListUpdateHandler) Invoke() error {
 		return nil
 	}
 
-	err = item.Expander.Update(h.Context, item, updatedJSON)
-	if err != nil {
-		h.status.Status(fmt.Sprintf("Error updating: %s", err), false)
-		return nil
-	}
+	// Handle the updating of the item asyncronously to allow tcell to update and redraw UI
+	go func() {
+		errorhandling.RecoveryWithCleanup()
 
-	h.status.Status("Done", false)
+		evt, done := eventing.SendStatusEvent(&eventing.StatusEvent{
+			InProgress: true,
+			Failure:    false,
+			Message:    "Updating resource",
+			Timeout:    time.Duration(time.Second * 30),
+		})
+
+		err = item.Expander.Update(h.Context, item, updatedJSON)
+		if err != nil {
+			evt.Failure = true
+			evt.Message = evt.Message + " failed: " + err.Error()
+			evt.Update()
+		}
+
+		done()
+	}()
+
 	return nil
 
 }

@@ -8,9 +8,9 @@ import (
 
 	"runtime/debug"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
-	"github.com/stuartleeks/gocui"
 )
 
 var history = []string{}

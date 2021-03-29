@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/nbio/st"
-	"github.com/stuartleeks/gocui"
 )
 
 func TestRecoveryWithCleanup_panicCaptured(t *testing.T) {

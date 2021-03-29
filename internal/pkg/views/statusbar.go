@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
-	"github.com/stuartleeks/gocui"
 )
 
 // StatusbarWidget controls the statusbar
@@ -138,7 +138,7 @@ func (w *StatusbarWidget) addStatusEvent(eventObj interface{}) {
 func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 	x0, y0, x1, y1 := getViewBounds(g, w.x, w.y, w.w, 3)
 
-	v, err := g.SetView(w.name, x0, y0, x1, y1)
+	v, err := g.SetView(w.name, x0, y0, x1, y1, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}

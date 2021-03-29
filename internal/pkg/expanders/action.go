@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"github.com/stuartleeks/gocui"
 )
 
 // ActionExpander handles actions

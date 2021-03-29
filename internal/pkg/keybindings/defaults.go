@@ -1,7 +1,7 @@
 package keybindings
 
 import (
-	"github.com/stuartleeks/gocui"
+	"github.com/awesome-gocui/gocui"
 )
 
 // DefaultKeys are the default key bindings for each handler.

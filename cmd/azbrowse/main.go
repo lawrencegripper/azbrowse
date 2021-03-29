@@ -21,8 +21,8 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 
+	"github.com/awesome-gocui/gocui"
 	opentracing "github.com/opentracing/opentracing-go"
-	"github.com/stuartleeks/gocui"
 )
 
 // Overridden via ldflags
@@ -59,7 +59,7 @@ func run(settings *config.Settings) {
 	armclient.LegacyInstance = armClient
 
 	// Start up gocui and configure some settings
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	g, err := gocui.NewGui(gocui.OutputTrue, false)
 	if err != nil {
 		log.Panicln(err)
 	}
@@ -199,8 +199,8 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	// Padding
 	maxX = maxX - 2
 
-	if maxX < 72 {
-		panic("I can't run in a terminal less than 72 wide ... it's tooooo small!!!")
+	if maxX < 60 {
+		panic("I can't run in a terminal less than 60 wide ... it's tooooo small!!!")
 	}
 
 	leftColumnWidth := 45

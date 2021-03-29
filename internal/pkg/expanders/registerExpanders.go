@@ -1,9 +1,9 @@
 package expanders
 
 import (
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
-	"github.com/stuartleeks/gocui"
 )
 
 var swaggerResourceExpander *SwaggerResourceExpander

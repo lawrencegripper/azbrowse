@@ -1,8 +1,8 @@
 package keybindings
 
 import (
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
-	"github.com/stuartleeks/gocui"
 )
 
 type CloseCommandPanelHandler struct {

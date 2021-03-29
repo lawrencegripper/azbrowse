@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
-	"github.com/stuartleeks/gocui"
 )
 
 var _ interfaces.CommandPanel = &CommandPanelWidget{}
@@ -46,6 +46,7 @@ func NewCommandPanelWidget(x, y, w int, g *gocui.Gui) *CommandPanelWidget {
 func (w *CommandPanelWidget) Hide() {
 	// hide
 	w.prepopulate = ""
+	w.options = nil
 	w.visible = false
 }
 
@@ -120,10 +121,8 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	// If we're not visible then do any clean-up needed
 	if !w.visible {
-		if _, err := g.View(optionsViewName); err != gocui.ErrUnknownView {
-			g.DeleteView(optionsViewName)
-		}
 		if viewExists {
+			g.DeleteView(optionsViewName)
 			g.DeleteView(inputViewName)
 			g.SetCurrentView(w.previousViewName) //nolint: errcheck
 			g.Cursor = false
@@ -142,13 +141,13 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 	var vList *gocui.View
 	if w.options != nil {
-		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight)
+		vList, err = g.SetView(optionsViewName, w.x, w.y+2, w.x+w.w, w.y+3+listHeight, 0)
 		if err != nil && err != gocui.ErrUnknownView {
 			return err
 		}
 	}
 
-	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height)
+	v, err := g.SetView(inputViewName, w.x, w.y, w.x+w.w, w.y+height, 0)
 	if err != nil && err != gocui.ErrUnknownView {
 		return err
 	}
