@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:  
-  build-xpath:
+  build-and-release:
     runs-on: ubuntu-18.04
 
     steps:
@@ -29,6 +29,10 @@ jobs:
     - name: Push devcontainer for caching
       if: ${{ github.ref == 'refs/heads/main' }}
       run: sudo -E make devcontainer-push
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        IS_CI: 1
 
     - name: Build the Docker image, run tests and publish(on master only)
       run: sudo -E make devcontainer-release
