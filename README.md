@@ -28,6 +28,9 @@ Lots [check out the guided tour here](docs/getting-started.md).
 
 For advanced [config review the settings page here](docs/config.md). For [command line arguments and docs see this page](./docs/commandline/azbrowse.md).
 
+## Contributing
+
+Take a look at the guide here [for a guide on the design of azbrowse](docs/design/README.md) and then a look here [for how to get started on deving](CONTRIBUTING.md)
 
 ## Install/Run
 
