@@ -31,6 +31,8 @@ Everything (or nearly everything) is represented as `expander`'s which return `E
 
 An `ExpanderResult` contains the content to display in the `itemView` and also `treeNode`'s each of which represents and item in the list of the left panel.
 
+Everything gets started in `cmd/azbrowse/cmd.go`
+
 ## Style/Qwerks
 
 1. Lots of strings are composed in the code. The `+` concat style is preferred throughout the codebase over `fmt` and `%s` as it was my (Lawrence) preference as I believe it's more readable when things started out with `go 1.13`.
@@ -58,6 +60,10 @@ The `armclient` provides some helpers to make this easier.
 3. Allows async requests using Golang `channels`
 4. Helpers for querying the [`azureResourceGraph`](https://azure.microsoft.com/en-us/features/resource-graph/) this is used to get status from `resources` in Azure
 5. Handle mocking and testing allowing authors of `expanders` to create mock responses to test their code
+
+Sometimes calls to Azure are expensive (take a while and return lots of data), when working with these calls we cache results with a `TTL` using ``internal/pkg/storage/store.go`. 
+
+`PopulateResourceAPILookup` in `armclient` is an example of this caching approach.
 
 ## Expanders, ExpanderResults and TreeNodes
 
@@ -144,6 +150,8 @@ caption := style.Title(currentItem.Name) +
 ### Expanders
 
 The hierarchical drill-down from Subscription -> Resource Group -> Resource -> ... is driven by Expanders. These are registered in `registerExpanders.go` and when the list widget expands a node it calls each expander asking if they have any nodes to provide. Multiple expanders can return nodes for any given parent node, but only one expander should mark the response as the primary response.
+
+> Note: Remember to update `InitializeExpanders` in `internal/pkg/expanders/registerExpanders.go` with your new expander if you add one otherwise it won't get called!
 
 Each node has an ID and IDs should be unique (to support the `--navigate` command), and typically are the resource ID for the resource in Azure (this allows the `open in portal` action to function)
 
@@ -281,10 +289,76 @@ they're displayed for the correct amount of time.
 
 This is the simplist view it shows the help for which keys do what.
 
-## Status and Notifications
+## Status and Notifications (and a bit of recovery/automation package)
 
-There 
+There is an overly complex `pub/sub` system for handling `StatusEvents` and other events in the system. 
 
-## Automation, Error Handling and Autocomplete
+```go
+// StatusEvent is used to show status information
+// in the statusbar
+type StatusEvent struct {
+	Message    string
+	Timeout    time.Duration
+	createdAt  time.Time
+	InProgress bool
+	IsToast    bool
+	Failure    bool
+	id         uuid.UUID
+}
+```
 
-WIP Section
+This is used by the `statusbar` view, `notifications` view. These events are published, updated and completed as follows:
+
+```go
+	statusEvent, done := eventing.SendStatusEvent(&eventing.StatusEvent{
+		Message:    "Opening: thing",
+		InProgress: true,
+	})
+	defer done() // This will mark the StatusEvent's InProgress field to false
+
+  // ... Do things here
+
+  event.Failure = true
+	event.InProgress = false
+	event.Message = "Failed to delete doing thing with error:" + err.Error()
+	event.Update()
+```
+
+Not great right? There are some helpers hanging off `eventing` which could be updated to make this nicer or the system could be refactored to simplify it.
+
+The same bus is used to push messages when `navigation` occurs, this is used to drive a number of features such as the `--navigate` CLI arg, `make fuzz` fuzzer and `--resume` cli command.
+
+You'll see calls to publish to the bus in the `internal/pkg/views/list.go` ListView like this:
+
+```go
+eventing.Publish("list.prenavigate", "GOBACK")
+eventing.Publish("list.navigated", ListNavigatedEventState{Success: false})
+```
+
+These events power functionality of `--navigate` via the code in `internal/pkg/automation/navigateTo.go` which listens to these events and drives to UI until it reaches the expected item. 
+
+The events are also used in `RegisterGuiAndStartHistoryTracking` part of the `recovery` package `internal/pkg/errorhandling/recovery.go`. In this package the events are used to track the path taken up until a crash/panic occurs to allow it to be easily reproduced.
+
+## Error Handling
+
+All go routines started in the solution have the following first line.
+
+```go
+// recover from panic, if one occurrs, and leave terminal usable
+	defer errorhandling.RecoveryWithCleanup()
+```
+
+This does 2 things. 
+
+1. Ensure we don't leave the terminal session unusable, closing out `gocui` and tidying up
+2. Outputting useful information for the user to report the crash like the path they took before the crash, stack etc
+
+## Autocomplete
+
+Inside `cmd/azbrowse/cmd.go` the command structure of the CLI is setup using `cobra`. 
+
+As part of this autocomplete functions are added which do the following:
+1. `subscriptionAutocompletion` allows `--subscription stuff<TAB>` --> `--subscription stuffAndThingsSub`
+1. `navigateAutocompletion` allows `--navigate /subscription/GUID/resourceg<TAB>` to autocomplete to a resource
+
+To ensure that autocomplete is quick results are cached using the `internal/pkg/storage/store.go` key vault store which also provides a rough `TTL` based expirey (it's a hack - go look ... it works but I'm not proud of it).
