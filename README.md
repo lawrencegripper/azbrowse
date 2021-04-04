@@ -35,8 +35,9 @@ For advanced [config review the settings page here](docs/config.md). For [comman
 
 <details>
   <summary>Mac/OSX via Homebrew</summary>
+<br />
     
-Via [HomeBrew](https://brew.sh/)
+Install [HomeBrew](https://brew.sh/)
 
 ```shell
 brew install lawrencegripper/tap/azbrowse
@@ -44,8 +45,7 @@ brew install lawrencegripper/tap/azbrowse
 </details>
 <details>
   <summary>Windows via Scoop</summary>
-
-Via [Scoop](https://scoop.sh/)
+<br />
 
 [Install Scoop]([Scoop](https://scoop.sh/))
 
@@ -62,6 +62,7 @@ scoop install azbrowse
 </details>
 <details>
     <summary>Run via Docker</summary>
+<br />
 
 You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
@@ -71,6 +72,7 @@ docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrence
 </details>
 <details>
     <summary>Linux via Snap Store</summary> 
+<br />
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/azbrowse)
 
@@ -78,6 +80,7 @@ docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrence
 
 <details>
     <summary>Linux via Releases tar.gz</summary> 
+<br />
 
 Grab the url to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
 
@@ -92,6 +95,7 @@ Make the binary executable: `chmod +x /usr/bin/azbrowse`
 </details>
 <details>
     <summary>Install via azure-cli extention</summary>
+<br />
 
 This is experimental and Non-functional on Windows. Only tested on Unix based systems
 
@@ -102,6 +106,7 @@ Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
 </details>
 <details>
     <summary>DIY</summary>
+<br />
 
 Simply download the archive/package suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it.
 
