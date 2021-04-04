@@ -29,17 +29,23 @@ Lots [check out the guided tour here](docs/getting-started.md).
 For advanced [config review the settings page here](docs/config.md). For [command line arguments and docs see this page](./docs/commandline/azbrowse.md).
 
 
-## Install
+## Install/Run
 
 > Pre-req: Ensure you have the [`az` command from Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) setup on your machine and are logged-in otherwise `azbrowse` won't work!
 
-### Mac (via [HomeBrew](https://brew.sh/))
+<details>
+  <summary>Mac/OSX via Homebrew</summary>
+<br />
+    
+Install [HomeBrew](https://brew.sh/)
 
 ```shell
 brew install lawrencegripper/tap/azbrowse
 ```
-
-### Windows (via [Scoop](https://scoop.sh/))
+</details>
+<details>
+  <summary>Windows via Scoop</summary>
+<br />
 
 [Install Scoop]([Scoop](https://scoop.sh/))
 
@@ -53,14 +59,28 @@ Install AzBrowse using Scoop
 scoop bucket add azbrowse https://github.com/lawrencegripper/scoop-bucket.git
 scoop install azbrowse
 ```
+</details>
+<details>
+    <summary>Run via Docker</summary>
+<br />
 
-### Linux
+You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
-#### via Snap Store
+```shell
+docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrencegripper/azbrowse
+```
+</details>
+<details>
+    <summary>Linux via Snap Store</summary> 
+<br />
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/azbrowse)
 
-#### via Releases tar.gz
+</details>
+
+<details>
+    <summary>Linux via Releases tar.gz</summary> 
+<br />
 
 Grab the url to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
 
@@ -68,38 +88,41 @@ Download the release (either via the browser or `wget https://github.com/lawrenc
 
 Extract the binary from the archive to a suitable location (here we're using `/usr/bin` for convenience): `tar -C /usr/bin -zxvf azbrowse_linux_amd64.tar.gz azbrowse`
 
+> Note: If you have a location on `$PATH` which is writable by the current user like `/home/USERNAMEHERE/go/bin` it's best to use this as it'll allow azbrowse to update itself in place without requiring `sudo` 
+
 Make the binary executable: `chmod +x /usr/bin/azbrowse`
 
-### Install via `azure-cli` extention
+</details>
+<details>
+    <summary>Install via azure-cli extention</summary>
+<br />
 
-> Warning: This is experimental and Non-functional on Windows. Only tested on Unix based systems
+This is experimental and Non-functional on Windows. Only tested on Unix based systems
 
 Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
 
 [This extension from Noel Bundick lets you do just that](https://github.com/noelbundick/azure-cli-extension-noelbundick/blob/master/README.md#browse)
 
-### Shell completion
+</details>
+<details>
+    <summary>DIY</summary>
+<br />
+
+Simply download the archive/package suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it.
+
+Bonus: Add it to your `$PATH` so you can run `azbrowse` anywhere. 
+</details>
+
+## Shell completion
 
 Azbrowse can generate shell completions for a number of different shells using the `azbrowse completion` command. 
+
+For example, `azbrowse -s thing<TAB>` -> `azbrowse -s thingSubscription` and jump straight to that Azure subscription.
 
 For example, to configure compltion in bash add the following to `~/.bashrc` or `~/.profile`
 
 ```bash
 source <(azbrowse completion bash)
-```
-
-### DIY
-
-Simply download the archive/package suitable for your machine, [from the release page](https://github.com/lawrencegripper/azbrowse/releases), and execute it.
-
-Bonus: Add it to your `$PATH` so you can run `azbrowse` anywhere. 
-
-### Test out via Docker
-
-You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
-
-```shell
-docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrencegripper/azbrowse
 ```
 
 ## Docs
