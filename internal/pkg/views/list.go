@@ -26,8 +26,6 @@ type ListWidget struct {
 	ctx                  context.Context
 	view                 *gocui.View
 	enableTracing        bool
-	FullscreenKeyBinding string
-	ActionKeyBinding     string
 	lastTopIndex         int
 	shouldRender         bool
 	lastCalculatedHeight int
@@ -288,7 +286,7 @@ func (w *ListWidget) ExpandCurrentSelection() {
 
 	currentItem := w.CurrentItem()
 
-	newTitle := fmt.Sprintf("[%s-> Fullscreen|%s -> Actions] %s", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding), currentItem.Name)
+	newTitle := currentItem.Name
 
 	eventing.Publish("list.prenavigate", currentItem.ID)
 

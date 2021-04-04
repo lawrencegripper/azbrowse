@@ -15,18 +15,23 @@ type CommandPanelFilterHandler struct {
 
 var _ Command = &CommandPanelFilterHandler{}
 
-func NewCommandPanelFilterHandler(
-	commandPanelWidget *views.CommandPanelWidget,
-	list *views.ListWidget,
-	itemView *views.ItemWidget) *CommandPanelFilterHandler {
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
 
 	handler := &CommandPanelFilterHandler{
 		commandPanelWidget: commandPanelWidget,
-		list:               list,
-		itemView:           itemView,
 	}
 	handler.id = HandlerIDFilter
 	return handler
+}
+
+//  Hack to work around circular import
+func (h *CommandPanelFilterHandler) SetItemWidget(w *views.ItemWidget) {
+	h.itemView = w
+}
+
+//  Hack #2 to work around circular import
+func (h *CommandPanelFilterHandler) SetListWidget(w *views.ListWidget) {
+	h.list = w
 }
 
 func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
@@ -42,6 +47,10 @@ func (h *CommandPanelFilterHandler) IsEnabled() bool {
 }
 func (h *CommandPanelFilterHandler) Invoke() error {
 	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
+	return nil
+}
+func (h *CommandPanelFilterHandler) InvokeWithStartString(s string) error {
+	h.commandPanelWidget.ShowWithText("Filter", s, nil, h.CommandPanelNotification)
 	return nil
 }
 func (h *CommandPanelFilterHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
