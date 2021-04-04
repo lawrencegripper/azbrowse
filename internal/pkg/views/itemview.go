@@ -219,9 +219,12 @@ func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderR
 
 // SetContentWithNode displays the string in the itemview and tracks the associated node
 func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string, contentType interfaces.ExpanderResponseType, title string) {
-	w.ClearFilter()
-	w.hasChanged = true
+	// Clear down filter stuff
+	w.filterString = ""
+	w.unfilteredContent = ""
+
 	w.view.Clear()
+	w.hasChanged = true
 	w.node = node
 	w.originalContent = content
 	w.content = content
