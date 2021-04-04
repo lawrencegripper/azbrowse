@@ -12,15 +12,15 @@ var _ interfaces.CommandPanel = &CommandPanelWidget{}
 
 // CommandPanelWidget controls the notifications windows in the top right
 type CommandPanelWidget struct {
+	Gui                 *gocui.Gui
+	PreviousViewName    string
 	name                string
 	x, y                int
 	w                   int
 	visible             bool
-	gui                 *gocui.Gui
 	panelContent        string
 	newPanelContent     string
 	prepopulate         string
-	previousViewName    string
 	title               string
 	options             *[]interfaces.CommandPanelListOption
 	filteredOptions     *[]interfaces.CommandPanelListOption
@@ -36,7 +36,7 @@ func NewCommandPanelWidget(x, y, w int, g *gocui.Gui) *CommandPanelWidget {
 		x:       x,
 		y:       y,
 		w:       w,
-		gui:     g,
+		Gui:     g,
 		visible: false,
 	}
 	return widget
@@ -55,9 +55,9 @@ func (w *CommandPanelWidget) ShowWithText(title string, s string, options *[]int
 	// Ensure we put things back how we found them before the panel was launched
 	w.trackPreviousView()
 
-	w.gui.DeleteView(w.name) //nolint: errcheck
+	w.Gui.DeleteView(w.name) //nolint: errcheck
 	w.title = title
-	w.gui.Cursor = false
+	w.Gui.Cursor = false
 	w.prepopulate = s
 	w.options = options
 	w.filteredOptions = options
@@ -99,8 +99,8 @@ func (w *CommandPanelWidget) EnterPressed() {
 }
 
 func (w *CommandPanelWidget) trackPreviousView() {
-	if view := w.gui.CurrentView(); view != nil {
-		w.previousViewName = view.Name()
+	if view := w.Gui.CurrentView(); view != nil {
+		w.PreviousViewName = view.Name()
 	}
 }
 
@@ -124,7 +124,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 		if viewExists {
 			g.DeleteView(optionsViewName)
 			g.DeleteView(inputViewName)
-			g.SetCurrentView(w.previousViewName) //nolint: errcheck
+			g.SetCurrentView(w.PreviousViewName) //nolint: errcheck
 			g.Cursor = false
 		}
 		return nil
@@ -227,7 +227,7 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 		w.panelChanged(w.panelContent)
 	}
 
-	_, err = w.gui.SetCurrentView(inputViewName)
+	_, err = w.Gui.SetCurrentView(inputViewName)
 	if err != nil {
 		panic("No view " + inputViewName + " found: " + err.Error())
 	}
@@ -237,7 +237,6 @@ func (w *CommandPanelWidget) Layout(g *gocui.Gui) error {
 
 // This is fired every time the content of the command panel has changed.
 func (w *CommandPanelWidget) panelChanged(content string) {
-
 	if len(content) < 1 && w.selectedIndex < 0 {
 		return
 	}
@@ -290,12 +289,12 @@ func (w *CommandPanelWidget) panelChanged(content string) {
 	}
 
 	if triggerLayout {
-		if err := w.Layout(w.gui); err != nil {
+		if err := w.Layout(w.Gui); err != nil {
 			panic("Layout failed")
 		}
 	}
 
-	w.gui.Update(func(gui *gocui.Gui) error {
+	w.Gui.Update(func(gui *gocui.Gui) error {
 		w.notificationHandler(state)
 		return nil
 	})

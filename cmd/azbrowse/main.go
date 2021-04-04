@@ -207,24 +207,31 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 
 	// Create the views used
 	status := views.NewStatusbarWidget(1, -3, 0, settings.HideGuids, g)
-	content := views.NewItemWidget(leftColumnWidth+2, 0, 0, -4, settings.HideGuids, settings.ShouldRender, "")
-	list := views.NewListWidget(ctx, 1, 0, leftColumnWidth, -4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
 	notifications := views.NewNotificationWidget(-45, 0, 45, g, client)
 
 	commandPanel := views.NewCommandPanelWidget(leftColumnWidth+3, 0, maxX-leftColumnWidth-20, g)
 
+	// Special handler/hack required by view because `/` doesn't trigger correctly in itemWidget
+	// this causes an ordering issue as the ItemWidget needs the command panel and the command panel needs the views as inputs
+	// to work around this we use two hacky methods of `Set*Widget`
+	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel)
+	content := views.NewItemWidget(leftColumnWidth+2, 0, 0, -4, settings.HideGuids, settings.ShouldRender, "", commandPanelFilterCommand.InvokeWithStartString)
+	list := views.NewListWidget(ctx, 1, 0, leftColumnWidth, -4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
+	commandPanelFilterCommand.SetItemWidget(content)
+	commandPanelFilterCommand.SetListWidget(list)
+
 	copyCommand := keybindings.NewCopyHandler(content, status)
 	toggleDemoModeCommand := keybindings.NewToggleDemoModeHandler(settings, list, status, content)
 
-	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, list)
 	commandPanelAzureSearchQueryCommand := keybindings.NewCommandPanelAzureSearchQueryHandler(commandPanel, content, list)
 
 	listActionsCommand := keybindings.NewListActionsHandler(list, ctx)
 	listOpenCommand := keybindings.NewListOpenHandler(list, ctx)
 	listUpdateCommand := keybindings.NewListUpdateHandler(list, status, ctx, content, g)
-	itemCopyItemIDCommand := keybindings.NewItemCopyItemIDHandler(content, status)
 	listDebugCopyItemDataCommand := keybindings.NewListDebugCopyItemDataHandler(list, status)
 	listSortCommand := keybindings.NewListSortHandler(list)
+
+	itemCopyItemIDCommand := keybindings.NewItemCopyItemIDHandler(content, status)
 
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
@@ -236,6 +243,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 		itemCopyItemIDCommand,
 		toggleDemoModeCommand,
 		listSortCommand,
+		itemCopyItemIDCommand,
 	}
 	if settings.EnableTracing {
 		commands = append(commands, listDebugCopyItemDataCommand)
@@ -294,6 +302,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	// ItemView handlers
 	keybindings.AddHandler(keybindings.NewItemViewPageDownHandler(content))
 	keybindings.AddHandler(keybindings.NewItemViewPageUpHandler(content))
+	keybindings.AddHandler(keybindings.NewItemClearFilterHandler(content))
 
 	// Item handlers
 	keybindings.AddHandler(keybindings.NewItemBackHandler(list))
@@ -309,8 +318,8 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	// Update views with keybindings
 	keyBindings := keybindings.GetKeyBindingsAsStrings()
 	status.HelpKeyBinding = strings.Join(keyBindings["help"], ",")
-	list.ActionKeyBinding = strings.Join(keyBindings["listactions"], ",")
-	list.FullscreenKeyBinding = strings.Join(keyBindings["fullscreen"], ",")
+	content.ActionKeyBinding = strings.Join(keyBindings["listactions"], ",")
+	content.FullscreenKeyBinding = strings.Join(keyBindings["fullscreen"], ",")
 	notifications.ConfirmDeleteKeyBinding = strings.Join(keyBindings["confirmdelete"], ",")
 	notifications.ClearPendingDeletesKeyBinding = strings.Join(keyBindings["clearpendingdeletes"], ",")
 

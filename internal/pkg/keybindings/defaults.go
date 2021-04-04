@@ -33,6 +33,7 @@ var DefaultKeys = map[string]interface{}{
 	"clearpendingdeletes": gocui.KeyCtrlN,
 	"itempagedown":        gocui.KeyPgdn,
 	"itempageup":          gocui.KeyPgup,
+	"itemclearfilter":     gocui.KeyEsc,
 	"commandpanelopen":    gocui.KeyCtrlP,
 	"commandpaneldown":    gocui.KeyArrowDown,
 	"commandpanelup":      gocui.KeyArrowUp,

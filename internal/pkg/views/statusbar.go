@@ -143,7 +143,8 @@ func (w *StatusbarWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Clear()
-	v.Title = fmt.Sprintf(`Status [%s -> Help]`, strings.ToUpper(w.HelpKeyBinding))
+	v.Title = "Status"
+	v.Subtitle = fmt.Sprintf(`[%s -> Help]`, strings.ToUpper(w.HelpKeyBinding))
 	v.Wrap = true
 
 	if w.hideGuids {

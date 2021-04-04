@@ -22,27 +22,39 @@ import (
 
 // ItemWidget is response for showing the text response from the Rest requests
 type ItemWidget struct {
-	x, y            int
-	w, h            int
-	hideGuids       bool
-	node            *expanders.TreeNode
-	originalContent string // unformatted - for copying
-	content         string
-	contentType     interfaces.ExpanderResponseType
-	view            *gocui.View
-	shouldRender    bool
+	x, y                 int
+	w, h                 int
+	hideGuids            bool
+	node                 *expanders.TreeNode
+	originalContent      string // unformatted - for copying
+	content              string
+	unfilteredContent    string // formatted content, before filter applied
+	contentType          interfaces.ExpanderResponseType
+	view                 *gocui.View
+	shouldRender         bool
+	FullscreenKeyBinding string
+	ActionKeyBinding     string
+	g                    *gocui.Gui
+	filterHandler        func(s string) error
+	filterString         string
+	title                string
 	// track if we need to re-render the layout or is it the same content?
 	hasChanged bool
-	g          *gocui.Gui
 }
 
 var _ interfaces.ItemWidget = &ItemWidget{}
 
 // NewItemWidget creates a new instance of ItemWidget
-func NewItemWidget(x, y, w, h int, hideGuids bool, shouldRender bool, content string) *ItemWidget {
+func NewItemWidget(x, y, w, h int, hideGuids bool, shouldRender bool, content string, filterHandler func(s string) error) *ItemWidget {
 	configureYAMLHighlighting()
 
-	return &ItemWidget{x: x, y: y, w: w, h: h, hideGuids: hideGuids, shouldRender: shouldRender, content: content}
+	return &ItemWidget{
+		x: x, y: y, w: w, h: h,
+		hideGuids:     hideGuids,
+		shouldRender:  shouldRender,
+		content:       content,
+		filterHandler: filterHandler,
+	}
 }
 
 // Layout draws the widget in the gocui view
@@ -56,7 +68,36 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Editable = true
+	v.KeybindOnEdit = true
 	v.Wrap = true
+	v.Subtitle = fmt.Sprintf("[%s-> Fullscreen|%s -> Actions|Type to filter]", strings.ToUpper(w.FullscreenKeyBinding), strings.ToUpper(w.ActionKeyBinding))
+	v.Editor = gocui.EditorFunc(func(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modifier) {
+		switch key {
+		case gocui.KeySpace:
+			v.EditWrite(' ')
+			return
+		case gocui.KeyArrowDown:
+			v.MoveCursor(0, 1)
+			return
+		case gocui.KeyArrowUp:
+			v.MoveCursor(0, -1)
+			return
+		case gocui.KeyArrowLeft:
+			v.MoveCursor(-1, 0)
+			return
+		case gocui.KeyArrowRight:
+			v.MoveCursor(1, 0)
+			return
+		}
+
+		// If we type any chars other than / (which pops up filtering) start filtering
+		if ch != 0 && ch != rune('/') {
+			err := w.filterHandler(string(ch))
+			if err != nil {
+				eventing.SendFailureStatusFromError("Failed to start filter", err)
+			}
+		}
+	})
 	w.view = v
 	width, height := v.Size()
 	expanders.ItemWidgetHeight = height
@@ -75,7 +116,12 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		if w.hideGuids {
 			w.content = StripSecretVals(w.content)
 		}
+		v.Clear()
 		fmt.Fprint(v, w.content)
+	}
+
+	if w.filterString != "" {
+		v.Title = w.title + " [filter=" + w.filterString + "]"
 	}
 
 	return nil
@@ -127,6 +173,48 @@ func (w *ItemWidget) PageUp() {
 	}
 }
 
+// SetFilter sets the filter to be applied to list items
+func (w *ItemWidget) SetFilter(filterString string) {
+	w.filterString = filterString
+
+	var currentContent []string
+	if w.unfilteredContent == "" {
+		currentContent = strings.Split(w.content, "\n")
+		w.unfilteredContent = w.content
+	} else {
+		currentContent = strings.Split(w.unfilteredContent, "\n")
+	}
+
+	var filteredResult strings.Builder
+	// ensure the content isn't under the filter resultbox
+	filteredResult.WriteString("\n\n")
+
+	for _, line := range currentContent {
+		if strings.Contains(strings.ToLower(line), strings.ToLower(filterString)) {
+			line = highlightText(line, filterString)
+			filteredResult.WriteString(line + "\n")
+		}
+	}
+
+	w.content = filteredResult.String()
+	w.hasChanged = true
+
+	w.g.Update(func(gui *gocui.Gui) error {
+		return nil
+	})
+}
+
+// ClearFilter clears a filter if applied
+func (w *ItemWidget) ClearFilter() {
+	w.filterString = ""
+	w.content = w.unfilteredContent
+	w.hasChanged = true
+
+	w.g.Update(func(gui *gocui.Gui) error {
+		return nil
+	})
+}
+
 // SetContent displays the string in the itemview
 func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderResponseType, title string) {
 	w.SetContentWithNode(nil, content, contentType, title)
@@ -134,12 +222,17 @@ func (w *ItemWidget) SetContent(content string, contentType interfaces.ExpanderR
 
 // SetContentWithNode displays the string in the itemview and tracks the associated node
 func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string, contentType interfaces.ExpanderResponseType, title string) {
-	w.hasChanged = true
+	// Clear down filter stuff
+	w.filterString = ""
+	w.unfilteredContent = ""
+
 	w.view.Clear()
+	w.hasChanged = true
 	w.node = node
 	w.originalContent = content
 	w.content = content
 	w.contentType = contentType
+	w.title = title
 
 	if w.hideGuids {
 		w.content = StripSecretVals(w.content)

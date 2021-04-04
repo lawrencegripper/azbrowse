@@ -34,6 +34,16 @@ Another great navigation feature is the `--navigate` command line argument which
 
 ![filtering, commands and --navigate](images/azbrowse-navigate-copyid-filter.gif)
 
+### Content panel, browse and filter
+
+Using the right allow move the selection to the content panel on the right. Up/Down and PageUp/Down let you navigate and scroll through the response content. 
+
+Typing, using using `/`, lets you filter the content of this panel much like the left list view can be filtered. Use `Esc` to clear a filter and return to the original content.
+
+In the example below I filter the response from a WebApps instance to check for the property `isXenon` and quickly see what it's set to.
+
+![filtering content](images/filterItemView.gif)
+
 ### Updating content
 
 For resources that have `PUT` endpoints defined in their API specs, azbrowse allows you to edit the content and send the update.

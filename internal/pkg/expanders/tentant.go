@@ -61,7 +61,6 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 			},
 			IsPrimaryResponse: true,
 		}
-		// return armclient.SubResponse{}, "", fmt.Errorf("Failed to load subscriptions: %s", err)
 	}
 
 	var subRequest SubResponse
@@ -90,23 +89,13 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 		})
 	}
 
-	var newContent string
-	var newContentType interfaces.ExpanderResponseType
-	if err != nil {
-		newContent = err.Error()
-		newContentType = interfaces.ResponsePlainText
-	} else {
-		newContent = data
-		newContentType = interfaces.ResponseJSON
-	}
-
 	return ExpanderResult{
 		SourceDescription: e.Name(),
 		IsPrimaryResponse: true,
 		Nodes:             newList,
 		Response: ExpanderResponse{
-			Response:     newContent,
-			ResponseType: newContentType,
+			Response:     data,
+			ResponseType: interfaces.ResponseJSON,
 		},
 	}
 }

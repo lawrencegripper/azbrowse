@@ -10,17 +10,28 @@ type CommandPanelFilterHandler struct {
 	GlobalHandler
 	commandPanelWidget *views.CommandPanelWidget
 	list               *views.ListWidget
+	itemView           *views.ItemWidget
 }
 
 var _ Command = &CommandPanelFilterHandler{}
 
-func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget, list *views.ListWidget) *CommandPanelFilterHandler {
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
+
 	handler := &CommandPanelFilterHandler{
 		commandPanelWidget: commandPanelWidget,
-		list:               list,
 	}
 	handler.id = HandlerIDFilter
 	return handler
+}
+
+//  Hack to work around circular import
+func (h *CommandPanelFilterHandler) SetItemWidget(w *views.ItemWidget) {
+	h.itemView = w
+}
+
+//  Hack #2 to work around circular import
+func (h *CommandPanelFilterHandler) SetListWidget(w *views.ListWidget) {
+	h.list = w
 }
 
 func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error {
@@ -38,8 +49,17 @@ func (h *CommandPanelFilterHandler) Invoke() error {
 	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
 	return nil
 }
+func (h *CommandPanelFilterHandler) InvokeWithStartString(s string) error {
+	h.commandPanelWidget.ShowWithText("Filter", s, nil, h.CommandPanelNotification)
+	return nil
+}
 func (h *CommandPanelFilterHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
-	h.list.SetFilter(state.CurrentText)
+	switch h.commandPanelWidget.PreviousViewName {
+	case "listWidget":
+		h.list.SetFilter(state.CurrentText)
+	case "itemWidget":
+		h.itemView.SetFilter(state.CurrentText)
+	}
 	if state.EnterPressed {
 		h.commandPanelWidget.Hide()
 	}
