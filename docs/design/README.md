@@ -362,3 +362,11 @@ As part of this autocomplete functions are added which do the following:
 1. `navigateAutocompletion` allows `--navigate /subscription/GUID/resourceg<TAB>` to autocomplete to a resource
 
 To ensure that autocomplete is quick results are cached using the `internal/pkg/storage/store.go` key vault store which also provides a rough `TTL` based expirey (it's a hack - go look ... it works but I'm not proud of it).
+
+## Release and Updating
+
+AzBrowse is built using the `scripts/ci_release.sh` script which runs locally or as part of the Github Action `.github/workflows/build.yaml`.
+
+Under the covers this uses `goreleaser` to build for multiple platforms and packaging systems (brew, docker, deb etc). It is configured in `.goreleaser.yml` and pushes output to Github releases.
+
+The `cmd/azbrowse/selfupdate.go` handles checking for new releases when the CLI started and offering to the user to update. It uses the [`selfupdate` package from rhysd](github.com/rhysd/go-github-selfupdate/selfupdate).
