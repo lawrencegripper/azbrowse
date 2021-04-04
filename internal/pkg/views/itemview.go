@@ -92,7 +92,10 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 
 		// If we type any chars other than / (which pops up filtering) start filtering
 		if ch != 0 && ch != rune('/') {
-			w.filterHandler(string(ch))
+			err := w.filterHandler(string(ch))
+			if err != nil {
+				eventing.SendFailureStatusFromError("Failed to start filter", err)
+			}
 		}
 	})
 	w.view = v
