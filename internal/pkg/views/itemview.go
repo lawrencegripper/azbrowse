@@ -22,15 +22,16 @@ import (
 
 // ItemWidget is response for showing the text response from the Rest requests
 type ItemWidget struct {
-	x, y            int
-	w, h            int
-	hideGuids       bool
-	node            *expanders.TreeNode
-	originalContent string // unformatted - for copying
-	content         string
-	contentType     interfaces.ExpanderResponseType
-	view            *gocui.View
-	shouldRender    bool
+	x, y              int
+	w, h              int
+	hideGuids         bool
+	node              *expanders.TreeNode
+	originalContent   string // unformatted - for copying
+	content           string
+	unfilteredContent string // formatted content, before filter applied
+	contentType       interfaces.ExpanderResponseType
+	view              *gocui.View
+	shouldRender      bool
 	// track if we need to re-render the layout or is it the same content?
 	hasChanged bool
 	g          *gocui.Gui
@@ -56,6 +57,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		return err
 	}
 	v.Editable = true
+	v.KeybindOnEdit = true
 	v.Wrap = true
 	w.view = v
 	width, height := v.Size()
@@ -75,6 +77,7 @@ func (w *ItemWidget) Layout(g *gocui.Gui) error {
 		if w.hideGuids {
 			w.content = StripSecretVals(w.content)
 		}
+		v.Clear()
 		fmt.Fprint(v, w.content)
 	}
 
@@ -125,6 +128,50 @@ func (w *ItemWidget) PageUp() {
 			Timeout:    time.Duration(time.Second * 4),
 		})
 	}
+}
+
+// SetFilter sets the filter to be applied to list items
+func (w *ItemWidget) SetFilter(filterString string) {
+	if filterString == "" {
+		w.ClearFilter()
+		return
+	}
+
+	var currentContent []string
+	if w.unfilteredContent == "" {
+		currentContent = strings.Split(w.content, "\n")
+		w.unfilteredContent = w.content
+	} else {
+		currentContent = strings.Split(w.unfilteredContent, "\n")
+	}
+
+	var filteredResult strings.Builder
+	// ensure the content isn't under the filter resultbox
+	filteredResult.WriteString("\n\n")
+
+	for _, line := range currentContent {
+		if strings.Contains(strings.ToLower(line), strings.ToLower(filterString)) {
+			line = highlightText(line, filterString)
+			filteredResult.WriteString(line + "\n")
+		}
+	}
+
+	w.content = filteredResult.String()
+	w.hasChanged = true
+
+	w.g.Update(func(gui *gocui.Gui) error {
+		return nil
+	})
+}
+
+// ClearFilter clears a filter if applied
+func (w *ItemWidget) ClearFilter() {
+	w.content = w.unfilteredContent
+	w.hasChanged = true
+
+	w.g.Update(func(gui *gocui.Gui) error {
+		return nil
+	})
 }
 
 // SetContent displays the string in the itemview

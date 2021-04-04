@@ -10,14 +10,20 @@ type CommandPanelFilterHandler struct {
 	GlobalHandler
 	commandPanelWidget *views.CommandPanelWidget
 	list               *views.ListWidget
+	itemView           *views.ItemWidget
 }
 
 var _ Command = &CommandPanelFilterHandler{}
 
-func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget, list *views.ListWidget) *CommandPanelFilterHandler {
+func NewCommandPanelFilterHandler(
+	commandPanelWidget *views.CommandPanelWidget,
+	list *views.ListWidget,
+	itemView *views.ItemWidget) *CommandPanelFilterHandler {
+
 	handler := &CommandPanelFilterHandler{
 		commandPanelWidget: commandPanelWidget,
 		list:               list,
+		itemView:           itemView,
 	}
 	handler.id = HandlerIDFilter
 	return handler
@@ -39,7 +45,12 @@ func (h *CommandPanelFilterHandler) Invoke() error {
 	return nil
 }
 func (h *CommandPanelFilterHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
-	h.list.SetFilter(state.CurrentText)
+	switch h.commandPanelWidget.PreviousViewName {
+	case "listWidget":
+		h.list.SetFilter(state.CurrentText)
+	case "itemWidget":
+		h.itemView.SetFilter(state.CurrentText)
+	}
 	if state.EnterPressed {
 		h.commandPanelWidget.Hide()
 	}
