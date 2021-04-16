@@ -243,7 +243,6 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 		itemCopyItemIDCommand,
 		toggleDemoModeCommand,
 		listSortCommand,
-		itemCopyItemIDCommand,
 	}
 	if settings.EnableTracing {
 		commands = append(commands, listDebugCopyItemDataCommand)
