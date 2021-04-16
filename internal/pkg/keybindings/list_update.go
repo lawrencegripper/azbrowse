@@ -15,6 +15,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/views"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/wsl"
@@ -75,6 +76,13 @@ func (h *ListUpdateHandler) IsEnabled() bool {
 		return false
 	}
 	enable, err := item.Expander.CanUpdate(h.Context, item)
+	if !enable || err != nil {
+		// TODO - make this more extensible/generic, but for now allow swagger expander to handle items (e.g. from resource group expander)
+		enable, err = expanders.GetSwaggerResourceExpander().CanUpdate(h.Context, item)
+		if enable && err == nil {
+			item.Metadata["UpdateWithSwaggerExpander"] = "true"
+		}
+	}
 	return enable && err == nil
 }
 func (h *ListUpdateHandler) Invoke() error {
@@ -218,7 +226,12 @@ func (h *ListUpdateHandler) Invoke() error {
 			Timeout:    time.Duration(time.Second * 30),
 		})
 
-		err = item.Expander.Update(h.Context, item, updatedJSON)
+		expander := item.Expander
+		if _, gotKey := item.Metadata["UpdateWithSwaggerExpander"]; gotKey {
+			expander = expanders.GetSwaggerResourceExpander()
+		}
+
+		err = expander.Update(h.Context, item, updatedJSON)
 		if err != nil {
 			evt.Failure = true
 			evt.Message = evt.Message + " failed: " + err.Error()
