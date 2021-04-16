@@ -20,6 +20,7 @@ import (
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 )
@@ -383,6 +384,9 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 	nodes := []*TreeNode{}
 	for _, document := range list.Documents {
 		document := document.(map[string]interface{})
+		id := document["id"].(string)
+		idWithPartitionKey := id
+		displayText := id
 		partitionKeyValue := ""
 		if partitionKey != "" {
 			// get the partitionKey value for the current document
@@ -394,18 +398,20 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 					SourceDescription: "CosmosDbExpander request",
 				}
 			}
-			partitionKeyValue = fmt.Sprintf("[\"%v\"]", v)
+			vString := fmt.Sprintf("%v", v)
+			partitionKeyValue = fmt.Sprintf("[\"%s\"]", vString)
+			idWithPartitionKey = fmt.Sprintf("%s %s", partitionKeyValue, id)
+			displayText = style.Subtle(vString) + "\n  " + id
 		}
-		id := document["id"].(string)
 		node := TreeNode{
 			Parentid:              item.ID,
-			ID:                    id,
+			ID:                    item.ID + "/" + idWithPartitionKey,
 			Namespace:             "cosmosdb",
-			Name:                  id,
-			Display:               id,
+			Name:                  idWithPartitionKey,
+			Display:               displayText,
 			ItemType:              cosmosdbSQLDocument,
 			ExpandURL:             ExpandURLNotSupported,
-			DeleteURL:             "placeholder",
+			DeleteURL:             item.ID + "/" + idWithPartitionKey,
 			SuppressSwaggerExpand: true,
 			SuppressGenericExpand: true,
 			Metadata: map[string]string{
@@ -414,6 +420,7 @@ func (e *CosmosDbExpander) expandSQLDocumentsCommon(ctx context.Context, item *T
 				"ContainerName":     containerName,
 				"AccountKey":        accountKey,
 				"PartitionKeyValue": partitionKeyValue,
+				"ItemID":            id,
 			},
 		}
 		nodes = append(nodes, &node)
@@ -455,8 +462,9 @@ func (e *CosmosDbExpander) expandSQLDocumentNode(ctx context.Context, item *Tree
 	containerName := item.Metadata["ContainerName"]
 	accountKey := item.Metadata["AccountKey"]
 	partitionKeyValue := item.Metadata["PartitionKeyValue"]
+	itemID := item.Metadata["ItemID"]
 
-	return e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, item.ID)
+	return e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, itemID)
 }
 
 func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string, partitionKeyValue string, id string) ExpanderResult {
@@ -501,6 +509,7 @@ func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode
 	containerName := item.Metadata["ContainerName"]
 	accountKey := item.Metadata["AccountKey"]
 	partitionKeyValue := item.Metadata["PartitionKeyValue"]
+	itemID := item.Metadata["ItemID"]
 
 	headers := map[string]string{}
 
@@ -508,7 +517,7 @@ func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode
 		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
 	}
 
-	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, itemID)
 	response, err := e.doRequestWithHeadersAndBody(ctx, "PUT", accountName, requestURL, accountKey, headers, strings.NewReader(updatedContent))
 	if err != nil {
 		return fmt.Errorf("Error updating documents: %s", err)
@@ -531,6 +540,7 @@ func (e *CosmosDbExpander) deleteSQLDocument(ctx context.Context, item *TreeNode
 	containerName := item.Metadata["ContainerName"]
 	accountKey := item.Metadata["AccountKey"]
 	partitionKeyValue := item.Metadata["PartitionKeyValue"]
+	itemID := item.Metadata["ItemID"]
 
 	headers := map[string]string{}
 
@@ -538,7 +548,7 @@ func (e *CosmosDbExpander) deleteSQLDocument(ctx context.Context, item *TreeNode
 		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
 	}
 
-	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, item.ID)
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, itemID)
 	response, err := e.doRequestWithHeaders(ctx, "DELETE", accountName, requestURL, accountKey, headers)
 	if err != nil {
 		return false, fmt.Errorf("Error getting documents: %s", err)
