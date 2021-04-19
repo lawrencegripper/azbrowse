@@ -22,7 +22,7 @@ how `azbrowse` is written, where stuff is and what we're proud of vs regret!
 
 ## Overview
 
-At it's core `azbrowse` is a `tree` which the user walks. The `root` node uses the `az cli` to discover all 
+As it's core `azbrowse` is a `tree` which the user walks. The `root` node uses the `az cli` to discover all 
 the subscriptions a user has access too. From this point the user can walk down the tree to `resources`, `subresources` and `actions`. 
 
 [![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggVERcbiAgICBBW1Jvb3RdIC0tPiBCKFN1YnNjcmlwdGlvbnMpXG4gICAgQiAtLT4gQyhSZXNvdXJjZSBHcm91cHMpXG4gICAgQyAtLT58UmVzb3VyY2UgRXhwYW5kZXJ8IERbU3RvcmFnZSBBY2NvdW50IFhZXVxuICAgIEMgLS0-fFJlc291cmNlIEV4cGFuZGVyfCBGW1NlcnZpY2VCdXMgQWNjb3VudCBaWF1cbiAgICBDIC0tPnxBZGRpdGlvbmFsIEV4cGFuZGVyfCBHW01ldHJpY3MgWlhdXG4gICAgRCAtLT58QWN0aW9ufCBIW2xpc3RLZXlzXVxuICAgIEQgLS0-fEFjdGlvbnwgWVtyZWdlbmVyYXRlS2V5c10iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)](https://mermaid-js.github.io/mermaid-live-editor/#/edit/eyJjb2RlIjoiZ3JhcGggVERcbiAgICBBW1Jvb3RdIC0tPiBCKFN1YnNjcmlwdGlvbnMpXG4gICAgQiAtLT4gQyhSZXNvdXJjZSBHcm91cHMpXG4gICAgQyAtLT58UmVzb3VyY2UgRXhwYW5kZXJ8IERbU3RvcmFnZSBBY2NvdW50IFhZXVxuICAgIEMgLS0-fFJlc291cmNlIEV4cGFuZGVyfCBGW1NlcnZpY2VCdXMgQWNjb3VudCBaWF1cbiAgICBDIC0tPnxBZGRpdGlvbmFsIEV4cGFuZGVyfCBHW01ldHJpY3MgWlhdXG4gICAgRCAtLT58QWN0aW9ufCBIW2xpc3RLZXlzXVxuICAgIEQgLS0-fEFjdGlvbnwgWVtyZWdlbmVyYXRlS2V5c10iLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlfQ)
@@ -33,20 +33,20 @@ An `ExpanderResult` contains the content to display in the `itemView` and also `
 
 Everything gets started in `cmd/azbrowse/cmd.go`
 
-## Style/Qwerks
+## Style/Quirks
 
 1. Lots of strings are composed in the code. The `+` concat style is preferred throughout the codebase over `fmt` and `%s` as it was my (Lawrence) preference as I believe it's more readable when things started out with `go 1.13`.
 1. The `Status` notifications are an overly complex `pub/sub` system that I'd not use if I had a do-over. I'll cover this later in the doc.
 
-... Probably more 
+... Probably more. 
 
 ## Talking to Azure
 
-When talking to Azure in `azbrowse` you'll use the `armclient` helpers.
+For connecting to Azure API's in `azbrowse` you'll use the `armclient` helpers.
 
 Early on we made a choice **not** to use the Golang SDK for Azure. 
 
-Instead we talk directly to the API's of 
+Instead, we talk directly to the API's of 
 the individual [`resourceProviders`](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types) using the code in [`armclient`](../../pkg/armclient).
 
 Using the REST methods directly via the helpers in `armclient` allows us to do the following:
@@ -112,9 +112,9 @@ Simple expanders may use a little as the following to construct a `treeNode` ins
 		}
 ```
 
-A more complex example would be the `metrics` expander. This constructs a complex `ExpandURL` while also suporessing other expanders for `Swagger` and `DefaultExpander`. 
+A more complex example would be the `metrics` expander. This constructs a complex `ExpandURL` while also suppressing other expanders for `Swagger` and `DefaultExpander`. 
 
-Another interesting case here is the use of `Metadata` map, this allows expanders to store arbritrary data which they, or another expander, can reuse when expanding the item (see `internal/pkg/expanders/metrics.go` for full code). 
+Another interesting case here is the use of `Metadata` map, this allows expanders to store arbitrary data which they, or another expander, can reuse when expanding the item (see `internal/pkg/expanders/metrics.go` for full code). 
 
 ```go
 &TreeNode{
@@ -184,15 +184,15 @@ type Expander interface {
 ```
 
 A good example of a simple expander is the `TenantExpander` at `internal/pkg/expanders/tentant.go`. It uses `armclient` to request
-a list of subscriptions for to show the user via the `/subscriptions` Azure REST call. The response is deserialised into a 
+a list of subscriptions for to show the user via the `/subscriptions` Azure REST call. The response is deserialized into a 
 go struct for ease and then the list items to show (one for each subscription) are created as `TreeNode`'s. The response
 content is set to the API response as JSON or the error received from the call.
 
 ### APISets
 
-The `SwaggerResourceExpander` is used to drill down within resources. It works against `SwaggerAPISet`s which provide the swagger metadata as well as encapsulating access to the the endpoints identified in the metadata.
+The `SwaggerResourceExpander` is used to drill down within resources. It works against `SwaggerAPISet`s which provide the swagger metadata as well as encapsulating access to the endpoints identified in the metadata.
 
-The default API Set is `SwaggerAPISetARMResources` which is based on code generated at build time via `make swagger-codegen`. The swagger codegen process loads all of the manamgement plane swagger documents published on GitHub and builds a hierarchy based on the URLs. This is then distilled down into a slightly simpler format based around the `ResourceType` struct. Access to the endpoints in `SwaggerAPISetARMResources` is performed by the `armclient` which piggy-backs on the authentication from the Azure CLI.
+The default API Set is `SwaggerAPISetARMResources` which is based on code generated at build time via `make swagger-codegen`. The swagger codegen process loads all the management plane swagger documents published on GitHub and builds a hierarchy based on the URLs. This is then distilled down into a slightly simpler format based around the `ResourceType` struct. Access to the endpoints in `SwaggerAPISetARMResources` is performed by the `armclient` which piggy-backs on the authentication from the Azure CLI.
 
 Other API Sets can be registered and currently containerService and search are two examples. The Azure Search API Set also uses a `ResourceType` hierarchy generated at build time, but it is dynamically registered with the `SwaggerResourceExpander` when the user expands the "Search Service" node (added by the `AzureSearchServiceExpander`). The API Set instance that is registered at that point has the credentials for authenticating to that specific instance of the Azure Search Service.
 
@@ -207,14 +207,14 @@ Issuing `PUT`/`DELETE` requests requires the same authentication as `GET` reques
 It does the following:
 1. Use `getRegisteredExpanders` to find all expanders
 1. Check which expanders are relevant for the `TreeNode` provided using `DoesExpand` on each expander
-1. Starts a go routine to call `Expand` asyncronously on each expander which indicated it could expand the item. Results are sent to a go Channel on completion as an `ExpanderResult` see `internal/pkg/expanders/types.go`
+1. Starts a go routine to call `Expand` asynchronously on each expander which indicated it could expand the item. Results are sent to a go channel on completion as an `ExpanderResult` see `internal/pkg/expanders/types.go`
 1. A timeout is also started to ensure we don't block on a single expander while others have responded
-1. Responses are collected from all expanders, by pulling from the go Channel and returned
+1. Responses are collected from all expanders, by pulling from the go channel and returned
 1. If `AllowDefaultExpander: true` the `DefaultExpander` is used which attempts to make a `GET` request to the `TreeNodes`'s ID. See `internal/pkg/expanders/default.go`
 
 ## Key bindings
 
-Key bindings are initialised in the `setupViewsAndKeybindings` function in `main.go`. Each binding is registered via the `keybindings.AddHandler` function and subsequently bound through the `keybindings.Bind` function.
+Key bindings are initialized in the `setupViewsAndKeybindings` function in `main.go`. Each binding is registered via the `keybindings.AddHandler` function and subsequently bound through the `keybindings.Bind` function.
 
 Handlers implement the `KeyHandler` interface which specifies an ID, an implementation to invoke, the widget that the binding is scoped to, and the default key.
 
@@ -236,7 +236,7 @@ This is one of the more complex views in the system, it:
 - Keeps a `navStack` which is a first-in first-out history used to go back to previous pages without reloading all items (it tracks the `content` and `TreeNode[]` of the previous items)
 - Allows `more ...` style behaviour to incrementally load more items to the list. This is used the `storage` data-plane for when a `container` holds lots of items
 - Handles `filtering` items in the list
-- Keeps track of the currently selected item and adds the `>` indicator to that item as `up/down` are pressed.
+- Tracks the currently selected item and adds the `>` indicator to that item as `up/down` are pressed.
 
 ### `itemView`
 
@@ -244,7 +244,7 @@ This view provides the main right-hand output panel displaying the `json`/`yaml`
 
 It has methods for `GetContent` and `SetContent` for example. 
 
-One of it's responsibilities is to add formatting and highlighting to the the content. 
+One of its responsibilities is to add formatting and highlighting to the content. 
 
 The content is provided to the views from the [`ExpanderResult`](../../internal/pkg/expanders/types.go) which is produced by the `expanders` we discussed in the sections above.
 
@@ -253,7 +253,7 @@ to return a reference to the currently displayed `TreeNode` or `CurrentItem`.
 
 ### `commandPanel`
 
-This view is the overlayed command panel (inspired by the CTRL+P panel in VSCode) which allows for more complex
+This view is the overlaid command panel (inspired by the CTRL+P panel in VSCode) which allows for more complex
 interactions with the UI. 
 
 For example, typing `/` opens the panel and then the user can type text and the `listView` will filter to only
@@ -266,15 +266,15 @@ select to invoke.
 
 This view handles the optional top-right notifications. 
 
-It is used to display pending delete's (resources queued for delete but not yet actioned) alongside 
-`toast` style notifications, for example, deletes that have been actioned and we're tracking their
+It is used to display pending deletes (resources queued for delete but not yet actioned) alongside 
+`toast` style notifications, for example, deletes that have been actioned, and we're tracking their
 async completion.
 
-The delete functionaility has taken over this view, the aim was to be generalised but it's more specific currently. Methods
+The delete functionality has taken over this view, the aim was to be generalized, but it's more specific currently. Methods
 for `AddPendingDelete` and `ConfirmDelete` handling logic for deleting items.
 
-Generalised `toast` notifications are driven by events sent via `internal/pkg/eventing/eventing.go` package `IsToast: true`. 
-Currently I'm not aware of this being used anywhere so it may not function correctly.
+Generalized `toast` notifications are driven by events sent via `internal/pkg/eventing/eventing.go` package `IsToast: true`. 
+Currently, I'm not aware of this being used anywhere, so it may not function correctly.
 
 ### `statusbar`
 
@@ -282,12 +282,12 @@ This view shows status messages along the bottom of the view.
 
 It listens to a `pub/sub` style bus of messages published by the `internal/pkg/eventing/eventing.go` package. 
 
-Each message has a `ttl`, `status` etc. It translates these to displayed text color, icons and ensures
+Each message has a `ttl`, `status` etc. It translates these to displayed text colour, icons and ensures
 they're displayed for the correct amount of time. 
 
 ### `help`
 
-This is the simplist view it shows the help for which keys do what.
+This is the simplest view it shows the help for which keys do what.
 
 ## Status and Notifications (and a bit of recovery/automation package)
 
@@ -361,7 +361,7 @@ As part of this autocomplete functions are added which do the following:
 1. `subscriptionAutocompletion` allows `--subscription stuff<TAB>` --> `--subscription stuffAndThingsSub`
 1. `navigateAutocompletion` allows `--navigate /subscription/GUID/resourceg<TAB>` to autocomplete to a resource
 
-To ensure that autocomplete is quick results are cached using the `internal/pkg/storage/store.go` key vault store which also provides a rough `TTL` based expirey (it's a hack - go look ... it works but I'm not proud of it).
+To ensure that autocomplete is quick results are cached using the `internal/pkg/storage/store.go` key vault store which also provides a rough `TTL` based expirey (it's a hack - go look ... it works, but I'm not proud of it).
 
 ## Release and Updating
 
