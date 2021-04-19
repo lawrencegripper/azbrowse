@@ -18,7 +18,7 @@ import (
 type Expander interface {
 	DoesExpand(ctx context.Context, currentNode *TreeNode) (bool, error)
 	Expand(ctx context.Context, currentNode *TreeNode) ExpanderResult
-	Name() string
+	Name() string // Returns the name of this expander for logging (ie. TenantExpander)
 	Delete(context context.Context, item *TreeNode) (bool, error)
 
 	HasActions(ctx context.Context, currentNode *TreeNode) (bool, error)

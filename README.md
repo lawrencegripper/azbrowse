@@ -11,9 +11,9 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 
 This is a pet project which has matured thanks to support from awesome contributions.
 
-Currently I'm using it every day **but it is experimental so use with caution on a production environment!!**
+[![asciicast](https://asciinema.org/a/325237.svg)](https://asciinema.org/a/325237)
 
-![Demo](./docs/images/quickdemo-azbrowse.gif)
+> Warning: This is experimental, please familiarize yourself with the code and the how-to's before using it in a production environment.
 
 # Cool what else can it do?
 
@@ -23,11 +23,14 @@ Lots [check out the guided tour here](docs/getting-started.md).
 - Multi-resource delete
 - Actions on resources such as restart and list-keys
 - ASCII Graphs for resource metrics
-- Interactice command panel for filtering and more
+- Interactive command panel for filtering and more
 - [Experimental fuse filesystem mount for Azure API](docs/azfs-intro.md)
 
 For advanced [config review the settings page here](docs/config.md). For [command line arguments and docs see this page](./docs/commandline/azbrowse.md).
 
+## Contributing
+
+Take a look at the guide here [for a guide on the design of azbrowse](docs/design/README.md) and then a look here [for how to get started on deving](CONTRIBUTING.md)
 
 ## Install/Run
 
@@ -82,7 +85,7 @@ docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrence
     <summary>Linux via Releases tar.gz</summary> 
 <br />
 
-Grab the url to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
+Grab the URL to the `.tar.gz` for the latest release for your platform/architecture. E.g. `https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`
 
 Download the release (either via the browser or `wget https://github.com/lawrencegripper/azbrowse/releases/download/v1.1.193/azbrowse_linux_amd64.tar.gz`).
 
@@ -97,7 +100,7 @@ Make the binary executable: `chmod +x /usr/bin/azbrowse`
     <summary>Install via azure-cli extention</summary>
 <br />
 
-This is experimental and Non-functional on Windows. Only tested on Unix based systems
+This is experimental and Non-functional on Windows. Only tested on Unix based systems.
 
 Want to run `az browse` and have the `azure-cli` install and run `azbrowse`?
 
@@ -119,7 +122,7 @@ Azbrowse can generate shell completions for a number of different shells using t
 
 For example, `azbrowse -s thing<TAB>` -> `azbrowse -s thingSubscription` and jump straight to that Azure subscription.
 
-For example, to configure compltion in bash add the following to `~/.bashrc` or `~/.profile`
+For example, to configure completion in bash add the following to `~/.bashrc` or `~/.profile`
 
 ```bash
 source <(azbrowse completion bash)
@@ -131,7 +134,7 @@ See the [docs](docs/README.md) for getting started guides, configuration docs, .
 
 ## Plans
 
-[Issues on the repository track plans](https://github.com/lawrencegripper/azbrowse/issues), I'd love help so feel free to comment on an issue you'd like to work on and we'll go from there.
+[Issues on the repository track plans](https://github.com/lawrencegripper/azbrowse/issues), I'd love help so feel free to comment on an issue you'd like to work.
 
 [golang]: https://golang.org/
 [installguide]: https://golang.org/doc/install
