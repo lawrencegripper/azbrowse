@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/awesome-gocui/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
@@ -32,6 +33,8 @@ type ListWidget struct {
 	// To avoid blocking the "UI" thread opening items is done in a go routine. This lock prevents duplicates.
 	navLock      sync.Mutex
 	isNavigating bool
+	refreshLock  sync.Mutex
+	isRefreshing bool
 }
 
 // ListNavigatedEventState captures the state when raising a `list.navigated` event
@@ -200,10 +203,22 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 
 // Refresh refreshes the current view
 func (w *ListWidget) Refresh() {
-	done := w.statusView.Status("Refreshing", true)
-	defer done()
 
+	if w.isRefreshing {
+		// already refreshing!
+		return
+	}
+	w.refreshLock.Lock()
+	if w.isRefreshing {
+		return
+	}
+	// Mark refresh as in-progress and disable UI update
+	w.isRefreshing = true
+	w.SetShouldRender(false)
+
+	currentExpandedItem := w.CurrentExpandedItem()
 	currentSelection := w.CurrentSelection()
+	done := w.statusView.Status("Refreshing", true)
 
 	// capture current state
 	sorted := false
@@ -219,19 +234,33 @@ func (w *ListWidget) Refresh() {
 	}
 
 	w.GoBack()
-	w.ExpandCurrentSelection()
+	w.expandItem(currentExpandedItem)
 
-	w.ChangeSelection(currentSelection)
+	// wait for navigation before resetting previous selection
+	go func() {
+		defer errorhandling.RecoveryWithCleanup()
+		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
+		<-navigatedChannel
+		eventing.Unsubscribe(navigatedChannel)
 
-	w.ClearFilter()
+		w.ChangeSelection(currentSelection)
 
-	// reapply state
-	if sorted {
-		w.SortItems()
-	}
-	if filterString != "" {
-		w.SetFilter(filterString)
-	}
+		w.ClearFilter()
+
+		// reapply state
+		if sorted {
+			w.SortItems()
+		}
+		if filterString != "" {
+			w.SetFilter(filterString)
+		}
+
+		// Clear isRefreshing and re-enable UI updates
+		w.SetShouldRender(true)
+		w.isRefreshing = false
+		w.refreshLock.Unlock()
+		done()
+	}()
 }
 
 // GoBack takes the user back to preview view
@@ -268,6 +297,11 @@ func (w *ListWidget) GoBack() {
 
 // ExpandCurrentSelection opens the resource Sub->RG for example
 func (w *ListWidget) ExpandCurrentSelection() {
+	w.expandItem(w.CurrentItem())
+}
+
+// expandItem opens the specified resource Sub->RG for example
+func (w *ListWidget) expandItem(item *expanders.TreeNode) {
 	if w.isNavigating {
 		// Skip if a navigation is already in progress
 		return
@@ -284,18 +318,16 @@ func (w *ListWidget) ExpandCurrentSelection() {
 		suppressPreviousTitle = true
 	}
 
-	currentItem := w.CurrentItem()
+	newTitle := item.Name
 
-	newTitle := currentItem.Name
-
-	eventing.Publish("list.prenavigate", currentItem.ID)
+	eventing.Publish("list.prenavigate", item.ID)
 
 	go func() {
 		defer func() {
 			w.isNavigating = false
 			w.navLock.Unlock()
 		}()
-		newContent, newItems, err := expanders.ExpandItem(w.ctx, currentItem)
+		newContent, newItems, err := expanders.ExpandItem(w.ctx, item)
 		if err != nil { // Don't need to display error as expander emits status event on error
 			// Set parameters to trigger non-successful `list.navigated` event
 			newItems = []*expanders.TreeNode{}
