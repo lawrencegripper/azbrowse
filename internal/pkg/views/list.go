@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/awesome-gocui/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
@@ -237,6 +238,7 @@ func (w *ListWidget) Refresh() {
 
 	// wait for navigation before resetting previous selection
 	go func() {
+		defer errorhandling.RecoveryWithCleanup()
 		navigatedChannel := eventing.SubscribeToTopic("list.navigated")
 		<-navigatedChannel
 		eventing.Unsubscribe(navigatedChannel)
