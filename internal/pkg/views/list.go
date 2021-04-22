@@ -14,6 +14,14 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 )
 
+// hitbox is used to enable mouse support on the list
+// it tracks which item is drawn on which lines in the list
+type hitbox struct {
+	start     int
+	end       int
+	itemIndex int
+}
+
 // ListWidget hosts the left panel showing resources and controls the navigation
 type ListWidget struct {
 	x, y int
@@ -30,6 +38,7 @@ type ListWidget struct {
 	lastTopIndex         int
 	shouldRender         bool
 	lastCalculatedHeight int
+	hitBoxes             []hitbox
 	// To avoid blocking the "UI" thread opening items is done in a go routine. This lock prevents duplicates.
 	navLock      sync.Mutex
 	isNavigating bool
@@ -137,6 +146,12 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		renderedItems = append(renderedItems, style.Separator("  ---\n"))
 
 		for i, s := range w.itemsToShow() {
+			// Calculate the start and end line of this item
+			// this is used to translate the x,y of a mouse click
+			// into an item index to expand
+			itemHitbox := hitbox{
+				start: linesUsedCount,
+			}
 			var itemToShow string
 			if i == w.currentPage.Selection {
 				itemToShow = "▶ "
@@ -147,7 +162,10 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 			itemToShow = itemToShow + highlightText(s.Display, w.currentPage.FilterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 			linesUsedCount += strings.Count(itemToShow, "\n")
+			itemHitbox.end = linesUsedCount
+			itemHitbox.itemIndex = i
 			renderedItems = append(renderedItems, itemToShow)
+			w.hitBoxes = append(w.hitBoxes, itemHitbox)
 		}
 
 		linesPerItem := linesUsedCount / w.itemCount()
@@ -199,6 +217,17 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	}
 
 	return nil
+}
+
+func (w *ListWidget) MouseClick(x, y int) {
+	// Currently mouse is only bound to this view so don't have to worry about
+	// the x coordinate being inside the view, just which item y is over
+	for _, item := range w.hitBoxes {
+		if y >= item.start && y <= item.end {
+			w.ChangeSelection(item.itemIndex)
+			w.ExpandCurrentSelection()
+		}
+	}
 }
 
 // Refresh refreshes the current view

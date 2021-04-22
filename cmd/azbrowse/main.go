@@ -91,6 +91,7 @@ func run(settings *config.Settings) {
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorCyan
 	g.InputEsc = true
+	g.Mouse = true
 
 	// Create the views we'll use to display information and
 	// bind up all the keys use to interact with the views
@@ -111,6 +112,16 @@ func run(settings *config.Settings) {
 
 	if settings.FuzzerEnabled {
 		automation.StartAutomatedFuzzer(list, settings, g)
+	}
+
+	// Enable mouse support for the list view
+	handleClick := func(g *gocui.Gui, v *gocui.View) error {
+		x, y := v.Cursor()
+		list.MouseClick(x, y)
+		return nil
+	}
+	if err := g.SetKeybinding("listWidget", gocui.MouseLeft, gocui.ModNone, handleClick); err != nil {
+		panic(err)
 	}
 
 	// Close the span used to track startup times
