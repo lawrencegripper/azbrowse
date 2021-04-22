@@ -7,4 +7,6 @@ if [ -z ${IS_CI} ]; then
 else 
     echo "Docker login:"
     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    echo "Docker login ghcr:"
+    echo $GITHUB_TOKEN | docker login ghcr.io --username $DOCKER_USERNAME --password-stdin
 fi

@@ -26,6 +26,7 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         IS_CI: 1
+        GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
 
     - name: Build the Docker image, run tests and publish(on master only)
       run: sudo -E make devcontainer-release
