@@ -30,8 +30,10 @@ else
     echo "On main setting PUBLISH=true"
     export PUBLISH=true
     
-    echo "Docker login"
+    echo "Docker login dockerhub"
     echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+    echo "Docker login ghcr"
+    echo $GITHUB_TOKEN | docker login ghcr.io --username $DOCKER_USERNAME --password-stdin
 
     echo "Snapcraft Login"
     echo $SNAPCRAFT_LOGIN | base64 -d > snap.login

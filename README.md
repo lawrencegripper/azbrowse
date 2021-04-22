@@ -70,7 +70,7 @@ scoop install azbrowse
 You can then start `azbrowse` in docker by mounting in your `$HOME` directory so `azbrowse` can access the login details from your machine inside the docker container.
 
 ```shell
-docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro lawrencegripper/azbrowse
+docker run -it --rm -v $HOME:/root/ -v /etc/localtime:/etc/localtime:ro ghcr.io/lawrencegripper/azbrowse/azbrowse
 ```
 </details>
 <details>
