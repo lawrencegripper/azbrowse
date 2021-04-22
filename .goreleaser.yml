@@ -45,6 +45,9 @@ dockers:
       - azbrowse
     # Templates of the Docker image names.
     image_templates:
+      - "ghcr.io/lawrencegripper/azbrowse/azbrowse:latest"
+      - "ghcr.io/lawrencegripper/azbrowse/azbrowse:{{ .Tag }}"
+      - "ghcr.io/lawrencegripper/azbrowse/azbrowse:v{{ .Major }}"
       - "lawrencegripper/azbrowse:latest"
       - "lawrencegripper/azbrowse:{{ .Tag }}"
       - "lawrencegripper/azbrowse:v{{ .Major }}"

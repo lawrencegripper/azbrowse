@@ -1,4 +1,4 @@
-FROM lawrencegripper/azbrowse-snapbase:latest as builder
+FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
@@ -126,3 +126,5 @@ RUN \
     && curl -sSL -o /tmp/docker-downloads/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
     && unzip /tmp/docker-downloads/terraform.zip \
     && mv terraform /usr/local/bin
+
+LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse

@@ -1,5 +1,5 @@
-DEV_CONTAINER_TAG:=lawrencegripper/azbrowsedevcontainer:latest
-DEV_CONTAINER_SNAPBASE_TAG:=lawrencegripper/azbrowse-snapbase:latest
+DEV_CONTAINER_TAG:=ghcr.io/lawrencegripper/azbrowse/devcontainer:latest
+DEV_CONTAINER_SNAPBASE_TAG:=ghcr.io/lawrencegripper/azbrowse/snapbase:latest
 -include .env
 
 # Used to override with richgo for colorized test output
