@@ -128,3 +128,7 @@ RUN \
     && mv terraform /usr/local/bin
 
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
+
+# Install ruby 
+COPY ./ruby.sh /tmp/ruby.sh
+RUN bash /tmp/ruby.sh "3.0.1"
