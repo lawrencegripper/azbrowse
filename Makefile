@@ -202,7 +202,7 @@ endif
 		--entrypoint /bin/bash \
 		--workdir "${PWD}" \
 		-t $(DEV_CONTAINER_TAG) \
-		-c "${PWD}/scripts/ci_release.sh"
+		-c bash -f "${PWD}/scripts/release.rb"
 		
 
 asfs-build:
