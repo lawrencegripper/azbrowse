@@ -32,14 +32,18 @@ end
 printHeader("Setup - Checking things good to create a release")
 
 required_envs = {
-  'docker_username' => 'DOCKER_USERNAME',
-  'docker_password' => 'DOCKER_PASSWORD',
-  # 'GITHUB_TOKEN', 'IS_CI', 'BRANCH'
+  # 'docker_username' => 'DOCKER_USERNAME',
+  # 'docker_password' => 'DOCKER_PASSWORD',
+  # 'github_token' => 'GITHUB_TOKEN',
+  'is_ci' => 'IS_CI',
+  'branch' => 'BRANCH',
 }
 required_envs.each do |var_name, env_name|
   exitWithError "Missing required ENV #{env_name}" if not ENV[env_name]
   instance_variable_set("@#{var_name}", ENV[env_name])
 end
+
+puts @is_ci
 
 is_release = ENV["BUILD_NUMBER"]
 if is_release == nil
