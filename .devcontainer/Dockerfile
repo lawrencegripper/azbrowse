@@ -128,3 +128,6 @@ RUN \
     && mv terraform /usr/local/bin
 
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
+
+# Install ruby bunder gem to support inline gems in ruby scripts
+RUN gem install bundler

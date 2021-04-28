@@ -50,7 +50,7 @@ required_envs = {
   'build_number': 'BUILD_NUMBER',
 }
 required_envs.each do |var_name, env_name|
-  exitWithError "Missing required ENV #{env_name}" if not ENV[env_name]
+  exitWithError "Missing required ENV #{env_name}" if ENV[env_name] == "" or ENV[env_name] == nil
   instance_variable_set("@#{var_name}", ENV[env_name])
 end
 

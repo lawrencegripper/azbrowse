@@ -199,10 +199,9 @@ endif
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--privileged \
 		--device /dev/fuse \
-		--entrypoint /bin/bash \
 		--workdir "${PWD}" \
-		-t $(DEV_CONTAINER_TAG) \
-		-c ruby ${PWD}/scripts/release.rb
+		$(DEV_CONTAINER_TAG) \
+		ruby ${PWD}/scripts/release.rb
 		
 
 asfs-build:
