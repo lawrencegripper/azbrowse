@@ -22,7 +22,7 @@ def printHeader(title)
   puts ""
 end
 
-def checkGitHasNoChanges(errorToShowIfChanges)
+def checkGitHasNoChanges(git_instance, errorToShowIfChanges)
   if git_instance.status.changed.count > 0
     git_instance.status.changed.keys {|key| puts "Changes in file #{key}" }
     exitWithError errorToShowIfChanges
@@ -96,11 +96,11 @@ git_instance.add_tag(tag)
 
 printHeader('Build, lint and codegen')
 puts `make ci`
-checkGitHasNoChanges('Codegen caused changes to files. Run "make swagger-codegen" and commit the results to resolve this issue')
+checkGitHasNoChanges(git_instance, 'Codegen caused changes to files. Run "make swagger-codegen" and commit the results to resolve this issue')
 
 printHeader('Generate docs')
 executeCommand "make docs-update"
-checkGitHasNoChanges('Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
+checkGitHasNoChanges(git_instance, 'Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
 
 printHeader('Run integration tests')
 executeCommand "./scripts/ci_integration_tests.sh"
