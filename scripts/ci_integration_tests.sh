@@ -3,6 +3,13 @@ set -e
 
 cd `dirname $0`
 
+Xvfb :99 -ac -screen 0 "$XVFB_RES" -nolisten tcp $XVFB_ARGS &
+XVFB_PROC=$!
+sleep 1
+export DISPLAY=:99
+exitcodefile=$(mktemp)
+logfile=$(mktemp)
+
 echo "Run make integration in Xterm"
 xterm -e sh -c 'make integration > '"$logfile"'; echo $? > '"$exitcodefile"
 echo "Tests finished"
