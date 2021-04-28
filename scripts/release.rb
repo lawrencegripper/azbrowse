@@ -9,7 +9,6 @@ gemfile do
   gem 'docker-api'
 end
 
-require 'simple_cli'
 require 'colorize'
 
 def printHeader(title)
@@ -36,19 +35,19 @@ def exitWithError(error)
 end
 
 # Move to the root of the repo
-repo_root = File.dirname(FILE)
+repo_root = File.dirname(__FILE__)
 Dir.chdir "#{repo_root}/../"
 
 printHeader("Setup - Checking things good to create a release")
 
 required_envs = {
-  'docker_username' => 'DOCKER_USERNAME',
-  'docker_password' => 'DOCKER_PASSWORD',
-  'github_token' => 'GITHUB_TOKEN',
-  'snapcraft_login' => 'SNAPCRAFT_LOGIN'
-  'is_ci' => 'IS_CI',
-  'branch' => 'BRANCH',
-  'build_number' => 'BUILD_NUMBER',
+  'docker_username': 'DOCKER_USERNAME',
+  'docker_password': 'DOCKER_PASSWORD',
+  'github_token': 'GITHUB_TOKEN',
+  'snapcraft_login': 'SNAPCRAFT_LOGIN',
+  'is_ci': 'IS_CI',
+  'branch': 'BRANCH',
+  'build_number': 'BUILD_NUMBER',
 }
 required_envs.each do |var_name, env_name|
   exitWithError "Missing required ENV #{env_name}" if not ENV[env_name]
