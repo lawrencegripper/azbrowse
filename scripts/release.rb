@@ -71,11 +71,11 @@ puts "Branch: #{@branch}"
 # By default don't publish build output
 publish_build_output = false
 
-if @is_ci and branch == "/refs/heads/main"
+if @is_ci and @branch == "/refs/heads/main"
   publish_build_output = true
   puts "Login to docker".colorize(:blue)
-  Docker.authenticate!('username' => ENV['DOCKER_USER'], 'password' => ENV['DOCKER_PASSWORD'])
-  Docker.authenticate!('serveraddress' => 'ghcr.io', 'username' => ENV['DOCKER_USER'], 'password' => ENV['GITHUB_TOKEN'])
+  Docker.authenticate!('username' => @docker_username, 'password' => @docker_password)
+  Docker.authenticate!('serveraddress' => 'ghcr.io', 'username' => @docker_username, 'password' => @github_token)
   
   puts "Login to snapcraft".colorize(:blue)
   executeCommand " 
@@ -130,4 +130,5 @@ rescue Exception => e
   puts "Failure details:"
   puts e.message
   puts e.backtrace.inspect
+  exit(1)
 end
