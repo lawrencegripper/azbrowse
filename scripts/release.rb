@@ -31,10 +31,18 @@ end
 
 def exitWithError(error)
   puts "Failed #{error}".colorize(:color => :white, :background => :red)
-  puts ""
-  exit(1)
+  raise error
 end
 
+def executeCommand(command)
+  `#{command}`
+  if not $?.success?
+    puts "Failed".colorize(:color => :white, :background => :red)
+    raise "Command '#{command}' failed to execute"
+  end
+end
+
+begin
 # Move to the root of the repo
 script_root = File.dirname(__FILE__)
 repo_root = "#{script_root}/../"
@@ -70,12 +78,12 @@ if @is_ci and branch == "/refs/heads/main"
   Docker.authenticate!('serveraddress' => 'ghcr.io', 'username' => ENV['DOCKER_USER'], 'password' => ENV['GITHUB_TOKEN'])
   
   puts "Login to snapcraft".colorize(:blue)
-  puts ` 
+  executeCommand " 
     echo $SNAPCRAFT_LOGIN | base64 -d > snap.login
     snapcraft login --with snap.login
     # cleanup login file
     rm snap.login
-  `
+  "
 else
   puts "Skipping publish as either not CI or branch != main"
 end
@@ -91,18 +99,18 @@ puts `make ci`
 checkGitHasNoChanges('Codegen caused changes to files. Run "make swagger-codegen" and commit the results to resolve this issue')
 
 printHeader('Generate docs')
-`make docs-update`
+executeCommand "make docs-update"
 checkGitHasNoChanges('Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
 
 printHeader('Run integration tests')
-`./scripts/ci_integration_tests.sh`
+executeCommand "./scripts/ci_integration_tests.sh"
 
 printHeader('Run goreleaser')
 if publish_build_output 
-  puts `goreleaser --skip-publish --rm-dist`
+  executeCommand "goreleaser --skip-publish --rm-dist"
 else
   puts `goreleaser`
-  docker push "$DEV_CONTAINER_TAG"
+  executeCommand "docker push \"$DEV_CONTAINER_TAG\""
 end
 
 # Push up built output for the devcontainer if we're on main
@@ -117,3 +125,9 @@ devcontainer_images.each do |image_name|
   end
 end
 
+rescue Exception => e
+  puts ""
+  puts "Failure details:"
+  puts e.message
+  puts e.backtrace.inspect
+end
