@@ -36,6 +36,6 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
         BUILD_NUMBER: ${{ github.run_id }}
-        IS_CI: 1
+        IS_CI: true
         IS_PR: ${{ github.head_ref }}
         BRANCH: ${{ github.ref }}
