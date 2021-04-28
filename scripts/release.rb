@@ -31,12 +31,14 @@ end
 
 def exitWithError(error)
   puts "Failed #{error}".colorize(:color => :white, :background => :red)
+  puts ""
   exit(1)
 end
 
 # Move to the root of the repo
-repo_root = File.dirname(__FILE__)
-Dir.chdir "#{repo_root}/../"
+script_root = File.dirname(__FILE__)
+repo_root = "#{script_root}/../"
+Dir.chdir repo_root
 
 printHeader("Setup - Checking things good to create a release")
 
@@ -64,7 +66,7 @@ publish_build_output = false
 if @is_ci and branch == "/refs/heads/main"
   publish_build_output = true
   puts "Login to docker".colorize(:blue)
-  Docker.authenticate!('username' => ENV['DOCKER_USER'], 'password' => ENV['DOCKER_PASSWWORD'])
+  Docker.authenticate!('username' => ENV['DOCKER_USER'], 'password' => ENV['DOCKER_PASSWORD'])
   Docker.authenticate!('serveraddress' => 'ghcr.io', 'username' => ENV['DOCKER_USER'], 'password' => ENV['GITHUB_TOKEN'])
   
   puts "Login to snapcraft".colorize(:blue)
@@ -75,7 +77,7 @@ if @is_ci and branch == "/refs/heads/main"
     rm snap.login
   `
 else
-  put "Skipping publish as either not CI or branch != main"
+  puts "Skipping publish as either not CI or branch != main"
 end
 
 printHeader('Git - Create tag for release')

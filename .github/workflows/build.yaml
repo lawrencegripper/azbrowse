@@ -25,7 +25,7 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        IS_CI: 1
+        IS_CI: true
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
 
     - name: Build the Docker image, run tests and publish(on master only)
