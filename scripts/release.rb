@@ -115,7 +115,7 @@ begin
 
   if publish_build_output
     print_header('Run goreleaser: Publish')
-    execute_command 'docker push "$DEV_CONTAINER_TAG"'
+    execute_command 'goreleaser'
   else
     print_header('Run goreleaser: Dry run')
     execute_command 'goreleaser --skip-publish --rm-dist'
