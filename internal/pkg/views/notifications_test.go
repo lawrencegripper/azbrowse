@@ -14,11 +14,7 @@ import (
 )
 
 func Test_Delete_AddPendingDelete(t *testing.T) {
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
-	g, err := gocui.NewGui(gocui.Output256, false)
+	g, err := gocui.NewGui(gocui.OutputSimulator, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -55,11 +51,6 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 }
 
 func Test_Delete_MessageSent(t *testing.T) {
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
-
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -78,7 +69,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 	expanders.InitializeExpanders(client, nil, nil, nil)
 
-	g, err := gocui.NewGui(gocui.Output256, false)
+	g, err := gocui.NewGui(gocui.OutputSimulator, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -101,10 +92,6 @@ func Test_Delete_MessageSent(t *testing.T) {
 }
 
 func Test_Delete_StopAfterFailure(t *testing.T) {
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
 
@@ -120,7 +107,7 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
-	g, err := gocui.NewGui(gocui.Output256, false)
+	g, err := gocui.NewGui(gocui.OutputSimulator, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -141,11 +128,6 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 }
 
 func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
-
 	// Wait for the last test to clear down
 	// Todo: This needs to be fixed. The ARMClient should be moved to a
 	// struct and not package level methods.
@@ -163,7 +145,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
-	g, err := gocui.NewGui(gocui.Output256, false)
+	g, err := gocui.NewGui(gocui.OutputSimulator, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -184,11 +166,6 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 }
 
 func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
-	if testing.Short() {
-		t.Log("Skipping integration test")
-		return
-	}
-
 	// Wait for the last test to clear down
 	// Todo: This needs to be fixed. The ARMClient should be moved to a
 	// struct and not package level methods.
@@ -211,7 +188,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	// Set the ARM client to use out test server
 	client := armclient.NewClientFromConfig(ts.Client(), dummyTokenFunc(), 5000)
 
-	g, err := gocui.NewGui(gocui.Output256, false)
+	g, err := gocui.NewGui(gocui.OutputSimulator, false)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()

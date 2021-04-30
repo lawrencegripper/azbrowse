@@ -2,6 +2,9 @@ module github.com/lawrencegripper/azbrowse
 
 go 1.16
 
+// Temp replacement to fork which allows init/close on tcell screen
+replace github.com/awesome-gocui/gocui v1.0.0-beta-4 => github.com/lawrencegripper/gocui v1.0.0-beta-3-simtesting
+
 require (
 	bazil.org/fuse v0.0.0-20200117225306-7b5117fecadc
 	github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3 // indirect
@@ -30,7 +33,6 @@ require (
 	github.com/mailru/easyjson v0.7.0 // indirect
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
 	github.com/onsi/ginkgo v1.14.1 // indirect
-	github.com/onsi/gomega v1.10.2 // indirect
 	github.com/opentracing/basictracer-go v1.0.0 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
 	github.com/peterbourgon/diskv v2.0.1+incompatible
@@ -49,7 +51,7 @@ require (
 	go.mongodb.org/mongo-driver v1.1.2 // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e
 	gopkg.in/h2non/gock.v1 v1.0.15
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 	gotest.tools v2.2.0+incompatible
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20180531100431-4c381bd170b4
