@@ -26,7 +26,7 @@ ENV GO111MODULE=on
 
 # Configure apt, install packages and tools
 RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales ruby \
+    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales ruby gnupg2 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
     && apt-get -y install git iproute2 procps lsb-release \
