@@ -26,7 +26,7 @@ ENV GO111MODULE=on
 
 # Configure apt, install packages and tools
 RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales ruby gnupg2 \
+    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales ruby-full gnupg2 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
     && apt-get -y install git iproute2 procps lsb-release \
@@ -88,7 +88,7 @@ RUN \
     # --> Delve for debugging
     go get github.com/go-delve/delve/cmd/dlv@v1.6.0 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.6.8 \
+    && go get golang.org/x/tools/gopls@v0.6.10 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
