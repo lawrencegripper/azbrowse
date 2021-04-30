@@ -102,9 +102,6 @@ printHeader('Generate docs')
 executeCommand "make docs-update"
 checkGitHasNoChanges(git_instance, 'Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
 
-printHeader('Run integration tests')
-executeCommand "./scripts/ci_integration_tests.sh"
-
 printHeader('Run goreleaser')
 if publish_build_output 
   executeCommand "goreleaser --skip-publish --rm-dist"
