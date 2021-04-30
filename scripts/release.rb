@@ -64,9 +64,14 @@ required_envs.each do |var_name, env_name|
   instance_variable_set("@#{var_name}", ENV[env_name])
 end
 
+# Get golang version, injected into build binaries for debugging
+go_version = `go version`
+ENV["GOVERSION"] = go_version
+
 printHeader("Configuration")
 puts "Is running in CI? #{@is_ci}"
 puts "Branch: #{@branch}"
+puts "Go version: #{go_version}"
 
 # By default don't publish build output
 publish_build_output = false
@@ -102,11 +107,11 @@ printHeader('Generate docs')
 executeCommand "make docs-update"
 checkGitHasNoChanges(git_instance, 'Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
 
-printHeader('Run goreleaser')
 if publish_build_output 
+  printHeader('Run goreleaser: Dry run')
   executeCommand "goreleaser --skip-publish --rm-dist"
 else
-  puts `goreleaser`
+  printHeader('Run goreleaser: Publish')
   executeCommand "docker push \"$DEV_CONTAINER_TAG\""
 end
 
