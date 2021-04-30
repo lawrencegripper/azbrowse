@@ -81,14 +81,14 @@ ENV DEVCONTAINER="TRUE"
 
 # Install docker used by go releaser
 ENV DOCKER_BUILDKIT=1
-RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-20.10.1.tgz && tar --strip-components=1 -xvzf docker-20.10.1.tgz -C /usr/local/bin"
+RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-20.10.6.tgz && tar --strip-components=1 -xvzf docker-20.10.6.tgz -C /usr/local/bin"
 
 # Install Go tools
 RUN \
     # --> Delve for debugging
     go get github.com/go-delve/delve/cmd/dlv@v1.6.0 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.6.6 \
+    && go get golang.org/x/tools/gopls@v0.6.8 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint

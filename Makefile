@@ -17,16 +17,16 @@ all: ci
 help : Makefile
 	@sed -n 's/^##//p' $<
 
+## test-go:
+## 		Run short go unit tests
+test-go: swagger-update-requirements terraform-hack-init
+	$(GO_BINARY) test -p 1 -short ./...
+
 ## test:
-## 		Run quick executing unit tests
+## 		Run all tests
 test: swagger-update-requirements terraform-hack-init
 	echo ${go}
 	pytest ./scripts/swagger_update/test_swagger_update.py
-	$(GO_BINARY) test -p 1 -short ./...
-
-## integration: 
-##		Run integration and unit tests
-integration:
 	$(GO_BINARY) test ./...
 
 ## checks:
