@@ -108,11 +108,11 @@ executeCommand "make docs-update"
 checkGitHasNoChanges(git_instance, 'Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
 
 if publish_build_output 
-  printHeader('Run goreleaser: Dry run')
-  executeCommand "goreleaser --skip-publish --rm-dist"
-else
   printHeader('Run goreleaser: Publish')
   executeCommand "docker push \"$DEV_CONTAINER_TAG\""
+else
+  printHeader('Run goreleaser: Dry run')
+  executeCommand "goreleaser --skip-publish --rm-dist"
 end
 
 # Push up built output for the devcontainer if we're on main
