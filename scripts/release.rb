@@ -116,8 +116,8 @@ begin
 
   # Ensure race condition in snapcraft isn't expose
   # https://github.com/goreleaser/goreleaser/issues/1715
-  FileUtils.mkdir_p('$HOME/.cache/snapcraft/download')
-  FileUtils.mkdir_p('$HOME/.cache/snapcraft/stage-packages')
+  FileUtils.mkdir_p("/#{ENV['HOME']}/.cache/snapcraft/download")
+  FileUtils.mkdir_p("/#{ENV['HOME']}/.cache/snapcraft/stage-packages")
   if publish_build_output
     print_header('Run goreleaser: Publish')
     execute_command 'goreleaser'
