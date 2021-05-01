@@ -48,5 +48,8 @@ DEPENDENCIES
   reek
   rubocop
 
+RUBY VERSION
+   ruby 2.5.5p157
+
 BUNDLED WITH
    2.2.16
