@@ -11,6 +11,7 @@ end
 
 require 'colorize'
 require 'English'
+require 'fileutils'
 
 def print_header(title)
   # Used to create collapsing sections in github actions output
@@ -113,6 +114,10 @@ begin
   error_if_git_has_changes(git_instance,
                            'Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
 
+  # Ensure race condition in snapcraft isn't expose
+  # https://github.com/goreleaser/goreleaser/issues/1715
+  FileUtils.mkdir_p('$HOME/.cache/snapcraft/download')
+  FileUtils.mkdir_p('$HOME/.cache/snapcraft/stage-packages')
   if publish_build_output
     print_header('Run goreleaser: Publish')
     execute_command 'goreleaser'
