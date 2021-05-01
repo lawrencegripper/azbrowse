@@ -41,7 +41,7 @@ def exit_with_error(error)
 end
 
 def execute_command(command)
-  `#{command}`
+  puts `#{command}`
   return if $CHILD_STATUS.success?
 
   puts 'Failed'.colorize(color: :white, background: :red)
@@ -106,7 +106,7 @@ begin
   git_instance.add_tag(tag)
 
   print_header('Build, lint and codegen')
-  puts `make ci`
+  execute_command `make ci`
   error_if_git_has_changes(git_instance,
                            'Codegen caused changes to files. Run "make swagger-codegen" and commit the results to resolve this issue')
 
