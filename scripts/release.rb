@@ -4,9 +4,9 @@ require 'bundler/inline'
 
 gemfile do
   source 'https://rubygems.org'
-  gem 'git', '~> 1.8'
-  gem 'colorize'
-  gem 'docker-api'
+  gem 'git', '=1.8.1'
+  gem 'colorize', '=0.8.1'
+  gem 'docker-api', '=2.1.0'
 end
 
 require 'colorize'
@@ -22,8 +22,9 @@ def print_header(title)
     "----> #{title}",
     '------------------------------------------------------------------'
   ]
-  puts github_actions_block.join("\n").colorize(:color => :black)
-  puts title_block.join("\n").colorize(:color => :black, :background => :blue)
+  puts github_actions_block.join("\n").colorize(color: :black)
+  title_text = title_block.map { |string| string.colorize(color: :white, background: :green) }.join("\n")
+  puts title_text
 end
 
 def error_if_git_has_changes(git_instance, error_to_show_if_changes)
