@@ -103,7 +103,7 @@ func (h *ListUpdateHandler) Invoke() error {
 
 	case interfaces.ResponseTerraform:
 		fileExtension = ".tf"
-		formattedContent = content // TODO: add Terraform fo``rmatter
+		formattedContent = content // TODO: add Terraform formatter
 
 	case interfaces.ResponseXML:
 		fileExtension = ".xml"
