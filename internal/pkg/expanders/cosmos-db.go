@@ -19,6 +19,7 @@ import (
 	"net/url"
 
 	"github.com/awesome-gocui/gocui"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/editor"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
@@ -79,6 +80,7 @@ const (
 	cosmosdbActionListKeys    = "list-keys"
 	cosmosdbActionGetDocument = "get-document"
 	cosmosdbActionSQLQuery    = "sql-query"
+	cosmosdbActionAddDocument = "add-document"
 )
 
 func (e *CosmosDbExpander) setClient(c *armclient.Client) {
@@ -267,6 +269,18 @@ func (e *CosmosDbExpander) ListActions(context context.Context, item *TreeNode) 
 					Metadata: map[string]string{
 						"ActionID": cosmosdbActionSQLQuery,
 					},
+				},
+				&TreeNode{
+					Parentid:              item.ID,
+					ID:                    item.ID + "?sql-query",
+					Namespace:             "cosmos-db",
+					Name:                  "Add New Document",
+					Display:               "Add New Document",
+					ItemType:              ActionType,
+					SuppressGenericExpand: true,
+					Metadata: map[string]string{
+						"ActionID": cosmosdbActionAddDocument,
+					},
 				})
 		}
 	}
@@ -287,6 +301,8 @@ func (e *CosmosDbExpander) ExecuteAction(context context.Context, item *TreeNode
 		return e.cosmosdbActionListKeys(context, item)
 	case cosmosdbActionGetDocument:
 		return e.cosmosdbActionGetDocument(context, item)
+	case cosmosdbActionAddDocument:
+		return e.cosmosdbActionAddDocument(context, item)
 	case cosmosdbActionSQLQuery:
 		return e.cosmosdbActionExecuteQuery(context, item)
 	case "":
@@ -479,7 +495,7 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, accountName st
 	response, err := e.doRequestWithHeaders(ctx, "GET", accountName, requestURL, accountKey, headers)
 	if err != nil {
 		return ExpanderResult{
-			Err:               fmt.Errorf("Error getting documents: %s", err),
+			Err:               fmt.Errorf("Error getting document: %s", err),
 			IsPrimaryResponse: true,
 			SourceDescription: "CosmosDbExpander request",
 		}
@@ -502,6 +518,30 @@ func (e *CosmosDbExpander) expandSQLDocument(ctx context.Context, accountName st
 	}
 }
 
+func (e *CosmosDbExpander) insertSQLDocument(ctx context.Context, accountName string, databaseName string, containerName string, accountKey string, partitionKeyValue string, content string) error {
+
+	headers := map[string]string{}
+
+	if partitionKeyValue != "" {
+		headers["x-ms-documentdb-partitionkey"] = partitionKeyValue
+	}
+
+	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs", databaseName, containerName)
+	response, err := e.doRequestWithHeadersAndBody(ctx, "POST", accountName, requestURL, accountKey, headers, strings.NewReader(content))
+	if err != nil {
+		return fmt.Errorf("Error inserting document: %s", err)
+	}
+	if !e.isSuccessCode(response.StatusCode) {
+		data := ""
+		if response != nil {
+			data = string(response.Data)
+		}
+		return fmt.Errorf("Error inserting document. StatusCode=%d, Response=%s", response.StatusCode, data)
+	}
+
+	return nil
+}
+
 func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode, updatedContent string) error {
 
 	accountName := item.Metadata["AccountName"]
@@ -520,7 +560,7 @@ func (e *CosmosDbExpander) updateSQLDocument(ctx context.Context, item *TreeNode
 	requestURL := fmt.Sprintf("/dbs/%s/colls/%s/docs/%s", databaseName, containerName, itemID)
 	response, err := e.doRequestWithHeadersAndBody(ctx, "PUT", accountName, requestURL, accountKey, headers, strings.NewReader(updatedContent))
 	if err != nil {
-		return fmt.Errorf("Error updating documents: %s", err)
+		return fmt.Errorf("Error updating document: %s", err)
 	}
 	if !e.isSuccessCode(response.StatusCode) {
 		data := ""
@@ -616,7 +656,16 @@ func (e *CosmosDbExpander) cosmosdbActionListKeys(ctx context.Context, item *Tre
 	}
 }
 
-func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *TreeNode) ExpanderResult {
+// CosmosDbConnectionDetails groups the details needed for connecting to a Cosmos DB SQL endpoint
+type CosmosDbSqlConnectionDetails struct {
+	AccountName   string
+	DatabaseName  string
+	ContainerName string
+	PartitionKey  string
+	AccountKey    string
+}
+
+func (e *CosmosDbExpander) walkParentsToGetConnectionDetails(ctx context.Context, item *TreeNode) (CosmosDbSqlConnectionDetails, error) {
 
 	swaggerResourceType := item.Parent.SwaggerResourceType // item is action node, item.Parent is the node the action relates to
 	tempItem := item
@@ -626,11 +675,7 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 	}
 	matchResult := swaggerResourceType.Endpoint.Match(tempItem.ID)
 	if !matchResult.IsMatch {
-		return ExpanderResult{
-			Err:               fmt.Errorf("Endpoint should match"),
-			SourceDescription: "CosmosDbExpander request",
-			IsPrimaryResponse: true,
-		}
+		return CosmosDbSqlConnectionDetails{}, fmt.Errorf("Endpoint should match")
 	}
 
 	accountName := matchResult.Values["accountName"]
@@ -639,20 +684,33 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 
 	accountKey, err := e.getAccountKey(ctx, tempItem)
 	if err != nil {
-		return ExpanderResult{
-			Err:               fmt.Errorf("Error getting account key: %s", err),
-			IsPrimaryResponse: true,
-			SourceDescription: "CosmosDbExpander request",
-		}
+		return CosmosDbSqlConnectionDetails{}, fmt.Errorf("Error getting account key: %s", err)
 	}
 
 	partitionKey, err := e.getCollectionPartitionKey(ctx, accountName, databaseName, containerName, accountKey)
 	if err != nil {
+		return CosmosDbSqlConnectionDetails{}, fmt.Errorf("Error getting partition key: %s", err)
+	}
+
+	return CosmosDbSqlConnectionDetails{
+		AccountName:   accountName,
+		DatabaseName:  databaseName,
+		ContainerName: containerName,
+		PartitionKey:  partitionKey,
+		AccountKey:    accountKey,
+	}, nil
+}
+
+func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *TreeNode) ExpanderResult {
+
+	connectionDetails, err := e.walkParentsToGetConnectionDetails(ctx, item)
+	if err != nil {
 		return ExpanderResult{
-			Err:               fmt.Errorf("Error getting partition key: %s", err),
-			IsPrimaryResponse: true,
+			Err:               err,
 			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
 		}
+
 	}
 
 	commandChannel := make(chan string, 1)
@@ -663,7 +721,7 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 		}
 	}
 	partitionKeyValue := ""
-	if partitionKey != "" {
+	if connectionDetails.PartitionKey != "" {
 		e.commandPanel.ShowWithText("partition key:", "", nil, commandPanelNotification)
 		// Force UI to re-render to pickup
 		e.gui.Update(func(g *gocui.Gui) error {
@@ -680,7 +738,7 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 		return nil
 	})
 
-	response := e.expandSQLDocument(ctx, accountName, databaseName, containerName, accountKey, partitionKeyValue, id)
+	response := e.expandSQLDocument(ctx, connectionDetails.AccountName, connectionDetails.DatabaseName, connectionDetails.ContainerName, connectionDetails.AccountKey, partitionKeyValue, id)
 
 	if response.Err != nil {
 		return response
@@ -698,10 +756,11 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 		SuppressSwaggerExpand: true,
 		SuppressGenericExpand: true,
 		Metadata: map[string]string{
-			"AccountName":       accountName,
-			"DatabaseName":      databaseName,
-			"ContainerName":     containerName,
-			"AccountKey":        accountKey,
+			"AccountName":       connectionDetails.AccountName,
+			"DatabaseName":      connectionDetails.DatabaseName,
+			"ContainerName":     connectionDetails.ContainerName,
+			"AccountKey":        connectionDetails.AccountKey,
+			"PartitionKey":      connectionDetails.PartitionKey,
 			"PartitionKeyValue": partitionKeyValue,
 		},
 	}
@@ -714,40 +773,112 @@ func (e *CosmosDbExpander) cosmosdbActionGetDocument(ctx context.Context, item *
 	}
 }
 
-func (e *CosmosDbExpander) cosmosdbActionExecuteQuery(ctx context.Context, item *TreeNode) ExpanderResult {
-
-	swaggerResourceType := item.Parent.SwaggerResourceType // item is action node, item.Parent is the node the action relates to
-	tempItem := item
-	for swaggerResourceType == nil && tempItem.Parent != nil {
-		tempItem = tempItem.Parent
-		swaggerResourceType = tempItem.SwaggerResourceType
-	}
-	matchResult := swaggerResourceType.Endpoint.Match(tempItem.ID)
-	if !matchResult.IsMatch {
-		return ExpanderResult{
-			Err:               fmt.Errorf("Endpoint should match"),
-			SourceDescription: "CosmosDbExpander request",
-			IsPrimaryResponse: true,
-		}
-	}
-
-	accountName := matchResult.Values["accountName"]
-	databaseName := matchResult.Values["databaseName"]
-	containerName := matchResult.Values["containerName"]
-
-	accountKey, err := e.getAccountKey(ctx, tempItem)
+func (e *CosmosDbExpander) cosmosdbActionAddDocument(ctx context.Context, item *TreeNode) ExpanderResult {
+	connectionDetails, err := e.walkParentsToGetConnectionDetails(ctx, item)
 	if err != nil {
 		return ExpanderResult{
-			Err:               fmt.Errorf("Error getting account key: %s", err),
-			IsPrimaryResponse: true,
+			Err:               err,
 			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
 		}
+	}
+
+	initialDocument := map[string]interface{}{
+		"id": "",
+	}
+
+	if connectionDetails.PartitionKey != "" {
+		keyParts := strings.Split(strings.TrimPrefix(connectionDetails.PartitionKey, "/"), "/")
+		var partitionValue interface{} = ""
+		for i := len(keyParts) - 1; i > 0; i-- {
+			keyPart := keyParts[i]
+			partitionValue = map[string]interface{}{
+				keyPart: partitionValue,
+			}
+		}
+		initialDocument[keyParts[0]] = partitionValue
+	}
+
+	initialContentBuf, err := json.MarshalIndent(initialDocument, "", "\t")
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	initialContent := "// Fill out this document and save and exit to insert a new document. To cancel, leave the document as-is or delete the content\n" + string(initialContentBuf)
+
+	content, err := editor.OpenForContent(initialContent, ".json")
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	if content == initialContent || strings.TrimSpace(content) == "" {
+		return ExpanderResult{
+			Err:               fmt.Errorf("User canceled"),
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	if strings.HasPrefix(content, "//") {
+		// remove the comment line we added!
+		newLineIndex := strings.Index(content, "\n")
+		content = content[newLineIndex+1:]
+	}
+
+	partitionKeyValue := ""
+	if connectionDetails.PartitionKey != "" {
+		keyParts := strings.Split(strings.TrimPrefix(connectionDetails.PartitionKey, "/"), "/")
+		temp, err := getJSONPropertyFromString(content, keyParts...)
+		if err != nil {
+			return ExpanderResult{
+				Err:               fmt.Errorf("Error getting partition key value: %s", err),
+				SourceDescription: "CosmosDbExpander request",
+				IsPrimaryResponse: true,
+			}
+		}
+		partitionKeyValue = fmt.Sprintf("[\"%v\"]", temp)
+	}
+
+	err = e.insertSQLDocument(ctx, connectionDetails.AccountName, connectionDetails.DatabaseName, connectionDetails.ContainerName, connectionDetails.AccountKey, partitionKeyValue, content)
+	if err != nil {
+		return ExpanderResult{
+			Err:               fmt.Errorf("Error inserting: %s", err),
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	return ExpanderResult{
+		SourceDescription: "CosmosDbExpander request",
+		Response:          ExpanderResponse{ResponseType: interfaces.ResponsePlainText, Response: "Document added."},
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *CosmosDbExpander) cosmosdbActionExecuteQuery(ctx context.Context, item *TreeNode) ExpanderResult {
+
+	connectionDetails, err := e.walkParentsToGetConnectionDetails(ctx, item)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "CosmosDbExpander request",
+			IsPrimaryResponse: true,
+		}
+
 	}
 
 	commandPanelNotification := func(state interfaces.CommandPanelNotification) {
 		if state.EnterPressed {
 			queryText := state.CurrentText
-			result, err := e.executeQuery(ctx, accountName, databaseName, containerName, accountKey, queryText)
+			result, err := e.executeQuery(ctx, connectionDetails.AccountName, connectionDetails.DatabaseName, connectionDetails.ContainerName, connectionDetails.AccountKey, queryText)
 			if err != nil {
 				e.contentPanel.SetContent("\n\n\n\n"+err.Error(), interfaces.ResponsePlainText, "Error executing query")
 			} else {
