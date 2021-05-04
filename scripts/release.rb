@@ -12,43 +12,13 @@ end
 require 'colorize'
 require 'English'
 require 'fileutils'
-
-def print_header(title)
-  # Used to create collapsing sections in github actions output
-  github_actions_block = ['::endgroup::', "::group::#{title}"]
-  title_block = [
-    '',
-    '------------------------------------------------------------------',
-    "----> #{title}",
-    '------------------------------------------------------------------'
-  ]
-  puts github_actions_block.join("\n").colorize(color: :black)
-  title_text = title_block.map { |string| string.colorize(color: :white, background: :green) }.join("\n")
-  puts title_text
-end
-
-def error_if_git_has_changes(git_instance, error_to_show_if_changes)
-  git_changes = git_instance.status.changed
-  return unless git_changes.count.positive?
-
-  git_changes.keys { |key| puts "Changes in file #{key}" }
-  exit_with_error error_to_show_if_changes
-end
-
-def exit_with_error(error)
-  puts "Failed #{error}".colorize(color: :white, background: :red)
-  raise error
-end
-
-def execute_command(command)
-  puts `#{command}`
-  return if $CHILD_STATUS.success?
-
-  puts 'Failed'.colorize(color: :white, background: :red)
-  raise "Command '#{command}' failed to execute"
-end
+require 'open3'
+require_relative 'release_helpers'
 
 begin
+  # Ensure output is written to stdout without buffer
+  $stdout.sync = true
+
   # Move to the root of the repo
   script_root = File.dirname(__FILE__)
   repo_root = "#{script_root}/../"
@@ -106,7 +76,7 @@ begin
   git_instance.add_tag(tag)
 
   print_header('Build, lint and codegen')
-  execute_command `make ci`
+  execute_command 'make ci'
   error_if_git_has_changes(git_instance,
                            'Codegen caused changes to files. Run "make swagger-codegen" and commit the results to resolve this issue')
 

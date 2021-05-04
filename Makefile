@@ -235,8 +235,3 @@ azfs-test:
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-integration:
 	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -v -count=1 -timeout 30s ./internal/pkg/filesystem
-
-fail: 
-	echo 1
-	$(shell exit 1)
-
