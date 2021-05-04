@@ -43,7 +43,6 @@
 			"usePlaceholders": true, // add parameter placeholders when completing a function
 			// Experimental settings
 			"completeUnimported": true, // autocomplete unimported packages
-			"watchFileChanges": true, // watch file changes outside of the editor
 			"deepCompletion": true, // enable deep completion
 		},
 		"files.eol": "\n", // formatting only supports LF line endings		
@@ -55,6 +54,8 @@
 	// Add the IDs of extensions you want installed when the container is created in the array below.
 	"extensions": [
 		"golang.go",
-		"ms-python.python"
-	]
+		"ms-python.python",
+		"rebornix.ruby"
+	],
+	"postStartCommand": "bundler install"
 }

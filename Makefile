@@ -199,10 +199,9 @@ endif
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		--privileged \
 		--device /dev/fuse \
-		--entrypoint /bin/bash \
 		--workdir "${PWD}" \
-		-t $(DEV_CONTAINER_TAG) \
-		-c "${PWD}/scripts/ci_release.sh"
+		$(DEV_CONTAINER_TAG) \
+		ruby ${PWD}/scripts/release.rb
 		
 
 asfs-build:
@@ -236,8 +235,3 @@ azfs-test:
 # The resource specified should have a value of 'replaceme' as a tag
 azfs-integration:
 	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -v -count=1 -timeout 30s ./internal/pkg/filesystem
-
-fail: 
-	echo 1
-	$(shell exit 1)
-

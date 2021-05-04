@@ -1,0 +1,55 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.2)
+    colorize (0.8.1)
+    docker-api (2.1.0)
+      excon (>= 0.47.0)
+      multi_json
+    excon (0.81.0)
+    git (1.8.1)
+      rchardet (~> 1.8)
+    kwalify (0.7.2)
+    multi_json (1.15.0)
+    parallel (1.20.1)
+    parser (3.0.1.0)
+      ast (~> 2.4.1)
+    psych (3.3.1)
+    rainbow (3.0.0)
+    rchardet (1.8.0)
+    reek (6.0.4)
+      kwalify (~> 0.7.0)
+      parser (~> 3.0.0)
+      psych (~> 3.1)
+      rainbow (>= 2.0, < 4.0)
+    regexp_parser (2.1.1)
+    rexml (3.2.5)
+    rubocop (1.13.0)
+      parallel (~> 1.10)
+      parser (>= 3.0.0.0)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
+      rexml
+      rubocop-ast (>= 1.2.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.4.1)
+      parser (>= 2.7.1.5)
+    ruby-progressbar (1.11.0)
+    unicode-display_width (2.0.0)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  colorize
+  docker-api
+  git (~> 1.8)
+  reek
+  rubocop
+
+RUBY VERSION
+   ruby 2.5.5p157
+
+BUNDLED WITH
+   2.2.16

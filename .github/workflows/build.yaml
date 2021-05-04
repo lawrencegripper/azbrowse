@@ -25,7 +25,7 @@ jobs:
       env:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        IS_CI: 1
+        IS_CI: true
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
 
     - name: Build the Docker image, run tests and publish(on master only)
@@ -36,6 +36,6 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
         BUILD_NUMBER: ${{ github.run_id }}
-        IS_CI: 1
+        IS_CI: true
         IS_PR: ${{ github.head_ref }}
         BRANCH: ${{ github.ref }}

@@ -9,8 +9,6 @@ COPY --from=builder /snap/core18 /snap/core18
 COPY --from=builder /snap/snapcraft /snap/snapcraft
 COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
 
-RUN apt-get update && apt-get install --yes snapd sudo locales && locale-gen en_US.UTF-8
-
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -26,18 +24,10 @@ ENV GO111MODULE=on
 
 # Configure apt, install packages and tools
 RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales \
+    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
-    && apt-get -y install git iproute2 procps lsb-release \
-    #
-    # Install Azure CLI
-    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
-    #
-    # Install Integration testing Tools 
-    #
-    # --> xvfb for integration testing (gocui requires a valid tty which isn't available in ci)
-    && apt-get install --no-install-recommends -y xvfb libgl1-mesa-dri \
+    && apt-get -y install git iproute2 procps lsb-release unzip \
     # 
     # Install Release Tools
     #
@@ -46,6 +36,9 @@ RUN apt-get update \
     # Install python3
     && apt-get -y install python3-pip \
     && apt-get -y install bash-completion \
+    #
+    # Install Azure CLI
+    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
@@ -81,14 +74,18 @@ ENV DEVCONTAINER="TRUE"
 
 # Install docker used by go releaser
 ENV DOCKER_BUILDKIT=1
-RUN bash -c "cd /tmp && curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-20.10.6.tgz && tar --strip-components=1 -xvzf docker-20.10.6.tgz -C /usr/local/bin"
+ENV DOCKERVERSION=20.10.6
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz \
+  && tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 \
+                 -C /usr/local/bin docker/docker \
+  && rm docker-${DOCKERVERSION}.tgz
 
 # Install Go tools
 RUN \
     # --> Delve for debugging
     go get github.com/go-delve/delve/cmd/dlv@v1.6.0 \
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.6.8 \
+    && go get golang.org/x/tools/gopls@v0.6.10 \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
@@ -120,11 +117,12 @@ RUN pip3 install rope black
 ARG TERRAFORM_VERSION=0.12.26
 RUN \
     # Install Terraform
-    apt-get update && \
-    apt-get -y install --no-install-recommends unzip && \
     mkdir -p /tmp/docker-downloads \
     && curl -sSL -o /tmp/docker-downloads/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
     && unzip /tmp/docker-downloads/terraform.zip \
     && mv terraform /usr/local/bin
 
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
+
+# Install ruby bunder gem to support inline gems in ruby scripts
+RUN gem install bundler
