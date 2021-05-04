@@ -13,7 +13,7 @@ def print_header(title)
     '------------------------------------------------------------------'
   ]
   puts github_actions_block.join("\n").colorize(color: :black)
-  title_text = title_block.map { |string| string.colorize(color: :white, background: :green) }.join("\n")
+  title_text = title_block.map { |string| string.colorize(color: :black, background: :light_green) }.join("\n")
   puts title_text
 end
 
