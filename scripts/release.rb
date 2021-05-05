@@ -52,7 +52,7 @@ begin
   # By default don't publish build output
   publish_build_output = false
 
-  if @is_ci && (@branch == '/refs/heads/main')
+  if @is_ci == 'true' && @branch == '/refs/heads/main'
     publish_build_output = true
     puts 'Login to docker'.colorize(:blue)
     Docker.authenticate!('username' => @docker_username, 'password' => @docker_password)
@@ -68,6 +68,8 @@ begin
   else
     puts 'Skipping publish as either not CI or branch != main'
   end
+
+  puts "Is running in CI? #{publish_build_output}"
 
   print_header('Git - Create tag for release')
   tag = "v2.0.#{@build_number}"
