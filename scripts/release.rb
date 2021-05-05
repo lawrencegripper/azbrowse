@@ -56,7 +56,8 @@ begin
     publish_build_output = true
     puts 'Login to docker'.colorize(:blue)
     Docker.authenticate!('username' => @docker_username, 'password' => @docker_password)
-    Docker.authenticate!('serveraddress' => 'ghcr.io', 'username' => @docker_username, 'password' => @github_token)
+    puts 'Login to ghcr.io'
+    Docker.authenticate!('serveraddress' => 'https://ghcr.io', 'username' => @docker_username, 'password' => @github_token)
 
     puts 'Login to snapcraft'.colorize(:blue)
     execute_command "
