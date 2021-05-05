@@ -19,15 +19,6 @@ jobs:
     - name: Build devcontainer for tooling
       run: sudo -E make devcontainer
 
-    - name: Push devcontainer for caching
-      if: ${{ github.ref == 'refs/heads/main' }}
-      run: sudo -E make devcontainer-push
-      env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        IS_CI: true
-        GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
-
     - name: Build the Docker image, run tests and publish(on master only)
       run: sudo -E make devcontainer-release
       env:
