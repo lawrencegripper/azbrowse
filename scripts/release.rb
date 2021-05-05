@@ -69,7 +69,7 @@ begin
     puts 'Skipping publish as either not CI or branch != main'
   end
 
-  puts "Is running in CI? #{publish_build_output}"
+  puts "Is release to be published? #{publish_build_output}"
 
   print_header('Git - Create tag for release')
   tag = "v2.0.#{@build_number}"
