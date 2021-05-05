@@ -54,9 +54,11 @@ begin
 
   if @is_ci == 'true' && @branch == 'refs/heads/main'
     publish_build_output = true
-    puts 'Login to docker'.colorize(:blue)
+    puts 'Login docker cli'.colorize(:blue)
+    execute_command('./scripts/docker_login.sh')
+    puts 'Login to docker ruby api'.colorize(:blue)
     Docker.authenticate!('username' => @docker_username, 'password' => @docker_password)
-    puts 'Login to ghcr.io'
+    puts 'Login to ghcr.io ruby api'
     Docker.authenticate!('serveraddress' => 'https://ghcr.io', 'username' => @docker_username, 'password' => @github_token)
 
     puts 'Login to snapcraft'.colorize(:blue)
