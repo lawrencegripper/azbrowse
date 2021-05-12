@@ -19,7 +19,7 @@ help : Makefile
 
 ## test-go:
 ## 		Run short go unit tests
-test-go: swagger-update-requirements terraform-hack-init
+test-go:
 	$(GO_BINARY) test -p 1 -short ./...
 
 ## test:
