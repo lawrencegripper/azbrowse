@@ -17,6 +17,7 @@ azbrowse [flags]
       --demo                  run in demo mode to filter sensitive output
       --fuzzer int            run fuzzer (optionally specify the duration in minutes) (default -1)
   -h, --help                  help for azbrowse
+  -m, --mouse                 (optional) enable mouse support. Note this disables normal text selection in the terminal
   -n, --navigate string       (optional) navigate to resource by resource ID
   -r, --resume                (optional) resume navigating from your last session
   -s, --subscription string   (optional) specify a subscription to load
