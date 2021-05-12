@@ -91,7 +91,9 @@ func run(settings *config.Settings) {
 	g.Highlight = true
 	g.SelFgColor = gocui.ColorCyan
 	g.InputEsc = true
-	g.Mouse = true
+	if settings.MouseEnabled {
+		g.Mouse = true
+	}
 
 	// Create the views we'll use to display information and
 	// bind up all the keys use to interact with the views

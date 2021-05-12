@@ -59,6 +59,7 @@ func createRootCmd() *cobra.Command {
 	var fuzzerDurationMinutes int
 	var tenantID string
 	var subscription string
+	var mouse bool
 
 	// Start tracking the last node navigated to in storage for the `resume` command
 	go func() {
@@ -83,6 +84,10 @@ func createRootCmd() *cobra.Command {
 			}
 			if demo {
 				settings.HideGuids = true
+			}
+
+			if mouse {
+				settings.MouseEnabled = mouse
 			}
 
 			if debug {
@@ -154,6 +159,7 @@ func createRootCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&debug, "debug", false, "run in debug mode")
 	cmd.Flags().BoolVar(&demo, "demo", false, "run in demo mode to filter sensitive output")
 	cmd.Flags().IntVar(&fuzzerDurationMinutes, "fuzzer", -1, "run fuzzer (optionally specify the duration in minutes)")
+	cmd.Flags().BoolVarP(&mouse, "mouse", "m", false, "(optional) enable mouse support. Note this disables normal text selection in the terminal")
 
 	if err := cmd.RegisterFlagCompletionFunc("subscription", subscriptionAutocompletion); err != nil {
 		panic(err)
