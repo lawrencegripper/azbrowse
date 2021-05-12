@@ -16,6 +16,7 @@ type Settings struct {
 	FuzzerDurationMinutes int
 	TenantID              string // the tenant ID to get an access token for from `az account get-access-token`
 	ShouldRender          bool
+	MouseEnabled          bool
 }
 
 // Config represents the user configuration options
