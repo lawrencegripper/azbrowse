@@ -80,6 +80,11 @@ func (w *NotificationWidget) AddPendingDelete(item *expanders.TreeNode) {
 	}
 
 	w.pendingDeletes = append(w.pendingDeletes, item)
+
+	eventing.SendStatusEvent(&eventing.StatusEvent{
+		Message: "Item `" + item.Name + "` added to delete list",
+		Timeout: time.Second * 5,
+	})
 }
 
 // ConfirmDelete delete all queued/pending deletes

@@ -53,6 +53,7 @@ func Test_Delete_AddPendingDelete(t *testing.T) {
 func Test_Delete_MessageSent(t *testing.T) {
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
+	clearEvents(statusEvents)
 
 	count := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +82,9 @@ func Test_Delete_MessageSent(t *testing.T) {
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg3", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg3"})
 
+	// Clear down the 'Successfully added' events
+	clearEvents(statusEvents)
+
 	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
@@ -94,6 +98,7 @@ func Test_Delete_MessageSent(t *testing.T) {
 func Test_Delete_StopAfterFailure(t *testing.T) {
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
+	clearEvents(statusEvents)
 
 	count := 0
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -117,6 +122,10 @@ func Test_Delete_StopAfterFailure(t *testing.T) {
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
+
+	// Clear down the 'Successfully added' events
+	clearEvents(statusEvents)
+
 	notView.ConfirmDelete()
 
 	// ConfirmDelete returns before it's finished
@@ -135,6 +144,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
+	clearEvents(statusEvents)
 
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		t.Logf("SEVER MESSAGE: received: %s method: %s", r.URL.String(), r.Method)
@@ -154,6 +164,7 @@ func Test_Delete_AddPendingWhileDeleteInProgressRefused(t *testing.T) {
 	notView := NewNotificationWidget(0, 0, 45, g, client)
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg1", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1"})
+	<-statusEvents // Receive the 'Item Added' status message so test can check failed status message
 	notView.ConfirmDelete()
 
 	notView.AddPendingDelete(&expanders.TreeNode{Name: "rg2", DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg2"})
@@ -173,6 +184,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 
 	statusEvents := eventing.SubscribeToStatusEvents()
 	defer eventing.Unsubscribe(statusEvents)
+	clearEvents(statusEvents)
 
 	count := 0
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -200,6 +212,7 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 		DeleteURL: ts.URL + "/subscriptions/1/resourceGroups/rg1",
 		Name:      "rg1",
 	})
+	<-statusEvents // Receive the 'Item Added' status message so test can check delete status message
 	notView.ConfirmDelete()
 
 	// Simulate double tap of delet key
@@ -209,5 +222,12 @@ func Test_Delete_RefusedDeleteWhileInprogress(t *testing.T) {
 	failureStatus := eventing.WaitForFailureStatusEvent(t, statusEvents, 5)
 	if failureStatus.Message != "Delete already in progress. Please wait for completion." {
 		t.Errorf("Expected message 'Delete already in progress. Please wait for completion.' Got: %s", failureStatus.Message)
+	}
+}
+
+func clearEvents(statusEvents chan interface{}) {
+	<-time.After(100 * time.Millisecond)
+	for len(statusEvents) > 0 {
+		<-statusEvents
 	}
 }
