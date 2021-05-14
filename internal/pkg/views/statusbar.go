@@ -68,6 +68,10 @@ func NewStatusbarWidget(x, y, w int, hideGuids bool, g *gocui.Gui) *StatusbarWid
 				// Remove any that have now expired
 				if message.HasExpired() {
 					delete(widget.messages, message.ID())
+					// Removing an item that has expired may result in
+					// an different item being displayed so we track this
+					// so we call g.update correctly
+					changesMade = true
 					continue
 				}
 			}
@@ -130,8 +134,6 @@ func (w *StatusbarWidget) addStatusEvent(eventObj interface{}) {
 		return
 	}
 	w.messages[event.ID()] = event
-	// Favor the most recent message
-	w.currentMessage = event
 }
 
 // Layout draws the widget in the gocui view
