@@ -104,6 +104,8 @@ func (w *NotificationWidget) ConfirmDelete() {
 	// Take a copy of the current pending deletes
 	pending := make([]*expanders.TreeNode, len(w.pendingDeletes))
 	copy(pending, w.pendingDeletes)
+	// Clear the pending deletes list while we delete things
+	w.pendingDeletes = []*expanders.TreeNode{}
 
 	// Force UI to re-render to pickup
 	w.gui.Update(func(g *gocui.Gui) error {
@@ -166,8 +168,6 @@ func (w *NotificationWidget) ConfirmDelete() {
 		event.InProgress = false
 		event.SetTimeout(time.Second * 2)
 		event.Update()
-
-		w.pendingDeletes = []*expanders.TreeNode{}
 	}()
 }
 

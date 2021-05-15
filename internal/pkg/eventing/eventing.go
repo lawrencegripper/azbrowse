@@ -61,6 +61,8 @@ func (s *StatusEvent) HasExpired() bool {
 
 // Update sends and update to the status event
 func (s *StatusEvent) Update() {
+	// lets assume this should bump the timeout by 5secs
+	s.SetTimeout(time.Second * 5)
 	SendStatusEvent(s)
 }
 
