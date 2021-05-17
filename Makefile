@@ -41,8 +41,14 @@ build:
 
 ## ci: 
 ##		Build lint and check
-ci: swagger-codegen checks test
+ci: swagger-codegen checks test gosec
 	$(GO_BINARY) build ./cmd/azbrowse
+
+## gosec: 
+##		Detect potential security issues in code
+gosec:
+	## Ignoring G104 as golangci-lint checks for unhandled errors
+	gosec -exclude G104 -nosec ./...
 
 ## debug:
 ##		Starts azbrowse using Delve ready for debugging from VSCode.
