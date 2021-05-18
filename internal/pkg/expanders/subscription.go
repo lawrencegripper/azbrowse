@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
 )
@@ -39,6 +40,17 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 
 	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	newItems := []*TreeNode{}
+	newItems = append(newItems, &TreeNode{
+		Parentid:       currentItem.ID,
+		Namespace:      "None",
+		Display:        style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
+		Name:           "Deployments",
+		ID:             currentItem.ID + "/providers/Microsoft.Resources/deployments",
+		ExpandURL:      currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2020-10-01",
+		ItemType:       deploymentsType,
+		DeleteURL:      "",
+		SubscriptionID: currentItem.SubscriptionID,
+	})
 
 	//    \/ It's not the usual ... look out
 	if err == nil {
