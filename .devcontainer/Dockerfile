@@ -94,8 +94,6 @@ RUN \
     && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.159.0"\
     # --> Go rich output for testing with colors
     && go get github.com/kyoh86/richgo@v0.3.6 \
-    # --> Install gosec tool
-    && curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.7.0 \
     && rm -rf /go/src/ && rm -rf /go/pkg
 
 RUN echo "alias go=richgo" >> "/root/.bashrc"

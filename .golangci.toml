@@ -22,13 +22,21 @@
     ignore-words = ["listend", "analyses"]
 
 [linters]
-  enable = ["vet", "golint", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet", "ineffassign"]
+  enable = ["vet", "golint", "gofmt", "deadcode", "varcheck", "structcheck", "misspell", "errcheck", "gosimple", "govet", "ineffassign", "gosec"]
 
 [issues]
   exclude-use-default = false
   max-per-linter = 0
   max-same-issues = 0
   exclude = []
+
+  #Ignore gosec error for unchecked errors as handled by other linters
+  [[issues.exclude-rules]]
+    text = "G104: Errors unhandled."
+    linters = ["gosec"]
+  [[issues.exclude-rules]]
+    text = "G307*"
+    linters = ["gosec"]
   
   #Ignore gocui funcs
   [[issues.exclude-rules]]
