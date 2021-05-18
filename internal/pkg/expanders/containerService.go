@@ -315,6 +315,7 @@ func (e *AzureKubernetesServiceExpander) getHTTPClientFromConfig(kubeConfig kube
 		TLSClientConfig: &tls.Config{
 			Certificates: []tls.Certificate{cert},
 			RootCAs:      caCerts,
+			MinVersion:   tls.VersionTLS12,
 		},
 	}
 
