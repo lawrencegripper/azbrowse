@@ -118,11 +118,12 @@ func (e *SubscriptionExpander) testCases() (bool, *[]expanderTestCase) {
 			statusCode:   200,
 			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
 				st.Expect(t, r.Err, nil)
-				st.Expect(t, len(r.Nodes), 6)
+				st.Expect(t, len(r.Nodes), 7)
 
 				// Validate content
-				st.Expect(t, r.Nodes[0].Name, "1testrg")
-				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/resources?api-version=2017-05-10")
+				st.Expect(t, r.Nodes[0].Name, "Deployments")
+				st.Expect(t, r.Nodes[1].Name, "1testrg")
+				st.Expect(t, r.Nodes[1].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/resources?api-version=2017-05-10")
 			},
 		},
 		{
