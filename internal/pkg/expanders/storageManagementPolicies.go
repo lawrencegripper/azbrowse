@@ -70,6 +70,7 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 							Err: err,
 						}
 					}
+					resourceTypeRef := resourceType
 					newItems = append(newItems, &TreeNode{
 						Parentid:            currentItem.ID,
 						Namespace:           "storageManagementPolicies",
@@ -77,7 +78,7 @@ func (e *StorageManagementPoliciesExpander) Expand(ctx context.Context, currentI
 						Display:             "Management Policy",
 						ItemType:            SubResourceType,
 						ExpandURL:           url,
-						SwaggerResourceType: &resourceType,
+						SwaggerResourceType: &resourceTypeRef,
 					})
 
 					break

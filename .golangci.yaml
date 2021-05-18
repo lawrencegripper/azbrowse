@@ -4,8 +4,13 @@ run:
 linters-settings:
   gosec:
     excludes:
+      # Error types not being check is covered by other linters
       - G104
       - G307
+      # Azb invokes commands / read files on the users behalf. As it runs under the users identity on their machine
+      # I think the impact of passing user input is minimal. See: #351
+      - G304
+      - G204
   govet:
     check-shadowing: true
   gocyclo:
