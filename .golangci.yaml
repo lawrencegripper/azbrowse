@@ -28,7 +28,7 @@ linters-settings:
 linters:
   enable:
     - vet
-    - golint
+    - revive
     - gofmt
     - deadcode
     - varcheck
@@ -65,16 +65,16 @@ issues:
       #Ignore comments for KeyBinding Handler funcs
     - path: internal/pkg/keybindings/listhandlers.go
       linters:
-        - golint
+        - revive
     - path: internal/pkg/keybindings/commandpanelhandlers.go
       linters:
-        - golint
+        - revive
     - path: internal/pkg/keybindings/itemhandlers.go
       linters:
-        - golint
+        - revive
     - path: internal/pkg/keybindings/globalhandlers.go
       linters:
-        - golint
+        - revive
     - path: internal/pkg/*
       linters:
-        - golint
+        - revive
