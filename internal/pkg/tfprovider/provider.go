@@ -120,7 +120,7 @@ func installProvider(ctx context.Context, name string, version string, providerP
 	}
 	`, name, version)
 
-	err = ioutil.WriteFile(path.Join(workingDir, "provider.tf"), []byte(providerFileContent), 0644)
+	err = ioutil.WriteFile(path.Join(workingDir, "provider.tf"), []byte(providerFileContent), 0600)
 	if err != nil {
 		return fmt.Errorf("Failed to create provider.tf file %w", err)
 	}
