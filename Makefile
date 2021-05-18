@@ -41,7 +41,7 @@ build:
 
 ## ci: 
 ##		Build lint and check
-ci: swagger-codegen checks test gosec
+ci: swagger-codegen checks test
 	$(GO_BINARY) build ./cmd/azbrowse
 
 ## debug:
