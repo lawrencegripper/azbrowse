@@ -219,7 +219,8 @@ func GetPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string)
 			getVerb = "get"
 		}
 
-		getOperation, err := getOperationByVerb(&swaggerPathItem, getVerb)
+		swaggerPathItemRef := swaggerPathItem
+		getOperation, err := getOperationByVerb(&swaggerPathItemRef, getVerb)
 		if err != nil {
 			return []Path{}, err
 		}

@@ -135,7 +135,7 @@ func TestEditRG(t *testing.T) {
 	newContent = strings.Replace(newContent, "replaceme", "replaceme1", -1)
 
 	// Write update
-	err = ioutil.WriteFile(fullResourcePath, []byte(newContent), 0644)
+	err = ioutil.WriteFile(fullResourcePath, []byte(newContent), 0600)
 	if err != nil {
 		log.Println(err)
 	}

@@ -225,7 +225,7 @@ func (e *TerraformImportExpander) getTfProvider(context context.Context, subscri
 	if err == nil {
 		azbPath = user.HomeDir + "/.azbrowse/terraform/"
 	}
-	err = os.MkdirAll(azbPath, 0777)
+	err = os.MkdirAll(azbPath, 0750)
 	if err != nil {
 		return nil, err
 	}

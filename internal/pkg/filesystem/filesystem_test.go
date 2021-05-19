@@ -279,7 +279,7 @@ func Test_Edit_Resource_DirectNavigation(t *testing.T) {
 
 	//Todo: Do some editing here....
 	resourceFilePath := path.Join(builtPath, fmt.Sprintf("resource.%s.json", resourceNameMock))
-	err = ioutil.WriteFile(resourceFilePath, []byte("{ 'somejson': 'here' }"), 0777)
+	err = ioutil.WriteFile(resourceFilePath, []byte("{ 'somejson': 'here' }"), 0600)
 
 	assert.NoError(t, err, "Expect write to succeed")
 

@@ -272,7 +272,7 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 			tmpDir = "/tmp"
 		}
 		tmpPath := tmpDir + "/k8s-paths.yml"
-		ioutil.WriteFile(tmpPath, tempBuf, 0644) //nolint:errcheck
+		ioutil.WriteFile(tmpPath, tempBuf, 0600) //nolint:errcheck
 	}
 
 	swaggerResourceTypes = swagger.ConvertToSwaggerResourceTypes(paths)
@@ -315,6 +315,7 @@ func (e *AzureKubernetesServiceExpander) getHTTPClientFromConfig(kubeConfig kube
 		TLSClientConfig: &tls.Config{
 			Certificates: []tls.Certificate{cert},
 			RootCAs:      caCerts,
+			MinVersion:   tls.VersionTLS12,
 		},
 	}
 
