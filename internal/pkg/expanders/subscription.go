@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
 )
@@ -39,6 +40,17 @@ func (e *SubscriptionExpander) Expand(ctx context.Context, currentItem *TreeNode
 
 	data, err := e.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	newItems := []*TreeNode{}
+	newItems = append(newItems, &TreeNode{
+		Parentid:       currentItem.ID,
+		Namespace:      "None",
+		Display:        style.Subtle("[Microsoft.Resources]") + "\n  Deployments",
+		Name:           "Deployments",
+		ID:             currentItem.ID + "/providers/Microsoft.Resources/deployments",
+		ExpandURL:      currentItem.ID + "/providers/Microsoft.Resources/deployments?api-version=2020-10-01",
+		ItemType:       deploymentsType,
+		DeleteURL:      "",
+		SubscriptionID: currentItem.SubscriptionID,
+	})
 
 	//    \/ It's not the usual ... look out
 	if err == nil {
@@ -106,11 +118,12 @@ func (e *SubscriptionExpander) testCases() (bool, *[]expanderTestCase) {
 			statusCode:   200,
 			treeNodeCheckerFunc: func(t *testing.T, r ExpanderResult) {
 				st.Expect(t, r.Err, nil)
-				st.Expect(t, len(r.Nodes), 6)
+				st.Expect(t, len(r.Nodes), 7)
 
 				// Validate content
-				st.Expect(t, r.Nodes[0].Name, "1testrg")
-				st.Expect(t, r.Nodes[0].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/resources?api-version=2017-05-10")
+				st.Expect(t, r.Nodes[0].Name, "Deployments")
+				st.Expect(t, r.Nodes[1].Name, "1testrg")
+				st.Expect(t, r.Nodes[1].ExpandURL, "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/1testrg/resources?api-version=2017-05-10")
 			},
 		},
 		{

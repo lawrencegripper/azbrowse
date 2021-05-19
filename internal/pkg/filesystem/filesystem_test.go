@@ -186,7 +186,7 @@ func Test_Get_Sub_TreeWalk(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, 7, len(files), "Expected 6 RGs + index file from mock response")
+	assert.Equal(t, 8, len(files), "Expected 6 RGs + deployments and index file from mock response")
 	checkPendingMocks(t)
 }
 
