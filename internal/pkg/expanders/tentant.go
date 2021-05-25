@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
@@ -78,7 +82,9 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	}
 
 	newList := []*TreeNode{}
+	subIds := make([]string, 0, len(subRequest.Subs))
 	for _, sub := range subRequest.Subs {
+		subIds = append(subIds, sub.ID)
 		newList = append(newList, &TreeNode{
 			Display:        sub.DisplayName,
 			Name:           sub.DisplayName,
@@ -86,6 +92,26 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 			ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
 			ItemType:       SubscriptionType,
 			SubscriptionID: sub.SubscriptionID,
+		})
+	}
+
+	// Load any custom graph queryies
+	queries, err := config.GetCustomResourceGraphQueries()
+	if err != nil {
+		eventing.SendFailureStatus(fmt.Sprintf("Failed to load custom resource graph queries %q", err))
+	}
+	for _, query := range queries {
+		newList = append(newList, &TreeNode{
+			Display:        style.Subtle("[Microsoft.ResourceGraph]") + "\nQuery: " + query.Name,
+			Name:           query.Name,
+			ID:             query.Name,
+			ExpandURL:      ExpandURLNotSupported,
+			ItemType:       ResourceGraphQueryType,
+			SubscriptionID: NotSupported,
+			Metadata: map[string]string{
+				"subscriptions": strings.Join(subIds, ","),
+				"query":         query.Query,
+			},
 		})
 	}
 
