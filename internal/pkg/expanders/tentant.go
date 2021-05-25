@@ -84,7 +84,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	newList := []*TreeNode{}
 	subIds := make([]string, 0, len(subRequest.Subs))
 	for _, sub := range subRequest.Subs {
-		subIds = append(subIds, sub.ID)
+		subIds = append(subIds, strings.Replace(sub.ID, "/subscriptions/", "", 1))
 		newList = append(newList, &TreeNode{
 			Display:        sub.DisplayName,
 			Name:           sub.DisplayName,
@@ -102,7 +102,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	}
 	for _, query := range queries {
 		newList = append(newList, &TreeNode{
-			Display:        style.Subtle("[Microsoft.ResourceGraph]") + "\nQuery: " + query.Name,
+			Display:        style.Subtle("[Microsoft.ResourceGraph]") + "\n  Query: " + query.Name,
 			Name:           query.Name,
 			ID:             query.Name,
 			ExpandURL:      ExpandURLNotSupported,

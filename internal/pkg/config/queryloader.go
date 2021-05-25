@@ -53,7 +53,7 @@ func GetCustomResourceGraphQueries() ([]GraphQuery, error) {
 			return nil, fmt.Errorf("query file in incorrect format, must contain #namehere in each query section. Found %q", lines[0])
 		}
 		graphQueries = append(graphQueries, GraphQuery{
-			Name:  lines[0],
+			Name:  strings.Replace(lines[0], "#", "", 1),
 			Query: strings.Join(lines[1:], ""), // Flatten the query to a single line for ease as kusto doesn't care
 		})
 	}
