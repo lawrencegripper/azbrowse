@@ -1,0 +1,5 @@
+# 5 items
+resourcecontainers | where type == 'microsoft.resources/subscriptions/resourcegroups' | take 5
+---
+# anotherquery
+resourcecontainers | where type == 'microsoft.resources/subscriptions/resourcegroups' | take 5
