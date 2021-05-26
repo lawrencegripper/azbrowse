@@ -1,11 +1,12 @@
 package config
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
-	"os/user"
+	"path"
 	"strings"
+
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 )
 
 // GraphQuery represents a custom query for Azure Resource Graph which should be presented
@@ -18,45 +19,34 @@ type GraphQuery struct {
 // GetCustomResourceGraphQueries retreives custom resource queries from the ~/.azbrowse-queries.config file
 // The file should be
 func GetCustomResourceGraphQueries() ([]GraphQuery, error) {
-	queryFileLocation := "/root/.azbrowse-query.config"
-	user, err := user.Current()
-	if err == nil {
-		queryFileLocation = user.HomeDir + "/.azbrowse-query.config"
+	queryDirLocation := storage.GetStorageDir()
+	// Create the dir if it doesn't exist
+	err := os.MkdirAll(queryDirLocation, 0644)
+	if err != nil {
+		return []GraphQuery{}, nil
 	}
 
-	_, err = os.Stat(queryFileLocation)
+	_, err = os.Stat(queryDirLocation)
 	if err != nil {
 		// don't error on no config file
 		return []GraphQuery{}, nil
 	}
 
-	configFile, err := os.Open(queryFileLocation)
+	files, err := ioutil.ReadDir(queryDirLocation)
 	if err != nil {
 		return []GraphQuery{}, err
 	}
-	defer configFile.Close() //nolint: errcheck
-	bytes, _ := ioutil.ReadAll(configFile)
-
-	rawQueries := strings.Split(string(bytes), "---\n")
-	graphQueries := make([]GraphQuery, 0, len(rawQueries))
-	for _, rawQuery := range rawQueries {
-		if len(rawQuery) == 0 {
-			// Skip any empty sections
+	queries := make([]GraphQuery, 0, len(files))
+	for _, file := range files {
+		if !strings.HasSuffix(file.Name(), ".kql") {
 			continue
 		}
-		lines := strings.Split(rawQuery, "\n")
-		if len(lines) < 2 {
-			return nil, fmt.Errorf("query file in incorrect format, section with less than 2 lines, see docs. Found %q", rawQuery)
+		content, err := os.ReadFile(path.Join(queryDirLocation, file.Name()))
+		if err != nil {
+			return []GraphQuery{}, err
 		}
-		// First line must be query name prefixed with a #
-		if !strings.HasPrefix(lines[0], "#") {
-			return nil, fmt.Errorf("query file in incorrect format, must contain #namehere in each query section. Found %q", lines[0])
-		}
-		graphQueries = append(graphQueries, GraphQuery{
-			Name:  strings.Replace(lines[0], "#", "", 1),
-			Query: strings.Join(lines[1:], ""), // Flatten the query to a single line for ease as kusto doesn't care
-		})
+		queries = append(queries, GraphQuery{Name: file.Name(), Query: string(content)})
 	}
 
-	return graphQueries, nil
+	return queries, nil
 }
