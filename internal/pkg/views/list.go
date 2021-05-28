@@ -35,7 +35,6 @@ type ListWidget struct {
 	ctx                  context.Context
 	view                 *gocui.View
 	enableTracing        bool
-	lastTopIndex         int
 	shouldRender         bool
 	lastCalculatedHeight int
 	hitBoxes             []hitbox
@@ -57,7 +56,7 @@ type ListNavigatedEventState struct {
 
 // NewListWidget creates a new instance
 func NewListWidget(ctx context.Context, x, y, w, h int, items []string, selected int, contentView *ItemWidget, status *StatusbarWidget, enableTracing bool, title string, shouldRender bool, g *gocui.Gui) *ListWidget {
-	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, lastTopIndex: 0, shouldRender: shouldRender, g: g}
+	listWidget := &ListWidget{ctx: ctx, x: x, y: y, w: w, h: h, contentView: contentView, statusView: status, enableTracing: enableTracing, shouldRender: shouldRender, g: g}
 	return listWidget
 }
 
@@ -141,10 +140,8 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 		}
 
 		linesUsedCount := 0
-		renderedItems := make([]string, 0, w.itemCount())
-
-		renderedItems = append(renderedItems, style.Separator("  ---\n"))
-
+		completeString := strings.Builder{}
+		completeString.WriteString(style.Separator("  ---\n"))
 		for i, s := range w.itemsToShow() {
 			// Calculate the start and end line of this item
 			// this is used to translate the x,y of a mouse click
@@ -164,41 +161,51 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 			linesUsedCount += strings.Count(itemToShow, "\n")
 			itemHitbox.end = linesUsedCount
 			itemHitbox.itemIndex = i
-			renderedItems = append(renderedItems, itemToShow)
+			completeString.WriteString(itemToShow) //nolint: errcheck
 			w.hitBoxes = append(w.hitBoxes, itemHitbox)
 		}
 
-		linesPerItem := linesUsedCount / w.itemCount()
-		// Handle a rare edge case where no lines are used per item
-		if linesPerItem == 0 {
-			linesPerItem = 1
+		// Hack, find the line currently selected
+		lines := strings.Split(completeString.String(), "\n")
+		var selectedLine int
+		for i, line := range lines {
+			if strings.HasPrefix(line, "▶ ") {
+				selectedLine = i
+				break
+			}
 		}
-		maxItemsCanShow := (height / linesPerItem) - 1 // minus 1 to be on the safe side
+		// Calculate the last line of the selected item
+		// ie. With a 3 line item find the index of it's last line
+		_, linesUsed := w.FindItemIndexOnLine(0, selectedLine)
+		selectedLine = selectedLine + linesUsed
+		// Find out how many lines we have available in the list view
+		_, y0, _, y1 := v.Dimensions()
+		availableLines := y1 - y0
+		// Configure the top and bottom indexs for the view
+		topIndex := 0
+		bottomIndex := availableLines
 
-		topIndex := w.lastTopIndex
-		bottomIndex := w.lastTopIndex + maxItemsCanShow
-
-		if w.currentPage.Selection >= bottomIndex {
+		// Is the selected line off the bottom of the view?
+		if selectedLine >= bottomIndex {
 			// need to adjust down
-			diff := w.currentPage.Selection - bottomIndex + 1
+			diff := selectedLine - bottomIndex + 1
 			topIndex += diff
 			bottomIndex += diff
 		}
-		if w.currentPage.Selection < topIndex {
+
+		// Is the selected line off the top of the view?
+		if selectedLine < topIndex {
 			// need to adjust up
-			diff := topIndex - w.currentPage.Selection
+			diff := topIndex - selectedLine
 			topIndex -= diff
 			bottomIndex -= diff
 		}
-		w.lastTopIndex = topIndex
-		if bottomIndex > len(renderedItems) {
-			bottomIndex = len(renderedItems) - 1
-		}
 
+		// Draw the lines which should be shown in the view based on the top and bottom index
 		for index := topIndex; index < bottomIndex+1; index++ {
-			if index < len(renderedItems) {
-				item := renderedItems[index]
-				fmt.Fprint(v, item)
+			if index < len(lines) {
+				item := lines[index]
+				fmt.Fprint(v, item+"\n")
 			}
 		}
 
@@ -219,15 +226,26 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 	return nil
 }
 
-func (w *ListWidget) MouseClick(x, y int) {
+// FindItemIndexOnLine finds index of the item at a particular line on the list
+// eg. w.itemsToShow()[!indexHere!] it also returns how man lines are used by that item in the list
+// if the item's display name has 3 new lines in it it'll linesUsed = 3
+func (w *ListWidget) FindItemIndexOnLine(x, y int) (itemIndex, linesUsed int) {
 	// Currently mouse is only bound to this view so don't have to worry about
 	// the x coordinate being inside the view, just which item y is over
 	for _, item := range w.hitBoxes {
 		if y >= item.start && y <= item.end {
-			w.ChangeSelection(item.itemIndex)
-			w.ExpandCurrentSelection()
+			return item.itemIndex, item.end - item.start
 		}
 	}
+	return 0, 0
+}
+
+// MouseClick expands an item given it's x,y coordinates
+// Todo: May not work with scrolled lists
+func (w *ListWidget) MouseClick(x, y int) {
+	itemIndex, _ := w.FindItemIndexOnLine(x, y)
+	w.ChangeSelection(itemIndex)
+	w.ExpandCurrentSelection()
 }
 
 // Refresh refreshes the current view
