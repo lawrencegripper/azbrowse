@@ -37,6 +37,7 @@ type Client struct {
 	tenantID           string
 	responseProcessors []ResponseProcessor
 	limiter            *rate.Limiter
+	clientType         string
 
 	acquireToken TokenFunc
 }
@@ -68,6 +69,20 @@ func NewClientFromConfig(client *http.Client, tokenFunc TokenFunc, reqPerSecLimi
 		acquireToken:       tokenFunc,
 		limiter:            rate.NewLimiter(rate.Limit(reqPerSecLimit), 10), // Keep the rate limitter but set high values for tests to complete quickly
 		client:             client,
+	}
+}
+
+// NewGraphClientFromCLI creates a new client for MS Graph
+func NewGraphClientFromCLI(tenantID string, responseProcessors ...ResponseProcessor) *Client {
+	aquireToken := func(clearCache bool) (AzCLIToken, error) {
+		return AcquireTokenForGraphFromAzCLI()
+	}
+	return &Client{
+		responseProcessors: responseProcessors,
+		limiter:            rate.NewLimiter(requestPerSecLimit, requestPerSecBurst),
+		acquireToken:       aquireToken,
+		client:             &http.Client{},
+		clientType:         "graph",
 	}
 }
 
@@ -156,7 +171,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 	span, _ := tracing.StartSpanFromContext(ctx, "request:"+method, tracing.SetTag("path", path))
 	defer span.Finish()
 
-	url, err := getRequestURL(path)
+	url, err := getRequestURL(path, c.clientType)
 	if err != nil {
 		return "", err
 	}

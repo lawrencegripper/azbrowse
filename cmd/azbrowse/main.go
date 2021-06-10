@@ -58,6 +58,9 @@ func run(settings *config.Settings) {
 	armClient := armclient.NewClientFromCLI(settings.TenantID, responseProcessor)
 	armclient.LegacyInstance = armClient
 
+	// Create a ARM Client for MS-Graph to use
+	graphClient := armclient.NewGraphClientFromCLI(settings.TenantID, responseProcessor)
+
 	// Start up gocui and configure some settings
 	g, err := gocui.NewGui(gocui.OutputTrue, false)
 	if err != nil {
@@ -101,7 +104,7 @@ func run(settings *config.Settings) {
 
 	// Initialize the expanders which will let the user walk the tree of
 	// resources in Azure
-	expanders.InitializeExpanders(armClient, g, commandPanel, content)
+	expanders.InitializeExpanders(armClient, graphClient, g, commandPanel, content)
 
 	// Start a go routine to populate the list with root of the nodes
 	startPopulatingList(ctx, g, list, armClient)

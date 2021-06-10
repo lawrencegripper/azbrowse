@@ -134,7 +134,9 @@ type TreeNode struct {
 
 const (
 	// SubscriptionType defines a sub
-	SubscriptionType  = "subscription"
+	SubscriptionType = "subscription"
+	// GraphType defines the Graph resource
+	GraphType         = "graph"
 	resourceGroupType = "resourcegroup"
 	// ResourceType defines a top level resource such as a Storage Account or VM
 	ResourceType = "resource"

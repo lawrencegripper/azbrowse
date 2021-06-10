@@ -78,6 +78,16 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	}
 
 	newList := []*TreeNode{}
+	newList = append(newList, &TreeNode{
+		Display:        "MS Graph",
+		Namespace:      "graph",
+		Name:           "MS Graph",
+		ID:             "graph",
+		ExpandURL:      ExpandURLNotSupported,
+		ItemType:       GraphType,
+		SubscriptionID: "",
+	})
+
 	for _, sub := range subRequest.Subs {
 		newList = append(newList, &TreeNode{
 			Display:        sub.DisplayName,

@@ -10,6 +10,7 @@ import (
 const (
 	armEndpoint       string = "https://management.azure.com"
 	armEndpointSuffix string = "management.azure.com"
+	graphEndpoint     string = "https://graph.microsoft.com/v1.0"
 )
 
 func isArmURLPath(urlPath string) bool {
@@ -19,12 +20,16 @@ func isArmURLPath(urlPath string) bool {
 		strings.HasPrefix(urlPath, "/providers")
 }
 
-func getRequestURL(path string) (string, error) {
+func getRequestURL(path string, clientType string) (string, error) {
 	u, err := url.ParseRequestURI(path)
 
 	if err != nil || !u.IsAbs() {
-		if !isArmURLPath(path) {
+		if clientType != "graph" && !isArmURLPath(path) {
 			return "", errors.New("Url path specified is invalid")
+		}
+
+		if clientType == "graph" {
+			return graphEndpoint + path, nil
 		}
 
 		return armEndpoint + path, nil
