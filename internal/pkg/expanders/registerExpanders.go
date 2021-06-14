@@ -38,7 +38,7 @@ func InitializeExpanders(client *armclient.Client, graphClient *armclient.Client
 		&TenantExpander{
 			client: client,
 		},
-		NewGraphExpander(graphClient),
+		NewGraphExpander(graphClient, gui, commandPanel, contentPanel),
 		&ResourceGroupResourceExpander{
 			client: client,
 		},

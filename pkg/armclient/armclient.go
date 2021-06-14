@@ -149,6 +149,10 @@ func (c *Client) DoRawRequest(ctx context.Context, req *http.Request) (*http.Res
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
 
+	if c.clientType == "graph" {
+		req.Header.Set("ConsistencyLevel", "eventual")
+	}
+
 	var span opentracing.Span
 	reservation := c.limiter.Reserve()
 	if !reservation.OK() {
