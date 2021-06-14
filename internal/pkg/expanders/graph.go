@@ -32,24 +32,30 @@ func (e *GraphExpander) setClient(c *armclient.Client) {
 }
 
 const (
-	namespace           = "graph"
+	namespace = "graph"
+
 	itemTypeMe          = "graph/me"
 	itemTypeAppOrSpList = "graph/apporsplist"
 	itemTypeAppOrSp     = "graph/apporsp"
 
-	searchAppsOrSps = "apporsp/search"
+	actionUpdateItem = "updateitem"
+	actionSearch     = "search"
+	actionViewOwners = "owners"
 )
 
+// MeResponse used for the /me response
 type MeResponse struct {
 	Mail        string `json:"mail"`
 	DisplayName string `json:"displayName"`
 }
 
+// AppsResponse used for the Apps / Service Principal list
 type AppsResponse struct {
-	Id          string `json:"id"`
+	ID          string `json:"id"`
 	DisplayName string `json:"displayName"`
 }
 
+// AppsListResponse is a wrapper for AppsResponse
 type AppsListResponse struct {
 	Items []AppsResponse `json:"value"`
 }
@@ -71,7 +77,7 @@ func (e *GraphExpander) Name() string {
 
 // DoesExpand checks if this node can/should expand
 func (e *GraphExpander) DoesExpand(ctx context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.Namespace == "graph" {
+	if currentItem.Namespace == namespace {
 		return true, nil
 	}
 	return false, nil
@@ -87,57 +93,19 @@ func (e *GraphExpander) Expand(ctx context.Context, currentItem *TreeNode) Expan
 		return e.listAppsOrSps(ctx, currentItem, "")
 	case itemTypeAppOrSp:
 		return e.showAppOrSp(ctx, currentItem)
+	case "graph":
+		return e.listRootMenu(ctx, currentItem)
+	case "action":
+		return ExpanderResult{
+			SourceDescription: "GraphExpander",
+			Err:               nil,
+		}
 	}
 
-	return e.listRootMenu(ctx, currentItem)
-
-	// if currentItem.Name == "Service Principals" {
-	// 	// get the list of sp's
-	// 	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.ExpandURL)
-	// 	if err == nil {
-	// 		var spListResponse AppsListResponse
-	// 		err = json.Unmarshal([]byte(data), &spListResponse)
-	// 		if err != nil {
-	// 			panic(err)
-	// 		}
-
-	// 		nodes := []*TreeNode{}
-	// 		for _, servicePrincipal := range spListResponse.Items {
-
-	// 			nodes = append(nodes,
-	// 				&TreeNode{
-	// 					Parentid:              currentItem.ID,
-	// 					ID:                    servicePrincipal.Id,
-	// 					Namespace:             "graph",
-	// 					Name:                  servicePrincipal.DisplayName,
-	// 					Display:               servicePrincipal.DisplayName,
-	// 					ExpandURL:             "/servicePrincipals/" + servicePrincipal.Id,
-	// 					ItemType:              "app",
-	// 					SuppressGenericExpand: true,
-	// 				})
-	// 		}
-
-	// 		return ExpanderResult{
-	// 			Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
-	// 			SourceDescription: "GraphSPListExpander request",
-	// 			Nodes:             nodes,
-	// 			IsPrimaryResponse: true,
-	// 		}
-	// 	}
-	// }
-
-	// if currentItem.Parentid == "graph/servicePrincipals" {
-	// 	// get the list of sps
-	// 	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.ExpandURL)
-	// 	if err == nil {
-	// 		return ExpanderResult{
-	// 			Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
-	// 			SourceDescription: "GraphAppExpander request",
-	// 			Nodes:             []*TreeNode{},
-	// 			IsPrimaryResponse: true,
-	// 		}
-	// 	}
-	//}
+	return ExpanderResult{
+		SourceDescription: "GraphExpander",
+		Err:               fmt.Errorf("Unhandled Graph Expander - " + currentItem.ItemType),
+	}
 }
 
 // Delete attempts to delete the item. Returns true if deleted, false if not handled, an error if an error occurred attempting to delete
@@ -157,25 +125,38 @@ func (e *GraphExpander) Delete(ctx context.Context, currentItem *TreeNode) (bool
 
 // HasActions is a default implementation returning false to indicate no actions available
 func (e *GraphExpander) HasActions(context context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ItemType == itemTypeAppOrSp {
+	if currentItem.ItemType == itemTypeAppOrSp || currentItem.ItemType == itemTypeAppOrSpList {
 		return true, nil
 	}
 
 	return false, nil
 }
 
-// ListActions returns an error as it should not be called as HasActions returns false
+// ListActions returns the actions for an app / sp
 func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNode) ListActionsResult {
 	nodes := []*TreeNode{}
+
+	if currentItem.ItemType == itemTypeAppOrSpList {
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              currentItem.ID,
+				ID:                    actionSearch,
+				Namespace:             namespace,
+				Name:                  "Search",
+				Display:               "Search",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+			})
+	}
 
 	if currentItem.ItemType == itemTypeAppOrSp {
 		nodes = append(nodes,
 			&TreeNode{
 				Parentid:              currentItem.ID,
-				ID:                    searchAppsOrSps,
+				ID:                    actionUpdateItem,
 				Namespace:             namespace,
-				Name:                  "Search",
-				Display:               "Search",
+				Name:                  "Update Item",
+				Display:               "Update Item",
 				ItemType:              ActionType,
 				SuppressGenericExpand: true,
 			})
@@ -183,15 +164,12 @@ func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNo
 		nodes = append(nodes,
 			&TreeNode{
 				Parentid:              currentItem.ID,
-				ID:                    currentItem.ItemType + "?update",
+				ID:                    actionViewOwners,
 				Namespace:             namespace,
-				Name:                  "Update Item",
-				Display:               "Update Item",
+				Name:                  "View Owners",
+				Display:               "View Owners",
 				ItemType:              ActionType,
 				SuppressGenericExpand: true,
-				Metadata: map[string]string{
-					"ActionID": "UpdateAppOrSp",
-				},
 			})
 	}
 
@@ -205,67 +183,18 @@ func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNo
 // ExecuteAction returns an error as it should not be called as HasActions returns false
 func (e *GraphExpander) ExecuteAction(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
-	if currentItem.Name == "Update Item" {
-		// get the data for the editor panel
-		data, err := e.armClient.DoRequest(ctx, "GET", currentItem.Parent.ExpandURL)
-		if err == nil {
-			content, err := editor.OpenForContent(data, ".json")
-			if err != nil {
-				return ExpanderResult{
-					Err:               err,
-					SourceDescription: "GraphAppUpdate request",
-					IsPrimaryResponse: true,
-				}
-			}
-			if content == data || strings.TrimSpace(content) == "" {
-				return ExpanderResult{
-					Err:               fmt.Errorf("User canceled"),
-					SourceDescription: "GraphAppUpdate request",
-					IsPrimaryResponse: true,
-				}
-			}
-
-			update, err := e.armClient.DoRequest(ctx, "PATCH", currentItem.Parent.ExpandURL)
-			if err != nil {
-				return ExpanderResult{
-					Err:               err,
-					SourceDescription: "GraphAppUpdate request",
-					IsPrimaryResponse: true,
-				}
-			}
-			return ExpanderResult{
-				Response:          ExpanderResponse{Response: update, ResponseType: interfaces.ResponseJSON},
-				SourceDescription: "GraphAppUpdate request",
-				Nodes:             []*TreeNode{},
-				IsPrimaryResponse: true,
-			}
-		}
-	}
-
-	if currentItem.Name == "Search" {
-		commandChannel := make(chan string, 1)
-		commandPanelNotification := func(state interfaces.CommandPanelNotification) {
-			if state.EnterPressed {
-				commandChannel <- state.CurrentText
-				e.commandPanel.Hide()
-			}
-		}
-
-		e.commandPanel.ShowWithText("App Name:", "", nil, commandPanelNotification)
-
-		queryText := <-commandChannel
-
-		// Force UI to re-render to pickup
-		e.gui.Update(func(g *gocui.Gui) error {
-			return nil
-		})
-
-		return e.listAppsOrSps(ctx, currentItem, queryText)
+	switch currentItem.ID {
+	case actionUpdateItem:
+		return e.updateAppOrSp(ctx, currentItem)
+	case actionSearch:
+		return e.searchAppsOrSps(ctx, currentItem)
+	case actionViewOwners:
+		return e.showOwners(ctx, currentItem)
 	}
 
 	return ExpanderResult{
 		SourceDescription: "GraphExpander",
-		Err:               fmt.Errorf("Unhandled ActionID"),
+		Err:               fmt.Errorf("Unhandled ActionID - " + currentItem.ID),
 	}
 }
 
@@ -315,13 +244,40 @@ func (e *GraphExpander) listRootMenu(ctx context.Context, currentItem *TreeNode)
 	}
 }
 
+func (e *GraphExpander) showMe(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+
+	// make the graph call
+	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	if err == nil {
+		var meResponse MeResponse
+		jsonErr := json.Unmarshal([]byte(data), &meResponse)
+		if jsonErr == nil {
+			return ExpanderResult{
+				Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
+				SourceDescription: "GraphMeExpander request",
+				Nodes:             []*TreeNode{},
+				IsPrimaryResponse: true,
+			}
+		}
+		return ExpanderResult{
+			SourceDescription: "GraphExpander failed to map ME result to object",
+			Err:               jsonErr,
+		}
+	}
+
+	return ExpanderResult{
+		SourceDescription: "GraphExpander failed to show ME",
+		Err:               err,
+	}
+}
+
 func (e *GraphExpander) listAppsOrSps(ctx context.Context, currentItem *TreeNode, queryText string) ExpanderResult {
 	// get the list of apps
 	url := currentItem.ExpandURL
 	expandURLRoot := currentItem.ID
 
-	if queryText != "" { // are we in search mode - only available in the app / sp list view
-		expandURLRoot = currentItem.Parent.Parent.ID
+	if queryText != "" { // are we in search mode?
+		expandURLRoot = currentItem.Parent.ID
 		url = expandURLRoot + "?$search=\"displayName:" + queryText + "\""
 	}
 
@@ -339,12 +295,12 @@ func (e *GraphExpander) listAppsOrSps(ctx context.Context, currentItem *TreeNode
 			nodes = append(nodes,
 				&TreeNode{
 					Parentid:              currentItem.ID,
-					ID:                    app.Id,
-					Namespace:             "graph",
+					ID:                    expandURLRoot + "/" + app.ID,
+					Namespace:             namespace,
 					Name:                  app.DisplayName,
 					Display:               app.DisplayName,
-					ExpandURL:             expandURLRoot + "/" + app.Id,
-					DeleteURL:             expandURLRoot + "/" + app.Id,
+					ExpandURL:             expandURLRoot + "/" + app.ID,
+					DeleteURL:             expandURLRoot + "/" + app.ID,
 					ItemType:              itemTypeAppOrSp,
 					SuppressGenericExpand: true,
 				})
@@ -382,29 +338,79 @@ func (e *GraphExpander) showAppOrSp(ctx context.Context, currentItem *TreeNode) 
 	}
 }
 
-func (e *GraphExpander) showMe(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+func (e *GraphExpander) updateAppOrSp(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
-	// make the graph call
-	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.ExpandURL)
+	// get the data for the editor panel
+	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.Parent.ExpandURL)
 	if err == nil {
-		var meResponse MeResponse
-		jsonErr := json.Unmarshal([]byte(data), &meResponse)
-		if jsonErr == nil {
+		content, err := editor.OpenForContent(data, ".json")
+		if err != nil {
 			return ExpanderResult{
-				Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
-				SourceDescription: "GraphMeExpander request",
-				Nodes:             []*TreeNode{},
+				Err:               err,
+				SourceDescription: "GraphAppUpdate request",
+				IsPrimaryResponse: true,
+			}
+		}
+		if content == data || strings.TrimSpace(content) == "" {
+			return ExpanderResult{
+				Err:               fmt.Errorf("User canceled"),
+				SourceDescription: "GraphAppUpdate request",
+				IsPrimaryResponse: true,
+			}
+		}
+
+		update, err := e.armClient.DoRequest(ctx, "PATCH", currentItem.Parent.ExpandURL)
+		if err != nil {
+			return ExpanderResult{
+				Err:               err,
+				SourceDescription: "GraphAppUpdate request",
 				IsPrimaryResponse: true,
 			}
 		}
 		return ExpanderResult{
-			SourceDescription: "GraphExpander failed to map ME result to object",
-			Err:               jsonErr,
+			Response:          ExpanderResponse{Response: update, ResponseType: interfaces.ResponseJSON},
+			SourceDescription: "GraphAppUpdate request",
+			Nodes:             []*TreeNode{},
+			IsPrimaryResponse: true,
 		}
 	}
 
 	return ExpanderResult{
-		SourceDescription: "GraphExpander failed to show ME",
+		Err:               err,
+		SourceDescription: "GraphAppUpdate request",
+		IsPrimaryResponse: true,
+	}
+}
+
+func (e *GraphExpander) searchAppsOrSps(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	commandChannel := make(chan string, 1)
+	commandPanelNotification := func(state interfaces.CommandPanelNotification) {
+		if state.EnterPressed {
+			commandChannel <- state.CurrentText
+			e.commandPanel.Hide()
+		}
+	}
+
+	e.commandPanel.ShowWithText("App Name:", "", nil, commandPanelNotification)
+
+	queryText := <-commandChannel
+
+	return e.listAppsOrSps(ctx, currentItem, queryText)
+}
+
+func (e *GraphExpander) showOwners(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.Parent.ExpandURL+"/owners")
+	if err == nil {
+		return ExpanderResult{
+			Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
+			SourceDescription: "GraphAppExpander request",
+			Nodes:             []*TreeNode{},
+			IsPrimaryResponse: true,
+		}
+	}
+
+	return ExpanderResult{
+		SourceDescription: "GraphExpander failed to show the owners",
 		Err:               err,
 	}
 }
