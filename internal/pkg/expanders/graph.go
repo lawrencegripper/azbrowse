@@ -44,6 +44,8 @@ const (
 	actionViewOwners      = "owners"
 	actionListMyApps      = "listmyapps"
 	actionListDeletedApps = "deletedapps"
+	actionGetAppByID      = "getappbyid"
+	actionNewApp          = "newapp"
 )
 
 // MeResponse used for the /me response
@@ -162,6 +164,16 @@ func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNo
 				ItemType:              ActionType,
 				SuppressGenericExpand: true,
 			})
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              currentItem.ID,
+				ID:                    actionNewApp,
+				Namespace:             namespace,
+				Name:                  "New App",
+				Display:               "New App",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+			})
 	}
 
 	if currentItem.ItemType == itemTypeAppList || currentItem.ItemType == itemTypeSpList {
@@ -170,8 +182,19 @@ func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNo
 				Parentid:              currentItem.ID,
 				ID:                    actionSearch,
 				Namespace:             namespace,
-				Name:                  "Search",
-				Display:               "Search",
+				Name:                  "Search By Name",
+				Display:               "Search By Name",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+			})
+
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              currentItem.ID,
+				ID:                    actionGetAppByID,
+				Namespace:             namespace,
+				Name:                  "Get by Object ID",
+				Display:               "Get by Object ID",
 				ItemType:              ActionType,
 				SuppressGenericExpand: true,
 			})
@@ -212,10 +235,14 @@ func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNo
 func (e *GraphExpander) ExecuteAction(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	switch currentItem.ID {
+	case actionNewApp:
+		return e.newApp(ctx, currentItem)
 	case actionUpdateItem:
 		return e.updateAppOrSp(ctx, currentItem)
 	case actionSearch:
 		return e.searchAppsOrSps(ctx, currentItem)
+	case actionGetAppByID:
+		return e.getAppByID(ctx, currentItem)
 	case actionViewOwners:
 		return e.showOwners(ctx, currentItem)
 	case actionListMyApps:
@@ -340,6 +367,64 @@ func (e *GraphExpander) listFilteredApps(ctx context.Context, currentItem *TreeN
 	}
 }
 
+func (e *GraphExpander) getAppByID(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+	commandChannel := make(chan string, 1)
+	commandPanelNotification := func(state interfaces.CommandPanelNotification) {
+		if state.EnterPressed {
+			commandChannel <- state.CurrentText
+			e.commandPanel.Hide()
+		}
+	}
+
+	e.commandPanel.ShowWithText("App ID:", "", nil, commandPanelNotification)
+
+	appID := <-commandChannel
+
+	// get the list of apps
+	expandURLRoot := currentItem.Parent.ID
+
+	data, err := e.armClient.DoRequest(ctx, "GET", expandURLRoot+"/"+appID)
+	if err == nil {
+		return makeSingleApp(data, expandURLRoot, currentItem)
+	}
+
+	return ExpanderResult{
+		SourceDescription: "GraphExpander failed to get app by ID",
+		Err:               err,
+	}
+}
+
+func makeSingleApp(data string, urlRoot string, currentItem *TreeNode) ExpanderResult {
+	var appsResponse AppsResponse
+	err := json.Unmarshal([]byte(data), &appsResponse)
+	if err == nil {
+		nodes := []*TreeNode{}
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              currentItem.ID,
+				ID:                    urlRoot + "/" + appsResponse.ID,
+				Namespace:             namespace,
+				Name:                  appsResponse.DisplayName,
+				Display:               appsResponse.DisplayName,
+				ExpandURL:             urlRoot + "/" + appsResponse.ID,
+				DeleteURL:             urlRoot + "/" + appsResponse.ID,
+				ItemType:              itemTypeAppOrSp,
+				SuppressGenericExpand: true,
+			})
+
+		return ExpanderResult{
+			Response:          ExpanderResponse{Response: data, ResponseType: interfaces.ResponseJSON},
+			SourceDescription: "GraphAppsExpander request",
+			Nodes:             nodes,
+			IsPrimaryResponse: true,
+		}
+	}
+	return ExpanderResult{
+		SourceDescription: "GraphExpander failed to deserialize app result",
+		Err:               err,
+	}
+}
+
 func makeAppsList(data string, urlRoot string, currentItem *TreeNode) ExpanderResult {
 	var appsListResponse AppsListResponse
 	err := json.Unmarshal([]byte(data), &appsListResponse)
@@ -393,12 +478,47 @@ func (e *GraphExpander) showAppOrSp(ctx context.Context, currentItem *TreeNode) 
 	}
 }
 
+func (e *GraphExpander) newApp(ctx context.Context, currentItem *TreeNode) ExpanderResult {
+
+	// get the data for the editor panel
+	data := "{ \"displayName\": \"Replace this\" }"
+	content, err := editor.OpenForContent(data, ".json")
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "GraphExpander New App request",
+			IsPrimaryResponse: true,
+		}
+	}
+	if content == data || strings.TrimSpace(content) == "" {
+		return ExpanderResult{
+			Err:               fmt.Errorf("User canceled"),
+			SourceDescription: "GraphExpander New App request",
+			IsPrimaryResponse: true,
+		}
+	}
+
+	update, err := e.armClient.DoRequestWithBody(ctx, "POST", currentItem.Parent.ID, content)
+	if err != nil {
+		return ExpanderResult{
+			Err:               err,
+			SourceDescription: "GraphExpander New App request",
+			IsPrimaryResponse: true,
+		}
+	}
+	return makeSingleApp(update, currentItem.Parent.ID, currentItem)
+}
+
 func (e *GraphExpander) updateAppOrSp(ctx context.Context, currentItem *TreeNode) ExpanderResult {
 
 	// get the data for the editor panel
 	data, err := e.armClient.DoRequest(ctx, "GET", currentItem.Parent.ExpandURL)
 	if err == nil {
-		content, err := editor.OpenForContent(data, ".json")
+		// trim appId and publisherDomain out to enable the update (PATCH)
+		inContent := removeString(data, "\"appId\":", ",")
+		inContent = removeString(inContent, "\"publisherDomain\":", ",")
+
+		content, err := editor.OpenForContent(inContent, ".json")
 		if err != nil {
 			return ExpanderResult{
 				Err:               err,
@@ -406,6 +526,7 @@ func (e *GraphExpander) updateAppOrSp(ctx context.Context, currentItem *TreeNode
 				IsPrimaryResponse: true,
 			}
 		}
+
 		if content == data || strings.TrimSpace(content) == "" {
 			return ExpanderResult{
 				Err:               fmt.Errorf("User canceled"),
@@ -414,7 +535,7 @@ func (e *GraphExpander) updateAppOrSp(ctx context.Context, currentItem *TreeNode
 			}
 		}
 
-		update, err := e.armClient.DoRequest(ctx, "PATCH", currentItem.Parent.ExpandURL)
+		_, err = e.armClient.DoRequestWithBody(ctx, "PATCH", currentItem.Parent.ExpandURL, content)
 		if err != nil {
 			return ExpanderResult{
 				Err:               err,
@@ -422,12 +543,7 @@ func (e *GraphExpander) updateAppOrSp(ctx context.Context, currentItem *TreeNode
 				IsPrimaryResponse: true,
 			}
 		}
-		return ExpanderResult{
-			Response:          ExpanderResponse{Response: update, ResponseType: interfaces.ResponseJSON},
-			SourceDescription: "GraphAppUpdate request",
-			Nodes:             []*TreeNode{},
-			IsPrimaryResponse: true,
-		}
+		return makeSingleApp(content, itemTypeAppList, currentItem)
 	}
 
 	return ExpanderResult{
@@ -435,6 +551,14 @@ func (e *GraphExpander) updateAppOrSp(ctx context.Context, currentItem *TreeNode
 		SourceDescription: "GraphAppUpdate request",
 		IsPrimaryResponse: true,
 	}
+}
+
+func removeString(content string, start string, end string) string {
+	beforeIndex := strings.Index(content, start)
+	before := content[:beforeIndex]
+	afterAppIndex := strings.Index(content[beforeIndex+1:], end)
+	after := content[beforeIndex+afterAppIndex+len(end)+1:]
+	return before + after
 }
 
 func (e *GraphExpander) searchAppsOrSps(ctx context.Context, currentItem *TreeNode) ExpanderResult {
