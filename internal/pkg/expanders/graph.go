@@ -34,13 +34,16 @@ func (e *GraphExpander) setClient(c *armclient.Client) {
 const (
 	namespace = "graph"
 
-	itemTypeMe          = "graph/me"
-	itemTypeAppOrSpList = "graph/apporsplist"
-	itemTypeAppOrSp     = "graph/apporsp"
+	itemTypeMe      = "graph/me"
+	itemTypeAppList = "/applications"
+	itemTypeSpList  = "/serviceprincipals"
+	itemTypeAppOrSp = "graph/apporsp"
 
-	actionUpdateItem = "updateitem"
-	actionSearch     = "search"
-	actionViewOwners = "owners"
+	actionUpdateItem      = "updateitem"
+	actionSearch          = "search"
+	actionViewOwners      = "owners"
+	actionListMyApps      = "listmyapps"
+	actionListDeletedApps = "deletedapps"
 )
 
 // MeResponse used for the /me response
@@ -89,7 +92,9 @@ func (e *GraphExpander) Expand(ctx context.Context, currentItem *TreeNode) Expan
 	switch currentItem.ItemType {
 	case itemTypeMe:
 		return e.showMe(ctx, currentItem)
-	case itemTypeAppOrSpList:
+	case itemTypeSpList:
+		return e.listAppsOrSps(ctx, currentItem, "")
+	case itemTypeAppList:
 		return e.listAppsOrSps(ctx, currentItem, "")
 	case itemTypeAppOrSp:
 		return e.showAppOrSp(ctx, currentItem)
@@ -125,7 +130,7 @@ func (e *GraphExpander) Delete(ctx context.Context, currentItem *TreeNode) (bool
 
 // HasActions is a default implementation returning false to indicate no actions available
 func (e *GraphExpander) HasActions(context context.Context, currentItem *TreeNode) (bool, error) {
-	if currentItem.ItemType == itemTypeAppOrSp || currentItem.ItemType == itemTypeAppOrSpList {
+	if currentItem.ItemType == itemTypeAppOrSp || currentItem.ItemType == itemTypeAppList || currentItem.ItemType == itemTypeSpList {
 		return true, nil
 	}
 
@@ -136,7 +141,30 @@ func (e *GraphExpander) HasActions(context context.Context, currentItem *TreeNod
 func (e *GraphExpander) ListActions(context context.Context, currentItem *TreeNode) ListActionsResult {
 	nodes := []*TreeNode{}
 
-	if currentItem.ItemType == itemTypeAppOrSpList {
+	if currentItem.ItemType == itemTypeAppList {
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              currentItem.ID,
+				ID:                    actionListMyApps,
+				Namespace:             namespace,
+				Name:                  "Owned Apps",
+				Display:               "Owned Apps",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+			})
+		nodes = append(nodes,
+			&TreeNode{
+				Parentid:              currentItem.ID,
+				ID:                    actionListDeletedApps,
+				Namespace:             namespace,
+				Name:                  "Deleted Apps",
+				Display:               "Deleted Apps",
+				ItemType:              ActionType,
+				SuppressGenericExpand: true,
+			})
+	}
+
+	if currentItem.ItemType == itemTypeAppList || currentItem.ItemType == itemTypeSpList {
 		nodes = append(nodes,
 			&TreeNode{
 				Parentid:              currentItem.ID,
@@ -190,6 +218,11 @@ func (e *GraphExpander) ExecuteAction(ctx context.Context, currentItem *TreeNode
 		return e.searchAppsOrSps(ctx, currentItem)
 	case actionViewOwners:
 		return e.showOwners(ctx, currentItem)
+	case actionListMyApps:
+		return e.listFilteredApps(ctx, currentItem, "/myorganization/me/ownedObjects/$/Microsoft.Graph.Application")
+	case actionListDeletedApps:
+		return e.listFilteredApps(ctx, currentItem, "/directory/deleteditems/Microsoft.Graph.Application")
+
 	}
 
 	return ExpanderResult{
@@ -218,7 +251,7 @@ func (e *GraphExpander) listRootMenu(ctx context.Context, currentItem *TreeNode)
 			Namespace:             namespace,
 			Name:                  "Apps",
 			Display:               "Apps",
-			ItemType:              itemTypeAppOrSpList,
+			ItemType:              itemTypeAppList,
 			ExpandURL:             "/applications",
 			SuppressSwaggerExpand: true,
 			SuppressGenericExpand: true,
@@ -229,7 +262,7 @@ func (e *GraphExpander) listRootMenu(ctx context.Context, currentItem *TreeNode)
 			Namespace:             namespace,
 			Name:                  "Service Principals",
 			Display:               "Service Principals",
-			ItemType:              itemTypeAppOrSpList,
+			ItemType:              itemTypeSpList,
 			ExpandURL:             "/servicePrincipals", //&$search="displayName:damoo"
 			SuppressSwaggerExpand: true,
 			SuppressGenericExpand: true,
@@ -283,24 +316,46 @@ func (e *GraphExpander) listAppsOrSps(ctx context.Context, currentItem *TreeNode
 
 	data, err := e.armClient.DoRequest(ctx, "GET", url)
 	if err == nil {
-		var appsListResponse AppsListResponse
-		err = json.Unmarshal([]byte(data), &appsListResponse)
-		if err != nil {
-			panic(err)
-		}
+		return makeAppsList(data, expandURLRoot, currentItem)
+	}
 
+	return ExpanderResult{
+		SourceDescription: "GraphExpander failed to list apps or service principals",
+		Err:               err,
+	}
+}
+
+func (e *GraphExpander) listFilteredApps(ctx context.Context, currentItem *TreeNode, url string) ExpanderResult {
+	// get the list of apps
+	expandURLRoot := currentItem.Parent.ID
+
+	data, err := e.armClient.DoRequest(ctx, "GET", url)
+	if err == nil {
+		return makeAppsList(data, expandURLRoot, currentItem)
+	}
+
+	return ExpanderResult{
+		SourceDescription: "GraphExpander failed to list apps owned by ME",
+		Err:               err,
+	}
+}
+
+func makeAppsList(data string, urlRoot string, currentItem *TreeNode) ExpanderResult {
+	var appsListResponse AppsListResponse
+	err := json.Unmarshal([]byte(data), &appsListResponse)
+	if err == nil {
 		nodes := []*TreeNode{}
 		for _, app := range appsListResponse.Items {
 
 			nodes = append(nodes,
 				&TreeNode{
 					Parentid:              currentItem.ID,
-					ID:                    expandURLRoot + "/" + app.ID,
+					ID:                    urlRoot + "/" + app.ID,
 					Namespace:             namespace,
 					Name:                  app.DisplayName,
 					Display:               app.DisplayName,
-					ExpandURL:             expandURLRoot + "/" + app.ID,
-					DeleteURL:             expandURLRoot + "/" + app.ID,
+					ExpandURL:             urlRoot + "/" + app.ID,
+					DeleteURL:             urlRoot + "/" + app.ID,
 					ItemType:              itemTypeAppOrSp,
 					SuppressGenericExpand: true,
 				})
@@ -315,7 +370,7 @@ func (e *GraphExpander) listAppsOrSps(ctx context.Context, currentItem *TreeNode
 	}
 
 	return ExpanderResult{
-		SourceDescription: "GraphExpander failed to list apps or service principals",
+		SourceDescription: "GraphExpander failed to deserialise apps list response",
 		Err:               err,
 	}
 }
