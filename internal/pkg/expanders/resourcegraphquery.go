@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
@@ -96,6 +98,26 @@ func (e *ResourceGraphQueryExpander) Expand(ctx context.Context, currentItem *Tr
 
 	newList := []*TreeNode{}
 	for _, item := range queryResponse.Data {
+		var expandUrl string
+		var itemType string
+		// Build the expand URL based off the resource type in the query response
+		if item.Type == "microsoft.resources/subscriptions/resourcegroups" {
+			expandUrl = item.ID + "/resources?api-version=2017-05-10"
+			itemType = resourceGroupType
+		} else {
+			resourceAPIVersion, err := armclient.GetAPIVersion(item.Type)
+			if err != nil {
+				eventing.SendStatusEvent(&eventing.StatusEvent{
+					Failure: true,
+					Message: "Failed to get resourceVersion for the Type:" + item.Type,
+					Timeout: time.Duration(time.Second * 5),
+				})
+			}
+			expandUrl = item.ID + "?api-version=" + resourceAPIVersion
+			itemType = ResourceType
+		}
+
+		// Add it to the list
 		newList = append(newList, &TreeNode{
 			Display: style.Subtle("["+item.SubscriptionID+"]") +
 				"\n  " +
@@ -104,8 +126,8 @@ func (e *ResourceGraphQueryExpander) Expand(ctx context.Context, currentItem *Tr
 				item.Name,
 			Name:           item.Name,
 			ID:             item.ID,
-			ExpandURL:      item.ID + "/resources?api-version=2017-05-10",
-			ItemType:       resourceGroupType,
+			ExpandURL:      expandUrl,
+			ItemType:       itemType,
 			SubscriptionID: item.SubscriptionID,
 		})
 	}

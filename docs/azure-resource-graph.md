@@ -1,22 +1,26 @@
 # Custom Views with Azure Resource Graph Queries
 
-This feature lets you write an Azure Resource Graphy Query as a view to be shown.
+This feature lets you write an Azure Resource Graph Query as a view to be shown.
 
 This allows you to group, filter and sort resource groups from multiple subscriptions in one view. 
 
-For each query you'd like create a file in `./azurebrowse/queries/` which ends in `.kql`.
+For each query create a file in `./azurebrowse/queries/` which ends in `.kql`. The file name becomes the name of the query in the UI.
 
 ## Writing your query
 
-Head into the [portal to author your query, there is a good guide here.](https://docs.microsoft.com/en-us/azure/governance/resource-graph/first-query-portal)
+Head into the [portal to author your query, there is a good guide here,](https://docs.microsoft.com/en-us/azure/governance/resource-graph/first-query-portal) and author your query interactively.
 
-Your query **must** return a list Resource Groups. To fit this the items should have:
+**NOTE:** Queries must return the following fields:
 
-`type == 'microsoft.resources/subscriptions/resourcegroups`
+- `type`
+- `id`
+- `name`
+- `subscriptionId`
+- `location`
 
-The easiest way to achieve this is to include the following `where` clause in your query:
+These are standard fields so unless you use `project` or other advanced query syntax these should appear by default.
 
-`| where type == 'microsoft.resources/subscriptions/resourcegroups'`
+Now you have your query returning what you want you can save it in `./azurebrowse/queries/` and you are good to go.
 
 ## Simple Example
 
@@ -29,15 +33,42 @@ resourcecontainers
 | where name contains("stable")
 ```
 
-When you start up azbrowse you'll see
+You'll see the following in the UI:
 
 ![](./images/kqlQueries.png)
 
-You can the open the query and you'll see the resource groups returned by the query
+You can the open the query and you'll see the resource groups returned by the query:
 
 ![](./images/kqlResults.png)
 
-## Complex Example
+## Queries
 
-// Todo Contributions welcome
+### Resource Container Queries
 
+Show certain resource groups
+
+```kusto
+resourcecontainers 
+| where type == 'microsoft.resources/subscriptions/resourcegroups' 
+| where name contains("stable")
+```
+
+// Todo Subscriptions example, contributions welcome
+
+### Resource Queries
+
+All SQL Server instances 
+
+```kusto
+Resources
+| where type=='microsoft.sql/servers' 
+```
+
+All AKS Instances
+
+```kusto
+Resources
+| where type=~'Microsoft.ContainerService/managedClusters' 
+```
+
+It's worth reviewing the Azure Graph docs for more details, complex queries can be written returning items which have certain `tags` or are in a certain `provisioningState` and lot more.
