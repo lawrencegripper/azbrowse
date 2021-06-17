@@ -6,6 +6,8 @@ This allows you to group, filter and sort resource groups from multiple subscrip
 
 For each query create a file in `./azurebrowse/queries/` which ends in `.kql`. The file name becomes the name of the query in the UI.
 
+You can launch straight to a set of query results with `azbrowse --navigate queryFileNameHere.kql` where `queryFileNameHere` is the name of your query file.
+
 ## Writing your query
 
 Head into the [portal to author your query, there is a good guide here,](https://docs.microsoft.com/en-us/azure/governance/resource-graph/first-query-portal) and author your query interactively.
