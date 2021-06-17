@@ -27,14 +27,20 @@ begin
   print_header('Setup - Checking things good to create a release')
 
   required_envs = {
-    'docker_username': 'DOCKER_USERNAME',
-    'docker_password': 'DOCKER_PASSWORD',
-    'github_token': 'GITHUB_TOKEN',
-    'snapcraft_login': 'SNAPCRAFT_LOGIN',
     'is_ci': 'IS_CI',
     'branch': 'BRANCH',
     'build_number': 'BUILD_NUMBER'
   }
+
+  required_envs_release = {
+    'docker_username': 'DOCKER_USERNAME',
+    'docker_password': 'DOCKER_PASSWORD',
+    'github_token': 'GITHUB_TOKEN',
+    'snapcraft_login': 'SNAPCRAFT_LOGIN'
+  }
+
+  required_envs = required_envs.merge(required_envs_release) if @branch == 'refs/heads/main'
+
   required_envs.each do |var_name, env_name|
     exit_with_error "Missing required ENV #{env_name}" if (ENV[env_name] == '') || ENV[env_name].nil?
     instance_variable_set("@#{var_name}", ENV[env_name])
