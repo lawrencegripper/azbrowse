@@ -119,9 +119,11 @@ func (e *ResourceGraphQueryExpander) Expand(ctx context.Context, currentItem *Tr
 
 		// Add it to the list
 		newList = append(newList, &TreeNode{
-			Display: style.Subtle("["+item.SubscriptionID+"]") +
+			Display: style.Subtle("["+item.Type+"]") +
 				"\n  " +
 				style.Subtitle("["+subNameMap[item.SubscriptionID]+"]") +
+				"\n  " +
+				style.Subtitle("["+item.SubscriptionID+"]") +
 				"\n  " +
 				item.Name,
 			Name:           item.Name,
