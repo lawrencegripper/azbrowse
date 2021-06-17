@@ -10,6 +10,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -83,17 +84,16 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 
 	newList := []*TreeNode{}
 	subIds := make([]string, 0, len(subRequest.Subs))
+	subNameMap := map[string]string{}
 	for _, sub := range subRequest.Subs {
 		subIds = append(subIds, strings.Replace(sub.ID, "/subscriptions/", "", 1))
-		newList = append(newList, &TreeNode{
-			Display:        sub.DisplayName,
-			Name:           sub.DisplayName,
-			ID:             sub.ID,
-			ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
-			ItemType:       SubscriptionType,
-			SubscriptionID: sub.SubscriptionID,
-		})
+		subNameMap[sub.SubscriptionID] = sub.DisplayName
 	}
+	subNameMapJson, _ := json.Marshal(subNameMap)
+	if err != nil {
+		panic("Failed to marshal map to json for subnames")
+	}
+	storage.PutCacheForTTL(subNameMapCacheKey, string(subNameMapJson))
 
 	// Load any custom graph queryies
 	queries, err := config.GetCustomResourceGraphQueries()
@@ -112,6 +112,18 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 				"subscriptions": strings.Join(subIds, ","),
 				"query":         query.Query,
 			},
+		})
+	}
+
+	// Add each subscription in tenant
+	for _, sub := range subRequest.Subs {
+		newList = append(newList, &TreeNode{
+			Display:        sub.DisplayName,
+			Name:           sub.DisplayName,
+			ID:             sub.ID,
+			ExpandURL:      sub.ID + "/resourceGroups?api-version=2018-05-01",
+			ItemType:       SubscriptionType,
+			SubscriptionID: sub.SubscriptionID,
 		})
 	}
 

@@ -239,5 +239,5 @@ azfs-integration:
 # add-sample-queries:
 # 		Copy some sample queries to the correct location. Used for testing the feature.
 add-sample-queries:
-	mkdir -p ~/.azbrowse/
-	cp ./samplequeries/* ~/.azbrowse/
+	mkdir -p ~/.azbrowse/queries
+	cp ./samplequeries/* ~/.azbrowse/queries

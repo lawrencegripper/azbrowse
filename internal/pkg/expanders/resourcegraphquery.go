@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
@@ -14,6 +15,8 @@ import (
 
 // Check interface
 var _ Expander = &ResourceGraphQueryExpander{}
+
+const subNameMapCacheKey = "SubNameMap"
 
 // TenantExpander expands the subscriptions under a tenant
 type ResourceGraphQueryExpander struct {
@@ -74,10 +77,31 @@ func (e *ResourceGraphQueryExpander) Expand(ctx context.Context, currentItem *Tr
 		}
 	}
 
+	// Get sub ID -> Names mapping
+	subNameMapJson, err := storage.GetCache(subNameMapCacheKey)
+	if err != nil {
+		return ExpanderResult{
+			SourceDescription: e.Name(),
+			Err:               fmt.Errorf("Failed to load subscription to name mapping from cache: %s", err),
+		}
+	}
+	subNameMap := map[string]string{}
+	err = json.Unmarshal([]byte(subNameMapJson), &subNameMap)
+	if err != nil {
+		return ExpanderResult{
+			SourceDescription: e.Name(),
+			Err:               fmt.Errorf("Failed to deserialise subscription to name mapping from cache: %s", err),
+		}
+	}
+
 	newList := []*TreeNode{}
 	for _, item := range queryResponse.Data {
 		newList = append(newList, &TreeNode{
-			Display:        style.Subtle("["+item.Type+"]") + "\n  " + item.Name,
+			Display: style.Subtle("["+item.SubscriptionID+"]") +
+				"\n  " +
+				style.Subtitle("["+subNameMap[item.SubscriptionID]+"]") +
+				"\n  " +
+				item.Name,
 			Name:           item.Name,
 			ID:             item.ID,
 			ExpandURL:      item.ID + "/resources?api-version=2017-05-10",

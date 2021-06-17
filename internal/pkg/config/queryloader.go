@@ -19,7 +19,7 @@ type GraphQuery struct {
 // GetCustomResourceGraphQueries retreives custom resource queries from the ~/.azbrowse-queries.config file
 // The file should be
 func GetCustomResourceGraphQueries() ([]GraphQuery, error) {
-	queryDirLocation := storage.GetStorageDir()
+	queryDirLocation := path.Join(storage.GetStorageDir(), "queries")
 	// Create the dir if it doesn't exist
 	err := os.MkdirAll(queryDirLocation, 0644)
 	if err != nil {
