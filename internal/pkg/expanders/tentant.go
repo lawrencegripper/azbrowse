@@ -93,8 +93,10 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	if err != nil {
 		panic("Failed to marshal map to json for subnames")
 	}
-	storage.PutCacheForTTL(subNameMapCacheKey, string(subNameMapJson))
-
+	err = storage.PutCacheForTTL(subNameMapCacheKey, string(subNameMapJson)) //nolint: errcheck
+	if err != nil {
+		panic("Failed to save json subnames to cache")
+	}
 	// Load any custom graph queryies
 	queries, err := config.GetCustomResourceGraphQueries()
 	if err != nil {
