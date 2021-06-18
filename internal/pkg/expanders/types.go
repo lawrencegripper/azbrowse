@@ -134,8 +134,10 @@ type TreeNode struct {
 
 const (
 	// SubscriptionType defines a sub
-	SubscriptionType  = "subscription"
-	resourceGroupType = "resourcegroup"
+	SubscriptionType = "subscription"
+	// ResourceGraphQueryType defines an Azure resource graph query
+	ResourceGraphQueryType = "graphquery"
+	resourceGroupType      = "resourcegroup"
 	// ResourceType defines a top level resource such as a Storage Account or VM
 	ResourceType = "resource"
 	// MetricsType defines an item which returns a graph
@@ -158,6 +160,7 @@ const (
 
 	// ExpandURLNotSupported is used to identify items which don't support generic expansion
 	ExpandURLNotSupported = "notsupported"
+	NotSupported          = "notsupported"
 )
 
 type expanderTestCase struct {

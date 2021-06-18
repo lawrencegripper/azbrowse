@@ -220,25 +220,41 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 
 // DoResourceGraphQuery performs an azure graph query
 func (c *Client) DoResourceGraphQuery(ctx context.Context, subscription, query string) (string, error) {
-	messageBody := `{"subscriptions": ["SUB_HERE"], "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0}}`
-	messageBody = strings.Replace(messageBody, "SUB_HERE", subscription, -1)
-	messageBody = strings.Replace(messageBody, "QUERY_HERE", query, -1)
+	queryBody := QueryBody{
+		Subscriptions: []string{subscription},
+		Query:         query,
+		Options: QueryOptions{
+			Top:  1000,
+			Skip: 0,
+		},
+	}
+	messageBody, err := json.Marshal(queryBody) //nolint: errcheck
+	if err != nil {
+		return "", err
+	}
 	tracing.SetTagOnCtx(ctx, "query", messageBody)
-	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
+	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", string(messageBody))
 }
 
 // DoResourceGraphQueryReturningObjectArray performs an azure graph query on all subs you have access too
 func (c *Client) DoResourceGraphQueryReturningObjectArray(ctx context.Context, subscriptionGUIDs []string, query string) (string, error) {
-	messageBody := `{"subscriptions": SUB_HERE, "query": "QUERY_HERE", "options": {"$top": 1000, "$skip": 0, "resultFormat": "objectArray"}}`
-	jsonSubsArray, err := json.Marshal(subscriptionGUIDs)
+	resultFmt := "objectArray"
+	queryBody := QueryBody{
+		Subscriptions: subscriptionGUIDs,
+		Query:         query,
+		Options: QueryOptions{
+			Top:          1000,
+			Skip:         0,
+			Resultformat: resultFmt,
+		},
+	}
+	messageBody, err := json.Marshal(queryBody) //nolint: errcheck
 	if err != nil {
 		return "", err
 	}
-	messageBody = strings.Replace(messageBody, "SUB_HERE", string(jsonSubsArray), -1)
-	messageBody = strings.Replace(messageBody, "QUERY_HERE", query, -1)
-	// cobra.CompErrorln(messageBody)
+
 	tracing.SetTagOnCtx(ctx, "query", messageBody)
-	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", messageBody)
+	return c.DoRequestWithBody(ctx, "POST", "/providers/Microsoft.ResourceGraph/resources?api-version=2018-09-01-preview", string(messageBody))
 }
 
 var resourceAPIVersionLookup map[string]string
@@ -344,4 +360,18 @@ func truncateString(s string, i int) string {
 		return string(runes[:i]) + "..."
 	}
 	return s
+}
+
+// QueryBody is the structured body require for an Azure Resource Graph submission
+type QueryBody struct {
+	Subscriptions []string     `json:"subscriptions"`
+	Query         string       `json:"query"`
+	Options       QueryOptions `json:"options"`
+}
+
+// QueryOptions is for use with QueryBocy to set max returned items and structure
+type QueryOptions struct {
+	Top          int    `json:"$top"`
+	Skip         int    `json:"$skip"`
+	Resultformat string `json:"resultFormat,omitempty"`
 }

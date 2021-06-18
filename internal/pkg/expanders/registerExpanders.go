@@ -44,6 +44,9 @@ func InitializeExpanders(client *armclient.Client, gui *gocui.Gui, commandPanel 
 		&SubscriptionExpander{
 			client: client,
 		},
+		&ResourceGraphQueryExpander{
+			client: client,
+		},
 		&ActionExpander{
 			client: client,
 			gui:    gui,

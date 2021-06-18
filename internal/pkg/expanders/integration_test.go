@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
 	"gopkg.in/h2non/gock.v1"
@@ -14,6 +15,7 @@ import (
 func Test_Expanders(t *testing.T) {
 
 	InitializeExpanders(nil, nil, nil, nil)
+	storage.LoadDB()
 	expanders := getRegisteredExpanders()
 
 	// Add special case of default expander
