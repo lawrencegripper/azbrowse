@@ -89,11 +89,11 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 		subIds = append(subIds, strings.Replace(sub.ID, "/subscriptions/", "", 1))
 		subNameMap[sub.SubscriptionID] = sub.DisplayName
 	}
-	subNameMapJson, _ := json.Marshal(subNameMap)
+	subNameMapJson, err := json.Marshal(subNameMap)
 	if err != nil {
 		panic("Failed to marshal map to json for subnames")
 	}
-	err = storage.PutCacheForTTL(subNameMapCacheKey, string(subNameMapJson)) //nolint: errcheck
+	err = storage.PutCache(subNameMapCacheKey, string(subNameMapJson)) //nolint: errcheck
 	if err != nil {
 		panic("Failed to save json subnames to cache")
 	}
