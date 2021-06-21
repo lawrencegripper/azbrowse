@@ -62,3 +62,20 @@ Lots of resources in Azure have metrics defined for them, and azbrowse has suppo
 ### Custom Views over multiple subscriptions
 
 See: [Build custom views from Azure Resource Graph Queries](./docs/azure-resource-graph.md)
+
+### Working with Microsoft Graph
+Above the list of subscriptions, you'll see the `MS Graph` menu. This provides access to a subset of MS Graph endpoints for working with AAD. Note that the graph token we use for these calls is retrieved from the Azure CLI, so it doesn't have permission to perform _all_ graph operations. 
+
+Currently implemented are:
+- `Me`: A call to the `/me` endpoint, useful to see your own profile data from the tenancy you're connected to.
+- `Apps`: For working with AAD Applications. Actions here:
+  - `Owned Apps`: Applications you are an owner of. 
+  - `New App`: Opens the editor with the minimal `json` to create a new AAD app
+  - `Search Apps by Name`: Performs a contains query on the app display name
+  - `Get By Object ID`: Get an app by it's **object** ID.
+  - For each App listed, you have the following actions:
+    - `Update Item`: Opens the editor containing the app `json`, removing the `appId` and `publisherDomain` fields, which cannot be updated. Upon save + close it will perform a `PATCH` call for the app. 
+    - `View Owners`: View the owners of that app
+- `Service Principals`: For working with AAD Service Principals. In the AAD Portal these are seen as 'Enterprise Applications'. A subset of the search / find operations for apps are available here.
+
+![MS Graph](images/ms-graph.gif)

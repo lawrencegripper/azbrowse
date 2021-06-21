@@ -26,7 +26,7 @@ var register []Expander
 
 // InitializeExpanders create instances of all the expanders
 // needed by the app
-func InitializeExpanders(client *armclient.Client, gui *gocui.Gui, commandPanel interfaces.CommandPanel, contentPanel interfaces.ItemWidget) {
+func InitializeExpanders(client *armclient.Client, graphClient *armclient.Client, gui *gocui.Gui, commandPanel interfaces.CommandPanel, contentPanel interfaces.ItemWidget) {
 	swaggerResourceExpander = NewSwaggerResourcesExpander()
 	swaggerResourceExpander.AddAPISet(NewSwaggerAPISetARMResources(client))
 
@@ -38,6 +38,7 @@ func InitializeExpanders(client *armclient.Client, gui *gocui.Gui, commandPanel 
 		&TenantExpander{
 			client: client,
 		},
+		NewGraphExpander(graphClient, gui, commandPanel, contentPanel),
 		&ResourceGroupResourceExpander{
 			client: client,
 		},

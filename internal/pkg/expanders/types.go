@@ -135,6 +135,8 @@ type TreeNode struct {
 const (
 	// SubscriptionType defines a sub
 	SubscriptionType = "subscription"
+	// GraphType defines the Graph resource
+	GraphType = "graph"
 	// ResourceGraphQueryType defines an Azure resource graph query
 	ResourceGraphQueryType = "graphquery"
 	resourceGroupType      = "resourcegroup"

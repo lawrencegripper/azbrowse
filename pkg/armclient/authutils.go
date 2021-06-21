@@ -64,3 +64,20 @@ func AcquireTokenForResourceFromAzCLI(subscription string, resource string) (AzC
 	}
 	return r, nil
 }
+
+// AcquireTokenForGraphFromAzCLI gets a token for MSGraph
+func AcquireTokenForGraphFromAzCLI() (AzCLIToken, error) {
+	args := []string{"account", "get-access-token", "--resource-type", "ms-graph", "--output", "json"}
+
+	out, err := exec.Command("az", args...).Output()
+	if err != nil {
+		return AzCLIToken{}, fmt.Errorf("%s (try running 'az account get-access-token' to get more details)", err)
+	}
+
+	var r AzCLIToken
+	err = json.Unmarshal(out, &r)
+	if err != nil {
+		return AzCLIToken{}, err
+	}
+	return r, nil
+}

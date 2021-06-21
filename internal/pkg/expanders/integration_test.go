@@ -14,7 +14,7 @@ import (
 
 func Test_Expanders(t *testing.T) {
 
-	InitializeExpanders(nil, nil, nil, nil)
+	InitializeExpanders(nil, nil, nil, nil, nil)
 	storage.LoadDB()
 	expanders := getRegisteredExpanders()
 
