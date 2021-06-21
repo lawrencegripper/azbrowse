@@ -4,9 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
+	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 	"github.com/lawrencegripper/azbrowse/pkg/armclient"
 	"github.com/nbio/st"
@@ -88,6 +93,41 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 		SubscriptionID: "",
 	})
 
+	subIds := make([]string, 0, len(subRequest.Subs))
+	subNameMap := map[string]string{}
+	for _, sub := range subRequest.Subs {
+		subIds = append(subIds, strings.Replace(sub.ID, "/subscriptions/", "", 1))
+		subNameMap[sub.SubscriptionID] = sub.DisplayName
+	}
+	subNameMapJson, err := json.Marshal(subNameMap)
+	if err != nil {
+		panic("Failed to marshal map to json for subnames")
+	}
+	err = storage.PutCache(subNameMapCacheKey, string(subNameMapJson)) //nolint: errcheck
+	if err != nil {
+		panic("Failed to save json subnames to cache")
+	}
+	// Load any custom graph queryies
+	queries, err := config.GetCustomResourceGraphQueries()
+	if err != nil {
+		eventing.SendFailureStatus(fmt.Sprintf("Failed to load custom resource graph queries %q", err))
+	}
+	for _, query := range queries {
+		newList = append(newList, &TreeNode{
+			Display:        style.Subtle("[Microsoft.ResourceGraph]") + "\n  Query: " + query.Name,
+			Name:           query.Name,
+			ID:             query.Name,
+			ExpandURL:      ExpandURLNotSupported,
+			ItemType:       ResourceGraphQueryType,
+			SubscriptionID: NotSupported,
+			Metadata: map[string]string{
+				"subscriptions": strings.Join(subIds, ","),
+				"query":         query.Query,
+			},
+		})
+	}
+
+	// Add each subscription in tenant
 	for _, sub := range subRequest.Subs {
 		newList = append(newList, &TreeNode{
 			Display:        sub.DisplayName,

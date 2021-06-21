@@ -2,10 +2,6 @@
 
 Mount the Azure ARM API as a fuse filesystem
 
-### Synopsis
-
-Mount the Azure ARM API as a fuse filesystem
-
 ```
 azbrowse azfs [flags]
 ```

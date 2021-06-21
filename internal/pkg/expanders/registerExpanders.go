@@ -45,6 +45,9 @@ func InitializeExpanders(client *armclient.Client, graphClient *armclient.Client
 		&SubscriptionExpander{
 			client: client,
 		},
+		&ResourceGraphQueryExpander{
+			client: client,
+		},
 		&ActionExpander{
 			client: client,
 			gui:    gui,

@@ -15,14 +15,19 @@ var clock mockableClock.Clock
 
 const ttlLastUpdatedKey = "LastUpdated"
 
-// LoadDB initializes and loads the DB instance
-func LoadDB() {
+// GetStorageDir returns the directory that azb uses for storage
+func GetStorageDir() string {
 	diskLocation := "/root/.azbrowse/"
 	user, err := user.Current()
 	if err == nil {
 		diskLocation = user.HomeDir + "/.azbrowse/"
 	}
-	initDb(diskLocation, mockableClock.New())
+	return diskLocation
+}
+
+// LoadDB initializes and loads the DB instance
+func LoadDB() {
+	initDb(GetStorageDir(), mockableClock.New())
 }
 
 func initDb(location string, inputClock mockableClock.Clock) {
@@ -67,7 +72,7 @@ func GetCache(key string) (string, error) {
 	return string(result), nil
 }
 
-// GetCacheIfWithinTTL gets an item from the cache if it's with the TTL duration. To simplify the TTL is provided by the caller
+// GetCacheWithTTL gets an item from the cache if it's with the TTL duration. To simplify the TTL is provided by the caller
 // the data store just tracks the key and it's last updated value
 func GetCacheWithTTL(key string, ttl time.Duration) (valid bool, value string, err error) {
 	cacheItem, err := GetCache(key)

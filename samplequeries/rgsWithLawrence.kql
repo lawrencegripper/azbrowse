@@ -1,0 +1,5 @@
+// Query finds resources groups beginning with 'lawrence'
+// or 'lag' in all subs
+resourcecontainers 
+| where type == 'microsoft.resources/subscriptions/resourcegroups' 
+| where name contains("lawrence") or name contains("lag")
