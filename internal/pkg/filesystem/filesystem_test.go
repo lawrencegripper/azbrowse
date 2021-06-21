@@ -160,7 +160,7 @@ func Test_Get_Subs(t *testing.T) {
 		t.Log(f.Name())
 	}
 
-	assert.Equal(t, 4, len(files), "Expected 3 subscriptions + index file from mock response")
+	assert.Equal(t, 5, len(files), "Expected 3 subscriptions + index file from mock response")
 	checkPendingMocks(t)
 }
 
