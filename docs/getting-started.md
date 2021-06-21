@@ -57,3 +57,8 @@ For example, you can navigate to a site in Azure App Service and then drill in t
 Lots of resources in Azure have metrics defined for them, and azbrowse has support for charting single-value metrics. Simple navigate to the `[Metrics]` node for a resource and pick a metric to display.
 
 ![displaying metrics](images/azbrowse-metrics.gif)
+
+
+### Custom Views over multiple subscriptions
+
+See: [Build custom views from Azure Resource Graph Queries](./docs/azure-resource-graph.md)

@@ -2,10 +2,6 @@
 
 An interactive CLI for browsing Azure
 
-### Synopsis
-
-An interactive CLI for browsing Azure
-
 ```
 azbrowse [flags]
 ```

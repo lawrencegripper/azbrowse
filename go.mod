@@ -38,7 +38,7 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20181222201310-74dc9339e414 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20181202132449-6a9ea43bcacd // indirect
 	github.com/skratchdot/open-golang v0.0.0-20160302144031-75fb7ed4208c
-	github.com/spf13/cobra v1.0.0
+	github.com/spf13/cobra v1.1.3
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 	github.com/stretchr/testify v1.6.1

@@ -13,7 +13,7 @@ This is a pet project which has matured thanks to support from awesome contribut
 
 [![asciicast](https://asciinema.org/a/325237.svg)](https://asciinema.org/a/325237)
 
-> Warning: This is experimental, please familiarize yourself with the code and the how-to's before using it in a production environment.
+> Warning: Please familiarize yourself with the code and the how-to's before using it in a production environment.
 
 # Cool what else can it do?
 
@@ -24,6 +24,7 @@ Lots [check out the guided tour here](docs/getting-started.md).
 - Actions on resources such as restart and list-keys
 - ASCII Graphs for resource metrics
 - Interactive command panel for filtering and more
+- Build custom views from [Azure Resource Graph Queries](./docs/azure-resource-graph.md)
 - [Experimental fuse filesystem mount for Azure API](docs/azfs-intro.md)
 
 For advanced [config review the settings page here](docs/config.md). For [command line arguments and docs see this page](./docs/commandline/azbrowse.md).
