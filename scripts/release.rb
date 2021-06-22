@@ -81,6 +81,8 @@ begin
   puts "Tag: #{tag}"
   git_instance = Git.open(repo_root)
   git_instance.add_tag(tag)
+  puts "Push tag: #{tag}"
+  git_instance.push('origin', 'main', { tags: true })
 
   print_header('Build, lint and codegen')
   execute_command 'make ci'
