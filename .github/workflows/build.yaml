@@ -29,7 +29,7 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         SNAPCRAFT_LOGIN: ${{ secrets.SNAPCRAFT_LOGIN }}
-        BUILD_NUMBER: ${{ github.run_id }}
+        BUILD_NUMBER: ${{ github.run_number }}
         IS_CI: "true"
         IS_PR: ${{ github.head_ref }}
         BRANCH: ${{ github.ref }}
