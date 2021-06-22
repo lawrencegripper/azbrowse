@@ -146,12 +146,9 @@ selfupdate-test:
 ##		Builds the devcontainer used for VSCode and CI
 devcontainer:
 	@echo "Building devcontainer using tag: $(DEV_CONTAINER_TAG)"
-	# Get cached layers by pulling previous version (leading dash means it's optional, will continue on failure)
-	-docker pull $(DEV_CONTAINER_TAG)
-	-docker pull $(DEV_CONTAINER_SNAPBASE_TAG)
 	# Build the devcontainer: Hide output if it builds to keep things clean
-	docker build -f ./.devcontainer/snapbase.Dockerfile ./.devcontainer --cache-from $(DEV_CONTAINER_SNAPBASE_TAG) -t $(DEV_CONTAINER_SNAPBASE_TAG) --build-arg BUILDKIT_INLINE_CACHE=1
-	docker build -f ./.devcontainer/Dockerfile ./.devcontainer --cache-from $(DEV_CONTAINER_TAG) -t $(DEV_CONTAINER_TAG) --build-arg BUILDKIT_INLINE_CACHE=1
+	docker buildx build -f ./.devcontainer/snapbase.Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_SNAPBASE_TAG)' -t $(DEV_CONTAINER_SNAPBASE_TAG)
+	docker buildx build -f ./.devcontainer/Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_TAG)' -t $(DEV_CONTAINER_TAG)
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
