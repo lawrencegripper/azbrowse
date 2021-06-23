@@ -76,6 +76,8 @@ begin
 
   puts "Is release to be published? #{publish_build_output}"
 
+  git_instance = Git.open(repo_root)
+
   print_header('Build, lint and codegen')
   execute_command 'make ci'
   error_if_git_has_changes(git_instance,
@@ -94,7 +96,6 @@ begin
     print_header('Git - Create tag for release')
     tag = "v2.1.#{@build_number}"
     puts "Tag: #{tag}"
-    git_instance = Git.open(repo_root)
     git_instance.add_tag(tag)
     puts "Push tag: #{tag}"
     git_instance.push('origin', 'main', { tags: true })
