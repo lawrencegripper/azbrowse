@@ -33,15 +33,13 @@ ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
 
-
 # Versions
 ARG TERRAFORM_VERSION=1.0.0
 ENV DOCKER_VERSION=20.10.7
 ARG GO_PLS_VERSION=0.7.0
 ARG DLV_VERSION=1.6.1
 ARG GO_RELEASER_VERSION=0.171.0
-ARG GOLANGCI_LINT_VERSION=1.141.1
-
+ARG GOLANGCI_LINT_VERSION=1.41.1
 
 # Configure apt, install packages and tools
 RUN apt-get update \
@@ -96,13 +94,13 @@ RUN \
     # --> Delve for debugging
     go get github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
     # --> Go language server
-    && go get golang.org/x/tools/gopls@$v{GO_PLS_VERSION} \
+    && go get golang.org/x/tools/gopls@v${GO_PLS_VERSION} \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOpPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
     && rm -rf /go/src/ && rm -rf /go/pkg
 
 # Install autocompletion for azbrowse
