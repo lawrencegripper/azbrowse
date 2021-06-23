@@ -33,3 +33,9 @@ jobs:
         IS_CI: "true"
         IS_PR: ${{ github.head_ref }}
         BRANCH: ${{ github.ref }}
+
+    - name: Upload azbrowse build as artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: azbrowse-test-assets
+        path: dist/
