@@ -120,7 +120,7 @@ Bonus: Add it to your `$PATH` so you can run `azbrowse` anywhere.
 
 Azbrowse can generate shell completions for a number of different shells using the `azbrowse completion` command. 
 
-For example, `azbrowse -s thing<TAB>` -> `azbrowse -s thingSubscription` and jump straight to that Azure subscription.
+For example, `azbrowse -s thing<TAB>` → `azbrowse -s thingSubscription` and jump straight to that Azure subscription.
 
 To configure completion in bash add the following to `~/.bashrc` or `~/.profile`
 

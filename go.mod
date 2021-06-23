@@ -3,7 +3,6 @@ module github.com/lawrencegripper/azbrowse
 go 1.16
 
 require (
-	bazil.org/fuse v0.0.0-20200117225306-7b5117fecadc
 	github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3 // indirect
 	github.com/TylerBrock/colorjson v0.0.0-20180527164720-95ec53f28296 // indirect
 	github.com/alecthomas/chroma v0.6.7
