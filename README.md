@@ -123,11 +123,19 @@ Azbrowse can generate shell completions for a number of different shells using t
 
 For example, `azbrowse -s thing<TAB>` -> `azbrowse -s thingSubscription` and jump straight to that Azure subscription.
 
-For example, to configure completion in bash add the following to `~/.bashrc` or `~/.profile`
+To configure completion in bash add the following to `~/.bashrc` or `~/.profile`
 
 ```bash
 source <(azbrowse completion bash)
 ```
+
+To configure completion for `zsh` run the following command
+
+```bash
+azbrowse completion zsh > "${fpath[1]}/_azbrowse"
+```
+
+> Ensure you have `autoload -Uz compinit && compinit` present in your `.zshrc` file to load these completions
 
 ## Docs
 
