@@ -41,7 +41,7 @@ nfpms:
 dockers:
   - goos: linux
     goarch: amd64
-    binaries:
+    ids:
       - azbrowse
     # Templates of the Docker image names.
     image_templates:
