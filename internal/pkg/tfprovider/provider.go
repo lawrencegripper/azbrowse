@@ -70,6 +70,10 @@ func SetupProvider(ctx context.Context, log logr.Logger, config TerraformProvide
 		return nil, fmt.Errorf("ProviderPath not set and is required")
 	}
 
+	if config.ProviderVersion == "" {
+		return nil, fmt.Errorf("ProviderVersion not set and is required")
+	}
+
 	var err error
 	providerPath := config.ProviderPath
 	providerInstance, err := getInstanceOfProvider(ctx, config.ProviderName, providerPath, config.ProviderVersion)
@@ -156,7 +160,7 @@ func getSHA256Checksum(path string) (string, error) {
 }
 
 func getInstanceOfProvider(ctx context.Context, name, basePath, version string) (*TerraformProvider, error) {
-	path := path.Join(basePath, ".terraform/plugins/linux_amd64/")
+	path := path.Join(basePath, fmt.Sprintf(".terraform/providers/registry.terraform.io/hashicorp/%s/%s/linux_amd64/", name, version))
 	span, ctx := tracing.StartSpanFromContext(ctx, "tfprovider:getInstance:find")
 	pluginMeta := discovery.FindPlugins(plugin.ProviderPluginName, []string{path}).WithName(name)
 	span.Finish()

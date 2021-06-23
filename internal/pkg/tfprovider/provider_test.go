@@ -58,7 +58,7 @@ func Test_PrepareProviderConfigWithDefaults_expectNoError(t *testing.T) {
 					panic(err)
 				}
 			}
-			provider, err := getInstanceOfProvider(context.Background(), tt.name, providerInstallPath, "")
+			provider, err := getInstanceOfProvider(context.Background(), tt.name, providerInstallPath, tt.version)
 			if err != nil {
 				t.Errorf("failed to get instance of provider. error = %v", err)
 			}
@@ -120,7 +120,7 @@ func TestSetupProvider(t *testing.T) {
 			purpose: "Error_When_OnlyNameSet",
 			config: TerraformProviderConfig{
 				ProviderName:    "azurerm",
-				ProviderVersion: "",
+				ProviderVersion: "2.22.0",
 				ProviderPath:    "",
 			},
 			wantErr: true,
@@ -129,7 +129,7 @@ func TestSetupProvider(t *testing.T) {
 			purpose: "Error_When_PathIsMissingProviderBinary",
 			config: TerraformProviderConfig{
 				ProviderName:    "azurerm",
-				ProviderVersion: "",
+				ProviderVersion: "2.22.0",
 				ProviderPath:    "/tmp",
 			},
 			wantErr: true,
@@ -138,7 +138,7 @@ func TestSetupProvider(t *testing.T) {
 			purpose: "Succeed_When_ValidProviderPathAndNameSet",
 			config: TerraformProviderConfig{
 				ProviderName:      "azurerm",
-				ProviderVersion:   "",
+				ProviderVersion:   "2.22.0",
 				ProviderPath:      providerInstallPath,
 				ProviderConfigHCL: "features {}",
 			},

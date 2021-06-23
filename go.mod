@@ -19,7 +19,7 @@ require (
 	github.com/hashicorp/go-hclog v0.15.0
 	github.com/hashicorp/go-plugin v1.4.0
 	github.com/hashicorp/hcl/v2 v2.9.1
-	github.com/hashicorp/terraform v0.14.11
+	github.com/hashicorp/terraform v0.13.7
 	github.com/hashicorp/terraform-exec v0.13.3
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
