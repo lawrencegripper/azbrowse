@@ -104,7 +104,7 @@ begin
     execute_command 'goreleaser'
   else
     print_header('Run goreleaser: Dry run')
-    execute_command 'goreleaser --skip-publish --rm-dist'
+    execute_command 'goreleaser --skip-publish --rm-dist --snapshot'
   end
 
   # Push up built output for the devcontainer if we're on main
