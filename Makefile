@@ -181,12 +181,9 @@ endif
 	# Docs
 	# - Build/CI/PR etc for controlling build vs build and publish release
 	# - "-v var/rundocker.socket" to allow docker builds via mounted docker socket
-	# - "privileged" and "--device" to allow fuse testing
 	@docker run -v ${PWD}:${PWD} \
-		-e "TERM=xterm-256color" \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
-		-e IS_PR="${IS_PR}" \
 		-e BRANCH="${BRANCH}" \
 		-e GITHUB_TOKEN="${GITHUB_TOKEN}" \
 		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
@@ -194,11 +191,14 @@ endif
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-e SNAPCRAFT_LOGIN="$(SNAPCRAFT_LOGIN)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		--privileged \
-		--device /dev/fuse \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		ruby ${PWD}/scripts/release.rb
+
+## devcontainer-local-ci
+##		This can be used to test the full CI process locally, the build won't be published but the same process will be followed as PR builds
+devcontainer-local-ci: devcontainer
+	./scripts/local-ci.sh
 
 # add-sample-queries:
 # 		Copy some sample queries to the correct location. Used for testing the feature.
