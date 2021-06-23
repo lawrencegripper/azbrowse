@@ -199,39 +199,6 @@ endif
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		ruby ${PWD}/scripts/release.rb
-		
-
-asfs-build:
-	$(GO_BINARY) build ./cmd/azfs
-
-azfs-run:
-	-@fusermount -u /mnt/azfs
-	mkdir -p /mnt/azfs
-	$(GO_BINARY) run ./cmd/azfs --mount /mnt/azfs --enableEdit
-
-# azfs-test:
-# 		Tests the azfs filesystem with unit tests and mocked api
-#
-# A '.env' file like the following is required 
-#
-# > TESTSUB=yoursubhere
-# > TESTRESOURCE=/rghere/resourcehere
-#
-# The resource specified should have a value of 'replaceme' as a tag
-azfs-test:
-	$(GO_BINARY) test -count=1 -timeout 30s -short ./internal/pkg/filesystem
-
-# azfs-integration:
-# 		Tests the azfs filesystem with integration tests
-#
-# A '.env' file like the following is required 
-#
-# > TESTSUB=yoursubhere
-# > TESTRESOURCE=/rghere/resourcehere
-#
-# The resource specified should have a value of 'replaceme' as a tag
-azfs-integration:
-	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -v -count=1 -timeout 30s ./internal/pkg/filesystem
 
 # add-sample-queries:
 # 		Copy some sample queries to the correct location. Used for testing the feature.

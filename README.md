@@ -25,7 +25,6 @@ Lots [check out the guided tour here](docs/getting-started.md).
 - ASCII Graphs for resource metrics
 - Interactive command panel for filtering and more
 - Build custom views from [Azure Resource Graph Queries](./docs/azure-resource-graph.md)
-- [Experimental fuse filesystem mount for Azure API](docs/azfs-intro.md)
 
 For advanced [config review the settings page here](docs/config.md). For [command line arguments and docs see this page](./docs/commandline/azbrowse.md).
 

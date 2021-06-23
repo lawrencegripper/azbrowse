@@ -22,7 +22,6 @@ azbrowse [flags]
 
 ### SEE ALSO
 
-* [azbrowse azfs](azbrowse_azfs.md)	 - Mount the Azure ARM API as a fuse filesystem
 * [azbrowse completion](azbrowse_completion.md)	 - Generates shell completion scripts
 * [azbrowse version](azbrowse_version.md)	 - Print version information
 
