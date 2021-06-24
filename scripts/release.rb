@@ -74,10 +74,16 @@ begin
     puts 'Skipping publish as either not CI or branch != main'
   end
 
-  git_instance = Git.open(repo_root)
   puts "Is release to be published? #{publish_build_output}"
+
+  git_instance = Git.open(repo_root)
+  error_if_git_has_changes(git_instance,
+    'Uncommitted changes found, release.rb requires a clean git state. Commit your changes then re-run.'
+  )
+
   last_release_tag = git_instance.describe("HEAD", {:tags => true, :abbrev => '0'})
   puts "Last release tag was #{last_release_tag}"
+
   changes_since_last_release = git_instance.gtree(last_release_tag).diff('HEAD^').map(&:path)
   puts 'Changed files since last release:'
   puts changes_since_last_release
@@ -131,6 +137,9 @@ begin
   FileUtils.mkdir_p("/#{ENV['HOME']}/.cache/snapcraft/download")
   FileUtils.mkdir_p("/#{ENV['HOME']}/.cache/snapcraft/stage-packages")
 
+  puts 'Remove existing ./dist folder'
+  execute_command('rm -rf ./dist')
+
   if publish_build_output
     print_header('Git - Create tag for release')
     tag = "v2.1.#{@build_number}"
@@ -146,6 +155,9 @@ begin
     print_header('Run goreleaser: Dry run')
     execute_command 'goreleaser --skip-publish --rm-dist --snapshot'
   end
+
+  puts 'Clean up file permissions on ./dist folder'
+  execute_command("/bin/bash -c 'chown -R $(whoami) ./dist'")
 
   print_header('Smoke test: Check released docker image starts')
   execute_command('docker run -e AZBROWSE_SKIP_UPDATE=rue ghcr.io/lawrencegripper/azbrowse/azbrowse:latest version')
