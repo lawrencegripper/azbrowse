@@ -12,13 +12,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      fetch-depth: 0
+      with:
+        fetch-depth: 0
 
     - name: Set up Docker BuildKit
       uses: docker/setup-buildx-action@v1
 
-    - name: CI Tooling
-      run: sudo apt update && sudo apt install build-essential fuse -y
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
 
     - name: Build devcontainer for tooling
       run: sudo -E make devcontainer

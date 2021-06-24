@@ -118,7 +118,7 @@ begin
   end
 
   has_go_changes = changes_since_last_release.select { |i| i.include?('.go') }
-  if has_go_changes
+  if has_go_changes.empty?
     puts 'Skipping test-go as no changes with .go files'
   else
     # Run golangci-lint

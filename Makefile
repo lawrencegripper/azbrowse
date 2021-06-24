@@ -193,6 +193,8 @@ endif
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-e SNAPCRAFT_LOGIN="$(SNAPCRAFT_LOGIN)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
+		-v ${HOME}/go/pkg/mod:/go/pkg/mod \
+		-v ${HOME}/.cache/go-build:/root/.cache/go-build \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		ruby ${PWD}/scripts/release.rb
