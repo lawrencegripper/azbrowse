@@ -1,3 +1,4 @@
+# syntax = docker/dockerfile:1.2
 FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
@@ -41,8 +42,10 @@ ARG DLV_VERSION=1.6.1
 ARG GO_RELEASER_VERSION=0.171.0
 ARG GOLANGCI_LINT_VERSION=1.41.1
 
-# Configure apt, install packages and tools
-RUN apt-get update \
+# Configure apt, install packages and tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-apt-packages)
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/aptapt-get \
+    apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
@@ -89,8 +92,8 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${
                  -C /usr/local/bin docker/docker \
   && rm docker-${DOCKER_VERSION}.tgz
 
-# Install Go tools
-RUN \
+# Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     # --> Delve for debugging
     go get github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
     # --> Go language server
@@ -101,7 +104,7 @@ RUN \
     && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOpPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
     && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
-    && rm -rf /go/src/ && rm -rf /go/pkg
+    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
 
 # Install autocompletion for azbrowse
 RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
