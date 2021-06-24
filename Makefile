@@ -19,15 +19,17 @@ help : Makefile
 
 ## test-go:
 ## 		Run short go unit tests
-test-go:
-	$(GO_BINARY) test -p 1 -short ./...
+test-go: terraform-hack-init
+	$(GO_BINARY) test ./...
+
+## test-python
+##		Run python tests, mostly used for swagger gen
+test-python: swagger-update-requirements
+	pytest ./scripts/swagger_update/test_swagger_update.py
 
 ## test:
 ## 		Run all tests
-test: swagger-update-requirements terraform-hack-init
-	echo ${go}
-	pytest ./scripts/swagger_update/test_swagger_update.py
-	$(GO_BINARY) test ./...
+test: test-go test-python
 
 ## checks:
 ##		Check/lint code
@@ -181,12 +183,9 @@ endif
 	# Docs
 	# - Build/CI/PR etc for controlling build vs build and publish release
 	# - "-v var/rundocker.socket" to allow docker builds via mounted docker socket
-	# - "privileged" and "--device" to allow fuse testing
 	@docker run -v ${PWD}:${PWD} \
-		-e "TERM=xterm-256color" \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
-		-e IS_PR="${IS_PR}" \
 		-e BRANCH="${BRANCH}" \
 		-e GITHUB_TOKEN="${GITHUB_TOKEN}" \
 		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
@@ -194,44 +193,16 @@ endif
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-e SNAPCRAFT_LOGIN="$(SNAPCRAFT_LOGIN)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		--privileged \
-		--device /dev/fuse \
+		-v ${HOME}/go/pkg/mod:/go/pkg/mod \
+		-v ${HOME}/.cache/go-build:/root/.cache/go-build \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		ruby ${PWD}/scripts/release.rb
-		
 
-asfs-build:
-	$(GO_BINARY) build ./cmd/azfs
-
-azfs-run:
-	-@fusermount -u /mnt/azfs
-	mkdir -p /mnt/azfs
-	$(GO_BINARY) run ./cmd/azfs --mount /mnt/azfs --enableEdit
-
-# azfs-test:
-# 		Tests the azfs filesystem with unit tests and mocked api
-#
-# A '.env' file like the following is required 
-#
-# > TESTSUB=yoursubhere
-# > TESTRESOURCE=/rghere/resourcehere
-#
-# The resource specified should have a value of 'replaceme' as a tag
-azfs-test:
-	$(GO_BINARY) test -count=1 -timeout 30s -short ./internal/pkg/filesystem
-
-# azfs-integration:
-# 		Tests the azfs filesystem with integration tests
-#
-# A '.env' file like the following is required 
-#
-# > TESTSUB=yoursubhere
-# > TESTRESOURCE=/rghere/resourcehere
-#
-# The resource specified should have a value of 'replaceme' as a tag
-azfs-integration:
-	TESTSUB=${TESTSUB} TESTRESOURCE=${TESTRESOURCE} $(GO_BINARY) test -v -count=1 -timeout 30s ./internal/pkg/filesystem
+## devcontainer-local-ci
+##		This can be used to test the full CI process locally, the build won't be published but the same process will be followed as PR builds
+devcontainer-local-ci: devcontainer
+	./scripts/local-ci.sh
 
 # add-sample-queries:
 # 		Copy some sample queries to the correct location. Used for testing the feature.

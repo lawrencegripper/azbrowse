@@ -1,8 +1,10 @@
+# syntax = docker/dockerfile:1.2
 FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
 FROM golang:1.16.2-buster
+LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 COPY --from=builder /snap/core /snap/core
 COPY --from=builder /snap/core18 /snap/core18
@@ -20,11 +22,31 @@ ARG USERNAME=vscode
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
+# Envs
 ENV GO111MODULE=on
+ENV DEVCONTAINER="TRUE"
+## Snap envs: Set the proper environment.
+ENV LANG="en_US.UTF-8"
+ENV LANGUAGE="en_US:en"
+ENV LC_ALL="en_US.UTF-8"
+ENV PATH="/snap/bin:$PATH"
+ENV SNAP="/snap/snapcraft/current"
+ENV SNAP_NAME="snapcraft"
+ENV SNAP_ARCH="amd64"
 
-# Configure apt, install packages and tools
-RUN apt-get update \
-    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano xterm locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
+# Versions
+ARG TERRAFORM_VERSION=1.0.0
+ENV DOCKER_VERSION=20.10.7
+ARG GO_PLS_VERSION=0.7.0
+ARG DLV_VERSION=1.6.1
+ARG GO_RELEASER_VERSION=0.171.0
+ARG GOLANGCI_LINT_VERSION=1.41.1
+
+# Configure apt, install packages and tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-apt-packages)
+RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
+RUN --mount=type=cache,target=/var/cache/aptapt-get \
+    apt-get update \
+    && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
     && apt-get -y install git iproute2 procps lsb-release unzip \
@@ -63,66 +85,39 @@ RUN echo "source /usr/share/bash-completion/bash_completion" >> "/root/.bashrc"
 RUN git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1 \
     && echo "if [ -f \"$HOME/.bash-git-prompt/gitprompt.sh\" ]; then GIT_PROMPT_ONLY_IN_REPO=1 && source $HOME/.bash-git-prompt/gitprompt.sh; fi" >> "/root/.bashrc"
 
-
-# Alow config for xvfb
-ARG RESOLUTION="1920x1080x24"
-ENV XVFB_RES="${RESOLUTION}"
-ARG XARGS=""
-ENV XVFB_ARGS="${XARGS}"
-
-ENV DEVCONTAINER="TRUE"
-
 # Install docker used by go releaser
 ENV DOCKER_BUILDKIT=1
-ENV DOCKERVERSION=20.10.6
-RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz \
-  && tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 \
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
+  && tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 \
                  -C /usr/local/bin docker/docker \
-  && rm docker-${DOCKERVERSION}.tgz
+  && rm docker-${DOCKER_VERSION}.tgz
 
-# Install Go tools
-RUN \
+# Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
+RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
     # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v1.6.0 \
+    go get github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
     # --> Go language server
-    && go get golang.org/x/tools/gopls@v0.6.10 \
+    && go get golang.org/x/tools/gopls@v${GO_PLS_VERSION} \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.40.1 \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOpPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- "v0.159.0"\
-    # --> Go rich output for testing with colors
-    && go get github.com/kyoh86/richgo@v0.3.6 \
-    && rm -rf /go/src/ && rm -rf /go/pkg
-
-RUN echo "alias go=richgo" >> "/root/.bashrc"
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
+    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
 
 # Install autocompletion for azbrowse
 RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
 
-# Set the proper environment.
-ENV LANG="en_US.UTF-8"
-ENV LANGUAGE="en_US:en"
-ENV LC_ALL="en_US.UTF-8"
-ENV PATH="/snap/bin:$PATH"
-
-ENV SNAP="/snap/snapcraft/current"
-ENV SNAP_NAME="snapcraft"
-ENV SNAP_ARCH="amd64"
-
 # Install python deps for deving
 RUN pip3 install rope black
 
-ARG TERRAFORM_VERSION=0.12.26
 RUN \
     # Install Terraform
     mkdir -p /tmp/docker-downloads \
     && curl -sSL -o /tmp/docker-downloads/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
     && unzip /tmp/docker-downloads/terraform.zip \
     && mv terraform /usr/local/bin
-
-LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 # Install ruby bunder gem to support inline gems in ruby scripts
 RUN gem install bundler

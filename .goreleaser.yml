@@ -39,12 +39,8 @@ nfpms:
       - rpm
 
 dockers:
-  - goos: linux
-    goarch: amd64
-    binaries:
-      - azbrowse
     # Templates of the Docker image names.
-    image_templates:
+  - image_templates:
       - "ghcr.io/lawrencegripper/azbrowse/azbrowse:latest"
       - "ghcr.io/lawrencegripper/azbrowse/azbrowse:{{ .Tag }}"
       - "ghcr.io/lawrencegripper/azbrowse/azbrowse:v{{ .Major }}"
@@ -52,7 +48,6 @@ dockers:
       - "lawrencegripper/azbrowse:{{ .Tag }}"
       - "lawrencegripper/azbrowse:v{{ .Major }}"
     skip_push: false
-    dockerfile: Dockerfile
     # Template of the docker build flags.
     build_flag_templates:
       - "--label=org.label-schema.schema-version=1.0"
