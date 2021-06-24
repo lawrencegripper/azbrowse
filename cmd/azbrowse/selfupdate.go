@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/blang/semver"
@@ -48,9 +49,10 @@ func confirmAndSelfUpdate() {
 
 	updateLastCheckedTime()
 
-	v, err := semver.Parse(version)
+	v, err := semver.Parse(strings.Replace(version, "v", "", 1))
 	if err != nil {
-		log.Panicln(err.Error())
+		log.Println("Failed to parse version number")
+		log.Println(err.Error())
 	}
 	if !found || latest.Version.LTE(v) {
 		log.Println("Current version is the latest")

@@ -19,15 +19,17 @@ help : Makefile
 
 ## test-go:
 ## 		Run short go unit tests
-test-go:
-	$(GO_BINARY) test -p 1 -short ./...
+test-go: terraform-hack-init
+	$(GO_BINARY) test ./...
+
+## test-python
+##		Run python tests, mostly used for swagger gen
+test-python: swagger-update-requirements
+	pytest ./scripts/swagger_update/test_swagger_update.py
 
 ## test:
 ## 		Run all tests
-test: swagger-update-requirements terraform-hack-init
-	echo ${go}
-	pytest ./scripts/swagger_update/test_swagger_update.py
-	$(GO_BINARY) test ./...
+test: test-go test-python
 
 ## checks:
 ##		Check/lint code
