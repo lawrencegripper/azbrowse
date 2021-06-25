@@ -93,22 +93,31 @@ class ApiVersion:
     def to_json(self):
         return json.dumps(self.__dict__, ensure_ascii=False, sort_keys=True)
 
+tag_regex = re.compile("openapi-type: [a-z\\-]+\ntag: ([a-z\\-0-9]*)")
+tag_from_header_regex = re.compile("### Tag: (package-[0-9]{4}-[0-9]{2}.*)")
 def get_api_version_tag(resource_provider_name, readme_contents, overrides):
     override = overrides.get(resource_provider_name)
     if override != None:
         return override
 
-    tag_regex = re.compile("openapi-type: [a-z\\-]+\ntag: ([a-z\\-0-9]*)")
     match = tag_regex.search(readme_contents)
     if match == None:
         return None
 
     tag = match.group(1)
-    return tag
+    if 'preview' not in tag:
+        return tag
+    
+    # If the default is a 'preview', return the stable api version if it exists,
+    # if not return the tag with 'preview' in it
+    stable_match = tag_from_header_regex.search(readme_contents)
+    if stable_match == None:
+        return tag
+    
+    return stable_match.group(1)
 
-
+code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 def find_api_version(resource_provider_name, readme_contents, version_tag, input_file_additions):
-    code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 
     # Regex to match:   ```yaml $(tag) == 'the-version-tag`
     # Also match:       ```yaml $(tag) == 'the-version-tag` || $(tag) == 'some-other-tag'
@@ -209,6 +218,14 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
                 api_version_folder + "/definitions",
             )
 
+            # Hack: Handle the case where a package version folder has files which aren't in the README docs
+            file_helper.copy_child_folder_if_exists(
+                resource_provider_source,
+                resource_provider_target,
+                api_version_folder,
+                ignore='examples'
+            )
+
             # find 'common.json' or ... 'Common.json'
             if os.path.exists(resource_provider_source + "/" + api_version_folder + "/common.json"):
                 file_helper.copy_file_ensure_paths(resource_provider_source, resource_provider_target, api_version_folder + "/common.json")
@@ -244,6 +261,7 @@ def get_additional_files_for_version(input_file_additions, resource_provider_nam
         files_to_add = input_file_additions[resource_provider_name][api_version]
     except KeyError:
         pass
+    
     return files_to_add
 
 

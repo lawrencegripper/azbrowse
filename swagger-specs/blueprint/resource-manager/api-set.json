@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Blueprint/preview/2018-11-01-preview/blueprintDefinition.json", "Microsoft.Blueprint/preview/2018-11-01-preview/blueprintAssignment.json", "Microsoft.Blueprint/preview/2018-11-01-preview/assignmentOperation.json"], "name": "package-2018-11-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Blueprint/preview/2017-11-11-preview/blueprintDefinition.json", "Microsoft.Blueprint/preview/2017-11-11-preview/blueprintAssignment.json"], "name": "package-2017-11-preview"}

@@ -115,7 +115,9 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 	if err != nil {
 		panic(err)
 	}
-	for _, resourceProviderFileInfo := range resourceProviderFileInfos {
+
+	for _, loopResourceProviderFileInfo := range resourceProviderFileInfos {
+		resourceProviderFileInfo := loopResourceProviderFileInfo
 		if resourceProviderFileInfo.IsDir() && resourceProviderFileInfo.Name() != "common-types" {
 			print(fmt.Sprintf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name()))
 			resourceProviderFolderPath := fmt.Sprintf("swagger-specs/%s/resource-manager", resourceProviderFileInfo.Name())
@@ -369,13 +371,15 @@ func writeOutput(paths []*swagger.Path, config *swagger.Config, filename string,
 
 	writeTemplate(writer, paths, config, structName)
 }
+
+// Init the template once and reuse
+var funcMap = template.FuncMap{
+	"upper": strings.ToUpper,
+}
+var parsedTemplate = template.Must(template.New("code-gen").Funcs(funcMap).Parse(tmpl))
+
 func writeTemplate(w io.Writer, paths []*swagger.Path, config *swagger.Config, structName string) {
-
-	funcMap := template.FuncMap{
-		"upper": strings.ToUpper,
-	}
-	t := template.Must(template.New("code-gen").Funcs(funcMap).Parse(tmpl))
-
+	t := parsedTemplate
 	type Context struct {
 		Paths      []*swagger.Path
 		StructName string

@@ -29,5 +29,11 @@
             "useBundler": true // enable reek via bundler
         }
     },
-    "ruby.format": "rubocop" // use rubocop for formatting
+    "ruby.format": "rubocop",
+    "python.testing.pytestArgs": [
+        "scripts/swagger_update"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": true // use rubocop for formatting
 }

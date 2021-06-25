@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.HybridCompute/preview/2021-03-25-preview/HybridCompute.json", "Microsoft.HybridCompute/preview/2021-03-25-preview/privateLinkScopes.json"], "name": "package-preview-2021-03"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.HybridCompute/stable/2021-05-20/HybridCompute.json", "Microsoft.HybridCompute/stable/2021-05-20/privateLinkScopes.json"], "name": "package-2021-05"}

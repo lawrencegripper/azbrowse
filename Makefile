@@ -74,7 +74,7 @@ run: install
 ## fuzz-from:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems
 fuzz: checks install
-	azbrowse --fuzzer 5 --debug
+	azbrowse --fuzzer 5
 
 ## fuzz:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems
@@ -172,9 +172,9 @@ endif
 		-t $(DEV_CONTAINER_TAG) \
 		-f ${PWD}/scripts/ci_integration_tests.sh
 
-## devcontainer-release:
-##		Used by the build to create, test and publish
-devcontainer-release:
+## devcontainer-run:
+##		Runs the CMD variable in the devcontainer, eg: CMD='ruby ${PWD}/scripts/release.rb' make devcontainer-run 
+devcontainer-run:
 ifdef DEVCONTAINER
 	$(error This target can only be run outside of the devcontainer as it mounts files and this fails within a devcontainer. Don't worry all it needs is docker)
 endif
@@ -197,7 +197,7 @@ endif
 		-v ${HOME}/.cache/go-build:/root/.cache/go-build \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
-		ruby ${PWD}/scripts/release.rb
+		${CMD}
 
 ## devcontainer-local-ci
 ##		This can be used to test the full CI process locally, the build won't be published but the same process will be followed as PR builds

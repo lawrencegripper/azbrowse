@@ -62,6 +62,11 @@ func StartAutomatedFuzzer(list *views.ListWidget, settings *config.Settings, gui
 			return true
 		}
 
+		// Skip Microsoft Graph otherwise we walk all applications in the tenant
+		if currentNode.Display == "MS Graph" {
+			return true
+		}
+
 		// Skip walking all processes on every instance of a webapp!
 		if r := regexp.MustCompile(".*/sites/.*/processes"); r.MatchString(currentNode.ID) {
 			return true

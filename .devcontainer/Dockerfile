@@ -42,10 +42,10 @@ ARG DLV_VERSION=1.6.1
 ARG GO_RELEASER_VERSION=0.171.0
 ARG GOLANGCI_LINT_VERSION=1.41.1
 
-# Configure apt, install packages and tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-apt-packages)
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-RUN --mount=type=cache,target=/var/cache/aptapt-get \
-    apt-get update \
+RUN \
+    # Add python3.9 support for newer shutil options
+    echo "deb http://http.us.debian.org/debian/ testing non-free contrib main" > /etc/apt/sources.list \
+    && apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
@@ -56,7 +56,7 @@ RUN --mount=type=cache,target=/var/cache/aptapt-get \
     # --> RPM used by goreleaser
     && apt install -y rpm \
     # Install python3
-    && apt-get -y install python3-pip \
+    && apt-get -y install python3 python3-pip \
     && apt-get -y install bash-completion \
     #
     # Install Azure CLI
@@ -93,7 +93,7 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${
   && rm docker-${DOCKER_VERSION}.tgz
 
 # Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
-RUN --mount=type=cache,target=/go/pkg/mod --mount=type=cache,target=/root/.cache/go-build \
+RUN \
     # --> Delve for debugging
     go get github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
     # --> Go language server

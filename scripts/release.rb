@@ -84,7 +84,7 @@ begin
   last_release_tag = git_instance.describe("HEAD", {:tags => true, :abbrev => '0'})
   puts "Last release tag was #{last_release_tag}"
 
-  changes_since_last_release = git_instance.gtree(last_release_tag).diff('HEAD^').map(&:path)
+  changes_since_last_release = git_instance.gtree(last_release_tag).diff('HEAD').map(&:path)
   puts 'Changed files since last release:'
   puts changes_since_last_release
 
@@ -170,7 +170,7 @@ begin
   devcontainer_images.each do |image_name|
     if publish_build_output && Docker::Image.exist?(image_name)
       print_header("Push devcontainer image #{image_name}")
-      Docker::Image.get(image_name).push
+      puts execute_command("docker push #{image_name}")
     end
   end
 rescue StandardError => e
