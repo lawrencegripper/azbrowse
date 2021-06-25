@@ -18,7 +18,7 @@ def test_get_api_version_from_readme_with_invalid_file_path_returns_none():
 def test_get_api_version_from_readme_with_simple_tags_returns_correct_fileset():
     dummy_overrides = {}
     dummy_includes = {
-        "dummy": { "package-2019-06-preview": ["./exampleaddition.json"]}
+        "dummy": { "package-2019-06": ["./exampleaddition.json"]}
     }
     api_version = get_api_version_from_readme(
         "dummy",
@@ -29,7 +29,7 @@ def test_get_api_version_from_readme_with_simple_tags_returns_correct_fileset():
 
     assert api_version != None, "Expected api_version"
 
-    assert api_version.get_name() == "package-2019-06-preview"
+    assert api_version.get_name() == "package-2019-06"
     input_files = api_version.get_input_files()
     assert len(input_files) == 4
     assert (
