@@ -43,7 +43,9 @@ ARG GO_RELEASER_VERSION=0.171.0
 ARG GOLANGCI_LINT_VERSION=1.41.1
 
 RUN \
-    apt-get update \
+    # Add python3.9 support for newer shutil options
+    echo "deb http://http.us.debian.org/debian/ testing non-free contrib main" > /etc/apt/sources.list \
+    && apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
@@ -54,7 +56,7 @@ RUN \
     # --> RPM used by goreleaser
     && apt install -y rpm \
     # Install python3
-    && apt-get -y install python3-pip \
+    && apt-get -y install python3 python3-pip \
     && apt-get -y install bash-completion \
     #
     # Install Azure CLI
