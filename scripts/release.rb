@@ -84,7 +84,7 @@ begin
   last_release_tag = git_instance.describe("HEAD", {:tags => true, :abbrev => '0'})
   puts "Last release tag was #{last_release_tag}"
 
-  changes_since_last_release = git_instance.gtree(last_release_tag).diff('HEAD^').map(&:path)
+  changes_since_last_release = git_instance.gtree(last_release_tag).diff('HEAD').map(&:path)
   puts 'Changed files since last release:'
   puts changes_since_last_release
 
