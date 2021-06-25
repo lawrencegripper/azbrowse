@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"sync"
 	"text/template"
 
 	"github.com/go-openapi/loads"
@@ -117,40 +116,34 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 		panic(err)
 	}
 
-	var wg sync.WaitGroup
 	for _, loopResourceProviderFileInfo := range resourceProviderFileInfos {
-		wg.Add(1)
 		resourceProviderFileInfo := loopResourceProviderFileInfo
-		go func() {
-			defer wg.Done()
-			if resourceProviderFileInfo.IsDir() && resourceProviderFileInfo.Name() != "common-types" {
-				print(fmt.Sprintf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name()))
-				resourceProviderFolderPath := fmt.Sprintf("swagger-specs/%s/resource-manager", resourceProviderFileInfo.Name())
-				resourceTypeFileInfos, err := ioutil.ReadDir(resourceProviderFolderPath)
-				_ = resourceTypeFileInfos
-				if err != nil {
-					return // may just be data-plane folder
-				}
-				processed := processAPISet(resourceProviderFolderPath)
-				if processed {
-					print("Got api-set.json")
-				} else {
-					// Didn't get an api-set.json in the resource provider - check in resource types
-					for _, resourceTypeFileInfo := range resourceTypeFileInfos {
-						if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
-							resourceTypeFolderPath := fmt.Sprintf("%s/%s", resourceProviderFolderPath, resourceTypeFileInfo.Name())
-							print(fmt.Sprintf("\tProcessing resource type folder: %s\n", resourceTypeFolderPath))
-							processed = processAPISet(resourceTypeFolderPath)
-							if processed {
-								print("Got api-set.json")
-							}
+		if resourceProviderFileInfo.IsDir() && resourceProviderFileInfo.Name() != "common-types" {
+			print(fmt.Sprintf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name()))
+			resourceProviderFolderPath := fmt.Sprintf("swagger-specs/%s/resource-manager", resourceProviderFileInfo.Name())
+			resourceTypeFileInfos, err := ioutil.ReadDir(resourceProviderFolderPath)
+			_ = resourceTypeFileInfos
+			if err != nil {
+				continue // may just be data-plane folder
+			}
+			processed := processAPISet(resourceProviderFolderPath)
+			if processed {
+				print("Got api-set.json")
+			} else {
+				// Didn't get an api-set.json in the resource provider - check in resource types
+				for _, resourceTypeFileInfo := range resourceTypeFileInfos {
+					if resourceTypeFileInfo.IsDir() && resourceTypeFileInfo.Name() != "common" {
+						resourceTypeFolderPath := fmt.Sprintf("%s/%s", resourceProviderFolderPath, resourceTypeFileInfo.Name())
+						print(fmt.Sprintf("\tProcessing resource type folder: %s\n", resourceTypeFolderPath))
+						processed = processAPISet(resourceTypeFolderPath)
+						if processed {
+							print("Got api-set.json")
 						}
 					}
 				}
 			}
-		}()
+		}
 	}
-	wg.Wait()
 	return paths
 }
 
