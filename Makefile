@@ -74,7 +74,7 @@ run: install
 ## fuzz-from:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems
 fuzz: checks install
-	azbrowse --fuzzer 5 --debug
+	azbrowse --fuzzer 5
 
 ## fuzz:
 ##		Runs azbrowse fuzzer which browses resource attempting to find problems

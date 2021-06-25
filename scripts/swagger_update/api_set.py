@@ -105,16 +105,16 @@ def get_api_version_tag(resource_provider_name, readme_contents, overrides):
         return None
 
     tag = match.group(1)
-
     if 'preview' not in tag:
         return tag
     
-    print('default tag was preview, falling back to latest stable tag')
-    match = tag_from_header_regex.search(readme_contents)
-    if match == None:
-        return None
+    # If the default is a 'preview', return the stable api version if it exists,
+    # if not return the tag with 'preview' in it
+    stable_match = tag_from_header_regex.search(readme_contents)
+    if stable_match == None:
+        return tag
     
-    return match.group(1)
+    return stable_match.group(1)
 
 code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 def find_api_version(resource_provider_name, readme_contents, version_tag, input_file_additions):
