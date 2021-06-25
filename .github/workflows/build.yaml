@@ -31,7 +31,7 @@ jobs:
       run: sudo -E make devcontainer
 
     - name: Build the Docker image, run tests and publish(on master only)
-      run: sudo -E make devcontainer-release
+      run: CMD='ruby ${PWD}/scripts/release.rb' sudo -E make devcontainer-run
       env:
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
