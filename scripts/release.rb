@@ -170,7 +170,7 @@ begin
   devcontainer_images.each do |image_name|
     if publish_build_output && Docker::Image.exist?(image_name)
       print_header("Push devcontainer image #{image_name}")
-      Docker::Image.get(image_name).push
+      puts execute_command("docker push #{image_name}")
     end
   end
 rescue StandardError => e

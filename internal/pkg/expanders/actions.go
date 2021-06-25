@@ -10,7 +10,6 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/tracing"
 )
 
-// dummy change in go file
 type expanderAndListActionsResponse struct {
 	Expander          Expander
 	ListActionsResult ListActionsResult
