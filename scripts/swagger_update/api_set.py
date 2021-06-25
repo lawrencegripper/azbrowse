@@ -93,22 +93,31 @@ class ApiVersion:
     def to_json(self):
         return json.dumps(self.__dict__, ensure_ascii=False, sort_keys=True)
 
+tag_regex = re.compile("openapi-type: [a-z\\-]+\ntag: ([a-z\\-0-9]*)")
+tag_from_header_regex = re.compile("### Tag: (package-[0-9]{4}-[0-9]{2}.*)")
 def get_api_version_tag(resource_provider_name, readme_contents, overrides):
     override = overrides.get(resource_provider_name)
     if override != None:
         return override
 
-    tag_regex = re.compile("openapi-type: [a-z\\-]+\ntag: ([a-z\\-0-9]*)")
     match = tag_regex.search(readme_contents)
     if match == None:
         return None
 
     tag = match.group(1)
-    return tag
 
+    if 'preview' not in tag:
+        return tag
+    
+    print('default tag was preview, falling back to latest stable tag')
+    match = tag_from_header_regex.search(readme_contents)
+    if match == None:
+        return None
+    
+    return match.group(1)
 
+code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 def find_api_version(resource_provider_name, readme_contents, version_tag, input_file_additions):
-    code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 
     # Regex to match:   ```yaml $(tag) == 'the-version-tag`
     # Also match:       ```yaml $(tag) == 'the-version-tag` || $(tag) == 'some-other-tag'

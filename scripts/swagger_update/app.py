@@ -35,7 +35,7 @@ if __name__ == "__main__":
     resource_provider_input_file_additions = {
         # storage package-2019-06 references privatelinks.json which is not listed in the input files
         "storage": { 
-            "package-2021-02": ["./Microsoft.Storage/stable/2021-02-01/privatelinks.json"] 
+            "package-2021-04": ["./Microsoft.Storage/stable/2021-02-01/privatelinks.json"] 
         },
         "cosmos-db" : {
             "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         "\n****************************************************************************"
     )
     print("Cloning azure-rest-api-sets repo")
-#    git_helper.clone_swagger_specs("swagger-temp")
+    git_helper.clone_or_update_swagger_specs("swagger-temp")
 
     print(
         "\n****************************************************************************"

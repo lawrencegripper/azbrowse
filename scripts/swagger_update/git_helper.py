@@ -12,10 +12,10 @@ def show_git_progress(op_code, cur_count, max_count, message):
         last_git_message = message
 
 
-def clone_swagger_specs(target_folder):
+def clone_or_update_swagger_specs(target_folder):
     if os.path.exists(target_folder):
-        print("Deleting " + target_folder + "...")
-        shutil.rmtree(target_folder)
+        Repo(target_folder + "/azure-rest-api-specs").remotes.origin.pull()
+        return
 
     os.mkdir(target_folder)
     with open(target_folder + "/.gitignore", "w") as f:
@@ -23,8 +23,7 @@ def clone_swagger_specs(target_folder):
 
 
     print("Cloning specs...")
-    repo = Repo()
-    repo.clone_from(
+    Repo().repo.clone_from(
         "https://github.com/azure/azure-rest-api-specs",
         target_folder + "/azure-rest-api-specs",
         progress=show_git_progress,
