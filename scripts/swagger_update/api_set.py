@@ -218,6 +218,14 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
                 api_version_folder + "/definitions",
             )
 
+            # Hack: Handle the case where a package version folder has files which aren't in the README docs
+            file_helper.copy_child_folder_if_exists(
+                resource_provider_source,
+                resource_provider_target,
+                api_version_folder,
+                ignore='examples'
+            )
+
             # find 'common.json' or ... 'Common.json'
             if os.path.exists(resource_provider_source + "/" + api_version_folder + "/common.json"):
                 file_helper.copy_file_ensure_paths(resource_provider_source, resource_provider_target, api_version_folder + "/common.json")
@@ -253,6 +261,7 @@ def get_additional_files_for_version(input_file_additions, resource_provider_nam
         files_to_add = input_file_additions[resource_provider_name][api_version]
     except KeyError:
         pass
+    
     return files_to_add
 
 
