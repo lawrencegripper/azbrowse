@@ -23,7 +23,7 @@ def clone_or_update_swagger_specs(target_folder):
 
 
     print("Cloning specs...")
-    Repo().repo.clone_from(
+    Repo().clone_from(
         "https://github.com/azure/azure-rest-api-specs",
         target_folder + "/azure-rest-api-specs",
         progress=show_git_progress,
