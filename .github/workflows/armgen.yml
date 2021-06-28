@@ -25,6 +25,8 @@ jobs:
     - name: Run swagger-codegen to gen go types
       run: CMD='make swagger-codegen' sudo -E make devcontainer-run
 
+    - name: Sort file permissions
+      run: chmod 777 .
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
