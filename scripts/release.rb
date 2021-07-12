@@ -88,6 +88,10 @@ begin
   puts 'Changed files since last release:'
   puts changes_since_last_release
 
+  print_header('Ensure go vendor file is up-to-date')
+  execute_command('go mod vendor')
+  error_if_git_has_changes('The /vendor file is out of date. Run "go mod vendor" and commit the changes to resolve this issue')
+
   print_header('Generation - Checking docs and swagger/openapi')
   codegen_changes = changes_since_last_release.select do |i|
     i.include?('.generated.go') or
