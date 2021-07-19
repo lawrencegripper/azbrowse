@@ -20,7 +20,7 @@ help : Makefile
 ## test-go:
 ## 		Run short go unit tests
 test-go: terraform-hack-init
-	$(GO_BINARY) test ./...
+	$(GO_BINARY) test -mod=vendor ./...
 
 ## test-python
 ##		Run python tests, mostly used for swagger gen
@@ -39,12 +39,11 @@ checks:
 ## build: 
 ##		Build azbrowse binary
 build:
-	$(GO_BINARY) build ./cmd/azbrowse
+	$(GO_BINARY) build -mod=vendor ./cmd/azbrowse
 
 ## ci: 
 ##		Build lint and check
-ci: swagger-codegen checks test
-	$(GO_BINARY) build ./cmd/azbrowse
+ci: swagger-codegen checks test build
 
 ## debug:
 ##		Starts azbrowse using Delve ready for debugging from VSCode.
@@ -85,7 +84,7 @@ fuzz-from: checks install
 ## install: 
 ##		Build and install azbrowse on this machine
 install:
-	$(GO_BINARY) install ./cmd/azbrowse
+	$(GO_BINARY) install -mod=vendor ./cmd/azbrowse
 
 ## terraform-hack-init:
 ##		Install terraform providers for tests
@@ -111,15 +110,15 @@ swagger-update-requirements:
 ##		set VERBOSE=true to see full output
 swagger-codegen:
 	export GO111MODULE=on
-	$(GO_BINARY) run ./cmd/swagger-codegen/ 
+	$(GO_BINARY) run -mod=vendor ./cmd/swagger-codegen/ 
 	# Format the generated code
 	gofmt -s -w internal/pkg/expanders/swagger-armspecs.generated.go
 	gofmt -s -w internal/pkg/expanders/search.generated.go
 	gofmt -s -w internal/pkg/expanders/databricks.generated.go
 	# Build the generated go files to check for any go build issues
-	$(GO_BINARY) build internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go internal/pkg/expanders/test_utils.go
+	$(GO_BINARY) build -mod=vendor internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go internal/pkg/expanders/test_utils.go
 	# Test the generated code initalizes
-	$(GO_BINARY) test -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
+	$(GO_BINARY) test -mod=vendor -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
 
 ## autocomplete-install:
 ## 		Add autocompletion for azbrowse to your bash prompt
@@ -141,7 +140,7 @@ autocomplete-clear:
 ## selfupdate-test:
 ##		Launches AzBrowse with a low version number to allow testing of the self-update feature
 selfupdate-test:
-	$(GO_BINARY) install -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
+	$(GO_BINARY) install -mod=vendor -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
 	AZBROWSE_FORCE_UPDATE=true azbrowse
 
 ## devcontainer:
