@@ -12320,11 +12320,11 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "assessmentMetadata",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Security/assessmentMetadata", "2020-01-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Security/assessmentMetadata", "2021-06-01"),
 			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{assessmentMetadataName}",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2020-01-01"),
+					Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2021-06-01"),
 				}},
 		},
 		{
@@ -12360,13 +12360,13 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "assessmentMetadata",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata", "2020-01-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata", "2021-06-01"),
 			SubResources: []swagger.ResourceType{
 				{
 					Display:        "{assessmentMetadataName}",
-					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2020-01-01"),
-					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2020-01-01"),
-					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2020-01-01"),
+					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2021-06-01"),
+					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2021-06-01"),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Security/assessmentMetadata/{assessmentMetadataName}", "2021-06-01"),
 				}},
 		},
 		{
@@ -12796,9 +12796,9 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:        "{assessmentName}",
-			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{resourceId}/providers/Microsoft.Security/assessments/{assessmentName}", "2020-01-01"),
-			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceId}/providers/Microsoft.Security/assessments/{assessmentName}", "2020-01-01"),
-			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/{resourceId}/providers/Microsoft.Security/assessments/{assessmentName}", "2020-01-01"),
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/{resourceId}/providers/Microsoft.Security/assessments/{assessmentName}", "2021-06-01"),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/{resourceId}/providers/Microsoft.Security/assessments/{assessmentName}", "2021-06-01"),
+			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/{resourceId}/providers/Microsoft.Security/assessments/{assessmentName}", "2021-06-01"),
 		},
 		{
 			Display:  "{complianceResultName}",
@@ -12856,7 +12856,7 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "assessments",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Security/assessments", "2020-01-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/{scope}/providers/Microsoft.Security/assessments", "2021-06-01"),
 			SubResources: []swagger.ResourceType{
 				{
 					Display:  "subAssessments",
