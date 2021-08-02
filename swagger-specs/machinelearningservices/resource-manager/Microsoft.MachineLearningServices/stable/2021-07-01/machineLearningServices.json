@@ -3,7 +3,7 @@
   "info": {
     "title": "Azure Machine Learning Workspaces",
     "description": "These APIs allow end users to operate on Azure Machine Learning Workspace resources.",
-    "version": "2021-04-01"
+    "version": "2021-07-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -43,7 +43,7 @@
         "operationId": "Operations_List",
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -56,7 +56,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -74,18 +74,18 @@
         "operationId": "Workspaces_Get",
         "x-ms-examples": {
           "Get Workspace": {
-            "$ref": "./examples/getWorkspace.json"
+            "$ref": "./examples/Workspace/get.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -101,7 +101,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -115,18 +115,18 @@
         "x-ms-long-running-operation": true,
         "x-ms-examples": {
           "Create Workspace": {
-            "$ref": "./examples/createWorkspace.json"
+            "$ref": "./examples/Workspace/create.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -148,19 +148,13 @@
               "$ref": "#/definitions/Workspace"
             }
           },
-          "201": {
-            "description": "The request was successful; the request was well-formed and received properly.",
-            "schema": {
-              "$ref": "#/definitions/Workspace"
-            }
-          },
           "202": {
             "description": "The request was successful; the request was well-formed and received properly."
           },
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -173,19 +167,19 @@
         "operationId": "Workspaces_Delete",
         "x-ms-examples": {
           "Delete Workspace": {
-            "$ref": "./examples/deleteWorkspace.json"
+            "$ref": "./examples/Workspace/delete.json"
           }
         },
         "x-ms-long-running-operation": true,
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -204,7 +198,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -217,18 +211,18 @@
         "operationId": "Workspaces_Update",
         "x-ms-examples": {
           "Update Workspace": {
-            "$ref": "./examples/updateWorkspace.json"
+            "$ref": "./examples/Workspace/update.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -253,54 +247,9 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
-        }
-      }
-    },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/features": {
-      "get": {
-        "tags": [
-          "Workspaces"
-        ],
-        "description": "Lists all enabled features for a workspace",
-        "operationId": "WorkspaceFeatures_List",
-        "x-ms-examples": {
-          "List Workspace features": {
-            "$ref": "./examples/ListWorkspaceFeatures.json"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/parameters/APIVersionParameter"
-          },
-          {
-            "$ref": "#/parameters/SubscriptionIdParameter"
-          },
-          {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "$ref": "#/parameters/WorkspaceNameParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request was successful; the request was well-formed and received properly.",
-            "schema": {
-              "$ref": "#/definitions/ListAmlUserFeatureResult"
-            }
-          },
-          "default": {
-            "description": "Error response describing why the operation failed",
-            "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          }
-        },
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
         }
       }
     },
@@ -313,18 +262,18 @@
         "operationId": "Workspaces_ListByResourceGroup",
         "x-ms-examples": {
           "Get Workspaces by Resource Group": {
-            "$ref": "./examples/getWorkspacesByResourceGroup.json"
+            "$ref": "./examples/Workspace/listByResourceGroup.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/PaginationParameter"
@@ -340,12 +289,88 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/diagnose": {
+      "post": {
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "Diagnose workspace setup issue.",
+        "operationId": "Workspaces_Diagnose",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/WorkspaceNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "in": "body",
+            "name": "parameters",
+            "description": "The parameter of diagnosing workspace health",
+            "schema": {
+              "$ref": "#/definitions/DiagnoseWorkspaceParameters"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Success",
+            "headers": {
+              "Location": {
+                "description": "URI to poll for asynchronous operation result.",
+                "type": "string"
+              },
+              "Retry-After": {
+                "description": "Duration the client should wait between requests, in seconds.",
+                "type": "integer",
+                "format": "int32",
+                "maximum": 600,
+                "minimum": 10
+              }
+            }
+          },
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/DiagnoseResponseResult"
+            }
+          },
+          "default": {
+            "description": "Error",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Diagnose Workspace": {
+            "$ref": "./examples/Workspace/diagnose.json"
+          }
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
         }
       }
     },
@@ -358,18 +383,18 @@
         "operationId": "Workspaces_ListKeys",
         "x-ms-examples": {
           "List Workspace Keys": {
-            "$ref": "./examples/listWorkspaceKeys.json"
+            "$ref": "./examples/Workspace/listKeys.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -385,7 +410,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -401,18 +426,18 @@
         "x-ms-long-running-operation": true,
         "x-ms-examples": {
           "Resync Workspace Keys": {
-            "$ref": "./examples/resyncWorkspaceKeys.json"
+            "$ref": "./examples/Workspace/resyncKeys.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -428,7 +453,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -443,10 +468,10 @@
         "description": "Gets the current usage information as well as limits for AML resources for given subscription and location.",
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
             "name": "location",
@@ -470,7 +495,7 @@
         },
         "x-ms-examples": {
           "List Usages": {
-            "$ref": "./examples/ListUsages.json"
+            "$ref": "./examples/Usage/list.json"
           }
         }
       }
@@ -492,10 +517,10 @@
             "pattern": "^[-\\w\\._]+$"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -508,7 +533,7 @@
         },
         "x-ms-examples": {
           "List VM Sizes": {
-            "$ref": "./examples/ListVMSizesResult.json"
+            "$ref": "./examples/VirtualMachineSize/list.json"
           }
         }
       }
@@ -539,10 +564,10 @@
             "description": "Quota update parameters."
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -555,13 +580,13 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
         "x-ms-examples": {
           "update quotas": {
-            "$ref": "./examples/updateQuota.json"
+            "$ref": "./examples/Quota/update.json"
           }
         }
       }
@@ -575,10 +600,10 @@
         "description": "Gets the currently assigned Workspace Quotas based on VMFamily.",
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
             "name": "location",
@@ -599,7 +624,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -608,7 +633,7 @@
         },
         "x-ms-examples": {
           "List workspace quotas by VMFamily": {
-            "$ref": "./examples/ListWorkspaceQuotasByVMFamily.json"
+            "$ref": "./examples/Quota/list.json"
           }
         }
       }
@@ -622,15 +647,15 @@
         "operationId": "Workspaces_ListBySubscription",
         "x-ms-examples": {
           "Get Workspaces by subscription": {
-            "$ref": "./examples/getWorkspacesBySubscription.json"
+            "$ref": "./examples/Workspace/listBySubscription.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
             "$ref": "#/parameters/PaginationParameter"
@@ -646,7 +671,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -664,25 +689,25 @@
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
         },
-        "operationId": "MachineLearningCompute_ListByWorkspace",
+        "operationId": "Compute_List",
         "description": "Gets computes in specified workspace.",
         "x-ms-examples": {
           "Get Computes": {
-            "$ref": "./examples/getComputes.json"
+            "$ref": "./examples/Compute/list.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/PaginationParameter"
@@ -698,7 +723,7 @@
           "default": {
             "description": "Error response describing why the request failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -710,25 +735,28 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_Get",
+        "operationId": "Compute_Get",
         "description": "Gets compute definition by its name. Any secrets (storage keys, service credentials, etc) are not returned - use 'keys' nested resource to get them.",
         "x-ms-examples": {
           "Get a AKS Compute": {
-            "$ref": "./examples/getAKSCompute.json"
+            "$ref": "./examples/Compute/get/AKSCompute.json"
           },
           "Get a AML Compute": {
-            "$ref": "./examples/getAmlCompute.json"
+            "$ref": "./examples/Compute/get/AmlCompute.json"
           },
           "Get an ComputeInstance": {
-            "$ref": "./examples/getComputeInstance.json"
+            "$ref": "./examples/Compute/get/ComputeInstance.json"
+          },
+          "Get a Kubernetes Compute": {
+            "$ref": "./examples/Compute/get/KubernetesCompute.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -737,7 +765,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -750,7 +778,7 @@
           "default": {
             "description": "Error response describing why the request failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -760,38 +788,41 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_CreateOrUpdate",
+        "operationId": "Compute_CreateOrUpdate",
         "description": "Creates or updates compute. This call will overwrite a compute if it exists. This is a nonrecoverable operation. If your intent is to create a new compute, do a GET first to verify that it does not exist yet.",
         "x-ms-long-running-operation": true,
         "x-ms-examples": {
           "Create a AML Compute": {
-            "$ref": "./examples/createBasicAmlCompute.json"
+            "$ref": "./examples/Compute/createOrUpdate/BasicAmlCompute.json"
           },
           "Create an ComputeInstance Compute with minimal inputs": {
-            "$ref": "./examples/createComputeInstanceMinimal.json"
+            "$ref": "./examples/Compute/createOrUpdate/ComputeInstanceMinimal.json"
           },
           "Create an ComputeInstance Compute": {
-            "$ref": "./examples/createComputeInstance.json"
+            "$ref": "./examples/Compute/createOrUpdate/ComputeInstance.json"
           },
-          "Create AKS Compute": {
-            "$ref": "./examples/createBasicAKSCompute.json"
+          "Create an AKS Compute": {
+            "$ref": "./examples/Compute/createOrUpdate/BasicAKSCompute.json"
           },
           "Create a DataFactory Compute": {
-            "$ref": "./examples/createBasicDataFactoryCompute.json"
+            "$ref": "./examples/Compute/createOrUpdate/BasicDataFactoryCompute.json"
           },
           "Update a AML Compute": {
-            "$ref": "./examples/updateAmlCompute.json"
+            "$ref": "./examples/Compute/createOrUpdate/AmlCompute.json"
           },
-          "Update a AKS Compute": {
-            "$ref": "./examples/updateAKSCompute.json"
+          "Update an AKS Compute": {
+            "$ref": "./examples/Compute/createOrUpdate/AKSCompute.json"
+          },
+          "Attach a Kubernetes Compute": {
+            "$ref": "./examples/Compute/createOrUpdate/KubernetesCompute.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -800,7 +831,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/ComputeDefinitionParameter"
@@ -828,7 +859,7 @@
           "default": {
             "description": "Error response describing why the request failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -838,20 +869,20 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_Update",
+        "operationId": "Compute_Update",
         "description": "Updates properties of a compute. This call will overwrite a compute if it exists. This is a nonrecoverable operation.",
         "x-ms-long-running-operation": true,
         "x-ms-examples": {
           "Update a AmlCompute Compute": {
-            "$ref": "./examples/patchAmlCompute.json"
+            "$ref": "./examples/Compute/patch.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -860,7 +891,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "parameters",
@@ -882,7 +913,7 @@
           "default": {
             "description": "Error response describing why the request failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -892,20 +923,20 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_Delete",
+        "operationId": "Compute_Delete",
         "description": "Deletes specified Machine Learning compute.",
         "x-ms-long-running-operation": true,
         "x-ms-examples": {
           "Delete Compute": {
-            "$ref": "./examples/deleteCompute.json"
+            "$ref": "./examples/Compute/delete.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -914,7 +945,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/UnderlyingResourceActionParameter"
@@ -940,7 +971,7 @@
           "default": {
             "description": "Error response describing why the request failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -951,14 +982,14 @@
         "tags": [
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_ListNodes",
+        "operationId": "Compute_ListNodes",
         "description": "Get the details (e.g IP address, port etc) of all the compute nodes in the compute.",
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -967,7 +998,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -980,7 +1011,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -990,7 +1021,7 @@
         },
         "x-ms-examples": {
           "Get compute nodes information for a compute": {
-            "$ref": "./examples/amlComputeListNodes.json"
+            "$ref": "./examples/Compute/listNodes.json"
           }
         }
       }
@@ -1004,18 +1035,18 @@
         "operationId": "Workspaces_ListNotebookAccessToken",
         "x-ms-examples": {
           "List Workspace Keys": {
-            "$ref": "./examples/listNotebookAccessToken.json"
+            "$ref": "./examples/Workspace/listNotebookAccessToken.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1031,7 +1062,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1043,19 +1074,19 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_ListKeys",
+        "operationId": "Compute_ListKeys",
         "description": "Gets secrets related to Machine Learning compute (storage keys, service credentials, etc).",
         "x-ms-examples": {
           "List AKS Compute Keys": {
-            "$ref": "./examples/listKeysAKSCompute.json"
+            "$ref": "./examples/Compute/listKeys.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1064,7 +1095,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1077,7 +1108,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1089,20 +1120,20 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_Start",
+        "operationId": "Compute_Start",
         "description": "Posts a start action to a compute instance",
         "x-ms-examples": {
           "Start ComputeInstance Compute": {
-            "$ref": "./examples/startComputeInstance.json"
+            "$ref": "./examples/Compute/start.json"
           }
         },
         "x-ms-long-running-operation": true,
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1111,7 +1142,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1121,7 +1152,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1133,20 +1164,20 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_Stop",
+        "operationId": "Compute_Stop",
         "description": "Posts a stop action to a compute instance",
         "x-ms-examples": {
           "Stop ComputeInstance Compute": {
-            "$ref": "./examples/stopComputeInstance.json"
+            "$ref": "./examples/Compute/stop.json"
           }
         },
         "x-ms-long-running-operation": true,
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1155,7 +1186,7 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1165,7 +1196,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1177,19 +1208,20 @@
           "OperationalizationClusters",
           "MachineLearningComputes"
         ],
-        "operationId": "MachineLearningCompute_Restart",
+        "operationId": "Compute_Restart",
         "description": "Posts a restart action to a compute instance",
         "x-ms-examples": {
           "Restart ComputeInstance Compute": {
-            "$ref": "./examples/restartComputeInstance.json"
+            "$ref": "./examples/Compute/restart.json"
           }
         },
+        "x-ms-long-running-operation": true,
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1198,58 +1230,64 @@
             "$ref": "#/parameters/ComputeNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
-          "200": {
+          "202": {
             "description": "Success."
           },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
       }
     },
-    "/subscriptions/{subscriptionId}/providers/Microsoft.MachineLearningServices/workspaces/skus": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/privateEndpointConnections": {
       "get": {
         "tags": [
-          "WorkspaceSkus"
+          "PrivateEndpointConnections"
         ],
-        "description": "Lists all skus with associated features",
-        "operationId": "Workspace_ListSkus",
+        "operationId": "PrivateEndpointConnections_List",
+        "description": "List all the private endpoint connections associated with the workspace.",
         "x-ms-examples": {
-          "List Skus": {
-            "$ref": "./examples/ListSkus.json"
+          "StorageAccountListPrivateEndpointConnections": {
+            "$ref": "./examples/PrivateEndpointConnection/list.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "#/parameters/WorkspaceNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
           "200": {
-            "description": "The request was successful; the request was well-formed and received properly.",
+            "description": "OK -- Successfully retrieved private endpoint connections.",
             "schema": {
-              "$ref": "#/definitions/SkuListResult"
+              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
             }
           },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         },
         "x-ms-pageable": {
-          "nextLinkName": "nextLink"
+          "nextLinkName": null
         }
       }
     },
@@ -1262,15 +1300,15 @@
         "description": "Gets the specified private endpoint connection associated with the workspace.",
         "x-ms-examples": {
           "WorkspaceGetPrivateEndpointConnection": {
-            "$ref": "./examples/workspaceGetPrivateEndpointConnection.json"
+            "$ref": "./examples/PrivateEndpointConnection/get.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1279,7 +1317,7 @@
             "$ref": "#/parameters/PrivateEndpointConnectionName"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1292,7 +1330,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1301,19 +1339,19 @@
         "tags": [
           "WorkspacePrivateEndpointConnections"
         ],
-        "operationId": "PrivateEndpointConnections_Put",
+        "operationId": "PrivateEndpointConnections_CreateOrUpdate",
         "description": "Update the state of specified private endpoint connection associated with the workspace.",
         "x-ms-examples": {
           "WorkspacePutPrivateEndpointConnection": {
-            "$ref": "./examples/workspacePutPrivateEndpointConnection.json"
+            "$ref": "./examples/PrivateEndpointConnection/createOrUpdate.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1322,7 +1360,7 @@
             "$ref": "#/parameters/PrivateEndpointConnectionName"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "properties",
@@ -1344,7 +1382,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1357,15 +1395,15 @@
         "description": "Deletes the specified private endpoint connection associated with the workspace.",
         "x-ms-examples": {
           "WorkspaceDeletePrivateEndpointConnection": {
-            "$ref": "./examples/workspaceDeletePrivateEndpointConnection.json"
+            "$ref": "./examples/PrivateEndpointConnection/delete.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1374,7 +1412,7 @@
             "$ref": "#/parameters/PrivateEndpointConnectionName"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1387,7 +1425,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1398,25 +1436,25 @@
         "tags": [
           "WorkspacePrivateLinkResources"
         ],
-        "operationId": "PrivateLinkResources_ListByWorkspace",
+        "operationId": "PrivateLinkResources_List",
         "description": "Gets the private link resources that need to be created for a workspace.",
         "x-ms-examples": {
           "WorkspaceListPrivateLinkResources": {
-            "$ref": "./examples/workspaceListPrivateLinkResources.json"
+            "$ref": "./examples/PrivateLinkResource/list.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1429,259 +1467,31 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/services": {
-      "get": {
-        "tags": [
-          "MachineLearningServices"
-        ],
-        "x-ms-pageable": {
-          "nextLinkName": "nextLink"
-        },
-        "operationId": "MachineLearningService_ListByWorkspace",
-        "description": "Gets services in specified workspace.",
-        "x-ms-examples": {
-          "Get Services": {
-            "$ref": "./examples/getServices.json"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/parameters/SubscriptionIdParameter"
-          },
-          {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "$ref": "#/parameters/WorkspaceNameParameter"
-          },
-          {
-            "$ref": "#/parameters/APIVersionParameter"
-          },
-          {
-            "$ref": "#/parameters/PaginationParameter"
-          },
-          {
-            "$ref": "#/parameters/ModelIdParameter"
-          },
-          {
-            "$ref": "#/parameters/ModelNameParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceTagParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceTagsParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServicePropertiesParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceRunIdParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceExpandParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceOrderByParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The response includes a paginated array of Machine Learning services and a URI to the next set of results, if any. For the more information the limits of the number of items in a resource group, see https://azure.microsoft.com/en-us/documentation/articles/azure-subscription-service-limits/.",
-            "schema": {
-              "$ref": "#/definitions/PaginatedServiceList"
-            }
-          },
-          "default": {
-            "description": "Error response describing why the request failed.",
-            "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          }
-        }
-      }
-    },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/services/{serviceName}": {
-      "get": {
-        "tags": [
-          "MachineLearningServices"
-        ],
-        "operationId": "MachineLearningService_Get",
-        "description": "Get a Service by name.",
-        "x-ms-examples": {
-          "Get Service": {
-            "$ref": "./examples/getService.json"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/parameters/SubscriptionIdParameter"
-          },
-          {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "$ref": "#/parameters/WorkspaceNameParameter"
-          },
-          {
-            "$ref": "#/parameters/APIVersionParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceNameParameter"
-          },
-          {
-            "in": "query",
-            "name": "expand",
-            "description": "Set to True to include Model details.",
-            "type": "boolean",
-            "default": false
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "schema": {
-              "$ref": "#/definitions/ServiceResource"
-            }
-          },
-          "default": {
-            "description": "Error response describing why the request failed.",
-            "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "MachineLearningServices"
-        ],
-        "operationId": "MachineLearningService_Delete",
-        "description": "Delete a specific Service..",
-        "x-ms-examples": {
-          "Delete Service": {
-            "$ref": "./examples/deleteService.json"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/parameters/SubscriptionIdParameter"
-          },
-          {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "$ref": "#/parameters/WorkspaceNameParameter"
-          },
-          {
-            "$ref": "#/parameters/APIVersionParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceNameParameter"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The resource exists and was deleted successfully."
-          },
-          "204": {
-            "description": "The resource does not exist and the request was well formed."
-          },
-          "default": {
-            "description": "Error response describing why the request failed.",
-            "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "MachineLearningServices"
-        ],
-        "description": "Creates or updates service. This call will update a service if it exists. This is a nonrecoverable operation. If your intent is to create a new service, do a GET first to verify that it does not exist yet.",
-        "operationId": "MachineLearningService_CreateOrUpdate",
-        "x-ms-long-running-operation": true,
-        "x-ms-examples": {
-          "Create Or Update service": {
-            "$ref": "./examples/createOrUpdateService.json"
-          }
-        },
-        "parameters": [
-          {
-            "$ref": "#/parameters/SubscriptionIdParameter"
-          },
-          {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
-          },
-          {
-            "$ref": "#/parameters/WorkspaceNameParameter"
-          },
-          {
-            "$ref": "#/parameters/APIVersionParameter"
-          },
-          {
-            "$ref": "#/parameters/WebServiceNameParameter"
-          },
-          {
-            "in": "body",
-            "name": "properties",
-            "description": "The payload that is used to create or update the Service.",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/CreateServiceRequest"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Service creation or update initiated.",
-            "schema": {
-              "$ref": "#/definitions/ServiceResource"
-            }
-          },
-          "201": {
-            "description": "Service creation or update initiated.",
-            "headers": {
-              "Azure-AsyncOperation": {
-                "description": "URI to poll for asynchronous operation status.",
-                "type": "string"
-              }
-            }
-          },
-          "default": {
-            "description": "Error response describing why the operation failed.",
-            "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          }
-        }
-      }
-    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/prepareNotebook": {
       "post": {
         "tags": [
           "ProxyOperations"
         ],
-        "operationId": "Notebooks_Prepare",
+        "operationId": "Workspaces_PrepareNotebook",
+        "description": "Prepare a notebook.",
         "x-ms-long-running-operation": true,
         "x-ms-long-running-operation-options": {
           "final-state-via": "location"
         },
         "x-ms-examples": {
           "Prepare Notebook": {
-            "$ref": "./examples/workspacePrepareNotebook.json"
+            "$ref": "./examples/Notebook/prepare.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1700,7 +1510,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1711,21 +1521,22 @@
         "tags": [
           "ProxyOperations"
         ],
-        "operationId": "StorageAccount_ListKeys",
+        "operationId": "Workspaces_ListStorageAccountKeys",
+        "description": "List storage account keys of a workspace.",
         "x-ms-examples": {
           "List Workspace Keys": {
-            "$ref": "./examples/listStorageAccountKeys.json"
+            "$ref": "./examples/Workspace/listStorageAccountKeys.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1741,7 +1552,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1752,21 +1563,22 @@
         "tags": [
           "ProxyOperations"
         ],
-        "operationId": "Notebooks_ListKeys",
+        "operationId": "Workspaces_ListNotebookKeys",
+        "description": "List keys of a notebook.",
         "x-ms-examples": {
           "List Workspace Keys": {
-            "$ref": "./examples/listNotebookKeys.json"
+            "$ref": "./examples/Notebook/listKeys.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1782,7 +1594,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1798,23 +1610,23 @@
         },
         "x-ms-examples": {
           "ListWorkspaceConnections": {
-            "$ref": "./examples/listWorkspaceConnections.json"
+            "$ref": "./examples/WorkspaceConnection/list.json"
           }
         },
         "operationId": "WorkspaceConnections_List",
         "description": "List all connections under a AML workspace.",
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "$ref": "#/parameters/TargetParameter"
@@ -1833,7 +1645,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1848,15 +1660,15 @@
         "description": "Add a new workspace connection.",
         "x-ms-examples": {
           "CreateWorkspaceConnection": {
-            "$ref": "./examples/createWorkspaceConnection.json"
+            "$ref": "./examples/WorkspaceConnection/create.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1865,7 +1677,7 @@
             "$ref": "#/parameters/ConnectionName"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           },
           {
             "name": "parameters",
@@ -1873,7 +1685,7 @@
             "description": "The object for creating or updating a new workspace connection",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/WorkspaceConnectionDto"
+              "$ref": "#/definitions/WorkspaceConnection"
             }
           }
         ],
@@ -1887,7 +1699,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1900,15 +1712,15 @@
         "description": "Get the detail of a workspace connection.",
         "x-ms-examples": {
           "GetWorkspaceConnection": {
-            "$ref": "./examples/getWorkspaceConnection.json"
+            "$ref": "./examples/WorkspaceConnection/get.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1917,7 +1729,7 @@
             "$ref": "#/parameters/ConnectionName"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1930,7 +1742,7 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -1943,15 +1755,15 @@
         "description": "Delete a workspace connection.",
         "x-ms-examples": {
           "DeleteWorkspaceConnection": {
-            "$ref": "./examples/deleteWorkspaceConnection.json"
+            "$ref": "./examples/WorkspaceConnection/delete.json"
           }
         },
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "$ref": "#/parameters/ResourceGroupNameParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "$ref": "#/parameters/WorkspaceNameParameter"
@@ -1960,7 +1772,7 @@
             "$ref": "#/parameters/ConnectionName"
           },
           {
-            "$ref": "#/parameters/APIVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -1973,29 +1785,59 @@
           "default": {
             "description": "Error response describing why the operation failed",
             "schema": {
-              "$ref": "#/definitions/MachineLearningServiceError"
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
             }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MachineLearningServices/workspaces/{workspaceName}/outboundNetworkDependenciesEndpoints": {
+      "get": {
+        "tags": [
+          "OutboundNetworkDependenciesEndpoints"
+        ],
+        "summary": "Called by Client (Portal, CLI, etc) to get a list of all external outbound dependencies (FQDNs) programmatically.",
+        "operationId": "Workspaces_ListOutboundNetworkDependenciesEndpoints",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/WorkspaceNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/ExternalFQDNResponse"
+            }
+          },
+          "default": {
+            "description": "Error",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "ListOutboundNetworkDependenciesEndpoints": {
+            "$ref": "./examples/ExternalFQDN/get.json"
           }
         }
       }
     }
   },
   "parameters": {
-    "SubscriptionIdParameter": {
-      "name": "subscriptionId",
-      "description": "Azure subscription identifier.",
-      "in": "path",
-      "type": "string",
-      "required": true
-    },
-    "ResourceGroupNameParameter": {
-      "name": "resourceGroupName",
-      "description": "Name of the resource group in which workspace is located.",
-      "in": "path",
-      "type": "string",
-      "required": true,
-      "x-ms-parameter-location": "method"
-    },
     "WorkspaceNameParameter": {
       "name": "workspaceName",
       "description": "Name of Azure Machine Learning workspace.",
@@ -2027,13 +1869,6 @@
       "type": "string",
       "required": true,
       "x-ms-parameter-location": "method"
-    },
-    "APIVersionParameter": {
-      "in": "query",
-      "name": "api-version",
-      "type": "string",
-      "description": "Version of Azure Machine Learning resource provider API.",
-      "required": true
     },
     "PaginationParameter": {
       "in": "query",
@@ -2083,98 +1918,6 @@
       "required": true,
       "type": "string",
       "description": "The name of the private endpoint connection associated with the workspace",
-      "x-ms-parameter-location": "method"
-    },
-    "ModelIdParameter": {
-      "in": "query",
-      "name": "modelId",
-      "type": "string",
-      "description": "The Model Id.",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "ModelNameParameter": {
-      "in": "query",
-      "name": "modelName",
-      "type": "string",
-      "description": "The Model name.",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceNameParameter": {
-      "name": "serviceName",
-      "description": "Name of the Azure Machine Learning service.",
-      "in": "path",
-      "type": "string",
-      "required": true,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceTagParameter": {
-      "in": "query",
-      "name": "tag",
-      "type": "string",
-      "description": "The object tag.",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceCountParameter": {
-      "in": "query",
-      "name": "count",
-      "type": "integer",
-      "format": "int32",
-      "description": "The number of items to retrieve in a page.",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceTagsParameter": {
-      "in": "query",
-      "name": "tags",
-      "type": "string",
-      "description": "A set of tags with which to filter the returned services. It is a comma separated string of tags key or tags key=value Example: tagKey1,tagKey2,tagKey3=value3 .",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServicePropertiesParameter": {
-      "in": "query",
-      "name": "properties",
-      "type": "string",
-      "description": "A set of properties with which to filter the returned services. It is a comma separated string of properties key and/or properties key=value Example: propKey1,propKey2,propKey3=value3 .",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceRunIdParameter": {
-      "in": "query",
-      "name": "runId",
-      "type": "string",
-      "description": "runId for model associated with service.",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceExpandParameter": {
-      "in": "query",
-      "name": "expand",
-      "type": "boolean",
-      "description": "Set to True to include Model details.",
-      "required": false,
-      "x-ms-parameter-location": "method"
-    },
-    "WebServiceOrderByParameter": {
-      "in": "query",
-      "name": "orderby",
-      "type": "string",
-      "description": "The option to order the response.",
-      "required": false,
-      "default": "UpdatedAtDesc",
-      "enum": [
-        "CreatedAtDesc",
-        "CreatedAtAsc",
-        "UpdatedAtDesc",
-        "UpdatedAtAsc"
-      ],
-      "x-ms-enum": {
-        "name": "OrderString",
-        "modelAsString": true
-      },
       "x-ms-parameter-location": "method"
     },
     "ConnectionName": {
@@ -2251,7 +1994,7 @@
       "description": "An object that represents a machine learning workspace.",
       "allOf": [
         {
-          "$ref": "#/definitions/Resource"
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/Resource"
         }
       ],
       "properties": {
@@ -2259,6 +2002,29 @@
           "$ref": "#/definitions/WorkspaceProperties",
           "description": "The properties of the machine learning workspace.",
           "x-ms-client-flatten": true
+        },
+        "identity": {
+          "$ref": "#/definitions/Identity",
+          "description": "The identity of the resource."
+        },
+        "location": {
+          "description": "Specifies the location of the resource.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Contains resource tags defined as key/value pairs.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sku": {
+          "$ref": "#/definitions/Sku",
+          "description": "The sku of the workspace."
+        },
+        "systemData": {
+          "description": "System data",
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/systemData"
         }
       }
     },
@@ -2289,7 +2055,8 @@
         },
         "containerRegistry": {
           "description": "ARM id of the container registry associated with this workspace. This cannot be changed once the workspace has been created",
-          "type": "string"
+          "type": "string",
+          "x-nullable": true
         },
         "storageAccount": {
           "description": "ARM id of the storage account associated with this workspace. This cannot be changed once the workspace has been created",
@@ -2346,6 +2113,18 @@
           "description": "The flag to indicate whether to allow public access when behind VNet.",
           "default": false
         },
+        "publicNetworkAccess": {
+          "type": "string",
+          "description": "Whether requests from Public Network are allowed.",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "x-ms-enum": {
+            "modelAsString": true,
+            "name": "PublicNetworkAccess"
+          }
+        },
         "privateEndpointConnections": {
           "readOnly": true,
           "type": "array",
@@ -2376,6 +2155,16 @@
         },
         "tenantId": {
           "description": "The tenant id associated with this workspace.",
+          "type": "string",
+          "readOnly": true
+        },
+        "storageHnsEnabled": {
+          "description": "If the storage associated with the workspace has hierarchical namespace(HNS) enabled.",
+          "type": "boolean",
+          "readOnly": true
+        },
+        "mlFlowTrackingUri": {
+          "description": "The URI associated with this workspace that machine learning flow must point at to set up tracking.",
           "type": "string",
           "readOnly": true
         }
@@ -2428,44 +2217,20 @@
         "primaryUserAssignedIdentity": {
           "description": "The user assigned identity resource id that represents the workspace identity.",
           "type": "string"
-        }
-      }
-    },
-    "AmlUserFeature": {
-      "description": "Features enabled for a workspace",
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "Specifies the feature ID",
-          "type": "string"
         },
-        "displayName": {
-          "description": "Specifies the feature name ",
-          "type": "string"
-        },
-        "description": {
-          "description": "Describes the feature for user experience",
-          "type": "string"
-        }
-      }
-    },
-    "ListAmlUserFeatureResult": {
-      "properties": {
-        "value": {
-          "readOnly": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/AmlUserFeature"
-          },
-          "description": "The list of AML user facing features."
-        },
-        "nextLink": {
-          "readOnly": true,
+        "publicNetworkAccess": {
           "type": "string",
-          "description": "The URI to fetch the next page of AML user features information. Call ListNext() with this to fetch the next page of AML user features information."
+          "description": "Whether requests from Public Network are allowed.",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "x-ms-enum": {
+            "modelAsString": true,
+            "name": "PublicNetworkAccess"
+          }
         }
-      },
-      "description": "The List Aml user feature operation response."
+      }
     },
     "UsageName": {
       "properties": {
@@ -2670,6 +2435,7 @@
       "description": "The estimated price info for using a VM."
     },
     "EstimatedVMPrice": {
+      "type": "object",
       "properties": {
         "retailPrice": {
           "type": "number",
@@ -2714,7 +2480,7 @@
     },
     "VirtualMachineSizeListResult": {
       "properties": {
-        "amlCompute": {
+        "value": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/VirtualMachineSize"
@@ -2785,6 +2551,178 @@
         }
       },
       "description": "Quota update parameters."
+    },
+    "DiagnoseRequestProperties": {
+      "type": "object",
+      "properties": {
+        "udr": {
+          "description": "Setting for diagnosing user defined routing",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "nsg": {
+          "description": "Setting for diagnosing network security group",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "resourceLock": {
+          "description": "Setting for diagnosing resource lock",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "dnsResolution": {
+          "description": "Setting for diagnosing dns resolution",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "storageAccount": {
+          "description": "Setting for diagnosing dependent storage account",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "keyVault": {
+          "description": "Setting for diagnosing dependent key vault",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "containerRegistry": {
+          "description": "Setting for diagnosing dependent container registry",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "applicationInsights": {
+          "description": "Setting for diagnosing dependent application insights",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        },
+        "others": {
+          "description": "Setting for diagnosing unclassified category of problems",
+          "type": "object",
+          "additionalProperties": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "DiagnoseWorkspaceParameters": {
+      "type": "object",
+      "description": "Parameters to diagnose a workspace",
+      "properties": {
+        "value": {
+          "description": "Value of Parameters",
+          "$ref": "#/definitions/DiagnoseRequestProperties"
+        }
+      }
+    },
+    "DiagnoseResult": {
+      "type": "object",
+      "description": "Result of Diagnose",
+      "properties": {
+        "code": {
+          "description": "Code for workspace setup error",
+          "type": "string",
+          "readOnly": true
+        },
+        "level": {
+          "description": "Level of workspace setup error",
+          "enum": [
+            "Warning",
+            "Error",
+            "Information"
+          ],
+          "type": "string",
+          "readOnly": true,
+          "x-ms-enum": {
+            "name": "DiagnoseResultLevel",
+            "modelAsString": true
+          }
+        },
+        "message": {
+          "description": "Message of workspace setup error",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "DiagnoseResponseResult": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "properties": {
+            "userDefinedRouteResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "networkSecurityRuleResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "resourceLockResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "dnsResolutionResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "storageAccountResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "keyVaultResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "containerRegistryResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "applicationInsightsResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            },
+            "otherResults": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DiagnoseResult"
+              }
+            }
+          }
+        }
+      }
     },
     "UpdateWorkspaceQuotasResult": {
       "properties": {
@@ -2994,50 +2932,6 @@
         }
       }
     },
-    "Resource": {
-      "description": "Azure Resource Manager resource envelope.",
-      "x-ms-azure-resource": true,
-      "properties": {
-        "id": {
-          "description": "Specifies the resource ID.",
-          "type": "string",
-          "readOnly": true
-        },
-        "name": {
-          "description": "Specifies the name of the resource.",
-          "type": "string",
-          "readOnly": true
-        },
-        "identity": {
-          "$ref": "#/definitions/Identity",
-          "description": "The identity of the resource."
-        },
-        "location": {
-          "description": "Specifies the location of the resource.",
-          "type": "string"
-        },
-        "type": {
-          "description": "Specifies the type of the resource.",
-          "type": "string",
-          "readOnly": true
-        },
-        "tags": {
-          "description": "Contains resource tags defined as key/value pairs.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "sku": {
-          "$ref": "#/definitions/Sku",
-          "description": "The sku of the workspace."
-        },
-        "systemData": {
-          "$ref": "#/definitions/SystemData",
-          "readOnly": true
-        }
-      }
-    },
     "ResourceId": {
       "properties": {
         "id": {
@@ -3172,7 +3066,7 @@
       "description": "Machine Learning compute object wrapped into ARM resource envelope.",
       "allOf": [
         {
-          "$ref": "#/definitions/Resource"
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/Resource"
         },
         {
           "type": "object",
@@ -3183,7 +3077,32 @@
             }
           }
         }
-      ]
+      ],
+      "properties": {
+        "identity": {
+          "$ref": "#/definitions/Identity",
+          "description": "The identity of the resource."
+        },
+        "location": {
+          "description": "Specifies the location of the resource.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Contains resource tags defined as key/value pairs.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sku": {
+          "$ref": "#/definitions/Sku",
+          "description": "The sku of the workspace."
+        },
+        "systemData": {
+          "description": "System data",
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/systemData"
+        }
+      }
     },
     "Compute": {
       "type": "object",
@@ -3240,7 +3159,7 @@
           "type": "array",
           "description": "Errors during provisioning",
           "items": {
-            "$ref": "#/definitions/MachineLearningServiceError"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
           },
           "readOnly": true
         },
@@ -3339,6 +3258,200 @@
       ],
       "x-ms-discriminator-value": "AKS"
     },
+    "Kubernetes": {
+      "description": "A Machine Learning compute based on Kubernetes Compute.",
+      "allOf": [
+        {
+          "$ref": "#/definitions/Compute"
+        },
+        {
+          "$ref": "#/definitions/KubernetesSchema"
+        }
+      ],
+      "x-ms-discriminator-value": "Kubernetes"
+    },
+    "KubernetesSchema": {
+      "type": "object",
+      "description": "Kubernetes Compute Schema",
+      "properties": {
+        "properties": {
+          "description": "Properties of Kubernetes",
+          "$ref": "#/definitions/KubernetesProperties"
+        }
+      }
+    },
+    "KubernetesProperties": {
+      "type": "object",
+      "description": "Kubernetes properties",
+      "properties": {
+        "relayConnectionString": {
+          "description": "Relay connection string.",
+          "type": "string",
+          "x-ms-secret": true
+        },
+        "serviceBusConnectionString": {
+          "description": "ServiceBus connection string.",
+          "type": "string",
+          "x-ms-secret": true
+        },
+        "extensionPrincipalId": {
+          "description": "Extension principal-id.",
+          "type": "string"
+        },
+        "extensionInstanceReleaseTrain": {
+          "description": "Extension instance release train.",
+          "type": "string"
+        },
+        "vcName": {
+          "description": "VC name.",
+          "type": "string"
+        },
+        "namespace": {
+          "description": "Compute namespace",
+          "type": "string",
+          "default": "default"
+        },
+        "defaultInstanceType": {
+          "description": "Default instance type",
+          "type": "string"
+        },
+        "instanceTypes": {
+          "description": "Instance Type Schema",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/InstanceTypeSchema"
+          }
+        }
+      }
+    },
+    "AmlComputeProperties": {
+      "type": "object",
+      "description": "AML Compute properties",
+      "properties": {
+        "osType": {
+          "description": "Compute OS Type",
+          "type": "string",
+          "default": "Linux",
+          "enum": [
+            "Linux",
+            "Windows"
+          ],
+          "x-ms-enum": {
+            "name": "OsType",
+            "modelAsString": true
+          }
+        },
+        "vmSize": {
+          "description": "Virtual Machine Size",
+          "type": "string"
+        },
+        "vmPriority": {
+          "description": "Virtual Machine priority",
+          "type": "string",
+          "enum": [
+            "Dedicated",
+            "LowPriority"
+          ],
+          "x-ms-enum": {
+            "name": "VmPriority",
+            "modelAsString": true
+          }
+        },
+        "virtualMachineImage": {
+          "description": "Virtual Machine image for AML Compute - windows only",
+          "$ref": "#/definitions/VirtualMachineImage"
+        },
+        "isolatedNetwork": {
+          "description": "Network is isolated or not",
+          "type": "boolean"
+        },
+        "scaleSettings": {
+          "description": "Scale settings for AML Compute",
+          "$ref": "#/definitions/ScaleSettings"
+        },
+        "userAccountCredentials": {
+          "title": "User account credentials.",
+          "description": "Credentials for an administrator user account that will be created on each compute node.",
+          "$ref": "#/definitions/UserAccountCredentials"
+        },
+        "subnet": {
+          "title": "Subnet.",
+          "description": "Virtual network subnet resource ID the compute nodes belong to.",
+          "$ref": "#/definitions/ResourceId"
+        },
+        "remoteLoginPortPublicAccess": {
+          "type": "string",
+          "default": "NotSpecified",
+          "title": "Close remote Login Access Port",
+          "description": "State of the public SSH port. Possible values are: Disabled - Indicates that the public ssh port is closed on all nodes of the cluster. Enabled - Indicates that the public ssh port is open on all nodes of the cluster. NotSpecified - Indicates that the public ssh port is closed on all nodes of the cluster if VNet is defined, else is open all public nodes. It can be default only during cluster creation time, after creation it will be either enabled or disabled.",
+          "enum": [
+            "Enabled",
+            "Disabled",
+            "NotSpecified"
+          ],
+          "x-ms-enum": {
+            "name": "remoteLoginPortPublicAccess",
+            "modelAsString": true
+          }
+        },
+        "allocationState": {
+          "type": "string",
+          "readOnly": true,
+          "title": "Allocation state.",
+          "description": "Allocation state of the compute. Possible values are: steady - Indicates that the compute is not resizing. There are no changes to the number of compute nodes in the compute in progress. A compute enters this state when it is created and when no operations are being performed on the compute to change the number of compute nodes. resizing - Indicates that the compute is resizing; that is, compute nodes are being added to or removed from the compute.",
+          "enum": [
+            "Steady",
+            "Resizing"
+          ],
+          "x-ms-enum": {
+            "name": "AllocationState",
+            "modelAsString": true
+          }
+        },
+        "allocationStateTransitionTime": {
+          "type": "string",
+          "readOnly": true,
+          "format": "date-time",
+          "title": "Allocation state transition time.",
+          "description": "The time at which the compute entered its current allocation state."
+        },
+        "errors": {
+          "readOnly": true,
+          "title": "Errors.",
+          "description": "Collection of errors encountered by various compute nodes during node setup.",
+          "type": "array",
+          "items": {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
+          }
+        },
+        "currentNodeCount": {
+          "type": "integer",
+          "readOnly": true,
+          "format": "int32",
+          "title": "Current node count.",
+          "description": "The number of compute nodes currently assigned to the compute."
+        },
+        "targetNodeCount": {
+          "type": "integer",
+          "readOnly": true,
+          "format": "int32",
+          "title": "Target node count.",
+          "description": "The target number of compute nodes for the compute. If the allocationState is resizing, this property denotes the target node count for the ongoing resize operation. If the allocationState is steady, this property denotes the target node count for the previous resize operation."
+        },
+        "nodeStateCounts": {
+          "title": "Node state counts.",
+          "description": "Counts of various node states on the compute.",
+          "readOnly": true,
+          "$ref": "#/definitions/NodeStateCounts"
+        },
+        "enableNodePublicIp": {
+          "type": "boolean",
+          "default": true,
+          "title": "Enable node public IP.",
+          "description": "Enable or disable node public IP address provisioning. Possible values are: Possible values are: true - Indicates that the compute nodes will have public IPs provisioned. false - Indicates that the compute nodes will have a private endpoint and no public IPs."
+        }
+      }
+    },
     "AmlCompute": {
       "description": "An Azure Machine Learning compute.",
       "allOf": [
@@ -3347,139 +3460,108 @@
         },
         {
           "type": "object",
+          "description": "Properties(top level) of AmlCompute",
           "properties": {
             "properties": {
-              "type": "object",
-              "description": "AML Compute properties",
-              "properties": {
-                "osType": {
-                  "description": "Compute OS Type",
-                  "type": "string",
-                  "default": "Linux",
-                  "enum": [
-                    "Linux",
-                    "Windows"
-                  ],
-                  "x-ms-enum": {
-                    "name": "OsType",
-                    "modelAsString": true
-                  }
-                },
-                "vmSize": {
-                  "description": "Virtual Machine Size",
-                  "type": "string"
-                },
-                "vmPriority": {
-                  "description": "Virtual Machine priority",
-                  "type": "string",
-                  "enum": [
-                    "Dedicated",
-                    "LowPriority"
-                  ],
-                  "x-ms-enum": {
-                    "name": "VmPriority",
-                    "modelAsString": true
-                  }
-                },
-                "virtualMachineImage": {
-                  "description": "Virtual Machine image for AML Compute - windows only",
-                  "$ref": "#/definitions/VirtualMachineImage"
-                },
-                "isolatedNetwork": {
-                  "description": "Network is isolated or not",
-                  "type": "boolean"
-                },
-                "scaleSettings": {
-                  "description": "Scale settings for AML Compute",
-                  "$ref": "#/definitions/ScaleSettings"
-                },
-                "userAccountCredentials": {
-                  "title": "User account credentials.",
-                  "description": "Credentials for an administrator user account that will be created on each compute node.",
-                  "$ref": "#/definitions/UserAccountCredentials"
-                },
-                "subnet": {
-                  "title": "Subnet.",
-                  "description": "Virtual network subnet resource ID the compute nodes belong to.",
-                  "$ref": "#/definitions/ResourceId"
-                },
-                "remoteLoginPortPublicAccess": {
-                  "type": "string",
-                  "default": "NotSpecified",
-                  "title": "Close remote Login Access Port",
-                  "description": "State of the public SSH port. Possible values are: Disabled - Indicates that the public ssh port is closed on all nodes of the cluster. Enabled - Indicates that the public ssh port is open on all nodes of the cluster. NotSpecified - Indicates that the public ssh port is closed on all nodes of the cluster if VNet is defined, else is open all public nodes. It can be default only during cluster creation time, after creation it will be either enabled or disabled.",
-                  "enum": [
-                    "Enabled",
-                    "Disabled",
-                    "NotSpecified"
-                  ],
-                  "x-ms-enum": {
-                    "name": "remoteLoginPortPublicAccess",
-                    "modelAsString": true
-                  }
-                },
-                "allocationState": {
-                  "type": "string",
-                  "readOnly": true,
-                  "title": "Allocation state.",
-                  "description": "Allocation state of the compute. Possible values are: steady - Indicates that the compute is not resizing. There are no changes to the number of compute nodes in the compute in progress. A compute enters this state when it is created and when no operations are being performed on the compute to change the number of compute nodes. resizing - Indicates that the compute is resizing; that is, compute nodes are being added to or removed from the compute.",
-                  "enum": [
-                    "Steady",
-                    "Resizing"
-                  ],
-                  "x-ms-enum": {
-                    "name": "AllocationState",
-                    "modelAsString": true
-                  }
-                },
-                "allocationStateTransitionTime": {
-                  "type": "string",
-                  "readOnly": true,
-                  "format": "date-time",
-                  "title": "Allocation state transition time.",
-                  "description": "The time at which the compute entered its current allocation state."
-                },
-                "errors": {
-                  "readOnly": true,
-                  "title": "Errors.",
-                  "description": "Collection of errors encountered by various compute nodes during node setup.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/MachineLearningServiceError"
-                  }
-                },
-                "currentNodeCount": {
-                  "type": "integer",
-                  "readOnly": true,
-                  "format": "int32",
-                  "title": "Current node count.",
-                  "description": "The number of compute nodes currently assigned to the compute."
-                },
-                "targetNodeCount": {
-                  "type": "integer",
-                  "readOnly": true,
-                  "format": "int32",
-                  "title": "Target node count.",
-                  "description": "The target number of compute nodes for the compute. If the allocationState is resizing, this property denotes the target node count for the ongoing resize operation. If the allocationState is steady, this property denotes the target node count for the previous resize operation."
-                },
-                "nodeStateCounts": {
-                  "title": "Node state counts.",
-                  "description": "Counts of various node states on the compute.",
-                  "readOnly": true,
-                  "$ref": "#/definitions/NodeStateCounts"
-                },
-                "enableNodePublicIp": {
-                  "type": "boolean",
-                  "default": true,
-                  "title": "Enable node public IP.",
-                  "description": "Enable or disable node public IP address provisioning. Possible values are: Possible values are: true - Indicates that the compute nodes will have public IPs provisioned. false - Indicates that the compute nodes will have a private endpoint and no public IPs."
-                }
-              }
+              "description": "Properties of AmlCompute",
+              "$ref": "#/definitions/AmlComputeProperties"
             }
           }
         }
       ],
       "x-ms-discriminator-value": "AmlCompute"
+    },
+    "ComputeInstanceProperties": {
+      "description": "Compute Instance properties",
+      "type": "object",
+      "properties": {
+        "vmSize": {
+          "description": "Virtual Machine Size",
+          "type": "string"
+        },
+        "subnet": {
+          "title": "Subnet.",
+          "description": "Virtual network subnet resource ID the compute nodes belong to.",
+          "$ref": "#/definitions/ResourceId"
+        },
+        "applicationSharingPolicy": {
+          "type": "string",
+          "default": "Shared",
+          "title": "Sharing policy for applications on this compute instance",
+          "description": "Policy for sharing applications on this compute instance among users of parent workspace. If Personal, only the creator can access applications on this compute instance. When Shared, any workspace user can access applications on this instance depending on his/her assigned role.",
+          "enum": [
+            "Personal",
+            "Shared"
+          ],
+          "x-ms-enum": {
+            "name": "applicationSharingPolicy",
+            "modelAsString": true
+          }
+        },
+        "sshSettings": {
+          "description": "Specifies policy and settings for SSH access.",
+          "$ref": "#/definitions/ComputeInstanceSshSettings"
+        },
+        "connectivityEndpoints": {
+          "readOnly": true,
+          "description": "Describes all connectivity endpoints available for this ComputeInstance.",
+          "$ref": "#/definitions/ComputeInstanceConnectivityEndpoints"
+        },
+        "applications": {
+          "type": "array",
+          "readOnly": true,
+          "description": "Describes available applications and their endpoints on this ComputeInstance.",
+          "items": {
+            "$ref": "#/definitions/ComputeInstanceApplication"
+          }
+        },
+        "createdBy": {
+          "readOnly": true,
+          "description": "Describes information on user who created this ComputeInstance.",
+          "$ref": "#/definitions/ComputeInstanceCreatedBy"
+        },
+        "errors": {
+          "readOnly": true,
+          "title": "Errors.",
+          "description": "Collection of errors encountered on this ComputeInstance.",
+          "type": "array",
+          "items": {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
+          }
+        },
+        "state": {
+          "description": "The current state of this ComputeInstance.",
+          "$ref": "#/definitions/ComputeInstanceState",
+          "readOnly": true
+        },
+        "computeInstanceAuthorizationType": {
+          "type": "string",
+          "title": "Compute Instance Authorization type.",
+          "description": "The Compute Instance Authorization type. Available values are personal (default).",
+          "default": "personal",
+          "enum": [
+            "personal"
+          ],
+          "x-ms-enum": {
+            "name": "ComputeInstanceAuthorizationType",
+            "modelAsString": true
+          }
+        },
+        "personalComputeInstanceSettings": {
+          "title": "Personal Compute Instance settings.",
+          "description": "Settings for a personal compute instance.",
+          "$ref": "#/definitions/PersonalComputeInstanceSettings"
+        },
+        "setupScripts": {
+          "description": "Details of customized scripts to execute for setting up the cluster.",
+          "$ref": "#/definitions/SetupScripts"
+        },
+        "lastOperation": {
+          "description": "The last operation on ComputeInstance.",
+          "$ref": "#/definitions/ComputeInstanceLastOperation",
+          "readOnly": true
+        }
+      }
     },
     "ComputeInstance": {
       "description": "An Azure Machine Learning compute instance.",
@@ -3489,98 +3571,11 @@
         },
         {
           "type": "object",
+          "description": "Properties(top level) of ComputeInstance",
           "properties": {
             "properties": {
-              "description": "Compute Instance properties",
-              "type": "object",
-              "properties": {
-                "vmSize": {
-                  "description": "Virtual Machine Size",
-                  "type": "string"
-                },
-                "subnet": {
-                  "title": "Subnet.",
-                  "description": "Virtual network subnet resource ID the compute nodes belong to.",
-                  "$ref": "#/definitions/ResourceId"
-                },
-                "applicationSharingPolicy": {
-                  "type": "string",
-                  "default": "Shared",
-                  "title": "Sharing policy for applications on this compute instance",
-                  "description": "Policy for sharing applications on this compute instance among users of parent workspace. If Personal, only the creator can access applications on this compute instance. When Shared, any workspace user can access applications on this instance depending on his/her assigned role.",
-                  "enum": [
-                    "Personal",
-                    "Shared"
-                  ],
-                  "x-ms-enum": {
-                    "name": "applicationSharingPolicy",
-                    "modelAsString": true
-                  }
-                },
-                "sshSettings": {
-                  "description": "Specifies policy and settings for SSH access.",
-                  "$ref": "#/definitions/ComputeInstanceSshSettings"
-                },
-                "connectivityEndpoints": {
-                  "readOnly": true,
-                  "description": "Describes all connectivity endpoints available for this ComputeInstance.",
-                  "$ref": "#/definitions/ComputeInstanceConnectivityEndpoints"
-                },
-                "applications": {
-                  "type": "array",
-                  "readOnly": true,
-                  "description": "Describes available applications and their endpoints on this ComputeInstance.",
-                  "items": {
-                    "$ref": "#/definitions/ComputeInstanceApplication"
-                  }
-                },
-                "createdBy": {
-                  "readOnly": true,
-                  "description": "Describes information on user who created this ComputeInstance.",
-                  "$ref": "#/definitions/ComputeInstanceCreatedBy"
-                },
-                "errors": {
-                  "readOnly": true,
-                  "title": "Errors.",
-                  "description": "Collection of errors encountered on this ComputeInstance.",
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/definitions/MachineLearningServiceError"
-                  }
-                },
-                "state": {
-                  "description": "The current state of this ComputeInstance.",
-                  "$ref": "#/definitions/ComputeInstanceState",
-                  "readOnly": true
-                },
-                "computeInstanceAuthorizationType": {
-                  "type": "string",
-                  "title": "Compute Instance Authorization type.",
-                  "description": "The Compute Instance Authorization type. Available values are personal (default).",
-                  "default": "personal",
-                  "enum": [
-                    "personal"
-                  ],
-                  "x-ms-enum": {
-                    "name": "ComputeInstanceAuthorizationType",
-                    "modelAsString": true
-                  }
-                },
-                "personalComputeInstanceSettings": {
-                  "title": "Personal Compute Instance settings.",
-                  "description": "Settings for a personal compute instance.",
-                  "$ref": "#/definitions/PersonalComputeInstanceSettings"
-                },
-                "setupScripts": {
-                  "description": "Details of customized scripts to execute for setting up the cluster.",
-                  "$ref": "#/definitions/SetupScripts"
-                },
-                "lastOperation": {
-                  "description": "The last operation on ComputeInstance.",
-                  "$ref": "#/definitions/ComputeInstanceLastOperation",
-                  "readOnly": true
-                }
-              }
+              "description": "Properties of ComputeInstance",
+              "$ref": "#/definitions/ComputeInstanceProperties"
             }
           }
         }
@@ -3627,6 +3622,25 @@
       ],
       "x-ms-discriminator-value": "VirtualMachine"
     },
+    "HDInsightProperties": {
+      "type": "object",
+      "description": "HDInsight compute properties",
+      "properties": {
+        "sshPort": {
+          "description": "Port open for ssh connections on the master node of the cluster.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "address": {
+          "description": "Public IP address of the master node of the cluster.",
+          "type": "string"
+        },
+        "administratorAccount": {
+          "description": "Admin credentials for master node of the cluster",
+          "$ref": "#/definitions/VirtualMachineSshCredentials"
+        }
+      }
+    },
     "HDInsight": {
       "description": "A HDInsight compute.",
       "allOf": [
@@ -3637,22 +3651,7 @@
           "type": "object",
           "properties": {
             "properties": {
-              "type": "object",
-              "properties": {
-                "sshPort": {
-                  "description": "Port open for ssh connections on the master node of the cluster.",
-                  "type": "integer",
-                  "format": "int32"
-                },
-                "address": {
-                  "description": "Public IP address of the master node of the cluster.",
-                  "type": "string"
-                },
-                "administratorAccount": {
-                  "description": "Admin credentials for master node of the cluster",
-                  "$ref": "#/definitions/VirtualMachineSshCredentials"
-                }
-              }
+              "$ref": "#/definitions/HDInsightProperties"
             }
           }
         }
@@ -3668,6 +3667,20 @@
       ],
       "x-ms-discriminator-value": "DataFactory"
     },
+    "DatabricksProperties": {
+      "type": "object",
+      "description": "Properties of Databricks",
+      "properties": {
+        "databricksAccessToken": {
+          "description": "Databricks access token",
+          "type": "string"
+        },
+        "workspaceUrl": {
+          "description": "Workspace Url",
+          "type": "string"
+        }
+      }
+    },
     "Databricks": {
       "description": "A DataFactory compute.",
       "allOf": [
@@ -3678,17 +3691,7 @@
           "type": "object",
           "properties": {
             "properties": {
-              "type": "object",
-              "properties": {
-                "databricksAccessToken": {
-                  "description": "Databricks access token",
-                  "type": "string"
-                },
-                "workspaceUrl": {
-                  "description": "Workspace Url",
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/DatabricksProperties"
             }
           }
         }
@@ -3719,13 +3722,59 @@
       "x-ms-discriminator-value": "DataLakeAnalytics"
     },
     "SynapseSpark": {
+      "type": "object",
       "description": "A SynapseSpark compute.",
+      "properties": {
+        "properties": {
+          "type": "object",
+          "properties": {
+            "autoScaleProperties": {
+              "description": "Auto scale properties.",
+              "$ref": "#/definitions/AutoScaleProperties"
+            },
+            "autoPauseProperties": {
+              "description": "Auto pause properties.",
+              "$ref": "#/definitions/AutoPauseProperties"
+            },
+            "sparkVersion": {
+              "description": "Spark version.",
+              "type": "string"
+            },
+            "nodeCount": {
+              "description": "The number of compute nodes currently assigned to the compute.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "nodeSize": {
+              "description": "Node size.",
+              "type": "string"
+            },
+            "nodeSizeFamily": {
+              "description": "Node size family.",
+              "type": "string"
+            },
+            "subscriptionId": {
+              "description": "Azure subscription identifier.",
+              "type": "string"
+            },
+            "resourceGroup": {
+              "description": "Name of the resource group in which workspace is located.",
+              "type": "string"
+            },
+            "workspaceName": {
+              "description": "Name of Azure Machine Learning workspace.",
+              "type": "string"
+            },
+            "poolName": {
+              "description": "Pool name.",
+              "type": "string"
+            }
+          }
+        }
+      },
       "allOf": [
         {
           "$ref": "#/definitions/Compute"
-        },
-        {
-          "$ref": "#/definitions/SynapseSparkPoolProperties"
         }
       ],
       "x-ms-discriminator-value": "SynapseSpark"
@@ -3937,12 +3986,21 @@
       },
       "description": "Counts of various compute node states on the amlCompute."
     },
-    "ClusterUpdateProperties": {
+    "ScaleSettingsInformation": {
+      "type": "object",
       "properties": {
         "scaleSettings": {
           "$ref": "#/definitions/ScaleSettings",
-          "title": "Scale settings.",
-          "description": "Desired scale settings for the amlCompute."
+          "title": "Scale settings."
+        }
+      },
+      "description": "Desired scale settings for the amlCompute."
+    },
+    "ClusterUpdateProperties": {
+      "properties": {
+        "properties": {
+          "description": "Properties of ClusterUpdate",
+          "$ref": "#/definitions/ScaleSettingsInformation"
         }
       },
       "description": "The properties of a amlCompute that need to be updated."
@@ -3957,51 +4015,24 @@
       },
       "description": "AmlCompute update parameters."
     },
-    "ComputeNodesInformation": {
+    "AmlComputeNodesInformation": {
       "type": "object",
-      "description": "Compute nodes information related to a Machine Learning compute. Might differ for every type of compute.",
-      "discriminator": "computeType",
+      "description": "Result of AmlCompute Nodes",
       "properties": {
-        "computeType": {
-          "description": "The type of compute",
-          "$ref": "#/definitions/ComputeType"
+        "nodes": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AmlComputeNodeInformation"
+          },
+          "description": "The collection of returned AmlCompute nodes details."
         },
         "nextLink": {
           "readOnly": true,
           "type": "string",
           "description": "The continuation token."
         }
-      },
-      "required": [
-        "computeType"
-      ]
-    },
-    "AmlComputeNodesInformation": {
-      "description": "Compute node information related to a AmlCompute.",
-      "allOf": [
-        {
-          "$ref": "#/definitions/ComputeNodesInformation"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "nodes": {
-              "readOnly": true,
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/AmlComputeNodeInformation"
-              },
-              "description": "The collection of returned AmlCompute nodes details."
-            },
-            "nextLink": {
-              "readOnly": true,
-              "type": "string",
-              "description": "The continuation token."
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "AmlCompute"
+      }
     },
     "AmlComputeNodeInformation": {
       "description": "Compute node information related to a AmlCompute.",
@@ -4054,8 +4085,7 @@
           "title": "Run ID.",
           "description": "ID of the Experiment running on the node, if any else null."
         }
-      },
-      "x-ms-discriminator-value": "AmlCompute"
+      }
     },
     "VirtualMachineSshCredentials": {
       "type": "object",
@@ -4093,6 +4123,24 @@
         "computeType"
       ]
     },
+    "AksComputeSecretsProperties": {
+      "type": "object",
+      "description": "Properties of AksComputeSecrets",
+      "properties": {
+        "userKubeConfig": {
+          "type": "string",
+          "description": "Content of kubeconfig file that can be used to connect to the Kubernetes cluster."
+        },
+        "adminKubeConfig": {
+          "type": "string",
+          "description": "Content of kubeconfig file that can be used to connect to the Kubernetes cluster."
+        },
+        "imagePullSecretName": {
+          "type": "string",
+          "description": "Image registry pull secret."
+        }
+      }
+    },
     "AksComputeSecrets": {
       "description": "Secrets related to a Machine Learning compute based on AKS.",
       "allOf": [
@@ -4100,21 +4148,7 @@
           "$ref": "#/definitions/ComputeSecrets"
         },
         {
-          "type": "object",
-          "properties": {
-            "userKubeConfig": {
-              "type": "string",
-              "description": "Content of kubeconfig file that can be used to connect to the Kubernetes cluster."
-            },
-            "adminKubeConfig": {
-              "type": "string",
-              "description": "Content of kubeconfig file that can be used to connect to the Kubernetes cluster."
-            },
-            "imagePullSecretName": {
-              "type": "string",
-              "description": "Image registry pull secret."
-            }
-          }
+          "$ref": "#/definitions/AksComputeSecretsProperties"
         }
       ],
       "x-ms-discriminator-value": "AKS"
@@ -4137,6 +4171,16 @@
       ],
       "x-ms-discriminator-value": "VirtualMachine"
     },
+    "DatabricksComputeSecretsProperties": {
+      "type": "object",
+      "description": "Properties of Databricks Compute Secrets",
+      "properties": {
+        "databricksAccessToken": {
+          "description": "access token for databricks account.",
+          "type": "string"
+        }
+      }
+    },
     "DatabricksComputeSecrets": {
       "description": "Secrets related to a Machine Learning compute based on Databricks.",
       "allOf": [
@@ -4144,13 +4188,7 @@
           "$ref": "#/definitions/ComputeSecrets"
         },
         {
-          "type": "object",
-          "properties": {
-            "databricksAccessToken": {
-              "description": "access token for databricks account.",
-              "type": "string"
-            }
-          }
+          "$ref": "#/definitions/DatabricksComputeSecretsProperties"
         }
       ],
       "x-ms-discriminator-value": "Databricks"
@@ -4160,6 +4198,7 @@
       "description": "The type of compute",
       "enum": [
         "AKS",
+        "Kubernetes",
         "AmlCompute",
         "ComputeInstance",
         "DataFactory",
@@ -4172,223 +4211,6 @@
       "x-ms-enum": {
         "name": "ComputeType",
         "modelAsString": true
-      }
-    },
-    "MachineLearningServiceError": {
-      "type": "object",
-      "description": "Wrapper for error response to follow ARM guidelines.",
-      "properties": {
-        "error": {
-          "description": "The error response.",
-          "$ref": "#/definitions/ErrorResponse",
-          "readOnly": true
-        }
-      }
-    },
-    "ErrorResponse": {
-      "type": "object",
-      "description": "Error response information.",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Error code.",
-          "readOnly": true
-        },
-        "message": {
-          "type": "string",
-          "description": "Error message.",
-          "readOnly": true
-        },
-        "target": {
-          "type": "string",
-          "description": "The target of the particular error",
-          "readOnly": true
-        },
-        "details": {
-          "type": "array",
-          "description": "An array of error detail objects.",
-          "items": {
-            "$ref": "#/definitions/ErrorDetail"
-          },
-          "readOnly": true
-        }
-      }
-    },
-    "ErrorDetail": {
-      "type": "object",
-      "description": "Error detail information.",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Error code."
-        },
-        "message": {
-          "type": "string",
-          "description": "Error message."
-        }
-      },
-      "required": [
-        "code",
-        "message"
-      ]
-    },
-    "SKUCapability": {
-      "description": "Features/user capabilities associated with the sku",
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "Capability/Feature ID",
-          "type": "string"
-        },
-        "value": {
-          "description": "Details about the feature/capability",
-          "type": "string"
-        }
-      }
-    },
-    "ResourceSkuLocationInfo": {
-      "properties": {
-        "location": {
-          "readOnly": true,
-          "type": "string",
-          "description": "Location of the SKU"
-        },
-        "zones": {
-          "readOnly": true,
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of availability zones where the SKU is supported."
-        },
-        "zoneDetails": {
-          "readOnly": true,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ResourceSkuZoneDetails"
-          },
-          "description": "Details of capabilities available to a SKU in specific zones."
-        }
-      }
-    },
-    "ResourceSkuZoneDetails": {
-      "properties": {
-        "name": {
-          "type": "array",
-          "readOnly": true,
-          "items": {
-            "type": "string"
-          },
-          "description": "The set of zones that the SKU is available in with the specified capabilities."
-        },
-        "capabilities": {
-          "type": "array",
-          "readOnly": true,
-          "items": {
-            "$ref": "#/definitions/SKUCapability"
-          },
-          "description": "A list of capabilities that are available for the SKU in the specified list of zones."
-        }
-      },
-      "description": "Describes The zonal capabilities of a SKU."
-    },
-    "WorkspaceSku": {
-      "description": "Describes Workspace Sku details and features",
-      "type": "object",
-      "properties": {
-        "locations": {
-          "readOnly": true,
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "The set of locations that the SKU is available. This will be supported and registered Azure Geo Regions (e.g. West US, East US, Southeast Asia, etc.)."
-        },
-        "locationInfo": {
-          "type": "array",
-          "readOnly": true,
-          "items": {
-            "$ref": "#/definitions/ResourceSkuLocationInfo"
-          },
-          "description": "A list of locations and availability zones in those locations where the SKU is available."
-        },
-        "tier": {
-          "description": "Sku Tier like Basic or Enterprise",
-          "type": "string",
-          "readOnly": true
-        },
-        "resourceType": {
-          "type": "string",
-          "readOnly": true
-        },
-        "name": {
-          "type": "string",
-          "readOnly": true
-        },
-        "capabilities": {
-          "description": "List of features/user capabilities associated with the sku",
-          "uniqueItems": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SKUCapability"
-          },
-          "readOnly": true
-        },
-        "restrictions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Restriction"
-          },
-          "description": "The restrictions because of which SKU cannot be used. This is empty if there are no restrictions."
-        }
-      }
-    },
-    "Restriction": {
-      "properties": {
-        "type": {
-          "readOnly": true,
-          "type": "string",
-          "description": "The type of restrictions. As of now only possible value for this is location."
-        },
-        "values": {
-          "readOnly": true,
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "The value of restrictions. If the restriction type is set to location. This would be different locations where the SKU is restricted."
-        },
-        "reasonCode": {
-          "type": "string",
-          "enum": [
-            "NotSpecified",
-            "NotAvailableForRegion",
-            "NotAvailableForSubscription"
-          ],
-          "x-ms-enum": {
-            "name": "ReasonCode",
-            "modelAsString": true
-          },
-          "description": "The reason for the restriction."
-        }
-      },
-      "description": "The restriction because of which SKU cannot be used."
-    },
-    "SkuListResult": {
-      "description": "List of skus with features",
-      "type": "object",
-      "properties": {
-        "value": {
-          "uniqueItems": false,
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/WorkspaceSku"
-          }
-        },
-        "nextLink": {
-          "type": "string",
-          "description": "The URI to fetch the next page of Workspace Skus. Call ListNext() with this URI to fetch the next page of Workspace Skus"
-        }
       }
     },
     "Sku": {
@@ -4405,17 +4227,53 @@
         }
       }
     },
+    "PrivateEndpointConnectionListResult": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "description": "Array of private endpoint connections",
+          "items": {
+            "$ref": "#/definitions/PrivateEndpointConnection"
+          }
+        }
+      },
+      "description": "List of private endpoint connection associated with the specified workspace"
+    },
     "PrivateEndpointConnection": {
       "properties": {
         "properties": {
           "$ref": "#/definitions/PrivateEndpointConnectionProperties",
           "x-ms-client-flatten": true,
           "description": "Resource properties."
+        },
+        "identity": {
+          "$ref": "#/definitions/Identity",
+          "description": "The identity of the resource."
+        },
+        "location": {
+          "description": "Specifies the location of the resource.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Contains resource tags defined as key/value pairs.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sku": {
+          "$ref": "#/definitions/Sku",
+          "description": "The sku of the workspace."
+        },
+        "systemData": {
+          "description": "System data",
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/systemData"
         }
       },
       "allOf": [
         {
-          "$ref": "#/definitions/Resource"
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/Resource"
         }
       ],
       "description": "The Private Endpoint Connection resource."
@@ -4520,11 +4378,34 @@
           "$ref": "#/definitions/PrivateLinkResourceProperties",
           "description": "Resource properties.",
           "x-ms-client-flatten": true
+        },
+        "identity": {
+          "$ref": "#/definitions/Identity",
+          "description": "The identity of the resource."
+        },
+        "location": {
+          "description": "Specifies the location of the resource.",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Contains resource tags defined as key/value pairs.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "sku": {
+          "$ref": "#/definitions/Sku",
+          "description": "The sku of the workspace."
+        },
+        "systemData": {
+          "description": "System data",
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/systemData"
         }
       },
       "allOf": [
         {
-          "$ref": "#/definitions/Resource"
+          "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/Resource"
         }
       ],
       "description": "A private link resource"
@@ -4648,282 +4529,6 @@
         }
       }
     },
-    "ServiceResource": {
-      "type": "object",
-      "description": "Machine Learning service object wrapped into ARM resource envelope.",
-      "allOf": [
-        {
-          "$ref": "#/definitions/Resource"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "properties": {
-              "description": "Service properties",
-              "$ref": "#/definitions/ServiceResponseBase"
-            }
-          }
-        }
-      ]
-    },
-    "SystemData": {
-      "description": "Read only system data",
-      "type": "object",
-      "properties": {
-        "createdBy": {
-          "type": "string",
-          "description": "An identifier for the identity that created the resource"
-        },
-        "createdByType": {
-          "$ref": "#/definitions/IdentityType",
-          "description": "The type of identity that created the resource"
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp of resource creation (UTC)"
-        },
-        "lastModifiedBy": {
-          "type": "string",
-          "description": "An identifier for the identity that last modified the resource"
-        },
-        "lastModifiedByType": {
-          "$ref": "#/definitions/IdentityType",
-          "description": "The type of identity that last modified the resource"
-        },
-        "lastModifiedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "The timestamp of resource last modification (UTC)"
-        }
-      }
-    },
-    "IdentityType": {
-      "description": "The type of identity that creates/modifies resources",
-      "type": "string",
-      "enum": [
-        "User",
-        "Application",
-        "ManagedIdentity",
-        "Key"
-      ],
-      "x-ms-enum": {
-        "name": "IdentityType",
-        "modelAsString": true
-      }
-    },
-    "ServiceResponseBase": {
-      "description": "The base service response. The correct inherited response based on computeType will be returned (ex. ACIServiceResponse)",
-      "required": [
-        "computeType"
-      ],
-      "type": "object",
-      "properties": {
-        "description": {
-          "description": "The service description.",
-          "type": "string"
-        },
-        "kvTags": {
-          "description": "The service tag dictionary. Tags are mutable.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "properties": {
-          "description": "The service property dictionary. Properties are immutable.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "state": {
-          "description": "The current state of the service.",
-          "enum": [
-            "Transitioning",
-            "Healthy",
-            "Unhealthy",
-            "Failed",
-            "Unschedulable"
-          ],
-          "type": "string",
-          "example": "Healthy",
-          "x-ms-enum": {
-            "name": "WebServiceState",
-            "modelAsString": true
-          },
-          "readOnly": true
-        },
-        "error": {
-          "description": "The error details.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          ],
-          "readOnly": true
-        },
-        "computeType": {
-          "description": "The compute environment type for the service.",
-          "enum": [
-            "ACI",
-            "AKS"
-          ],
-          "type": "string",
-          "example": "AKS",
-          "x-ms-enum": {
-            "name": "ComputeEnvironmentType",
-            "modelAsString": true
-          }
-        },
-        "deploymentType": {
-          "description": "The deployment type for the service.",
-          "enum": [
-            "GRPCRealtimeEndpoint",
-            "HttpRealtimeEndpoint",
-            "Batch"
-          ],
-          "type": "string",
-          "example": "HttpRealtimeEndpoint",
-          "x-ms-enum": {
-            "name": "DeploymentType",
-            "modelAsString": true
-          }
-        }
-      },
-      "discriminator": "computeType"
-    },
-    "PaginatedServiceList": {
-      "type": "object",
-      "description": "Paginated list of Machine Learning service objects wrapped in ARM resource envelope.",
-      "properties": {
-        "value": {
-          "readOnly": true,
-          "type": "array",
-          "description": "An array of Machine Learning compute objects wrapped in ARM resource envelope.",
-          "items": {
-            "$ref": "#/definitions/ServiceResource"
-          }
-        },
-        "nextLink": {
-          "readOnly": true,
-          "type": "string",
-          "description": "A continuation link (absolute URI) to the next page of results in the list."
-        }
-      }
-    },
-    "ACIServiceResponse": {
-      "description": "The response for an ACI service.",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/ServiceResponseBase"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "containerResourceRequirements": {
-              "description": "The container resource requirements.",
-              "$ref": "#/definitions/ContainerResourceRequirements"
-            },
-            "scoringUri": {
-              "description": "The Uri for sending scoring requests.",
-              "type": "string",
-              "readOnly": true
-            },
-            "location": {
-              "description": "The name of the Azure location/region.",
-              "type": "string"
-            },
-            "authEnabled": {
-              "description": "Whether or not authentication is enabled on the service.",
-              "type": "boolean"
-            },
-            "sslEnabled": {
-              "description": "Whether or not SSL is enabled.",
-              "type": "boolean"
-            },
-            "appInsightsEnabled": {
-              "description": "Whether or not Application Insights is enabled.",
-              "type": "boolean"
-            },
-            "dataCollection": {
-              "description": "Details of the data collection options specified.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/ModelDataCollection"
-                }
-              ]
-            },
-            "sslCertificate": {
-              "description": "The public SSL certificate in PEM format to use if SSL is enabled.",
-              "type": "string"
-            },
-            "sslKey": {
-              "description": "The public SSL key in PEM format for the certificate.",
-              "type": "string"
-            },
-            "cname": {
-              "description": "The CName for the service.",
-              "type": "string"
-            },
-            "publicIp": {
-              "description": "The public IP address for the service.",
-              "type": "string"
-            },
-            "publicFqdn": {
-              "description": "The public Fqdn for the service.",
-              "type": "string"
-            },
-            "swaggerUri": {
-              "description": "The Uri for sending swagger requests.",
-              "type": "string",
-              "readOnly": true
-            },
-            "modelConfigMap": {
-              "description": "Details on the models and configurations.",
-              "type": "object",
-              "additionalProperties": {
-                "type": "object"
-              },
-              "readOnly": true
-            },
-            "models": {
-              "description": "The list of models.",
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Model"
-              }
-            },
-            "environmentImageRequest": {
-              "description": "The Environment, models and assets used for inferencing.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/EnvironmentImageResponse"
-                }
-              ]
-            },
-            "vnetConfiguration": {
-              "description": "The virtual network configuration.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/VnetConfiguration"
-                }
-              ]
-            },
-            "encryptionProperties": {
-              "description": "The encryption properties.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/EncryptionProperties"
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "ACI"
-    },
     "ContainerResourceRequirements": {
       "description": "The resource requirements for the container (cpu and memory).",
       "type": "object",
@@ -4963,1229 +4568,6 @@
           "type": "integer"
         }
       }
-    },
-    "ModelDataCollection": {
-      "description": "The Model data collection properties.",
-      "type": "object",
-      "properties": {
-        "eventHubEnabled": {
-          "description": "Option for enabling/disabling Event Hub.",
-          "type": "boolean"
-        },
-        "storageEnabled": {
-          "description": "Option for enabling/disabling storage.",
-          "type": "boolean"
-        }
-      }
-    },
-    "VnetConfiguration": {
-      "type": "object",
-      "properties": {
-        "vnetName": {
-          "description": "The name of the virtual network.",
-          "type": "string"
-        },
-        "subnetName": {
-          "description": "The name of the virtual network subnet.",
-          "type": "string"
-        }
-      }
-    },
-    "EncryptionProperties": {
-      "type": "object",
-      "properties": {
-        "vaultBaseUrl": {
-          "description": "vault base Url",
-          "type": "string"
-        },
-        "keyName": {
-          "description": "Encryption Key name",
-          "type": "string"
-        },
-        "keyVersion": {
-          "description": "Encryption Key Version",
-          "type": "string"
-        }
-      },
-      "required": [
-        "vaultBaseUrl",
-        "keyName",
-        "keyVersion"
-      ]
-    },
-    "Model": {
-      "description": "An Azure Machine Learning Model.",
-      "required": [
-        "mimeType",
-        "name",
-        "url"
-      ],
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "The Model Id.",
-          "type": "string",
-          "example": "sklearn_mnist:1"
-        },
-        "name": {
-          "description": "The Model name.",
-          "type": "string",
-          "example": "sklearn_mnist"
-        },
-        "framework": {
-          "description": "The Model framework.",
-          "type": "string"
-        },
-        "frameworkVersion": {
-          "description": "The Model framework version.",
-          "type": "string"
-        },
-        "version": {
-          "format": "int64",
-          "description": "The Model version assigned by Model Management Service.",
-          "type": "integer",
-          "example": 1
-        },
-        "datasets": {
-          "description": "The list of datasets associated with the model.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/DatasetReference"
-          }
-        },
-        "url": {
-          "description": "The URL of the Model. Usually a SAS URL.",
-          "type": "string"
-        },
-        "mimeType": {
-          "description": "The MIME type of Model content. For more details about MIME type, please open https://www.iana.org/assignments/media-types/media-types.xhtml",
-          "type": "string"
-        },
-        "description": {
-          "description": "The Model description text.",
-          "type": "string",
-          "example": "A mnist model, first version."
-        },
-        "createdTime": {
-          "format": "date-time",
-          "description": "The Model creation time (UTC).",
-          "type": "string"
-        },
-        "modifiedTime": {
-          "format": "date-time",
-          "description": "The Model last modified time (UTC).",
-          "type": "string"
-        },
-        "unpack": {
-          "description": "Indicates whether we need to unpack the Model during docker Image creation.",
-          "type": "boolean"
-        },
-        "parentModelId": {
-          "description": "The Parent Model Id.",
-          "type": "string",
-          "example": "sklearn_mnist_root:1"
-        },
-        "runId": {
-          "description": "The RunId that created this model.",
-          "type": "string"
-        },
-        "experimentName": {
-          "description": "The name of the experiment where this model was created.",
-          "type": "string"
-        },
-        "kvTags": {
-          "description": "The Model tag dictionary. Items are mutable.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "properties": {
-          "description": "The Model property dictionary. Properties are immutable.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "derivedModelIds": {
-          "description": "Models derived from this model",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "sampleInputData": {
-          "description": "Sample Input Data for the Model. A reference to a dataset in the workspace in the format aml://dataset/{datasetId}",
-          "type": "string"
-        },
-        "sampleOutputData": {
-          "description": "Sample Output Data for the Model. A reference to a dataset in the workspace in the format aml://dataset/{datasetId}",
-          "type": "string"
-        },
-        "resourceRequirements": {
-          "description": "Resource requirements for the model",
-          "$ref": "#/definitions/ContainerResourceRequirements"
-        }
-      }
-    },
-    "EnvironmentImageRequest": {
-      "description": "Request to create a Docker image based on Environment.",
-      "type": "object",
-      "properties": {
-        "driverProgram": {
-          "description": "The name of the driver file.",
-          "type": "string"
-        },
-        "assets": {
-          "description": "The list of assets.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ImageAsset"
-          }
-        },
-        "modelIds": {
-          "description": "The list of model Ids.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "models": {
-          "description": "The list of models.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Model"
-          }
-        },
-        "environment": {
-          "description": "The details of the AZURE ML environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelEnvironmentDefinition"
-            }
-          ]
-        },
-        "environmentReference": {
-          "description": "The unique identifying details of the AZURE ML environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/EnvironmentReference"
-            }
-          ]
-        }
-      }
-    },
-    "EnvironmentImageResponse": {
-      "description": "Request to create a Docker image based on Environment.",
-      "type": "object",
-      "properties": {
-        "driverProgram": {
-          "description": "The name of the driver file.",
-          "type": "string"
-        },
-        "assets": {
-          "description": "The list of assets.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ImageAsset"
-          }
-        },
-        "modelIds": {
-          "description": "The list of model Ids.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "models": {
-          "description": "The list of models.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Model"
-          }
-        },
-        "environment": {
-          "description": "The details of the AZURE ML environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelEnvironmentDefinitionResponse"
-            }
-          ]
-        },
-        "environmentReference": {
-          "description": "The unique identifying details of the AZURE ML environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/EnvironmentReference"
-            }
-          ]
-        }
-      }
-    },
-    "ImageAsset": {
-      "description": "An Image asset.",
-      "type": "object",
-      "properties": {
-        "id": {
-          "description": "The Asset Id.",
-          "type": "string"
-        },
-        "mimeType": {
-          "description": "The mime type.",
-          "type": "string"
-        },
-        "url": {
-          "description": "The Url of the Asset.",
-          "type": "string"
-        },
-        "unpack": {
-          "description": "Whether the Asset is unpacked.",
-          "type": "boolean"
-        }
-      }
-    },
-    "ModelEnvironmentDefinition": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the environment.",
-          "type": "string",
-          "example": "mydevenvironment"
-        },
-        "version": {
-          "description": "The environment version.",
-          "type": "string",
-          "example": "1"
-        },
-        "python": {
-          "description": "Settings for a Python environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelPythonSection"
-            }
-          ]
-        },
-        "environmentVariables": {
-          "description": "Definition of environment variables to be defined in the environment.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "docker": {
-          "description": "The definition of a Docker container.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelDockerSection"
-            }
-          ]
-        },
-        "spark": {
-          "description": "The configuration for a Spark environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelSparkSection"
-            }
-          ]
-        },
-        "r": {
-          "description": "Settings for a R environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/RSection"
-            }
-          ]
-        },
-        "inferencingStackVersion": {
-          "description": "The inferencing stack version added to the image. To avoid adding an inferencing stack, do not set this value. Valid values: \"latest\".",
-          "type": "string",
-          "example": "latest"
-        }
-      }
-    },
-    "ModelEnvironmentDefinitionResponse": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the environment.",
-          "type": "string",
-          "example": "mydevenvironment"
-        },
-        "version": {
-          "description": "The environment version.",
-          "type": "string",
-          "example": "1"
-        },
-        "python": {
-          "description": "Settings for a Python environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelPythonSection"
-            }
-          ]
-        },
-        "environmentVariables": {
-          "description": "Definition of environment variables to be defined in the environment.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "docker": {
-          "description": "The definition of a Docker container.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelDockerSectionResponse"
-            }
-          ]
-        },
-        "spark": {
-          "description": "The configuration for a Spark environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ModelSparkSection"
-            }
-          ]
-        },
-        "r": {
-          "description": "Settings for a R environment.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/RSectionResponse"
-            }
-          ]
-        },
-        "inferencingStackVersion": {
-          "description": "The inferencing stack version added to the image. To avoid adding an inferencing stack, do not set this value. Valid values: \"latest\".",
-          "type": "string",
-          "example": "latest"
-        }
-      }
-    },
-    "EnvironmentReference": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "Name of the environment.",
-          "type": "string"
-        },
-        "version": {
-          "description": "Version of the environment.",
-          "type": "string"
-        }
-      }
-    },
-    "ModelPythonSection": {
-      "type": "object",
-      "properties": {
-        "interpreterPath": {
-          "description": "The python interpreter path to use if an environment build is not required. The path specified gets used to call the user script.",
-          "type": "string"
-        },
-        "userManagedDependencies": {
-          "description": "True means that AzureML reuses an existing python environment; False means that AzureML will create a python environment based on the Conda dependencies specification.",
-          "type": "boolean"
-        },
-        "condaDependencies": {
-          "description": "A JObject containing Conda dependencies.",
-          "type": "object"
-        },
-        "baseCondaEnvironment": {
-          "type": "string"
-        }
-      }
-    },
-    "ContainerRegistry": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "string"
-        },
-        "username": {
-          "type": "string",
-          "x-ms-secret": true
-        },
-        "password": {
-          "type": "string",
-          "x-ms-secret": true
-        }
-      }
-    },
-    "ContainerRegistryResponse": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "string"
-        }
-      }
-    },
-    "ModelDockerSection": {
-      "type": "object",
-      "properties": {
-        "baseImage": {
-          "description": "Base image used for Docker-based runs. Mutually exclusive with BaseDockerfile.",
-          "type": "string",
-          "example": "ubuntu:latest"
-        },
-        "baseDockerfile": {
-          "description": "Base Dockerfile used for Docker-based runs. Mutually exclusive with BaseImage.",
-          "type": "string",
-          "example": "FROM ubuntu:latest\r\nRUN echo \"Hello world!\""
-        },
-        "baseImageRegistry": {
-          "description": "Image registry that contains the base image.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ContainerRegistry"
-            }
-          ]
-        }
-      }
-    },
-    "ModelDockerSectionResponse": {
-      "type": "object",
-      "properties": {
-        "baseImage": {
-          "description": "Base image used for Docker-based runs. Mutually exclusive with BaseDockerfile.",
-          "type": "string",
-          "example": "ubuntu:latest"
-        },
-        "baseDockerfile": {
-          "description": "Base Dockerfile used for Docker-based runs. Mutually exclusive with BaseImage.",
-          "type": "string",
-          "example": "FROM ubuntu:latest\r\nRUN echo \"Hello world!\""
-        },
-        "baseImageRegistry": {
-          "description": "Image registry that contains the base image.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/ContainerRegistryResponse"
-            }
-          ]
-        }
-      }
-    },
-    "SparkMavenPackage": {
-      "type": "object",
-      "properties": {
-        "group": {
-          "type": "string"
-        },
-        "artifact": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        }
-      }
-    },
-    "ModelSparkSection": {
-      "type": "object",
-      "properties": {
-        "repositories": {
-          "description": "The list of spark repositories.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "packages": {
-          "description": "The Spark packages to use.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SparkMavenPackage"
-          }
-        },
-        "precachePackages": {
-          "description": "Whether to precache the packages.",
-          "type": "boolean"
-        }
-      }
-    },
-    "RCranPackage": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The package name.",
-          "type": "string"
-        },
-        "repository": {
-          "description": "The repository name.",
-          "type": "string"
-        }
-      }
-    },
-    "RGitHubPackage": {
-      "type": "object",
-      "properties": {
-        "repository": {
-          "description": "Repository address in the format username/repo[/subdir][@ref|#pull].",
-          "type": "string"
-        },
-        "authToken": {
-          "description": "Personal access token to install from a private repo",
-          "type": "string",
-          "x-ms-secret": true
-        }
-      }
-    },
-    "RGitHubPackageResponse": {
-      "type": "object",
-      "properties": {
-        "repository": {
-          "description": "Repository address in the format username/repo[/subdir][@ref|#pull].",
-          "type": "string"
-        }
-      }
-    },
-    "RSection": {
-      "type": "object",
-      "properties": {
-        "rVersion": {
-          "description": "The version of R to be installed",
-          "type": "string"
-        },
-        "userManaged": {
-          "description": "Indicates whether the environment is managed by user or by AzureML.",
-          "type": "boolean"
-        },
-        "rscriptPath": {
-          "description": "The Rscript path to use if an environment build is not required.\r\nThe path specified gets used to call the user script.",
-          "type": "string"
-        },
-        "snapshotDate": {
-          "description": "Date of MRAN snapshot to use in YYYY-MM-DD format, e.g. \"2019-04-17\"",
-          "type": "string"
-        },
-        "cranPackages": {
-          "description": "The CRAN packages to use.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RCranPackage"
-          }
-        },
-        "gitHubPackages": {
-          "description": "The packages directly from GitHub.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RGitHubPackage"
-          }
-        },
-        "customUrlPackages": {
-          "description": "The packages from custom urls.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "bioConductorPackages": {
-          "description": "The packages from Bioconductor.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "RSectionResponse": {
-      "type": "object",
-      "properties": {
-        "rVersion": {
-          "description": "The version of R to be installed",
-          "type": "string"
-        },
-        "userManaged": {
-          "description": "Indicates whether the environment is managed by user or by AzureML.",
-          "type": "boolean"
-        },
-        "rscriptPath": {
-          "description": "The Rscript path to use if an environment build is not required.\r\nThe path specified gets used to call the user script.",
-          "type": "string"
-        },
-        "snapshotDate": {
-          "description": "Date of MRAN snapshot to use in YYYY-MM-DD format, e.g. \"2019-04-17\"",
-          "type": "string"
-        },
-        "cranPackages": {
-          "description": "The CRAN packages to use.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RCranPackage"
-          }
-        },
-        "gitHubPackages": {
-          "description": "The packages directly from GitHub.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/RGitHubPackageResponse"
-          }
-        },
-        "customUrlPackages": {
-          "description": "The packages from custom urls.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "bioConductorPackages": {
-          "description": "The packages from Bioconductor.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "DatasetReference": {
-      "description": "The dataset reference object.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the dataset reference.",
-          "type": "string"
-        },
-        "id": {
-          "description": "The id of the dataset reference.",
-          "type": "string"
-        }
-      }
-    },
-    "AKSVariantResponse": {
-      "description": "The response for an AKS variant.",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/ServiceResponseBase"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "isDefault": {
-              "description": "Is this the default variant.",
-              "type": "boolean"
-            },
-            "trafficPercentile": {
-              "format": "float",
-              "description": "The amount of traffic variant receives.",
-              "type": "number",
-              "example": 100
-            },
-            "type": {
-              "description": "The type of the variant.",
-              "enum": [
-                "Control",
-                "Treatment"
-              ],
-              "type": "string",
-              "example": "Control",
-              "x-ms-enum": {
-                "name": "VariantType",
-                "modelAsString": true
-              }
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "Custom"
-    },
-    "AutoScaler": {
-      "description": "The Auto Scaler properties.",
-      "type": "object",
-      "properties": {
-        "autoscaleEnabled": {
-          "description": "Option to enable/disable auto scaling.",
-          "type": "boolean"
-        },
-        "minReplicas": {
-          "format": "int32",
-          "description": "The minimum number of replicas to scale down to.",
-          "type": "integer",
-          "example": 1
-        },
-        "maxReplicas": {
-          "format": "int32",
-          "description": "The maximum number of replicas in the cluster.",
-          "type": "integer",
-          "example": 3
-        },
-        "targetUtilization": {
-          "format": "int32",
-          "description": "The target utilization percentage to use for determining whether to scale the cluster.",
-          "type": "integer",
-          "example": 70
-        },
-        "refreshPeriodInSeconds": {
-          "format": "int32",
-          "description": "The amount of seconds to wait between auto scale updates.",
-          "type": "integer",
-          "example": 120
-        }
-      }
-    },
-    "AKSReplicaStatus": {
-      "type": "object",
-      "properties": {
-        "desiredReplicas": {
-          "format": "int32",
-          "description": "The desired number of replicas.",
-          "type": "integer",
-          "example": 2
-        },
-        "updatedReplicas": {
-          "format": "int32",
-          "description": "The number of updated replicas.",
-          "type": "integer",
-          "example": 1
-        },
-        "availableReplicas": {
-          "format": "int32",
-          "description": "The number of available replicas.",
-          "type": "integer",
-          "example": 1
-        },
-        "error": {
-          "description": "The error details.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/MachineLearningServiceError"
-            }
-          ]
-        }
-      }
-    },
-    "LivenessProbeRequirements": {
-      "description": "The liveness probe requirements.",
-      "type": "object",
-      "properties": {
-        "failureThreshold": {
-          "format": "int32",
-          "description": "The number of failures to allow before returning an unhealthy status.",
-          "type": "integer"
-        },
-        "successThreshold": {
-          "format": "int32",
-          "description": "The number of successful probes before returning a healthy status.",
-          "type": "integer"
-        },
-        "timeoutSeconds": {
-          "format": "int32",
-          "description": "The probe timeout in seconds.",
-          "type": "integer"
-        },
-        "periodSeconds": {
-          "format": "int32",
-          "description": "The length of time between probes in seconds.",
-          "type": "integer"
-        },
-        "initialDelaySeconds": {
-          "format": "int32",
-          "description": "The delay before the first probe in seconds.",
-          "type": "integer"
-        }
-      }
-    },
-    "AKSServiceResponse": {
-      "description": "The response for an AKS service.",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/AKSVariantResponse"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "models": {
-              "description": "The list of models.",
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Model"
-              }
-            },
-            "containerResourceRequirements": {
-              "description": "The container resource requirements.",
-              "$ref": "#/definitions/ContainerResourceRequirements"
-            },
-            "maxConcurrentRequestsPerContainer": {
-              "format": "int32",
-              "description": "The maximum number of concurrent requests per container.",
-              "type": "integer",
-              "example": 100
-            },
-            "maxQueueWaitMs": {
-              "format": "int32",
-              "description": "Maximum time a request will wait in the queue (in milliseconds). After this time, the service will return 503 (Service Unavailable)",
-              "type": "integer",
-              "example": 250
-            },
-            "computeName": {
-              "description": "The name of the compute resource.",
-              "type": "string"
-            },
-            "namespace": {
-              "description": "The Kubernetes namespace of the deployment.",
-              "type": "string",
-              "example": "default"
-            },
-            "numReplicas": {
-              "format": "int32",
-              "description": "The number of replicas on the cluster.",
-              "type": "integer",
-              "example": 1
-            },
-            "dataCollection": {
-              "description": "Details of the data collection options specified.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/ModelDataCollection"
-                }
-              ]
-            },
-            "appInsightsEnabled": {
-              "description": "Whether or not Application Insights is enabled.",
-              "type": "boolean"
-            },
-            "autoScaler": {
-              "description": "The auto scaler properties.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/AutoScaler"
-                }
-              ]
-            },
-            "scoringUri": {
-              "description": "The Uri for sending scoring requests.",
-              "type": "string",
-              "readOnly": true
-            },
-            "deploymentStatus": {
-              "description": "The deployment status.",
-              "readOnly": true,
-              "allOf": [
-                {
-                  "$ref": "#/definitions/AKSReplicaStatus"
-                }
-              ]
-            },
-            "scoringTimeoutMs": {
-              "format": "int32",
-              "description": "The scoring timeout in milliseconds.",
-              "type": "integer",
-              "example": 100
-            },
-            "livenessProbeRequirements": {
-              "description": "The liveness probe requirements.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/LivenessProbeRequirements"
-                }
-              ]
-            },
-            "authEnabled": {
-              "description": "Whether or not authentication is enabled.",
-              "type": "boolean"
-            },
-            "aadAuthEnabled": {
-              "description": "Whether or not AAD authentication is enabled.",
-              "type": "boolean"
-            },
-            "swaggerUri": {
-              "description": "The Uri for sending swagger requests.",
-              "type": "string",
-              "readOnly": true
-            },
-            "modelConfigMap": {
-              "description": "Details on the models and configurations.",
-              "type": "object",
-              "additionalProperties": {
-                "type": "object"
-              },
-              "readOnly": true
-            },
-            "environmentImageRequest": {
-              "description": "The Environment, models and assets used for inferencing.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/EnvironmentImageResponse"
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "AKS"
-    },
-    "AuthKeys": {
-      "type": "object",
-      "properties": {
-        "primaryKey": {
-          "description": "The primary key.",
-          "type": "string"
-        },
-        "secondaryKey": {
-          "description": "The secondary key.",
-          "type": "string"
-        }
-      }
-    },
-    "CreateServiceRequest": {
-      "description": "The base class for creating a service.",
-      "required": [
-        "computeType"
-      ],
-      "type": "object",
-      "properties": {
-        "description": {
-          "description": "The description of the service.",
-          "type": "string"
-        },
-        "kvTags": {
-          "description": "The service tag dictionary. Tags are mutable.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "properties": {
-          "description": "The service properties dictionary. Properties are immutable.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "keys": {
-          "description": "The authentication keys.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/AuthKeys"
-            }
-          ]
-        },
-        "computeType": {
-          "description": "The compute environment type for the service.",
-          "enum": [
-            "ACI",
-            "AKS"
-          ],
-          "type": "string",
-          "example": "AKS",
-          "x-ms-enum": {
-            "name": "ComputeEnvironmentType",
-            "modelAsString": true
-          }
-        },
-        "environmentImageRequest": {
-          "description": "The Environment, models and assets needed for inferencing.",
-          "allOf": [
-            {
-              "$ref": "#/definitions/EnvironmentImageRequest"
-            }
-          ]
-        },
-        "location": {
-          "description": "The name of the Azure location/region.",
-          "type": "string"
-        }
-      },
-      "discriminator": "computeType"
-    },
-    "ACIServiceCreateRequest": {
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/CreateServiceRequest"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "containerResourceRequirements": {
-              "description": "The container resource requirements.",
-              "$ref": "#/definitions/ContainerResourceRequirements"
-            },
-            "authEnabled": {
-              "description": "Whether or not authentication is enabled on the service.",
-              "default": false,
-              "type": "boolean"
-            },
-            "sslEnabled": {
-              "description": "Whether or not SSL is enabled.",
-              "default": false,
-              "type": "boolean"
-            },
-            "appInsightsEnabled": {
-              "description": "Whether or not Application Insights is enabled.",
-              "default": false,
-              "type": "boolean"
-            },
-            "dataCollection": {
-              "description": "Details of the data collection options specified.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/ModelDataCollection"
-                }
-              ]
-            },
-            "sslCertificate": {
-              "description": "The public SSL certificate in PEM format to use if SSL is enabled.",
-              "type": "string"
-            },
-            "sslKey": {
-              "description": "The public SSL key in PEM format for the certificate.",
-              "type": "string"
-            },
-            "cname": {
-              "description": "The CName for the service.",
-              "type": "string"
-            },
-            "dnsNameLabel": {
-              "description": "The Dns label for the service.",
-              "type": "string"
-            },
-            "vnetConfiguration": {
-              "description": "The virtual network configuration.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/VnetConfiguration"
-                }
-              ]
-            },
-            "encryptionProperties": {
-              "description": "The encryption properties.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/EncryptionProperties"
-                }
-              ]
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "ACI"
-    },
-    "AKSServiceCreateRequest": {
-      "description": "The request to create an AKS service.",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/CreateEndpointVariantRequest"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "numReplicas": {
-              "format": "int32",
-              "description": "The number of replicas on the cluster.",
-              "type": "integer",
-              "example": 1
-            },
-            "dataCollection": {
-              "description": "Details of the data collection options specified.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/ModelDataCollection"
-                }
-              ]
-            },
-            "computeName": {
-              "description": "The name of the compute resource.",
-              "type": "string"
-            },
-            "appInsightsEnabled": {
-              "description": "Whether or not Application Insights is enabled.",
-              "type": "boolean"
-            },
-            "autoScaler": {
-              "description": "The auto scaler properties.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/AutoScaler"
-                }
-              ]
-            },
-            "containerResourceRequirements": {
-              "description": "The container resource requirements.",
-              "$ref": "#/definitions/ContainerResourceRequirements"
-            },
-            "maxConcurrentRequestsPerContainer": {
-              "format": "int32",
-              "description": "The maximum number of concurrent requests per container.",
-              "type": "integer",
-              "example": 100
-            },
-            "maxQueueWaitMs": {
-              "format": "int32",
-              "description": "Maximum time a request will wait in the queue (in milliseconds). After this time, the service will return 503 (Service Unavailable)",
-              "type": "integer",
-              "example": 250
-            },
-            "namespace": {
-              "description": "Kubernetes namespace for the service.",
-              "type": "string",
-              "example": "default"
-            },
-            "scoringTimeoutMs": {
-              "format": "int32",
-              "description": "The scoring timeout in milliseconds.",
-              "type": "integer",
-              "example": 100
-            },
-            "authEnabled": {
-              "description": "Whether or not authentication is enabled.",
-              "type": "boolean"
-            },
-            "livenessProbeRequirements": {
-              "description": "The liveness probe requirements.",
-              "allOf": [
-                {
-                  "$ref": "#/definitions/LivenessProbeRequirements"
-                }
-              ]
-            },
-            "aadAuthEnabled": {
-              "description": "Whether or not AAD authentication is enabled.",
-              "type": "boolean"
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "AKS"
-    },
-    "CreateEndpointVariantRequest": {
-      "description": "The Variant properties.",
-      "type": "object",
-      "allOf": [
-        {
-          "$ref": "#/definitions/CreateServiceRequest"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "isDefault": {
-              "description": "Is this the default variant.",
-              "type": "boolean"
-            },
-            "trafficPercentile": {
-              "format": "float",
-              "description": "The amount of traffic variant receives.",
-              "type": "number",
-              "example": 100
-            },
-            "type": {
-              "description": "The type of the variant.",
-              "enum": [
-                "Control",
-                "Treatment"
-              ],
-              "type": "string",
-              "example": "Control",
-              "x-ms-enum": {
-                "name": "VariantType",
-                "modelAsString": true
-              }
-            }
-          }
-        }
-      ],
-      "x-ms-discriminator-value": "Custom"
     },
     "ComputeInstanceSshSettings": {
       "type": "object",
@@ -6405,7 +4787,8 @@
         },
         "notebookPreparationError": {
           "$ref": "#/definitions/NotebookPreparationError",
-          "description": "The error that occurs when preparing notebook."
+          "description": "The error that occurs when preparing notebook.",
+          "x-nullable": true
         }
       }
     },
@@ -6482,22 +4865,6 @@
           "type": "string",
           "description": "Resource type of workspace connection.",
           "readOnly": true
-        },
-        "properties": {
-          "type": "object",
-          "description": "Properties of workspace connection.",
-          "$ref": "#/definitions/WorkspaceConnectionProps",
-          "x-ms-client-flatten": true
-        }
-      }
-    },
-    "WorkspaceConnectionDto": {
-      "type": "object",
-      "description": "object used for creating workspace connection.",
-      "properties": {
-        "name": {
-          "description": "Friendly name of the workspace connection",
-          "type": "string"
         },
         "properties": {
           "type": "object",
@@ -6616,55 +4983,92 @@
         }
       }
     },
-    "SynapseSparkPoolProperties": {
+    "InstanceTypeSchema": {
       "type": "object",
-      "description": "Properties specific to Synapse Spark pools.",
+      "description": "Instance type schema.",
+      "properties": {
+        "nodeSelector": {
+          "type": "object",
+          "description": "Node Selector",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "resources": {
+          "type": "object",
+          "description": "Resource requests/limits for this instance type",
+          "properties": {
+            "requests": {
+              "description": "Resource requests for this instance type",
+              "$ref": "#/definitions/InstanceResourceSchema"
+            },
+            "limits": {
+              "description": "Resource limits for this instance type",
+              "$ref": "#/definitions/InstanceResourceSchema"
+            }
+          }
+        }
+      }
+    },
+    "InstanceResourceSchema": {
+      "type": "object",
+      "description": "Resource requests/limits for this instance type",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "FQDNEndpointDetail": {
+      "type": "object",
+      "properties": {
+        "port": {
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "FQDNEndpoint": {
+      "type": "object",
+      "properties": {
+        "domainName": {
+          "type": "string"
+        },
+        "endpointDetails": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FQDNEndpointDetail"
+          }
+        }
+      }
+    },
+    "FQDNEndpointsProperties": {
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string"
+        },
+        "endpoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FQDNEndpoint"
+          }
+        }
+      }
+    },
+    "FQDNEndpoints": {
+      "type": "object",
       "properties": {
         "properties": {
-          "type": "object",
-          "description": "AKS properties",
-          "properties": {
-            "autoScaleProperties": {
-              "description": "Auto scale properties.",
-              "$ref": "#/definitions/AutoScaleProperties"
-            },
-            "autoPauseProperties": {
-              "description": "Auto pause properties.",
-              "$ref": "#/definitions/AutoPauseProperties"
-            },
-            "sparkVersion": {
-              "description": "Spark version.",
-              "type": "string"
-            },
-            "nodeCount": {
-              "description": "The number of compute nodes currently assigned to the compute.",
-              "type": "integer",
-              "format": "int32"
-            },
-            "nodeSize": {
-              "description": "Node size.",
-              "type": "string"
-            },
-            "nodeSizeFamily": {
-              "description": "Node size family.",
-              "type": "string"
-            },
-            "subscriptionId": {
-              "description": "Azure subscription identifier.",
-              "type": "string"
-            },
-            "resourceGroup": {
-              "description": "Name of the resource group in which workspace is located.",
-              "type": "string"
-            },
-            "workspaceName": {
-              "description": "Name of Azure Machine Learning workspace.",
-              "type": "string"
-            },
-            "poolName": {
-              "description": "Pool name.",
-              "type": "string"
-            }
+          "$ref": "#/definitions/FQDNEndpointsProperties"
+        }
+      }
+    },
+    "ExternalFQDNResponse": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FQDNEndpoints"
           }
         }
       }
