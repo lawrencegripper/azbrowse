@@ -3,7 +3,7 @@ FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
-FROM golang:1.16.2-buster
+FROM golang:1.17-bullseye
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 COPY --from=builder /snap/core /snap/core
@@ -37,15 +37,13 @@ ENV SNAP_ARCH="amd64"
 # Versions
 ARG TERRAFORM_VERSION=1.0.0
 ENV DOCKER_VERSION=20.10.7
-ARG GO_PLS_VERSION=0.7.0
-ARG DLV_VERSION=1.6.1
-ARG GO_RELEASER_VERSION=0.171.0
-ARG GOLANGCI_LINT_VERSION=1.41.1
+ARG GO_PLS_VERSION=0.7.2
+ARG DLV_VERSION=1.7.2
+ARG GO_RELEASER_VERSION=0.180.3
+ARG GOLANGCI_LINT_VERSION=1.42.1
 
 RUN \
-    # Add python3.9 support for newer shutil options
-    echo "deb http://http.us.debian.org/debian/ testing non-free contrib main" > /etc/apt/sources.list \
-    && apt-get update \
+    apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
@@ -58,9 +56,6 @@ RUN \
     # Install python3
     && apt-get -y install python3 python3-pip \
     && apt-get -y install bash-completion \
-    #
-    # Install Azure CLI
-    && curl -sL https://aka.ms/InstallAzureCLIDeb | bash \
     # Clean up
     && apt-get autoremove -y \
     && apt-get clean -y \
@@ -101,7 +96,7 @@ RUN \
     # --> Go symbols and outline for go to symbol support and test support 
     && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOpPATH)/bin v${GOLANGCI_LINT_VERSION} \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
     && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
     && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
