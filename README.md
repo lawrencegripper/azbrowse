@@ -15,7 +15,7 @@ This is a pet project which has matured thanks to support from awesome contribut
 
 > Warning: Please familiarize yourself with the code and the how-to's before using it in a production environment.
 
-# Cool what else can it do?
+## Cool what else can it do?
 
 Lots [check out the guided tour here](docs/getting-started.md).
 
