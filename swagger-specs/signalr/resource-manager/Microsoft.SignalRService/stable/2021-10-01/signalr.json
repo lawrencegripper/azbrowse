@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2021-09-01-preview",
+    "version": "2021-10-01",
     "title": "SignalRManagementClient",
     "description": "REST API for Azure SignalR Service"
   },
@@ -1447,6 +1447,14 @@
           "$ref": "#/definitions/PrivateEndpoint",
           "description": "Private endpoint associated with the private endpoint connection"
         },
+        "groupIds": {
+          "description": "Group IDs",
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true
+        },
         "privateLinkServiceConnectionState": {
           "$ref": "#/definitions/PrivateLinkServiceConnectionState",
           "description": "Connection state"
@@ -1609,6 +1617,33 @@
         }
       },
       "x-ms-azure-resource": true
+    },
+    "ResourceLogCategory": {
+      "description": "Resource log category configuration of a Microsoft.SignalRService resource.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Gets or sets the resource log category's name.\r\nAvailable values: ConnectivityLogs, MessagingLogs.\r\nCase insensitive.",
+          "type": "string"
+        },
+        "enabled": {
+          "description": "Indicates whether or the resource log category is enabled.\r\nAvailable values: true, false.\r\nCase insensitive.",
+          "type": "string"
+        }
+      }
+    },
+    "ResourceLogConfiguration": {
+      "description": "Resource log configuration of a Microsoft.SignalRService resource.",
+      "type": "object",
+      "properties": {
+        "categories": {
+          "description": "Gets or sets the list of category configurations.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ResourceLogCategory"
+          }
+        }
+      }
     },
     "ResourceSku": {
       "description": "The billing information of the resource.",
@@ -1988,6 +2023,10 @@
           "items": {
             "$ref": "#/definitions/SignalRFeature"
           }
+        },
+        "resourceLogConfiguration": {
+          "$ref": "#/definitions/ResourceLogConfiguration",
+          "description": "Resource log configuration of a Microsoft.SignalRService resource.\r\nIf resourceLogConfiguration isn't null or empty, it will override options \"EnableConnectivityLog\" and \"EnableMessagingLogs\" in features.\r\nOtherwise, use options \"EnableConnectivityLog\" and \"EnableMessagingLogs\" in features."
         },
         "cors": {
           "$ref": "#/definitions/SignalRCorsSettings",
