@@ -78,7 +78,7 @@ func (w *ListWidget) SetFilter(filterString string) {
 	}
 	filteredItems := []*expanders.TreeNode{}
 	for _, item := range w.currentPage.Items {
-		if strings.Contains(strings.ToLower(item.Display), filterString) {
+		if strings.Contains(strings.ToLower(item.Display), strings.ToLower(filterString)) {
 			filteredItems = append(filteredItems, item)
 		}
 	}
