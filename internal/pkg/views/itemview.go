@@ -189,8 +189,10 @@ func (w *ItemWidget) SetFilter(filterString string) {
 	// ensure the content isn't under the filter resultbox
 	filteredResult.WriteString("\n\n")
 
+	var filterStringLower = strings.ToLower(filterString)
+
 	for _, line := range currentContent {
-		if strings.Contains(strings.ToLower(line), strings.ToLower(filterString)) {
+		if strings.Contains(strings.ToLower(line), filterStringLower) {
 			line = highlightText(line, filterString)
 			filteredResult.WriteString(line + "\n")
 		}
