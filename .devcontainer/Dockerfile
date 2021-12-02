@@ -116,3 +116,7 @@ RUN \
 
 # Install ruby bunder gem to support inline gems in ruby scripts
 RUN gem install bundler
+
+# azure-cli-no-mount
+COPY scripts/azure-cli.sh /tmp/
+RUN /tmp/azure-cli.sh
