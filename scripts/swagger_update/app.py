@@ -33,10 +33,6 @@ if __name__ == "__main__":
     # This allows you to augment the included files for each README.MD for a specific tag
     # this is useful when files which are needed are incorrectly left out of the 'input-file'
     resource_provider_input_file_additions = {
-        # storage package-2019-06 references privatelinks.json which is not listed in the input files
-        "storage": { 
-            "package-2021-04": ["./Microsoft.Storage/stable/2021-02-01/privatelinks.json"] 
-        },
         "cosmos-db" : {
             "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
         }
