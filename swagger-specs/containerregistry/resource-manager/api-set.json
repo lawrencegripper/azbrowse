@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.ContainerRegistry/preview/2021-08-01-preview/containerregistry.json"], "name": "package-2021-08-preview-only"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ContainerRegistry/stable/2021-09-01/containerregistry.json", "Microsoft.ContainerRegistry/preview/2019-06-01-preview/containerregistry_build.json"], "name": "package-2021-09"}
