@@ -149,3 +149,4 @@ See the [docs](docs/README.md) for getting started guides, configuration docs, .
 [golangcilinter]: https://github.com/golangci/golangci-lint
 [golangdep]: https://github.com/golang/dep
 [gopath]: https://golang.org/doc/code.html#GOPATH
+
