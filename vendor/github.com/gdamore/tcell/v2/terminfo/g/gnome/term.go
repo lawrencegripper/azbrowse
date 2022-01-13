@@ -36,7 +36,6 @@ func init() {
 		ExitAcs:      "\x0f",
 		EnableAcs:    "\x1b)0",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -65,6 +64,7 @@ func init() {
 		KeyF12:       "\x1b[24~",
 		KeyBacktab:   "\x1b[Z",
 		Modifiers:    1,
+		AutoMargin:   true,
 	})
 
 	// GNOME Terminal with xterm 256-colors
@@ -97,7 +97,6 @@ func init() {
 		ExitAcs:      "\x0f",
 		EnableAcs:    "\x1b)0",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -126,5 +125,6 @@ func init() {
 		KeyF12:       "\x1b[24~",
 		KeyBacktab:   "\x1b[Z",
 		Modifiers:    1,
+		AutoMargin:   true,
 	})
 }

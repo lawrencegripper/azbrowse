@@ -6,11 +6,7 @@ package gocui
 
 import (
 	"errors"
-
-	"github.com/mattn/go-runewidth"
 )
-
-const maxInt = int(^uint(0) >> 1)
 
 // Editor interface must be satisfied by gocui editors.
 type Editor interface {
@@ -49,13 +45,13 @@ func simpleEditor(v *View, key Key, ch rune, mod Modifier) {
 	case KeyEnter:
 		v.EditNewLine()
 	case KeyArrowDown:
-		v.moveCursor(0, 1)
+		v.MoveCursor(0, 1)
 	case KeyArrowUp:
-		v.moveCursor(0, -1)
+		v.MoveCursor(0, -1)
 	case KeyArrowLeft:
-		v.moveCursor(-1, 0)
+		v.MoveCursor(-1, 0)
 	case KeyArrowRight:
-		v.moveCursor(1, 0)
+		v.MoveCursor(1, 0)
 	case KeyTab:
 		v.EditWrite('\t')
 	case KeyEsc:
@@ -68,7 +64,7 @@ func simpleEditor(v *View, key Key, ch rune, mod Modifier) {
 // EditWrite writes a rune at the cursor position.
 func (v *View) EditWrite(ch rune) {
 	v.writeRune(v.cx, v.cy, ch)
-	v.moveCursor(1, 0)
+	v.MoveCursor(1, 0)
 }
 
 // EditDeleteToStartOfLine is the equivalent of pressing ctrl+U in your terminal, it deletes to the start of the line. Or if you are already at the start of the line, it deletes the newline character
@@ -89,7 +85,7 @@ func (v *View) EditDeleteToStartOfLine() {
 func (v *View) EditGotoToStartOfLine() {
 	x, _ := v.Cursor()
 	for x > 0 {
-		v.moveCursor(-1, 0)
+		v.MoveCursor(-1, 0)
 		x, _ = v.Cursor()
 	}
 }
@@ -104,12 +100,12 @@ func (v *View) EditGotoToEndOfLine() {
 		prevX := -1
 		for prevX != x {
 			prevX = x
-			v.moveCursor(1, 0)
+			v.MoveCursor(1, 0)
 			x, _ = v.Cursor()
 		}
 	} else {
 		// most left so now we're at the end of the original line
-		v.moveCursor(-1, 0)
+		v.MoveCursor(-1, 0)
 	}
 }
 
@@ -121,7 +117,7 @@ func (v *View) EditDelete(back bool) {
 		return
 	}
 	if y >= len(v.lines) {
-		v.moveCursor(-1, 0)
+		v.MoveCursor(-1, 0)
 		return
 	}
 
@@ -137,15 +133,16 @@ func (v *View) EditDelete(back bool) {
 		return
 	}
 	if back { // middle/end of the line
-		n, _ := v.deleteRune(v.cx-1, v.cy)
-		v.moveCursor(-n, 0)
+		if err := v.deleteRune(v.cx-1, v.cy); err == nil {
+			v.MoveCursor(-1, 0)
+		}
 		return
 	}
 	if x == len(v.lines[y]) { // end of the line
 		_ = v.mergeLines(y)
 		return
 	}
-	_, _ = v.deleteRune(v.cx, v.cy) // start/middle of the line
+	v.deleteRune(v.cx, v.cy) // start/middle of the line
 }
 
 // EditNewLine inserts a new line under the cursor.
@@ -158,11 +155,6 @@ func (v *View) EditNewLine() {
 
 // MoveCursor mores the cursor relative from it's current possition
 func (v *View) MoveCursor(dx, dy int) {
-	v.moveCursor(dx, dy)
-	v.gui.userEvents <- userEvent{func(g *Gui) error { return nil }}
-}
-
-func (v *View) moveCursor(dx, dy int) {
 	newX, newY := v.cx+dx, v.cy+dy
 
 	if len(v.lines) == 0 {
@@ -268,26 +260,16 @@ func (v *View) writeRune(x, y int, ch rune) error {
 
 // deleteRune removes a rune from the view's internal buffer, at the
 // position corresponding to the point (x, y).
-// returns the amount of columns that where removed.
-func (v *View) deleteRune(x, y int) (int, error) {
+// returns error if invalid point is specified.
+func (v *View) deleteRune(x, y int) error {
 	v.tainted = true
 
 	if x < 0 || y < 0 || y >= len(v.lines) || x >= len(v.lines[y]) {
-		return 0, errors.New("invalid point")
+		return errors.New("invalid point")
 	}
 
-	var tw int
-	for i := range v.lines[y] {
-		w := runewidth.RuneWidth(v.lines[y][i].chr)
-		tw += w
-		if tw > x {
-			v.lines[y] = append(v.lines[y][:i], v.lines[y][i+1:]...)
-			return w, nil
-		}
-
-	}
-
-	return 0, nil
+	v.lines[y] = append(v.lines[y][:x], v.lines[y][x+1:]...)
+	return nil
 }
 
 // mergeLines merges the lines "y" and "y+1" if possible.

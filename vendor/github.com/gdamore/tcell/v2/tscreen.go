@@ -1,4 +1,4 @@
-// Copyright 2020 The TCell Authors
+// Copyright 2021 The TCell Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use file except in compliance with the License.
@@ -16,6 +16,7 @@ package tcell
 
 import (
 	"bytes"
+	"errors"
 	"io"
 	"os"
 	"strconv"
@@ -24,6 +25,7 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"golang.org/x/term"
 	"golang.org/x/text/transform"
 
 	"github.com/gdamore/tcell/v2/terminfo"
@@ -41,6 +43,14 @@ import (
 // $COLUMNS environment variables can be set to the actual window size,
 // otherwise defaults taken from the terminal database are used.
 func NewTerminfoScreen() (Screen, error) {
+	return NewTerminfoScreenFromTty(nil)
+}
+
+// NewTerminfoScreenFromTty returns a Screen using a custom Tty implementation.
+// If the passed in tty is nil, then a reasonable default (typically /dev/tty)
+// is presumed, at least on UNIX hosts. (Windows hosts will typically fail this
+// call altogether.)
+func NewTerminfoScreenFromTty(tty Tty) (Screen, error) {
 	ti, e := terminfo.LookupTerminfo(os.Getenv("TERM"))
 	if e != nil {
 		ti, e = loadDynamicTerminfo(os.Getenv("TERM"))
@@ -49,7 +59,7 @@ func NewTerminfoScreen() (Screen, error) {
 		}
 		terminfo.AddTerminfo(ti)
 	}
-	t := &tScreen{ti: ti}
+	t := &tScreen{ti: ti, tty: tty}
 
 	t.keyexist = make(map[Key]bool)
 	t.keycodes = make(map[string]*tKeyCode)
@@ -58,7 +68,7 @@ func NewTerminfoScreen() (Screen, error) {
 	}
 	t.prepareKeys()
 	t.buildAcsMap()
-	t.sigwinch = make(chan os.Signal, 10)
+	t.resizeQ = make(chan bool, 1)
 	t.fallback = make(map[rune]string)
 	for k, v := range RuneFallbacks {
 		t.fallback[k] = v
@@ -76,20 +86,18 @@ type tKeyCode struct {
 // tScreen represents a screen backed by a terminfo implementation.
 type tScreen struct {
 	ti           *terminfo.Terminfo
+	tty          Tty
 	h            int
 	w            int
 	fini         bool
 	cells        CellBuffer
-	in           *os.File
-	out          *os.File
 	buffering    bool // true if we are collecting writes to buf instead of sending directly to out
 	buf          bytes.Buffer
 	curstyle     Style
 	style        Style
 	evch         chan Event
-	sigwinch     chan os.Signal
+	resizeQ      chan bool
 	quit         chan struct{}
-	indoneq      chan struct{}
 	keyexist     map[Key]bool
 	keycodes     map[string]*tKeyCode
 	keychan      chan []byte
@@ -101,7 +109,6 @@ type tScreen struct {
 	clear        bool
 	cursorx      int
 	cursory      int
-	tiosp        *termiosPrivate
 	wasbtn       bool
 	acs          map[rune]string
 	charset      string
@@ -116,13 +123,22 @@ type tScreen struct {
 	finiOnce     sync.Once
 	enablePaste  string
 	disablePaste string
+	saved        *term.State
+	stopQ        chan struct{}
+	running      bool
+	wg           sync.WaitGroup
+	mouseFlags   MouseFlags
+	pasteEnabled bool
 
 	sync.Mutex
 }
 
 func (t *tScreen) Init() error {
+	if e := t.initialize(); e != nil {
+		return e
+	}
+
 	t.evch = make(chan Event, 10)
-	t.indoneq = make(chan struct{})
 	t.keychan = make(chan []byte, 10)
 	t.keytimer = time.NewTimer(time.Millisecond * 50)
 	t.charset = "UTF-8"
@@ -145,10 +161,6 @@ func (t *tScreen) Init() error {
 	if i, _ := strconv.Atoi(os.Getenv("COLUMNS")); i != 0 {
 		w = i
 	}
-	if e := t.termioInit(); e != nil {
-		return e
-	}
-
 	if t.ti.SetFgBgRGB != "" || t.ti.SetFgRGB != "" || t.ti.SetBgRGB != "" {
 		t.truecolor = true
 	}
@@ -165,11 +177,6 @@ func (t *tScreen) Init() error {
 		t.colors[Color(i)|ColorValid] = Color(i) | ColorValid
 	}
 
-	t.TPuts(ti.EnterCA)
-	t.TPuts(ti.HideCursor)
-	t.TPuts(ti.EnableAcs)
-	t.TPuts(ti.Clear)
-
 	t.quit = make(chan struct{})
 
 	t.Lock()
@@ -182,8 +189,9 @@ func (t *tScreen) Init() error {
 	t.resize()
 	t.Unlock()
 
-	go t.mainLoop()
-	go t.inputLoop()
+	if err := t.engage(); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -291,7 +299,7 @@ func (t *tScreen) prepareBracketedPaste() {
 		t.disablePaste = t.ti.DisablePaste
 		t.prepareKey(keyPasteStart, t.ti.PasteStart)
 		t.prepareKey(keyPasteEnd, t.ti.PasteEnd)
-	} else if t.ti.MouseMode != "" {
+	} else if t.ti.Mouse != "" {
 		t.enablePaste = "\x1b[?2004h"
 		t.disablePaste = "\x1b[?2004l"
 		t.prepareKey(keyPasteStart, "\x1b[200~")
@@ -470,31 +478,8 @@ func (t *tScreen) Fini() {
 }
 
 func (t *tScreen) finish() {
-	t.Lock()
-	defer t.Unlock()
-
-	ti := t.ti
-	t.cells.Resize(0, 0)
-	t.TPuts(ti.ShowCursor)
-	t.TPuts(ti.AttrOff)
-	t.TPuts(ti.Clear)
-	t.TPuts(ti.ExitCA)
-	t.TPuts(ti.ExitKeypad)
-	t.TPuts(ti.TParm(ti.MouseMode, 0))
-	t.TPuts(t.disablePaste)
-	t.curstyle = styleInvalid
-	t.clear = false
-	t.fini = true
-
-	select {
-	case <-t.quit:
-		// do nothing, already closed
-
-	default:
-		close(t.quit)
-	}
-
-	t.termioFini()
+	close(t.quit)
+	t.finalize()
 }
 
 func (t *tScreen) SetStyle(style Style) {
@@ -643,7 +628,24 @@ func (t *tScreen) drawCell(x, y int) int {
 		return width
 	}
 
-	if t.cy != y || t.cx != x {
+	if y == t.h-1 && x == t.w-1 && t.ti.AutoMargin && ti.InsertChar != "" {
+		// our solution is somewhat goofy.
+		// we write to the second to the last cell what we want in the last cell, then we
+		// insert a character at that 2nd to last position to shift the last column into
+		// place, then we rewrite that 2nd to last cell.  Old terminals suck.
+		t.TPuts(ti.TGoto(x-1, y))
+		defer func() {
+			t.TPuts(ti.TGoto(x-1, y))
+			t.TPuts(ti.InsertChar)
+			t.cy = y
+			t.cx = x - 1
+			t.cells.SetDirty(x-1, y, true)
+			_ = t.drawCell(x-1, y)
+			t.TPuts(t.ti.TGoto(0, 0))
+			t.cy = 0
+			t.cx = 0
+		}()
+	} else if t.cy != y || t.cx != x {
 		t.TPuts(ti.TGoto(x, y))
 		t.cx = x
 		t.cy = y
@@ -755,7 +757,7 @@ func (t *tScreen) writeString(s string) {
 	if t.buffering {
 		_, _ = io.WriteString(&t.buf, s)
 	} else {
-		_, _ = io.WriteString(t.out, s)
+		_, _ = io.WriteString(t.tty, s)
 	}
 }
 
@@ -763,7 +765,7 @@ func (t *tScreen) TPuts(s string) {
 	if t.buffering {
 		t.ti.TPuts(&t.buf, s)
 	} else {
-		t.ti.TPuts(t.out, s)
+		t.ti.TPuts(t.tty, s)
 	}
 }
 
@@ -831,27 +833,74 @@ func (t *tScreen) draw() {
 	// restore the cursor
 	t.showCursor()
 
-	_, _ = t.buf.WriteTo(t.out)
+	_, _ = t.buf.WriteTo(t.tty)
 }
 
-func (t *tScreen) EnableMouse() {
+func (t *tScreen) EnableMouse(flags ...MouseFlags) {
+	var f MouseFlags
+	flagsPresent := false
+	for _, flag := range flags {
+		f |= flag
+		flagsPresent = true
+	}
+	if !flagsPresent {
+		f = MouseMotionEvents
+	}
+
+	t.Lock()
+	t.mouseFlags = f
+	t.enableMouse(f)
+	t.Unlock()
+}
+
+func (t *tScreen) enableMouse(f MouseFlags) {
+	// Rather than using terminfo to find mouse escape sequences, we rely on the fact that
+	// pretty much *every* terminal that supports mouse tracking follows the
+	// XTerm standards (the modern ones).
 	if len(t.mouse) != 0 {
-		t.TPuts(t.ti.TParm(t.ti.MouseMode, 1))
+		// start by disabling all tracking.
+		t.TPuts("\x1b[?1000l\x1b[?1002l\x1b[?1003l\x1b[?1006l")
+		if f&MouseMotionEvents != 0 {
+			t.TPuts("\x1b[?1003h\x1b[?1006h")
+		} else if f&MouseDragEvents != 0 {
+			t.TPuts("\x1b[?1002h\x1b[?1006h")
+		} else if f&MouseButtonEvents != 0 {
+			t.TPuts("\x1b[?1000h\x1b[?1006h")
+		}
 	}
 }
 
 func (t *tScreen) DisableMouse() {
-	if len(t.mouse) != 0 {
-		t.TPuts(t.ti.TParm(t.ti.MouseMode, 0))
-	}
+	t.Lock()
+	t.mouseFlags = 0
+	t.enableMouse(0)
+	t.Unlock()
 }
 
 func (t *tScreen) EnablePaste() {
-	t.TPuts(t.enablePaste)
+	t.Lock()
+	t.pasteEnabled = true
+	t.enablePasting(true)
+	t.Unlock()
 }
 
 func (t *tScreen) DisablePaste() {
-	t.TPuts(t.disablePaste)
+	t.Lock()
+	t.pasteEnabled = false
+	t.enablePasting(false)
+	t.Unlock()
+}
+
+func (t *tScreen) enablePasting(on bool) {
+	var s string
+	if on {
+		s = t.enablePaste
+	} else {
+		s = t.disablePaste
+	}
+	if s != "" {
+		t.TPuts(s)
+	}
 }
 
 func (t *tScreen) Size() (int, int) {
@@ -862,7 +911,7 @@ func (t *tScreen) Size() (int, int) {
 }
 
 func (t *tScreen) resize() {
-	if w, h, e := t.getWinSize(); e == nil {
+	if w, h, e := t.tty.WindowSize(); e == nil {
 		if w != t.w || h != t.h {
 			t.cx = -1
 			t.cy = -1
@@ -892,6 +941,26 @@ func (t *tScreen) nColors() int {
 	return t.ti.Colors
 }
 
+func (t *tScreen) ChannelEvents(ch chan<- Event, quit <-chan struct{}) {
+	defer close(ch)
+	for {
+		select {
+		case <-quit:
+			return
+		case <-t.quit:
+			return
+		case ev := <-t.evch:
+			select {
+			case <-quit:
+				return
+			case <-t.quit:
+				return
+			case ch <- ev:
+			}
+		}
+	}
+}
+
 func (t *tScreen) PollEvent() Event {
 	select {
 	case <-t.quit:
@@ -899,6 +968,10 @@ func (t *tScreen) PollEvent() Event {
 	case ev := <-t.evch:
 		return ev
 	}
+}
+
+func (t *tScreen) HasPendingEvent() bool {
+	return len(t.evch) > 0
 }
 
 // vtACSNames is a map of bytes defined by terminfo that are used in
@@ -1405,14 +1478,16 @@ func (t *tScreen) collectEventsFromInput(buf *bytes.Buffer, expire bool) []Event
 	return res
 }
 
-func (t *tScreen) mainLoop() {
+func (t *tScreen) mainLoop(stopQ chan struct{}) {
+	defer t.wg.Done()
 	buf := &bytes.Buffer{}
 	for {
 		select {
-		case <-t.quit:
-			close(t.indoneq)
+		case <-stopQ:
 			return
-		case <-t.sigwinch:
+		case <-t.quit:
+			return
+		case <-t.resizeQ:
 			t.Lock()
 			t.cx = -1
 			t.cy = -1
@@ -1458,19 +1533,26 @@ func (t *tScreen) mainLoop() {
 	}
 }
 
-func (t *tScreen) inputLoop() {
+func (t *tScreen) inputLoop(stopQ chan struct{}) {
 
+	defer t.wg.Done()
 	for {
+		select {
+		case <-stopQ:
+			return
+		default:
+		}
 		chunk := make([]byte, 128)
-		n, e := t.in.Read(chunk)
+		n, e := t.tty.Read(chunk)
 		switch e {
-		case io.EOF:
 		case nil:
 		default:
 			_ = t.PostEvent(NewEventError(e))
 			return
 		}
-		t.keychan <- chunk[:n]
+		if n > 0 {
+			t.keychan <- chunk[:n]
+		}
 	}
 }
 
@@ -1542,3 +1624,104 @@ func (t *tScreen) HasKey(k Key) bool {
 }
 
 func (t *tScreen) Resize(int, int, int, int) {}
+
+func (t *tScreen) Suspend() error {
+	t.disengage()
+	return nil
+}
+
+func (t *tScreen) Resume() error {
+	return t.engage()
+}
+
+// engage is used to place the terminal in raw mode and establish screen size, etc.
+// Thing of this is as tcell "engaging" the clutch, as it's going to be driving the
+// terminal interface.
+func (t *tScreen) engage() error {
+	t.Lock()
+	defer t.Unlock()
+	if t.tty == nil {
+		return ErrNoScreen
+	}
+	t.tty.NotifyResize(func() {
+		select {
+		case t.resizeQ <- true:
+		default:
+		}
+	})
+	if t.running {
+		return errors.New("already engaged")
+	}
+	if err := t.tty.Start(); err != nil {
+		return err
+	}
+	t.running = true
+	if w, h, err := t.tty.WindowSize(); err == nil && w != 0 && h != 0 {
+		t.cells.Resize(w, h)
+	}
+	stopQ := make(chan struct{})
+	t.stopQ = stopQ
+	t.enableMouse(t.mouseFlags)
+	t.enablePasting(t.pasteEnabled)
+
+	ti := t.ti
+	t.TPuts(ti.EnterCA)
+	t.TPuts(ti.EnterKeypad)
+	t.TPuts(ti.HideCursor)
+	t.TPuts(ti.EnableAcs)
+	t.TPuts(ti.Clear)
+
+	t.wg.Add(2)
+	go t.inputLoop(stopQ)
+	go t.mainLoop(stopQ)
+	return nil
+}
+
+// disengage is used to release the terminal back to support from the caller.
+// Think of this as tcell disengaging the clutch, so that another application
+// can take over the terminal interface.  This restores the TTY mode that was
+// present when the application was first started.
+func (t *tScreen) disengage() {
+
+	t.Lock()
+	if !t.running {
+		t.Unlock()
+		return
+	}
+	t.running = false
+	stopQ := t.stopQ
+	close(stopQ)
+	_ = t.tty.Drain()
+	t.Unlock()
+
+	t.tty.NotifyResize(nil)
+	// wait for everything to shut down
+	t.wg.Wait()
+
+	// shutdown the screen and disable special modes (e.g. mouse and bracketed paste)
+	ti := t.ti
+	t.cells.Resize(0, 0)
+	t.TPuts(ti.ShowCursor)
+	t.TPuts(ti.ResetFgBg)
+	t.TPuts(ti.AttrOff)
+	t.TPuts(ti.Clear)
+	t.TPuts(ti.ExitCA)
+	t.TPuts(ti.ExitKeypad)
+	t.enableMouse(0)
+	t.enablePasting(false)
+
+	_ = t.tty.Stop()
+}
+
+// Beep emits a beep to the terminal.
+func (t *tScreen) Beep() error {
+	t.writeString(string(byte(7)))
+	return nil
+}
+
+// finalize is used to at application shutdown, and restores the terminal
+// to it's initial state.  It should not be called more than once.
+func (t *tScreen) finalize() {
+	t.disengage()
+	_ = t.tty.Close()
+}

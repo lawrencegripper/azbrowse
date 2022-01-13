@@ -1,4 +1,4 @@
-// Copyright 2019 The TCell Authors
+// Copyright 2021 The TCell Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use file except in compliance with the License.
@@ -16,7 +16,7 @@ package tcell
 
 // Screen represents the physical (or emulated) screen.
 // This can be a terminal window or a physical console.  Platforms implement
-// this differerently.
+// this differently.
 type Screen interface {
 	// Init initializes the screen for use.
 	Init() error
@@ -78,16 +78,37 @@ type Screen interface {
 	// response to a call to Clear or Flush.
 	Size() (int, int)
 
+	// ChannelEvents is an infinite loop that waits for an event and
+	// channels it into the user provided channel ch.  Closing the
+	// quit channel and calling the Fini method are cancellation
+	// signals.  When a cancellation signal is received the method
+	// returns after closing ch.
+	//
+	// This method should be used as a goroutine.
+	//
+	// NOTE: PollEvent should not be called while this method is running.
+	ChannelEvents(ch chan<- Event, quit <-chan struct{})
+
 	// PollEvent waits for events to arrive.  Main application loops
 	// must spin on this to prevent the application from stalling.
 	// Furthermore, this will return nil if the Screen is finalized.
 	PollEvent() Event
+
+	// HasPendingEvent returns true if PollEvent would return an event
+	// without blocking.  If the screen is stopped and PollEvent would
+	// return nil, then the return value from this function is unspecified.
+	// The purpose of this function is to allow multiple events to be collected
+	// at once, to minimize screen redraws.
+	HasPendingEvent() bool
 
 	// PostEvent tries to post an event into the event stream.  This
 	// can fail if the event queue is full.  In that case, the event
 	// is dropped, and ErrEventQFull is returned.
 	PostEvent(ev Event) error
 
+	// Deprecated: PostEventWait is unsafe, and will be removed
+	// in the future.
+	//
 	// PostEventWait is like PostEvent, but if the queue is full, it
 	// blocks until there is space in the queue, making delivery
 	// reliable.  However, it is VERY important that this function
@@ -99,7 +120,9 @@ type Screen interface {
 	PostEventWait(ev Event)
 
 	// EnableMouse enables the mouse.  (If your terminal supports it.)
-	EnableMouse()
+	// If no flags are specified, then all events are reported, if the
+	// terminal supports them.
+	EnableMouse(...MouseFlags)
 
 	// DisableMouse disables the mouse.
 	DisableMouse()
@@ -107,7 +130,7 @@ type Screen interface {
 	// EnablePaste enables bracketed paste mode, if supported.
 	EnablePaste()
 
-	// DisablePaste() disables bracketed paste mode.
+	// DisablePaste disables bracketed paste mode.
 	DisablePaste()
 
 	// HasMouse returns true if the terminal (apparently) supports a
@@ -146,7 +169,7 @@ type Screen interface {
 	CharacterSet() string
 
 	// RegisterRuneFallback adds a fallback for runes that are not
-	// part of the character set -- for example one coudld register
+	// part of the character set -- for example one could register
 	// o as a fallback for ø.  This should be done cautiously for
 	// characters that might be displayed ordinarily in language
 	// specific text -- characters that could change the meaning of
@@ -157,7 +180,7 @@ type Screen interface {
 	// character set, those are used in preference.  Also, standard
 	// fallbacks for graphical characters in the ACSC terminfo string
 	// are registered implicitly.
-
+	//
 	// The display string should be the same width as original rune.
 	// This makes it possible to register two character replacements
 	// for full width East Asian characters, for example.
@@ -200,6 +223,14 @@ type Screen interface {
 	// runes) is always true.
 	HasKey(Key) bool
 
+	// Suspend pauses input and output processing.  It also restores the
+	// terminal settings to what they were when the application started.
+	// This can be used to, for example, run a sub-shell.
+	Suspend() error
+
+	// Resume resumes after Suspend().
+	Resume() error
+
 	// Beep attempts to sound an OS-dependent audible alert and returns an error
 	// when unsuccessful.
 	Beep() error
@@ -217,3 +248,13 @@ func NewScreen() (Screen, error) {
 		return nil, e
 	}
 }
+
+// MouseFlags are options to modify the handling of mouse events.
+// Actual events can be or'd together.
+type MouseFlags int
+
+const (
+	MouseButtonEvents = MouseFlags(1) // Click events only
+	MouseDragEvents   = MouseFlags(2) // Click-drag events (includes button events)
+	MouseMotionEvents = MouseFlags(4) // All mouse events (includes click and drag events)
+)

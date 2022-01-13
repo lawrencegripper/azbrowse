@@ -1,6 +1,6 @@
 // +build windows
 
-// Copyright 2020 The TCell Authors
+// Copyright 2021 The TCell Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use file except in compliance with the License.
@@ -41,6 +41,7 @@ type cScreen struct {
 	fini       bool
 	vten       bool
 	truecolor  bool
+	running    bool
 
 	w int
 	h int
@@ -52,6 +53,10 @@ type cScreen struct {
 	cells   CellBuffer
 
 	finiOnce sync.Once
+
+	mouseEnabled bool
+	wg           sync.WaitGroup
+	stopQ        chan struct{}
 
 	sync.Mutex
 }
@@ -176,7 +181,7 @@ func (s *cScreen) Init() error {
 	// ConEmu handling of colors and scrolling when in terminal
 	// mode is extremely problematic at the best.  The color
 	// palette will scroll even though characters do not, when
-	// emiting stuff for the last character.  In the future we
+	// emitting stuff for the last character.  In the future we
 	// might change this to look at specific versions of ConEmu
 	// if they fix the bug.
 	if os.Getenv("ConEmuPID") != "" {
@@ -188,16 +193,6 @@ func (s *cScreen) Init() error {
 	case "enable":
 		s.truecolor = true
 	}
-
-	cf, _, e := procCreateEvent.Call(
-		uintptr(0),
-		uintptr(1),
-		uintptr(0),
-		uintptr(0))
-	if cf == uintptr(0) {
-		return e
-	}
-	s.cancelflag = syscall.Handle(cf)
 
 	s.Lock()
 
@@ -223,17 +218,15 @@ func (s *cScreen) Init() error {
 			s.vten = true
 		} else {
 			s.truecolor = false
+			s.setOutMode(0)
 		}
 	} else {
 		s.setOutMode(0)
 	}
 
-	s.clearScreen(s.style)
-	s.hideCursor()
 	s.Unlock()
-	go s.scanInput()
 
-	return nil
+	return s.engage()
 }
 
 func (s *cScreen) CharacterSet() string {
@@ -241,48 +234,100 @@ func (s *cScreen) CharacterSet() string {
 	return "UTF-16LE"
 }
 
-func (s *cScreen) EnableMouse() {
-	s.setInMode(modeResizeEn | modeMouseEn | modeExtndFlg)
+func (s *cScreen) EnableMouse(...MouseFlags) {
+	s.Lock()
+	s.mouseEnabled = true
+	s.enableMouse(true)
+	s.Unlock()
 }
 
 func (s *cScreen) DisableMouse() {
-	s.setInMode(modeResizeEn | modeExtndFlg)
+	s.Lock()
+	s.mouseEnabled = false
+	s.enableMouse(false)
+	s.Unlock()
 }
+
+func (s *cScreen) enableMouse(on bool) {
+	if on {
+		s.setInMode(modeResizeEn | modeMouseEn | modeExtndFlg)
+	} else {
+		s.setInMode(modeResizeEn | modeExtndFlg)
+	}
+}
+
+// Windows lacks bracketed paste (for now)
 
 func (s *cScreen) EnablePaste() {}
 
 func (s *cScreen) DisablePaste() {}
 
 func (s *cScreen) Fini() {
-	s.finiOnce.Do(s.finish)
+	s.disengage()
 }
 
-func (s *cScreen) finish() {
+func (s *cScreen) disengage() {
 	s.Lock()
-	s.style = StyleDefault
-	s.curx = -1
-	s.cury = -1
-	s.fini = true
-	s.vten = false
+	if !s.running {
+		s.Unlock()
+		return
+	}
+	s.running = false
+	stopQ := s.stopQ
+	procSetEvent.Call(uintptr(s.cancelflag))
+	close(stopQ)
 	s.Unlock()
 
-	s.setCursorInfo(&s.ocursor)
+	s.wg.Wait()
+
 	s.setInMode(s.oimode)
 	s.setOutMode(s.oomode)
 	s.setBufferSize(int(s.oscreen.size.x), int(s.oscreen.size.y))
-	s.clearScreen(StyleDefault)
-	s.setCursorPos(0, 0)
+	s.clearScreen(StyleDefault, false)
+	s.setCursorPos(0, 0, false)
+	s.setCursorInfo(&s.ocursor)
 	procSetConsoleTextAttribute.Call(
 		uintptr(s.out),
 		uintptr(s.mapStyle(StyleDefault)))
+}
 
-	close(s.quit)
-	procSetEvent.Call(uintptr(s.cancelflag))
-	// Block until scanInput returns; this prevents a race condition on Win 8+
-	// which causes syscall.Close to block until another keypress is read.
-	<-s.scandone
-	syscall.Close(s.in)
-	syscall.Close(s.out)
+func (s *cScreen) engage() error {
+	s.Lock()
+	defer s.Unlock()
+	if s.running {
+		return errors.New("already engaged")
+	}
+	s.stopQ = make(chan struct{})
+	cf, _, e := procCreateEvent.Call(
+		uintptr(0),
+		uintptr(1),
+		uintptr(0),
+		uintptr(0))
+	if cf == uintptr(0) {
+		return e
+	}
+	s.running = true
+	s.cancelflag = syscall.Handle(cf)
+	s.enableMouse(s.mouseEnabled)
+
+	if s.vten {
+		s.setOutMode(modeVtOutput | modeNoAutoNL | modeCookedOut)
+	} else {
+		s.setOutMode(0)
+	}
+
+	s.clearScreen(s.style, s.vten)
+	s.hideCursor()
+
+	s.cells.Invalidate()
+	s.hideCursor()
+	s.resize()
+	s.draw()
+	s.doCursor()
+
+	s.wg.Add(1)
+	go s.scanInput(s.stopQ)
+	return nil
 }
 
 func (s *cScreen) PostEventWait(ev Event) {
@@ -298,13 +343,37 @@ func (s *cScreen) PostEvent(ev Event) error {
 	}
 }
 
+func (s *cScreen) ChannelEvents(ch chan<- Event, quit <-chan struct{}) {
+	defer close(ch)
+	for {
+		select {
+		case <-quit:
+			return
+		case <-s.stopQ:
+			return
+		case ev := <-s.evch:
+			select {
+			case <-quit:
+				return
+			case <-s.stopQ:
+				return
+			case ch <- ev:
+			}
+		}
+	}
+}
+
 func (s *cScreen) PollEvent() Event {
 	select {
-	case <-s.quit:
+	case <-s.stopQ:
 		return nil
 	case ev := <-s.evch:
 		return ev
 	}
+}
+
+func (s *cScreen) HasPendingEvent() bool {
+	return len(s.evch) > 0
 }
 
 type cursorInfo struct {
@@ -366,7 +435,7 @@ func (s *cScreen) doCursor() {
 	if x < 0 || y < 0 || x >= s.w || y >= s.h {
 		s.hideCursor()
 	} else {
-		s.setCursorPos(x, y)
+		s.setCursorPos(x, y, s.vten)
 		s.showCursor()
 	}
 }
@@ -690,10 +759,15 @@ func (s *cScreen) getConsoleInput() error {
 	return nil
 }
 
-func (s *cScreen) scanInput() {
+func (s *cScreen) scanInput(stopQ chan struct{}) {
+	defer s.wg.Done()
 	for {
+		select {
+		case <-stopQ:
+			return
+		default:
+		}
 		if e := s.getConsoleInput(); e != nil {
-			close(s.scandone)
 			return
 		}
 	}
@@ -842,7 +916,7 @@ func (s *cScreen) writeString(x, y int, style Style, ch []uint16) {
 	if len(ch) == 0 {
 		return
 	}
-	s.setCursorPos(x, y)
+	s.setCursorPos(x, y, s.vten)
 
 	if s.vten {
 		s.sendVtStyle(style)
@@ -858,7 +932,7 @@ func (s *cScreen) draw() {
 	// allocate a scratch line bit enough for no combining chars.
 	// if you have combining characters, you may pay for extra allocs.
 	if s.clear {
-		s.clearScreen(s.style)
+		s.clearScreen(s.style, s.vten)
 		s.clear = false
 		s.cells.Invalidate()
 	}
@@ -964,8 +1038,8 @@ func (s *cScreen) setCursorInfo(info *cursorInfo) {
 
 }
 
-func (s *cScreen) setCursorPos(x, y int) {
-	if s.vten {
+func (s *cScreen) setCursorPos(x, y int, vtEnable bool) {
+	if vtEnable {
 		// Note that the string is Y first.  Origin is 1,1.
 		s.emitVtString(fmt.Sprintf(vtCursorPos, y+1, x+1))
 	} else {
@@ -1027,15 +1101,15 @@ func (s *cScreen) Fill(r rune, style Style) {
 	s.Unlock()
 }
 
-func (s *cScreen) clearScreen(style Style) {
-	if s.vten {
+func (s *cScreen) clearScreen(style Style, vtEnable bool) {
+	if vtEnable {
 		s.sendVtStyle(style)
 		row := strings.Repeat(" ", s.w)
 		for y := 0; y < s.h; y++ {
-			s.setCursorPos(0, y)
+			s.setCursorPos(0, y, vtEnable)
 			s.emitVtString(row)
 		}
-		s.setCursorPos(0, 0)
+		s.setCursorPos(0, 0, vtEnable)
 
 	} else {
 		pos := coord{0, 0}
@@ -1183,4 +1257,13 @@ func (s *cScreen) Beep() error {
 		return err
 	}
 	return nil
+}
+
+func (s *cScreen) Suspend() error {
+	s.disengage()
+	return nil
+}
+
+func (s *cScreen) Resume() error {
+	return s.engage()
 }
