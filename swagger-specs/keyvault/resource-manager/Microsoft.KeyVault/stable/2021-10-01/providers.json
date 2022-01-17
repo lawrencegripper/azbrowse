@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2019-09-01",
+    "version": "2021-10-01",
     "title": "KeyVaultManagementClient",
     "description": "The Azure management API provides a RESTful set of web services that interact with Azure Key Vault."
   },
@@ -38,7 +38,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -74,7 +74,8 @@
           "type": "string",
           "description": "The URL to get the next set of operations."
         }
-      }
+      },
+      "type": "object"
     },
     "Operation": {
       "description": "Key Vault REST API operation definition.",
@@ -128,7 +129,8 @@
           "$ref": "#/definitions/ServiceSpecification",
           "description": "One property of operation, include metric specifications."
         }
-      }
+      },
+      "type": "object"
     },
     "ServiceSpecification": {
       "description": "One property of operation, include log specifications.",
@@ -147,7 +149,8 @@
             "$ref": "#/definitions/MetricSpecification"
           }
         }
-      }
+      },
+      "type": "object"
     },
     "LogSpecification": {
       "description": "Log specification of operation.",
@@ -164,7 +167,8 @@
           "type": "string",
           "description": "Blob duration of specification."
         }
-      }
+      },
+      "type": "object"
     },
     "MetricSpecification": {
       "description": "Metric specification of operation.",
@@ -175,11 +179,11 @@
         },
         "displayName": {
           "type": "string",
-          "description": "Display name of Metric specification."
+          "description": "Display name of metric specification."
         },
         "displayDescription": {
           "type": "string",
-          "description": "Display description of Metric specification."
+          "description": "Display description of metric specification."
         },
         "unit": {
           "type": "string",
@@ -222,7 +226,8 @@
           "type": "string",
           "description": "The internal metric name."
         }
-      }
+      },
+      "type": "object"
     },
     "DimensionProperties": {
       "description": "Type of operation: get, read, delete, etc.",
@@ -237,32 +242,10 @@
         },
         "toBeExportedForShoebox": {
           "type": "boolean",
-          "description": "Property to specify whether the dimension should be exported for shoebox."
-        }
-      }
-    },
-    "CloudError": {
-      "description": "An error response from Key Vault resource provider",
-      "properties": {
-        "error": {
-          "$ref": "#/definitions/CloudErrorBody"
+          "description": "Property to specify whether the dimension should be exported for Shoebox."
         }
       },
-      "x-ms-external": true
-    },
-    "CloudErrorBody": {
-      "description": "An error response from Key Vault resource provider",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Error code. This is a mnemonic that can be consumed programmatically."
-        },
-        "message": {
-          "type": "string",
-          "description": "User friendly error message. The message is typically localized and may vary with service version."
-        }
-      },
-      "x-ms-external": true
+      "type": "object"
     }
   },
   "parameters": {
