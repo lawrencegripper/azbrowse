@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2019-09-01",
+    "version": "2021-10-01",
     "title": "KeyVaultManagementClient",
     "description": "The Azure management API provides a RESTful set of web services that interact with Azure Key Vault."
   },
@@ -67,7 +67,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -130,7 +130,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -187,7 +187,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -263,7 +263,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -328,7 +328,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -350,78 +350,6 @@
     }
   },
   "definitions": {
-    "CloudError": {
-      "description": "An error response from Key Vault resource provider",
-      "properties": {
-        "error": {
-          "$ref": "#/definitions/CloudErrorBody"
-        }
-      },
-      "x-ms-external": true
-    },
-    "CloudErrorBody": {
-      "description": "An error response from Key Vault resource provider",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Error code. This is a mnemonic that can be consumed programmatically."
-        },
-        "message": {
-          "type": "string",
-          "description": "User friendly error message. The message is typically localized and may vary with service version."
-        }
-      },
-      "x-ms-external": true
-    },
-    "Attributes": {
-      "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Determines whether or not the object is enabled."
-        },
-        "nbf": {
-          "x-ms-client-name": "NotBefore",
-          "type": "integer",
-          "format": "int64",
-          "description": "Not before date in seconds since 1970-01-01T00:00:00Z."
-        },
-        "exp": {
-          "x-ms-client-name": "Expires",
-          "type": "integer",
-          "format": "int64",
-          "description": "Expiry date in seconds since 1970-01-01T00:00:00Z."
-        },
-        "created": {
-          "type": "integer",
-          "format": "int64",
-          "readOnly": true,
-          "description": "Creation time in seconds since 1970-01-01T00:00:00Z."
-        },
-        "updated": {
-          "type": "integer",
-          "format": "int64",
-          "readOnly": true,
-          "description": "Last updated time in seconds since 1970-01-01T00:00:00Z."
-        },
-        "recoveryLevel": {
-          "type": "string",
-          "description": "The deletion recovery level currently in effect for the object. If it contains 'Purgeable', then the object can be permanently deleted by a privileged user; otherwise, only the system can purge the object at the end of the retention interval.",
-          "enum": [
-            "Purgeable",
-            "Recoverable+Purgeable",
-            "Recoverable",
-            "Recoverable+ProtectedSubscription"
-          ],
-          "x-ms-enum": {
-            "name": "DeletionRecoveryLevel",
-            "modelAsString": true
-          },
-          "readOnly": true,
-          "x-nullable": false
-        }
-      },
-      "description": "The object attributes managed by the Azure Key Vault service."
-    },
     "KeyProperties": {
       "properties": {
         "attributes": {
@@ -493,15 +421,62 @@
           "readOnly": true
         }
       },
-      "description": "The properties of the key."
+      "description": "The properties of the key.",
+      "type": "object"
     },
     "KeyAttributes": {
-      "allOf": [
-        {
-          "$ref": "#/definitions/Attributes"
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Determines whether or not the object is enabled."
+        },
+        "nbf": {
+          "x-ms-client-name": "NotBefore",
+          "type": "integer",
+          "format": "int64",
+          "description": "Not before date in seconds since 1970-01-01T00:00:00Z."
+        },
+        "exp": {
+          "x-ms-client-name": "Expires",
+          "type": "integer",
+          "format": "int64",
+          "description": "Expiry date in seconds since 1970-01-01T00:00:00Z."
+        },
+        "created": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true,
+          "description": "Creation time in seconds since 1970-01-01T00:00:00Z."
+        },
+        "updated": {
+          "type": "integer",
+          "format": "int64",
+          "readOnly": true,
+          "description": "Last updated time in seconds since 1970-01-01T00:00:00Z."
+        },
+        "recoveryLevel": {
+          "type": "string",
+          "description": "The deletion recovery level currently in effect for the object. If it contains 'Purgeable', then the object can be permanently deleted by a privileged user; otherwise, only the system can purge the object at the end of the retention interval.",
+          "enum": [
+            "Purgeable",
+            "Recoverable+Purgeable",
+            "Recoverable",
+            "Recoverable+ProtectedSubscription"
+          ],
+          "x-ms-enum": {
+            "name": "DeletionRecoveryLevel",
+            "modelAsString": true
+          },
+          "readOnly": true,
+          "x-nullable": false
+        },
+        "exportable": {
+          "type": "boolean",
+          "description": "Indicates if the private key can be exported."
         }
-      ],
-      "description": "The attributes of the key."
+      },
+      "description": "The object attributes managed by the Azure Key Vault service.",
+      "type": "object"
     },
     "KeyCreateParameters": {
       "properties": {
@@ -521,7 +496,8 @@
       "required": [
         "properties"
       ],
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
     },
     "Key": {
       "properties": {
@@ -539,7 +515,8 @@
           "$ref": "./keyvault.json#/definitions/Resource"
         }
       ],
-      "description": "The key resource."
+      "description": "The key resource.",
+      "type": "object"
     },
     "KeyListResult": {
       "properties": {
@@ -555,7 +532,8 @@
           "description": "The URL to get the next page of keys."
         }
       },
-      "description": "The page of keys."
+      "description": "The page of keys.",
+      "type": "object"
     }
   },
   "parameters": {
