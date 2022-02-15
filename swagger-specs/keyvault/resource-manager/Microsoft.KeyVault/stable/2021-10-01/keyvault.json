@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2019-09-01",
+    "version": "2021-10-01",
     "title": "KeyVaultManagementClient",
     "description": "The Azure management API provides a RESTful set of web services that interact with Azure Key Vault."
   },
@@ -63,24 +63,10 @@
               "$ref": "#/definitions/Vault"
             }
           },
-          "400": {
-            "description": "Bad request.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
-          "409": {
-            "description": "A conflict occurred to prevent the operation from completing.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -150,24 +136,10 @@
               "$ref": "#/definitions/Vault"
             }
           },
-          "400": {
-            "description": "Bad request.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
-          "409": {
-            "description": "A conflict occurred to prevent the operation from completing.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -218,17 +190,10 @@
           "204": {
             "description": "No Content."
           },
-          "400": {
-            "description": "Bad request.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -282,7 +247,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -367,31 +332,10 @@
               "$ref": "#/definitions/VaultAccessPolicyParameters"
             }
           },
-          "400": {
-            "description": "Bad request.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
-          "404": {
-            "description": "The specified resource does not exist.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
-          "409": {
-            "description": "A conflict occurred to prevent the operation from completing.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -447,7 +391,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -499,7 +443,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -544,7 +488,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -603,7 +547,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -657,24 +601,10 @@
           "202": {
             "description": "Vault is being purged."
           },
-          "400": {
-            "description": "Bad request.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
-          "404": {
-            "description": "The specified resource does not exist.",
-            "schema": {
-              "$ref": "#/definitions/CloudError"
-            },
-            "x-ms-error-response": true
-          },
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -707,6 +637,10 @@
             "enum": [
               "resourceType eq 'Microsoft.KeyVault/vaults'"
             ],
+            "x-ms-enum": {
+              "name": "VaultListFilterTypes",
+              "modelAsString": false
+            },
             "description": "The filter to apply on the operation."
           },
           {
@@ -725,6 +659,10 @@
             "enum": [
               "2015-11-01"
             ],
+            "x-ms-enum": {
+              "name": "ResourceManagerApiVersions",
+              "modelAsString": false
+            },
             "description": "Azure Resource Manager Api Version."
           },
           {
@@ -741,7 +679,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -792,7 +730,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
@@ -854,7 +792,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         }
@@ -923,7 +861,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         }
@@ -986,11 +924,59 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         },
         "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateEndpointConnections": {
+      "get": {
+        "tags": [
+          "PrivateEndpointConnections"
+        ],
+        "operationId": "PrivateEndpointConnections_ListByResource",
+        "description": "The List operation gets information about the private endpoint connections associated with the vault.",
+        "x-ms-examples": {
+          "KeyVaultListPrivateEndpointConnection": {
+            "$ref": "./examples/listPrivateEndpointConnection.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/ResourceGroupName"
+          },
+          {
+            "$ref": "#/parameters/VaultName"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Get information about all private endpoint connections in the specified resource group.",
+            "schema": {
+              "$ref": "#/definitions/PrivateEndpointConnectionListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "common.json#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.KeyVault/vaults/{vaultName}/privateLinkResources": {
@@ -1032,7 +1018,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/CloudError"
+              "$ref": "common.json#/definitions/CloudError"
             }
           }
         }
@@ -1040,29 +1026,6 @@
     }
   },
   "definitions": {
-    "CloudError": {
-      "description": "An error response from Key Vault resource provider",
-      "properties": {
-        "error": {
-          "$ref": "#/definitions/CloudErrorBody"
-        }
-      },
-      "x-ms-external": true
-    },
-    "CloudErrorBody": {
-      "description": "An error response from Key Vault resource provider",
-      "properties": {
-        "code": {
-          "type": "string",
-          "description": "Error code. This is a mnemonic that can be consumed programmatically."
-        },
-        "message": {
-          "type": "string",
-          "description": "User friendly error message. The message is typically localized and may vary with service version."
-        }
-      },
-      "x-ms-external": true
-    },
     "Sku": {
       "properties": {
         "family": {
@@ -1094,7 +1057,8 @@
       "required": [
         "name",
         "family"
-      ]
+      ],
+      "type": "object"
     },
     "AccessPolicyEntry": {
       "properties": {
@@ -1122,7 +1086,8 @@
         "tenantId",
         "objectId",
         "permissions"
-      ]
+      ],
+      "type": "object"
     },
     "Permissions": {
       "properties": {
@@ -1237,7 +1202,8 @@
           "description": "Permissions to storage accounts"
         }
       },
-      "description": "Permissions the identity has for keys, secrets, certificates and storage."
+      "description": "Permissions the identity has for keys, secrets, certificates and storage.",
+      "type": "object"
     },
     "VaultProperties": {
       "properties": {
@@ -1259,7 +1225,7 @@
         },
         "vaultUri": {
           "type": "string",
-          "description": "The URI of the vault for performing operations on keys and secrets. This property is readonly"
+          "description": "The URI of the vault for performing operations on keys and secrets."
         },
         "hsmPoolResourceId": {
           "type": "string",
@@ -1337,13 +1303,19 @@
             "$ref": "#/definitions/PrivateEndpointConnectionItem"
           },
           "description": "List of private endpoint connections associated with the key vault."
+        },
+        "publicNetworkAccess": {
+          "type": "string",
+          "default": "enabled",
+          "description": "Property to specify whether the vault will accept traffic from public internet. If set to 'disabled' all traffic except private endpoint traffic and that that originates from trusted services will be blocked. This will override the set firewall rules, meaning that even if the firewall rules are present we will not honor the rules."
         }
       },
       "required": [
         "tenantId",
         "sku"
       ],
-      "description": "Properties of the vault"
+      "description": "Properties of the vault",
+      "type": "object"
     },
     "VaultPatchProperties": {
       "properties": {
@@ -1407,9 +1379,14 @@
         "networkAcls": {
           "$ref": "#/definitions/NetworkRuleSet",
           "description": "A collection of rules governing the accessibility of the vault from specific network locations."
+        },
+        "publicNetworkAccess": {
+          "type": "string",
+          "description": "Property to specify whether the vault will accept traffic from public internet. If set to 'disabled' all traffic except private endpoint traffic and that that originates from trusted services will be blocked. This will override the set firewall rules, meaning that even if the firewall rules are present we will not honor the rules."
         }
       },
-      "description": "Properties of the vault"
+      "description": "Properties of the vault",
+      "type": "object"
     },
     "VaultAccessPolicyProperties": {
       "properties": {
@@ -1424,7 +1401,8 @@
       "required": [
         "accessPolicies"
       ],
-      "description": "Properties of the vault access policy"
+      "description": "Properties of the vault access policy",
+      "type": "object"
     },
     "DeletedVaultProperties": {
       "properties": {
@@ -1464,7 +1442,8 @@
           "description": "Purge protection status of the original vault."
         }
       },
-      "description": "Properties of the deleted vault."
+      "description": "Properties of the deleted vault.",
+      "type": "object"
     },
     "VaultCreateOrUpdateParameters": {
       "properties": {
@@ -1489,7 +1468,8 @@
         "location",
         "properties"
       ],
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
     },
     "VaultPatchParameters": {
       "properties": {
@@ -1506,7 +1486,8 @@
         }
       },
       "description": "Parameters for creating or updating a vault",
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
     },
     "VaultAccessPolicyParameters": {
       "properties": {
@@ -1539,7 +1520,8 @@
       "required": [
         "properties"
       ],
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
     },
     "Vault": {
       "properties": {
@@ -1569,6 +1551,10 @@
           },
           "description": "Tags assigned to the key vault resource."
         },
+        "systemData": {
+          "description": "System metadata for the key vault.",
+          "$ref": "common.json#/definitions/SystemData"
+        },
         "properties": {
           "$ref": "#/definitions/VaultProperties",
           "description": "Properties of the vault"
@@ -1578,7 +1564,8 @@
         "properties"
       ],
       "description": "Resource information with extended details.",
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
     },
     "DeletedVault": {
       "properties": {
@@ -1602,7 +1589,8 @@
           "description": "Properties of the vault"
         }
       },
-      "description": "Deleted vault information with extended details."
+      "description": "Deleted vault information with extended details.",
+      "type": "object"
     },
     "VaultListResult": {
       "properties": {
@@ -1618,7 +1606,8 @@
           "description": "The URL to get the next set of vaults."
         }
       },
-      "description": "List of vaults"
+      "description": "List of vaults",
+      "type": "object"
     },
     "DeletedVaultListResult": {
       "properties": {
@@ -1634,7 +1623,8 @@
           "description": "The URL to get the next set of deleted vaults."
         }
       },
-      "description": "List of vaults"
+      "description": "List of vaults",
+      "type": "object"
     },
     "ResourceListResult": {
       "properties": {
@@ -1650,7 +1640,8 @@
           "description": "The URL to get the next set of vault resources."
         }
       },
-      "description": "List of vault resources."
+      "description": "List of vault resources.",
+      "type": "object"
     },
     "Resource": {
       "properties": {
@@ -1684,7 +1675,8 @@
         }
       },
       "description": "Key Vault resource",
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
     },
     "VaultCheckNameAvailabilityParameters": {
       "properties": {
@@ -1708,7 +1700,8 @@
         "name",
         "type"
       ],
-      "description": "The parameters used to check the availability of the vault name."
+      "description": "The parameters used to check the availability of the vault name.",
+      "type": "object"
     },
     "CheckNameAvailabilityResult": {
       "properties": {
@@ -1736,7 +1729,8 @@
           "description": "An error message explaining the Reason value in more detail."
         }
       },
-      "description": "The CheckNameAvailability operation response."
+      "description": "The CheckNameAvailability operation response.",
+      "type": "object"
     },
     "NetworkRuleSet": {
       "properties": {
@@ -1779,7 +1773,8 @@
           "description": "The list of virtual network rules."
         }
       },
-      "description": "A set of rules governing the network accessibility of a vault."
+      "description": "A set of rules governing the network accessibility of a vault.",
+      "type": "object"
     },
     "IPRule": {
       "properties": {
@@ -1791,7 +1786,8 @@
       "required": [
         "value"
       ],
-      "description": "A rule governing the accessibility of a vault from a specific ip address or ip range."
+      "description": "A rule governing the accessibility of a vault from a specific ip address or ip range.",
+      "type": "object"
     },
     "VirtualNetworkRule": {
       "properties": {
@@ -1807,7 +1803,8 @@
       "required": [
         "id"
       ],
-      "description": "A rule governing the accessibility of a vault from a specific virtual network."
+      "description": "A rule governing the accessibility of a vault from a specific virtual network.",
+      "type": "object"
     },
     "PrivateEndpointConnectionItem": {
       "properties": {
@@ -1825,7 +1822,8 @@
           "description": "Private endpoint connection properties."
         }
       },
-      "description": "Private endpoint connection item."
+      "description": "Private endpoint connection item.",
+      "type": "object"
     },
     "PrivateEndpointConnection": {
       "properties": {
@@ -1845,7 +1843,25 @@
         }
       ],
       "description": "Private endpoint connection resource.",
-      "x-ms-azure-resource": true
+      "x-ms-azure-resource": true,
+      "type": "object"
+    },
+    "PrivateEndpointConnectionListResult": {
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PrivateEndpointConnection"
+          },
+          "description": "The list of private endpoint connections."
+        },
+        "nextLink": {
+          "type": "string",
+          "description": "The URL to get the next set of private endpoint connections."
+        }
+      },
+      "description": "List of private endpoint connections.",
+      "type": "object"
     },
     "PrivateEndpointConnectionProperties": {
       "properties": {
@@ -1862,7 +1878,8 @@
           "description": "Provisioning state of the private endpoint connection."
         }
       },
-      "description": "Properties of the private endpoint connection resource."
+      "description": "Properties of the private endpoint connection resource.",
+      "type": "object"
     },
     "PrivateEndpoint": {
       "properties": {
@@ -1872,7 +1889,8 @@
           "description": "Full identifier of the private endpoint resource."
         }
       },
-      "description": "Private endpoint object properties."
+      "description": "Private endpoint object properties.",
+      "type": "object"
     },
     "PrivateLinkServiceConnectionState": {
       "properties": {
@@ -1886,10 +1904,18 @@
         },
         "actionsRequired": {
           "type": "string",
-          "description": "A message indicating if changes on the service provider require any updates on the consumer."
+          "description": "A message indicating if changes on the service provider require any updates on the consumer.",
+          "enum": [
+            "None"
+          ],
+          "x-ms-enum": {
+            "name": "ActionsRequired",
+            "modelAsString": true
+          }
         }
       },
-      "description": "An object that represents the approval state of the private link connection."
+      "description": "An object that represents the approval state of the private link connection.",
+      "type": "object"
     },
     "PrivateEndpointServiceConnectionStatus": {
       "type": "string",
@@ -1932,7 +1958,8 @@
           }
         }
       },
-      "description": "A list of private link resources"
+      "description": "A list of private link resources",
+      "type": "object"
     },
     "PrivateLinkResource": {
       "properties": {
@@ -1947,7 +1974,8 @@
           "$ref": "#/definitions/Resource"
         }
       ],
-      "description": "A private link resource"
+      "description": "A private link resource",
+      "type": "object"
     },
     "PrivateLinkResourceProperties": {
       "properties": {
@@ -1972,7 +2000,8 @@
           "description": "Required DNS zone names of the the private link resource."
         }
       },
-      "description": "Properties of a private link resource."
+      "description": "Properties of a private link resource.",
+      "type": "object"
     }
   },
   "parameters": {

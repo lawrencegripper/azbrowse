@@ -3,7 +3,7 @@
   "info": {
     "title": "ComputeManagementClient",
     "description": "The Compute Management Client.",
-    "version": "2021-07-01"
+    "version": "2021-11-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -52,10 +52,24 @@
             "schema": {
               "$ref": "#/definitions/ComputeOperationListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": null
+        },
+        "x-ms-examples": {
+          "Operations_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/Operations_List_MaximumSet_Gen.json"
+          },
+          "Operations_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/Operations_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -102,6 +116,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/AvailabilitySet"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -154,6 +174,20 @@
             "schema": {
               "$ref": "#/definitions/AvailabilitySet"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "AvailabilitySets_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_Update_MaximumSet_Gen.json"
+          },
+          "AvailabilitySets_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_Update_MinimumSet_Gen.json"
           }
         }
       },
@@ -191,6 +225,20 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "AvailabilitySets_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_Delete_MaximumSet_Gen.json"
+          },
+          "AvailabilitySets_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_Delete_MinimumSet_Gen.json"
           }
         }
       },
@@ -228,6 +276,20 @@
             "schema": {
               "$ref": "#/definitions/AvailabilitySet"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "AvailabilitySets_Get_MaximumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_Get_MaximumSet_Gen.json"
+          },
+          "AvailabilitySets_Get_MinimumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_Get_MinimumSet_Gen.json"
           }
         }
       }
@@ -259,6 +321,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/AvailabilitySetListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -300,10 +368,24 @@
             "schema": {
               "$ref": "#/definitions/AvailabilitySetListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "AvailabilitySets_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_List_MaximumSet_Gen.json"
+          },
+          "AvailabilitySets_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -342,10 +424,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineSizeListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": null
+        },
+        "x-ms-examples": {
+          "AvailabilitySets_ListAvailableSizes_MaximumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_ListAvailableSizes_MaximumSet_Gen.json"
+          },
+          "AvailabilitySets_ListAvailableSizes_MinimumSet_Gen": {
+            "$ref": "./examples/compute/AvailabilitySets_ListAvailableSizes_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -399,6 +495,12 @@
             "schema": {
               "$ref": "#/definitions/ProximityPlacementGroup"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -450,6 +552,12 @@
             "schema": {
               "$ref": "#/definitions/ProximityPlacementGroup"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -489,6 +597,12 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -538,6 +652,12 @@
             "schema": {
               "$ref": "#/definitions/ProximityPlacementGroup"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -567,6 +687,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/ProximityPlacementGroupListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -607,6 +733,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/ProximityPlacementGroupListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -670,6 +802,12 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHostGroup"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -721,6 +859,20 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHostGroup"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "DedicatedHostGroups_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_Update_MaximumSet_Gen.json"
+          },
+          "DedicatedHostGroups_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_Update_MinimumSet_Gen.json"
           }
         }
       },
@@ -758,6 +910,20 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "DedicatedHostGroups_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_Delete_MaximumSet_Gen.json"
+          },
+          "DedicatedHostGroups_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_Delete_MinimumSet_Gen.json"
           }
         }
       },
@@ -810,6 +976,12 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHostGroup"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -847,10 +1019,24 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHostGroupListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "DedicatedHostGroups_ListByResourceGroup_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_ListByResourceGroup_MaximumSet_Gen.json"
+          },
+          "DedicatedHostGroups_ListByResourceGroup_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_ListByResourceGroup_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -875,10 +1061,24 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHostGroupListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "DedicatedHostGroups_ListBySubscription_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_ListBySubscription_MaximumSet_Gen.json"
+          },
+          "DedicatedHostGroups_ListBySubscription_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHostGroups_ListBySubscription_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -939,6 +1139,12 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHost"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -998,9 +1204,23 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHost"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "DedicatedHosts_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHosts_Update_MaximumSet_Gen.json"
+          },
+          "DedicatedHosts_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHosts_Update_MinimumSet_Gen.json"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -1046,9 +1266,23 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "DedicatedHosts_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHosts_Delete_MaximumSet_Gen.json"
+          },
+          "DedicatedHosts_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHosts_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "tags": [
@@ -1106,6 +1340,12 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHost"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -1150,10 +1390,24 @@
             "schema": {
               "$ref": "#/definitions/DedicatedHostListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "DedicatedHosts_ListByHostGroup_MaximumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHosts_ListByHostGroup_MaximumSet_Gen.json"
+          },
+          "DedicatedHosts_ListByHostGroup_MinimumSet_Gen": {
+            "$ref": "./examples/compute/DedicatedHosts_ListByHostGroup_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -1178,10 +1432,24 @@
             "schema": {
               "$ref": "#/definitions/SshPublicKeysGroupListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "SshPublicKeys_ListBySubscription_MaximumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_ListBySubscription_MaximumSet_Gen.json"
+          },
+          "SshPublicKeys_ListBySubscription_MinimumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_ListBySubscription_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -1213,10 +1481,24 @@
             "schema": {
               "$ref": "#/definitions/SshPublicKeysGroupListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "SshPublicKeys_ListByResourceGroup_MaximumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_ListByResourceGroup_MaximumSet_Gen.json"
+          },
+          "SshPublicKeys_ListByResourceGroup_MinimumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_ListByResourceGroup_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -1270,6 +1552,12 @@
             "schema": {
               "$ref": "#/definitions/SshPublicKeyResource"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -1321,6 +1609,20 @@
             "schema": {
               "$ref": "#/definitions/SshPublicKeyResource"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "SshPublicKeys_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_Update_MaximumSet_Gen.json"
+          },
+          "SshPublicKeys_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_Update_MinimumSet_Gen.json"
           }
         }
       },
@@ -1358,6 +1660,20 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "SshPublicKeys_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_Delete_MaximumSet_Gen.json"
+          },
+          "SshPublicKeys_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/SshPublicKeys_Delete_MinimumSet_Gen.json"
           }
         }
       },
@@ -1394,6 +1710,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/SshPublicKeyResource"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -1438,6 +1760,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/SshPublicKeyGenerateKeyPairResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -1494,6 +1822,20 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineExtensionImage"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineExtensionImages_Get_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensionImages_Get_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensionImages_Get_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensionImages_Get_MinimumSet_Gen.json"
           }
         }
       }
@@ -1535,6 +1877,20 @@
                 "$ref": "#/definitions/VirtualMachineExtensionImage"
               }
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineExtensionImages_ListTypes_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensionImages_ListTypes_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensionImages_ListTypes_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensionImages_ListTypes_MinimumSet_Gen.json"
           }
         }
       }
@@ -1602,9 +1958,23 @@
                 "$ref": "#/definitions/VirtualMachineExtensionImage"
               }
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-odata": "#/definitions/VirtualMachineExtensionImage"
+        "x-ms-odata": "#/definitions/VirtualMachineExtensionImage",
+        "x-ms-examples": {
+          "VirtualMachineExtensionImages_ListVersions_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensionImages_ListVersions_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensionImages_ListVersions_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensionImages_ListVersions_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/extensions/{vmExtensionName}": {
@@ -1664,9 +2034,23 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineExtension"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineExtensions_CreateOrUpdate_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_CreateOrUpdate_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensions_CreateOrUpdate_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_CreateOrUpdate_MinimumSet_Gen.json"
+          }
+        }
       },
       "patch": {
         "tags": [
@@ -1718,12 +2102,18 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineExtension"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
         "x-ms-examples": {
           "Update VM extension.": {
-            "$ref": "./examples/compute/UpdateVMExtensionWithSuppressFailureEnabled.json"
+            "$ref": "./examples/compute/UpdateVMExtension.json"
           }
         }
       },
@@ -1771,9 +2161,23 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineExtensions_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_Delete_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensions_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "tags": [
@@ -1823,6 +2227,20 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineExtension"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineExtensions_Get_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_Get_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensions_Get_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_Get_MinimumSet_Gen.json"
           }
         }
       }
@@ -1869,6 +2287,20 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineExtensionsListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineExtensions_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineExtensions_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineExtensions_List_MinimumSet_Gen.json"
           }
         }
       }
@@ -1929,6 +2361,20 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineImage"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImages_Get_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_Get_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImages_Get_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_Get_MinimumSet_Gen.json"
           }
         }
       }
@@ -2005,6 +2451,20 @@
                 "$ref": "#/definitions/VirtualMachineImageResource"
               }
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImages_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImages_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_List_MinimumSet_Gen.json"
           }
         }
       }
@@ -2047,6 +2507,20 @@
                 "$ref": "#/definitions/VirtualMachineImageResource"
               }
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImages_ListOffers_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_ListOffers_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImages_ListOffers_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_ListOffers_MinimumSet_Gen.json"
           }
         }
       }
@@ -2082,6 +2556,20 @@
                 "$ref": "#/definitions/VirtualMachineImageResource"
               }
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImages_ListPublishers_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_ListPublishers_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImages_ListPublishers_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_ListPublishers_MinimumSet_Gen.json"
           }
         }
       }
@@ -2131,6 +2619,20 @@
                 "$ref": "#/definitions/VirtualMachineImageResource"
               }
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImages_ListSkus_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_ListSkus_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImages_ListSkus_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImages_ListSkus_MinimumSet_Gen.json"
           }
         }
       }
@@ -2204,6 +2706,14 @@
             "schema": {
               "$ref": "#/definitions/CloudError"
             }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImagesEdgeZone_Get_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_Get_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImagesEdgeZone_Get_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_Get_MinimumSet_Gen.json"
           }
         }
       }
@@ -2296,6 +2806,14 @@
               "$ref": "#/definitions/CloudError"
             }
           }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImagesEdgeZone_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImagesEdgeZone_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -2351,6 +2869,14 @@
               "$ref": "#/definitions/CloudError"
             }
           }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImagesEdgeZone_ListOffers_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_ListOffers_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImagesEdgeZone_ListOffers_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_ListOffers_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -2398,6 +2924,14 @@
             "schema": {
               "$ref": "#/definitions/CloudError"
             }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImagesEdgeZone_ListPublishers_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_ListPublishers_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImagesEdgeZone_ListPublishers_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_ListPublishers_MinimumSet_Gen.json"
           }
         }
       }
@@ -2461,6 +2995,14 @@
               "$ref": "#/definitions/CloudError"
             }
           }
+        },
+        "x-ms-examples": {
+          "VirtualMachineImagesEdgeZone_ListSkus_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_ListSkus_MaximumSet_Gen.json"
+          },
+          "VirtualMachineImagesEdgeZone_ListSkus_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineImagesEdgeZone_ListSkus_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -2493,10 +3035,24 @@
             "schema": {
               "$ref": "#/definitions/ListUsagesResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "Usage_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/Usage_List_MaximumSet_Gen.json"
+          },
+          "Usage_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/Usage_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -2528,6 +3084,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/VirtualMachineListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -2617,10 +3179,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineSizeListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": null
+        },
+        "x-ms-examples": {
+          "VirtualMachineSizes_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineSizes_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineSizes_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineSizes_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -2673,6 +3249,12 @@
             "description": "Created",
             "schema": {
               "$ref": "#/definitions/Image"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -2759,6 +3341,12 @@
             "schema": {
               "$ref": "#/definitions/Image"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -2805,9 +3393,23 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "Images_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/Images_Delete_MaximumSet_Gen.json"
+          },
+          "Images_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/Images_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "tags": [
@@ -2850,6 +3452,12 @@
             "schema": {
               "$ref": "#/definitions/Image"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -2887,6 +3495,12 @@
             "schema": {
               "$ref": "#/definitions/ImageListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -2919,6 +3533,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/ImageListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -2979,11 +3599,25 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
         "x-ms-long-running-operation-options": {
           "final-state-via": "location"
+        },
+        "x-ms-examples": {
+          "VirtualMachines_Capture_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Capture_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_Capture_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Capture_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -3036,6 +3670,12 @@
             "description": "Created",
             "schema": {
               "$ref": "#/definitions/VirtualMachine"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -3151,6 +3791,15 @@
           },
           "Create a VM from a shared gallery image": {
             "$ref": "./examples/compute/CreateAVmFromASharedGalleryImage.json"
+          },
+          "Create a VM from a community gallery image": {
+            "$ref": "./examples/compute/CreateAVmFromACommunityGalleryImage.json"
+          },
+          "Create a VM with securityType ConfidentialVM with Platform Managed Keys": {
+            "$ref": "./examples/compute/CreateAVmWithSecurityTypeConfidentialVM.json"
+          },
+          "Create a VM with securityType ConfidentialVM with Customer Managed Keys": {
+            "$ref": "./examples/compute/CreateAVmWithSecurityTypeConfidentialVMWithCustomerManagedKeys.json"
           }
         }
       },
@@ -3196,6 +3845,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/VirtualMachine"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -3253,6 +3908,12 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -3311,6 +3972,12 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachine"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -3319,6 +3986,9 @@
           },
           "Get a virtual machine placed on a dedicated host group through automatic placement": {
             "$ref": "./examples/compute/GetVirtualMachineAutoPlacedOnDedicatedHostGroup.json"
+          },
+          "Get a virtual machine with VM Size Properties": {
+            "$ref": "./examples/compute/GetVirtualMachineWithVMSizeProperties.json"
           }
         }
       }
@@ -3357,6 +4027,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/VirtualMachineInstanceView"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -3405,9 +4081,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_ConvertToManagedDisks_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_ConvertToManagedDisks_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_ConvertToManagedDisks_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_ConvertToManagedDisks_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/deallocate": {
@@ -3452,9 +4142,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_Deallocate_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Deallocate_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_Deallocate_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Deallocate_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/generalize": {
@@ -3489,6 +4193,12 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -3514,6 +4224,13 @@
             "description": "The name of the resource group."
           },
           {
+            "name": "$filter",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The system query option to filter VMs returned in the response. Allowed value is 'virtualMachineScaleSet/id' eq /subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}'"
+          },
+          {
             "$ref": "#/parameters/ApiVersionParameter"
           },
           {
@@ -3526,10 +4243,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachines_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -3553,6 +4284,13 @@
             "required": false,
             "type": "string",
             "description": "statusOnly=true enables fetching run time status of all Virtual Machines in the subscription."
+          },
+          {
+            "name": "$filter",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The system query option to filter VMs returned in the response. Allowed value is 'virtualMachineScaleSet/id' eq /subscriptions/{subId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmssName}'"
           }
         ],
         "responses": {
@@ -3561,10 +4299,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachines_ListAll_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_ListAll_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_ListAll_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_ListAll_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -3578,6 +4330,9 @@
         "x-ms-examples": {
           "Create or update a restore point collection.": {
             "$ref": "./examples/compute/CreateOrUpdateARestorePointCollection.json"
+          },
+          "Create or update a restore point collection for cross region copy.": {
+            "$ref": "./examples/compute/CreateOrUpdateARestorePointCollectionForCrossRegionCopy.json"
           }
         },
         "parameters": [
@@ -3682,6 +4437,14 @@
               "$ref": "#/definitions/CloudError"
             }
           }
+        },
+        "x-ms-examples": {
+          "RestorePointCollections_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/RestorePointCollections_Update_MaximumSet_Gen.json"
+          },
+          "RestorePointCollections_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/RestorePointCollections_Update_MinimumSet_Gen.json"
+          }
         }
       },
       "delete": {
@@ -3729,7 +4492,15 @@
             }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "RestorePointCollections_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/RestorePointCollections_Delete_MaximumSet_Gen.json"
+          },
+          "RestorePointCollections_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/RestorePointCollections_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "tags": [
@@ -3889,6 +4660,9 @@
         "x-ms-examples": {
           "Create a restore point": {
             "$ref": "./examples/compute/CreateARestorePoint.json"
+          },
+          "Copy a restore point to a different region": {
+            "$ref": "./examples/compute/CopyRestorePointBetweenRegions.json"
           }
         },
         "parameters": [
@@ -3994,7 +4768,15 @@
             }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "RestorePoints_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/RestorePoints_Delete_MaximumSet_Gen.json"
+          },
+          "RestorePoints_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/RestorePoints_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "operationId": "RestorePoints_Get",
@@ -4025,12 +4807,29 @@
             "description": "The name of the restore point."
           },
           {
+            "name": "$expand",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The expand expression to apply on the operation. 'InstanceView' retrieves information about the run-time state of a restore point.",
+            "enum": [
+              "instanceView"
+            ],
+            "x-ms-enum": {
+              "name": "RestorePointExpandOptions",
+              "modelAsString": true
+            }
+          },
+          {
             "$ref": "#/parameters/ApiVersionParameter"
           }
         ],
         "x-ms-examples": {
           "Get a restore point": {
             "$ref": "./examples/compute/GetRestorePoint.json"
+          },
+          "Get restore point with instance view": {
+            "$ref": "./examples/compute/GetRestorePointWithInstanceView.json"
           }
         },
         "responses": {
@@ -4083,6 +4882,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/VirtualMachineSizeListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -4210,6 +5015,14 @@
               "$ref": "#/definitions/CloudError"
             }
           }
+        },
+        "x-ms-examples": {
+          "CapacityReservationGroups_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservationGroups_Update_MaximumSet_Gen.json"
+          },
+          "CapacityReservationGroups_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservationGroups_Update_MinimumSet_Gen.json"
+          }
         }
       },
       "delete": {
@@ -4252,6 +5065,14 @@
             "schema": {
               "$ref": "#/definitions/CloudError"
             }
+          }
+        },
+        "x-ms-examples": {
+          "CapacityReservationGroups_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservationGroups_Delete_MaximumSet_Gen.json"
+          },
+          "CapacityReservationGroups_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservationGroups_Delete_MinimumSet_Gen.json"
           }
         }
       },
@@ -4550,14 +5371,14 @@
           }
         ],
         "responses": {
-          "202": {
-            "description": "Accepted"
-          },
           "200": {
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/CapacityReservation"
             }
+          },
+          "202": {
+            "description": "Accepted"
           },
           "default": {
             "description": "Error response describing why the operation failed.",
@@ -4566,7 +5387,15 @@
             }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "CapacityReservations_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservations_Update_MaximumSet_Gen.json"
+          },
+          "CapacityReservations_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservations_Update_MinimumSet_Gen.json"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -4620,7 +5449,15 @@
             }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "CapacityReservations_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservations_Delete_MaximumSet_Gen.json"
+          },
+          "CapacityReservations_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/CapacityReservations_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "tags": [
@@ -4788,9 +5625,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_PowerOff_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_PowerOff_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_PowerOff_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_PowerOff_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/reapply": {
@@ -4879,9 +5730,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_Restart_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Restart_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_Restart_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Restart_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/start": {
@@ -4919,9 +5784,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_Start_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Start_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_Start_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Start_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/redeploy": {
@@ -4959,9 +5838,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_Redeploy_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Redeploy_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_Redeploy_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_Redeploy_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/reimage": {
@@ -5008,6 +5901,12 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -5112,9 +6011,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachines_PerformMaintenance_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_PerformMaintenance_MaximumSet_Gen.json"
+          },
+          "VirtualMachines_PerformMaintenance_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachines_PerformMaintenance_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachines/{vmName}/simulateEviction": {
@@ -5149,6 +6062,12 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": false,
@@ -5332,6 +6251,12 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSet"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -5425,6 +6350,15 @@
           },
           "Create a scale set with spot restore policy": {
             "$ref": "./examples/compute/CreateAScaleSetWithSpotRestorePolicy.json"
+          },
+          "Create a VMSS with an extension with protectedSettingsFromKeyVault": {
+            "$ref": "./examples/compute/CreateAScaleSetWithProtectedSettingsFromKeyVault.json"
+          },
+          "Create a scale set with vm size properties": {
+            "$ref": "./examples/compute/CreateOrUpdateAScaleSetWithVMSizeProperties.json"
+          },
+          "Create a scale set with SecurityType as ConfidentialVM": {
+            "$ref": "./examples/compute/CreateAScaleSetWithSecurityTypeConfidentialVM.json"
           }
         }
       },
@@ -5471,9 +6405,23 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSet"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Update_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Update_MinimumSet_Gen.json"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -5519,6 +6467,12 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -5576,6 +6530,12 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSet"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
@@ -5584,6 +6544,9 @@
           },
           "Get a virtual machine scale set with UserData": {
             "$ref": "./examples/compute/GetVirtualMachineScaleSetWithUserData.json"
+          },
+          "Get a virtual machine scale set": {
+            "$ref": "./examples/compute/GetVirtualMachineScaleSet.json"
           }
         }
       }
@@ -5632,9 +6595,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_Deallocate_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Deallocate_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_Deallocate_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Deallocate_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/delete": {
@@ -5688,9 +6665,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_DeleteInstances_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_DeleteInstances_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_DeleteInstances_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_DeleteInstances_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/instanceView": {
@@ -5728,6 +6719,20 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetInstanceView"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_GetInstanceView_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_GetInstanceView_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_GetInstanceView_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_GetInstanceView_MinimumSet_Gen.json"
           }
         }
       }
@@ -5760,10 +6765,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -5824,9 +6843,23 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetExtension"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetExtensions_CreateOrUpdate_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_CreateOrUpdate_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetExtensions_CreateOrUpdate_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_CreateOrUpdate_MinimumSet_Gen.json"
+          }
+        }
       },
       "patch": {
         "tags": [
@@ -5884,9 +6917,23 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetExtension"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetExtensions_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_Update_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetExtensions_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_Update_MinimumSet_Gen.json"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -5932,9 +6979,23 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetExtensions_Delete_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_Delete_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetExtensions_Delete_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_Delete_MinimumSet_Gen.json"
+          }
+        }
       },
       "get": {
         "tags": [
@@ -5984,6 +7045,20 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetExtension"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSetExtensions_Get_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_Get_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetExtensions_Get_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_Get_MinimumSet_Gen.json"
           }
         }
       }
@@ -6023,10 +7098,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetExtensionListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSetExtensions_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetExtensions_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetExtensions_List_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -6051,10 +7140,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetListWithLinkResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_ListAll_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ListAll_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_ListAll_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ListAll_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -6093,10 +7196,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetListSkusResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_ListSkus_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ListSkus_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_ListSkus_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ListSkus_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -6135,10 +7252,24 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetListOSUpgradeHistory"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_GetOSUpgradeHistory_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_GetOSUpgradeHistory_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_GetOSUpgradeHistory_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_GetOSUpgradeHistory_MinimumSet_Gen.json"
+          }
         }
       }
     },
@@ -6194,9 +7325,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_PowerOff_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_PowerOff_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_PowerOff_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_PowerOff_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/restart": {
@@ -6243,9 +7388,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_Restart_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Restart_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_Restart_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Restart_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/start": {
@@ -6292,9 +7451,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_Start_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Start_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_Start_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Start_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/redeploy": {
@@ -6341,9 +7514,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_Redeploy_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Redeploy_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_Redeploy_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Redeploy_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/performMaintenance": {
@@ -6390,9 +7577,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_PerformMaintenance_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_PerformMaintenance_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_PerformMaintenance_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_PerformMaintenance_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/manualupgrade": {
@@ -6439,9 +7640,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_UpdateInstances_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_UpdateInstances_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_UpdateInstances_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_UpdateInstances_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/reimage": {
@@ -6488,9 +7703,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_Reimage_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Reimage_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_Reimage_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_Reimage_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/reimageall": {
@@ -6537,9 +7766,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_ReimageAll_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ReimageAll_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_ReimageAll_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ReimageAll_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/rollingUpgrades/cancel": {
@@ -6577,9 +7820,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetRollingUpgrades_Cancel_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetRollingUpgrades_Cancel_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetRollingUpgrades_Cancel_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetRollingUpgrades_Cancel_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/osRollingUpgrade": {
@@ -6617,9 +7874,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetRollingUpgrades_StartOSUpgrade_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetRollingUpgrades_StartOSUpgrade_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetRollingUpgrades_StartOSUpgrade_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetRollingUpgrades_StartOSUpgrade_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/extensionRollingUpgrade": {
@@ -6657,6 +7928,12 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -6702,6 +7979,20 @@
             "schema": {
               "$ref": "#/definitions/RollingUpgradeStatusInfo"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSetRollingUpgrades_GetLatest_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetRollingUpgrades_GetLatest_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetRollingUpgrades_GetLatest_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetRollingUpgrades_GetLatest_MinimumSet_Gen.json"
           }
         }
       }
@@ -6740,6 +8031,20 @@
             "required": true,
             "type": "integer",
             "description": "The platform update domain for which a manual recovery walk is requested"
+          },
+          {
+            "name": "zone",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The zone in which the manual recovery walk is requested for cross zone virtual machine scale set"
+          },
+          {
+            "name": "placementGroupId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "The placement group id for which the manual recovery walk is requested."
           }
         ],
         "responses": {
@@ -6748,6 +8053,20 @@
             "schema": {
               "$ref": "#/definitions/RecoveryWalkResponse"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_ForceRecoveryServiceFabricPlatformUpdateDomainWalk_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ForceRecoveryServiceFabricPlatformUpdateDomainWalk_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_ForceRecoveryServiceFabricPlatformUpdateDomainWalk_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ForceRecoveryServiceFabricPlatformUpdateDomainWalk_MinimumSet_Gen.json"
           }
         }
       }
@@ -6793,6 +8112,20 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_ConvertToSinglePlacementGroup_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ConvertToSinglePlacementGroup_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_ConvertToSinglePlacementGroup_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_ConvertToSinglePlacementGroup_MinimumSet_Gen.json"
           }
         }
       }
@@ -6841,9 +8174,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSets_SetOrchestrationServiceState_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_SetOrchestrationServiceState_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSets_SetOrchestrationServiceState_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSets_SetOrchestrationServiceState_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/extensions/{vmExtensionName}": {
@@ -7197,7 +8544,7 @@
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/reimage": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/reimage": {
       "post": {
         "tags": [
           "VirtualMachineScaleSetVMs"
@@ -7248,12 +8595,26 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_Reimage_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Reimage_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_Reimage_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Reimage_MinimumSet_Gen.json"
+          }
+        }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/reimageall": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/reimageall": {
       "post": {
         "tags": [
           "VirtualMachineScaleSetVMs"
@@ -7295,12 +8656,26 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_ReimageAll_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_ReimageAll_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_ReimageAll_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_ReimageAll_MinimumSet_Gen.json"
+          }
+        }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/deallocate": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/deallocate": {
       "post": {
         "tags": [
           "VirtualMachineScaleSetVMs"
@@ -7342,12 +8717,26 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_Deallocate_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Deallocate_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_Deallocate_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Deallocate_MinimumSet_Gen.json"
+          }
+        }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}": {
       "put": {
         "tags": [
           "VirtualMachineScaleSetVMs"
@@ -7404,9 +8793,23 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetVM"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_Update_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Update_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_Update_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Update_MinimumSet_Gen.json"
+          }
+        }
       },
       "delete": {
         "tags": [
@@ -7459,6 +8862,12 @@
           },
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -7524,16 +8933,25 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetVM"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-examples": {
           "Get VM scale set VM with UserData": {
             "$ref": "./examples/compute/GetVirtualMachineScaleSetVMWithUserData.json"
+          },
+          "Get VM scale set VM with VMSizeProperties": {
+            "$ref": "./examples/compute/GetVirtualMachineScaleSetVMWithVMSizeProperties.json"
           }
         }
       }
     },
-    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/instanceView": {
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/instanceView": {
       "get": {
         "tags": [
           "VirtualMachineScaleSetVMs"
@@ -7574,6 +8992,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetVMInstanceView"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -7640,12 +9064,26 @@
             "schema": {
               "$ref": "#/definitions/VirtualMachineScaleSetVMListResult"
             }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-pageable": {
           "nextLinkName": "nextLink"
         },
-        "x-ms-odata": "#/definitions/VirtualMachineScaleSetVM"
+        "x-ms-odata": "#/definitions/VirtualMachineScaleSetVM",
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_List_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_List_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_List_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_List_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/poweroff": {
@@ -7698,9 +9136,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_PowerOff_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_PowerOff_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_PowerOff_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_PowerOff_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/restart": {
@@ -7745,9 +9197,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_Restart_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Restart_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_Restart_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Restart_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/start": {
@@ -7792,9 +9258,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_Start_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Start_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_Start_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Start_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/redeploy": {
@@ -7839,9 +9319,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_Redeploy_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Redeploy_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_Redeploy_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_Redeploy_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualmachines/{instanceId}/retrieveBootDiagnosticsData": {
@@ -7952,9 +9446,23 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "VirtualMachineScaleSetVMs_PerformMaintenance_MaximumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_PerformMaintenance_MaximumSet_Gen.json"
+          },
+          "VirtualMachineScaleSetVMs_PerformMaintenance_MinimumSet_Gen": {
+            "$ref": "./examples/compute/VirtualMachineScaleSetVMs_PerformMaintenance_MinimumSet_Gen.json"
+          }
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/virtualMachineScaleSets/{vmScaleSetName}/virtualMachines/{instanceId}/simulateEviction": {
@@ -7996,6 +9504,12 @@
         "responses": {
           "204": {
             "description": "No Content"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": false,
@@ -8052,6 +9566,12 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
@@ -8106,11 +9626,72 @@
           },
           "202": {
             "description": "Accepted"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
           }
         },
         "x-ms-long-running-operation": true,
         "x-ms-long-running-operation-options": {
           "final-state-via": "azure-async-operation"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Compute/hostGroups/{hostGroupName}/hosts/{hostName}/restart": {
+      "post": {
+        "tags": [
+          "DedicatedHost"
+        ],
+        "operationId": "DedicatedHosts_Restart",
+        "description": "Restart the dedicated host. The operation will complete successfully once the dedicated host has restarted and is running. To determine the health of VMs deployed on the dedicated host after the restart check the Resource Health Center in the Azure Portal. Please refer to https://docs.microsoft.com/en-us/azure/service-health/resource-health-overview for more details.",
+        "parameters": [
+          {
+            "name": "resourceGroupName",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The name of the resource group."
+          },
+          {
+            "name": "hostGroupName",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The name of the dedicated host group."
+          },
+          {
+            "name": "hostName",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The name of the dedicated host."
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-examples": {
+          "Restart Dedicated Host.": {
+            "$ref": "./examples/compute/DedicatedHostRestart.json"
+          }
         }
       }
     }
@@ -8340,6 +9921,56 @@
       ],
       "description": "Restore Point details."
     },
+    "RestorePointInstanceView": {
+      "type": "object",
+      "properties": {
+        "diskRestorePoints": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DiskRestorePointInstanceView"
+          },
+          "description": "The disk restore points information."
+        },
+        "statuses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InstanceViewStatus"
+          },
+          "description": "The resource status information."
+        }
+      },
+      "description": "The instance view of a restore point."
+    },
+    "DiskRestorePointInstanceView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Disk restore point Id."
+        },
+        "replicationStatus": {
+          "type": "object",
+          "items": {
+            "$ref": "#/definitions/DiskRestorePointReplicationStatus"
+          },
+          "description": "The disk restore point replication status information."
+        }
+      },
+      "description": "The instance view of a disk restore point."
+    },
+    "DiskRestorePointReplicationStatus": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "object",
+          "items": {
+            "$ref": "#/definitions/InstanceViewStatus"
+          },
+          "description": "The resource status information."
+        }
+      },
+      "description": "The instance view of a disk restore point."
+    },
     "RestorePointProperties": {
       "type": "object",
       "properties": {
@@ -8378,6 +10009,15 @@
           "type": "string",
           "format": "date-time",
           "description": "Gets the creation time of the restore point."
+        },
+        "sourceRestorePoint": {
+          "$ref": "#/definitions/ApiEntityReference",
+          "description": "Resource Id of the source restore point from which a copy needs to be created."
+        },
+        "instanceView": {
+          "$ref": "#/definitions/RestorePointInstanceView",
+          "readOnly": true,
+          "description": "The restore point instance view."
         }
       },
       "description": "The restore point properties."
@@ -8941,6 +10581,12 @@
           "$ref": "#/definitions/DedicatedHostInstanceView",
           "readOnly": true,
           "description": "The dedicated host instance view."
+        },
+        "timeCreated": {
+          "readOnly": true,
+          "type": "string",
+          "format": "date-time",
+          "description": "Specifies the time at which the Dedicated Host resource was created.<br><br>Minimum api-version: 2021-11-01."
         }
       },
       "description": "Properties of the dedicated host."
@@ -9174,6 +10820,12 @@
           "$ref": "#/definitions/CapacityReservationInstanceView",
           "readOnly": true,
           "description": "The Capacity reservation instance view."
+        },
+        "timeCreated": {
+          "readOnly": true,
+          "type": "string",
+          "format": "date-time",
+          "description": "Specifies the time at which the Capacity Reservation resource was created.<br><br>Minimum api-version: 2021-11-01."
         }
       },
       "description": "Properties of the Capacity reservation."
@@ -9530,6 +11182,10 @@
         "suppressFailures": {
           "type": "boolean",
           "description": "Indicates whether failures stemming from the extension will be suppressed (Operational failures such as not connecting to the VM will not be suppressed regardless of this value). The default is false."
+        },
+        "protectedSettingsFromKeyVault": {
+          "type": "object",
+          "description": "The extensions protected settings that are passed by reference, and consumed from key vault"
         }
       },
       "description": "Describes the properties of a Virtual Machine Extension."
@@ -9571,6 +11227,10 @@
         "suppressFailures": {
           "type": "boolean",
           "description": "Indicates whether failures stemming from the extension will be suppressed (Operational failures such as not connecting to the VM will not be suppressed regardless of this value). The default is false."
+        },
+        "protectedSettingsFromKeyVault": {
+          "type": "object",
+          "description": "The extensions protected settings that are passed by reference, and consumed from key vault"
         }
       },
       "description": "Describes the properties of a Virtual Machine Extension."
@@ -10595,6 +12255,10 @@
         "sharedGalleryImageId": {
           "type": "string",
           "description": "Specified the shared gallery image unique id for vm deployment. This can be fetched from shared gallery image GET call."
+        },
+        "communityGalleryImageId": {
+          "type": "string",
+          "description": "Specified the community gallery image unique id for vm deployment. This can be fetched from community gallery image GET call."
         }
       },
       "allOf": [
@@ -10628,6 +12292,28 @@
         }
       ],
       "description": "Describes the parameter of customer managed disk encryption set resource id that can be specified for disk. <br><br> NOTE: The disk encryption set resource id can only be specified for managed disk. Please refer https://aka.ms/mdssewithcmkoverview for more details."
+    },
+    "VMDiskSecurityProfile": {
+      "type": "object",
+      "properties": {
+        "securityEncryptionType": {
+          "type": "string",
+          "description": "Specifies the EncryptionType of the managed disk. <br> It is set to DiskWithVMGuestState for encryption of the managed disk along with VMGuestState blob, and VMGuestStateOnly for encryption of just the VMGuestState blob. <br><br> NOTE: It can be set for only Confidential VMs.",
+          "enum": [
+            "VMGuestStateOnly",
+            "DiskWithVMGuestState"
+          ],
+          "x-ms-enum": {
+            "name": "securityEncryptionTypes",
+            "modelAsString": true
+          }
+        },
+        "diskEncryptionSet": {
+          "$ref": "#/definitions/DiskEncryptionSetParameters",
+          "description": "Specifies the customer managed disk encryption set resource id for the managed disk that is used for Customer Managed Key encrypted ConfidentialVM OS Disk and VMGuest blob."
+        }
+      },
+      "description": "Specifies the security profile settings for the managed disk. <br><br> NOTE: It can only be set for Confidential VMs"
     },
     "KeyVaultKeyReference": {
       "properties": {
@@ -10782,6 +12468,10 @@
         "diskEncryptionSet": {
           "$ref": "#/definitions/DiskEncryptionSetParameters",
           "description": "Specifies the customer managed disk encryption set resource id for the managed disk."
+        },
+        "securityProfile": {
+          "$ref": "#/definitions/VMDiskSecurityProfile",
+          "description": "Specifies the security profile for the managed disk."
         }
       },
       "allOf": [
@@ -10982,9 +12672,10 @@
         },
         "securityType": {
           "type": "string",
-          "description": "Specifies the SecurityType of the virtual machine. It is set as TrustedLaunch to enable UefiSettings. <br><br> Default: UefiSettings will not be enabled unless this property is set as TrustedLaunch.",
+          "description": "Specifies the SecurityType of the virtual machine. It has to be set to any specified value to enable UefiSettings. <br><br> Default: UefiSettings will not be enabled unless this property is set.",
           "enum": [
-            "TrustedLaunch"
+            "TrustedLaunch",
+            "ConfidentialVM"
           ],
           "x-ms-enum": {
             "name": "SecurityTypes",
@@ -11032,6 +12723,16 @@
         }
       },
       "description": "Contains the list of gallery applications that should be made available to the VM/VMSS"
+    },
+    "VirtualMachineScaleSetHardwareProfile": {
+      "type": "object",
+      "properties": {
+        "vmSizeProperties": {
+          "$ref": "#/definitions/VMSizeProperties",
+          "description": "Specifies the properties for customizing the size of the virtual machine. Minimum api-version: 2021-11-01. <br><br> Please follow the instructions in [VM Customization](https://aka.ms/vmcustomization) for more details."
+        }
+      },
+      "description": "Specifies the hardware settings for the virtual machine scale set."
     },
     "AdditionalCapabilities": {
       "properties": {
@@ -11240,7 +12941,6 @@
           "description": "Specifies the name of the administrator account. <br><br> This property cannot be updated after the VM is created. <br><br> **Windows-only restriction:** Cannot end in \".\" <br><br> **Disallowed values:** \"administrator\", \"admin\", \"user\", \"user1\", \"test\", \"user2\", \"test1\", \"user3\", \"admin1\", \"1\", \"123\", \"a\", \"actuser\", \"adm\", \"admin2\", \"aspnet\", \"backup\", \"console\", \"david\", \"guest\", \"john\", \"owner\", \"root\", \"server\", \"sql\", \"support\", \"support_388945a0\", \"sys\", \"test2\", \"test3\", \"user4\", \"user5\". <br><br> **Minimum-length (Linux):** 1  character <br><br> **Max-length (Linux):** 64 characters <br><br> **Max-length (Windows):** 20 characters."
         },
         "adminPassword": {
-          "x-ms-secret": true,
           "type": "string",
           "description": "Specifies the password of the administrator account. <br><br> **Minimum-length (Windows):** 8 characters <br><br> **Minimum-length (Linux):** 6 characters <br><br> **Max-length (Windows):** 123 characters <br><br> **Max-length (Linux):** 72 characters <br><br> **Complexity requirements:** 3 out of 4 conditions below need to be fulfilled <br> Has lower characters <br>Has upper characters <br> Has a digit <br> Has a special character (Regex match [\\W_]) <br><br> **Disallowed values:** \"abc@123\", \"P@$$w0rd\", \"P@ssw0rd\", \"P@ssword123\", \"Pa$$word\", \"pass@word1\", \"Password!\", \"Password1\", \"Password22\", \"iloveyou!\" <br><br> For resetting the password, see [How to reset the Remote Desktop service or its login password in a Windows VM](https://docs.microsoft.com/troubleshoot/azure/virtual-machines/reset-rdp) <br><br> For resetting root password, see [Manage users, SSH, and check or repair disks on Azure Linux VMs using the VMAccess Extension](https://docs.microsoft.com/troubleshoot/azure/virtual-machines/troubleshoot-ssh-connection)"
         },
@@ -11282,7 +12982,20 @@
         },
         "gracePeriod": {
           "type": "string",
-          "description": "The amount of time for which automatic repairs are suspended due to a state change on VM. The grace time starts after the state change has completed. This helps avoid premature or accidental repairs. The time duration should be specified in ISO 8601 format. The minimum allowed grace period is 30 minutes (PT30M), which is also the default value. The maximum allowed grace period is 90 minutes (PT90M)."
+          "description": "The amount of time for which automatic repairs are suspended due to a state change on VM. The grace time starts after the state change has completed. This helps avoid premature or accidental repairs. The time duration should be specified in ISO 8601 format. The minimum allowed grace period is 10 minutes (PT10M), which is also the default value. The maximum allowed grace period is 90 minutes (PT90M)."
+        },
+        "repairAction": {
+          "type": "string",
+          "description": "Type of repair action (replace, restart, reimage) that will be used for repairing unhealthy virtual machines in the scale set. Default value is replace.",
+          "enum": [
+            "Replace",
+            "Restart",
+            "Reimage"
+          ],
+          "x-ms-enum": {
+            "name": "RepairAction",
+            "modelAsString": true
+          }
         }
       },
       "description": "Specifies the configuration parameters for automatic repairs on the virtual machine scale set."
@@ -11435,7 +13148,7 @@
           }
         }
       },
-      "description": "Describes the public IP Sku"
+      "description": "Describes the public IP Sku. It can only be set with OrchestrationMode as Flexible."
     },
     "VirtualMachinePublicIPAddressConfiguration": {
       "properties": {
@@ -12065,6 +13778,12 @@
         "applicationProfile": {
           "$ref": "#/definitions/ApplicationProfile",
           "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
+        },
+        "timeCreated": {
+          "readOnly": true,
+          "type": "string",
+          "format": "date-time",
+          "description": "Specifies the time at which the Virtual Machine resource was created.<br><br>Minimum api-version: 2021-11-01."
         }
       },
       "description": "Describes the properties of a Virtual Machine."
@@ -12566,7 +14285,6 @@
           "description": "Specifies the name of the administrator account. <br><br> **Windows-only restriction:** Cannot end in \".\" <br><br> **Disallowed values:** \"administrator\", \"admin\", \"user\", \"user1\", \"test\", \"user2\", \"test1\", \"user3\", \"admin1\", \"1\", \"123\", \"a\", \"actuser\", \"adm\", \"admin2\", \"aspnet\", \"backup\", \"console\", \"david\", \"guest\", \"john\", \"owner\", \"root\", \"server\", \"sql\", \"support\", \"support_388945a0\", \"sys\", \"test2\", \"test3\", \"user4\", \"user5\". <br><br> **Minimum-length (Linux):** 1  character <br><br> **Max-length (Linux):** 64 characters <br><br> **Max-length (Windows):** 20 characters"
         },
         "adminPassword": {
-          "x-ms-secret": true,
           "type": "string",
           "description": "Specifies the password of the administrator account. <br><br> **Minimum-length (Windows):** 8 characters <br><br> **Minimum-length (Linux):** 6 characters <br><br> **Max-length (Windows):** 123 characters <br><br> **Max-length (Linux):** 72 characters <br><br> **Complexity requirements:** 3 out of 4 conditions below need to be fulfilled <br> Has lower characters <br>Has upper characters <br> Has a digit <br> Has a special character (Regex match [\\W_]) <br><br> **Disallowed values:** \"abc@123\", \"P@$$w0rd\", \"P@ssw0rd\", \"P@ssword123\", \"Pa$$word\", \"pass@word1\", \"Password!\", \"Password1\", \"Password22\", \"iloveyou!\" <br><br> For resetting the password, see [How to reset the Remote Desktop service or its login password in a Windows VM](https://docs.microsoft.com/troubleshoot/azure/virtual-machines/reset-rdp) <br><br> For resetting root password, see [Manage users, SSH, and check or repair disks on Azure Linux VMs using the VMAccess Extension](https://docs.microsoft.com/troubleshoot/azure/virtual-machines/troubleshoot-ssh-connection)"
         },
@@ -12588,6 +14306,10 @@
             "$ref": "#/definitions/VaultSecretGroup"
           },
           "description": "Specifies set of certificates that should be installed onto the virtual machines in the scale set. To install certificates on a virtual machine it is recommended to use the [Azure Key Vault virtual machine extension for Linux](https://docs.microsoft.com/azure/virtual-machines/extensions/key-vault-linux) or the [Azure Key Vault virtual machine extension for Windows](https://docs.microsoft.com/azure/virtual-machines/extensions/key-vault-windows)."
+        },
+        "allowExtensionOperations": {
+          "type": "boolean",
+          "description": "Specifies whether extension operations should be allowed on the virtual machine scale set. <br><br>This may only be set to False when no extensions are present on the virtual machine scale set."
         }
       },
       "description": "Describes a virtual machine scale set OS profile."
@@ -12625,6 +14347,10 @@
         "diskEncryptionSet": {
           "$ref": "#/definitions/DiskEncryptionSetParameters",
           "description": "Specifies the customer managed disk encryption set resource id for the managed disk."
+        },
+        "securityProfile": {
+          "$ref": "#/definitions/VMDiskSecurityProfile",
+          "description": "Specifies the security profile for the managed disk."
         }
       },
       "description": "Describes the parameters of a ScaleSet managed disk."
@@ -13240,6 +14966,10 @@
           "$ref": "#/definitions/VirtualMachineScaleSetPublicIPAddressConfigurationDnsSettings",
           "description": "The dns settings to be applied on the publicIP addresses ."
         },
+        "publicIPPrefix": {
+          "$ref": "#/definitions/SubResource",
+          "description": "The PublicIPPrefix from which to allocate publicIP addresses."
+        },
         "deleteOption": {
           "type": "string",
           "description": "Specify what happens to the public IP when the VM is deleted",
@@ -13358,6 +15088,10 @@
         "suppressFailures": {
           "type": "boolean",
           "description": "Indicates whether failures stemming from the extension will be suppressed (Operational failures such as not connecting to the VM will not be suppressed regardless of this value). The default is false."
+        },
+        "protectedSettingsFromKeyVault": {
+          "type": "object",
+          "description": "The extensions protected settings that are passed by reference, and consumed from key vault"
         }
       },
       "description": "Describes the properties of a Virtual Machine Scale Set Extension."
@@ -13501,6 +15235,10 @@
         "applicationProfile": {
           "$ref": "#/definitions/ApplicationProfile",
           "description": "Specifies the gallery applications that should be made available to the VM/VMSS"
+        },
+        "hardwareProfile": {
+          "$ref": "#/definitions/VirtualMachineScaleSetHardwareProfile",
+          "description": "Specifies the hardware profile related details of a scale set. <br><br>Minimum api-version: 2021-11-01."
         }
       },
       "description": "Describes a virtual machine scale set virtual machine profile."
@@ -13618,6 +15356,12 @@
         "spotRestorePolicy": {
           "$ref": "#/definitions/SpotRestorePolicy",
           "description": "Specifies the Spot Restore properties for the virtual machine scale set."
+        },
+        "timeCreated": {
+          "readOnly": true,
+          "type": "string",
+          "format": "date-time",
+          "description": "Specifies the time at which the Virtual Machine Scale Set resource was created.<br><br>Minimum api-version: 2021-11-01."
         }
       },
       "description": "Describes the properties of a Virtual Machine Scale Set."
