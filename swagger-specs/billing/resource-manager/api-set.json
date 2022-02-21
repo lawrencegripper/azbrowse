@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Billing/stable/2020-05-01/billing.json", "Microsoft.Billing/preview/2018-03-01-preview/billingV2.json"], "name": "package-2020-05"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Billing/stable/2020-05-01/billing.json", "Microsoft.Billing/preview/2018-03-01-preview/billingV2.json", "Microsoft.Billing/stable/2020-05-01/billingOperations.json"], "name": "package-2020-05"}
