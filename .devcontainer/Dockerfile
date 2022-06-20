@@ -3,7 +3,7 @@ FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
-FROM golang:1.17-bullseye
+FROM golang:1.18-bullseye
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 COPY --from=builder /snap/core /snap/core
