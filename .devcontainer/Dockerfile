@@ -87,20 +87,6 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${
                  -C /usr/local/bin docker/docker \
   && rm docker-${DOCKER_VERSION}.tgz
 
-# Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
-RUN \
-    # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
-    # --> Go language server
-    && go get golang.org/x/tools/gopls@v${GO_PLS_VERSION} \
-    # --> Go symbols and outline for go to symbol support and test support 
-    && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
-    # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
-    # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
-    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
-
 # Install autocompletion for azbrowse
 RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
 
@@ -120,3 +106,17 @@ RUN gem install bundler
 # azure-cli-no-mount
 COPY scripts/azure-cli.sh /tmp/
 RUN /tmp/azure-cli.sh
+
+# Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
+RUN \
+    # --> Delve for debugging
+    go install github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
+    # --> Go language server
+    && go install golang.org/x/tools/gopls@v${GO_PLS_VERSION} \
+    # --> Go symbols and outline for go to symbol support and test support 
+    && go install github.com/acroca/go-symbols@v0.1.1 && go install github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
+    # --> GolangCI-lint
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
+    # --> Go releaser 
+    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
+    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
