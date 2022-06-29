@@ -118,5 +118,5 @@ RUN \
     # --> GolangCI-lint
     && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
+    && go install github.com/goreleaser/goreleaser@v${GO_RELEASER_VERSION} \
     && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
