@@ -166,7 +166,8 @@ begin
   end
 
   puts 'Clean up file permissions on ./dist folder'
-  execute_command("/bin/bash -c 'chown -R $(whoami) ./dist'")
+  execute_command("/bin/bash -c 'chown -R $(whoami) ./'")
+  execute_command("/bin/bash -c 'chmod 777 -R ./'")
 
   print_header('Smoke test: Check released docker image starts')
   execute_command('docker run -e AZBROWSE_SKIP_UPDATE=rue ghcr.io/lawrencegripper/azbrowse/azbrowse:latest version')
