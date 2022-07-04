@@ -121,7 +121,6 @@ def find_api_version(resource_provider_name, readme_contents, version_tag, input
     # Regex to match:   ```yaml $(tag) == 'the-version-tag`
     # Also match:       ```yaml $(tag) == 'the-version-tag` || $(tag) == 'some-other-tag'
     # But don't match   ```yaml $(tag) == 'the-version-tag' && $(another-condition)
-    print(version_tag)
     start_match = re.search(
         "^```[\\s]*yaml [^&^\\n]*\\$\\(tag\\) == '" + version_tag + "'[^&^\\n]*$",
         readme_contents,
@@ -163,7 +162,6 @@ def get_api_version_from_readme(resource_provider_name, readme_path, version_ove
         print("==> no version tag found in readme: " + readme_path)
         return None
 
-    print(readme_path)
     api_version = find_api_version(resource_provider_name, contents, version_tag, input_file_additions)
     return api_version
 
