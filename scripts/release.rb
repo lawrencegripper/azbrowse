@@ -36,7 +36,7 @@ begin
     'docker_username': 'DOCKER_USERNAME',
     'docker_password': 'DOCKER_PASSWORD',
     'github_token': 'GITHUB_TOKEN',
-    'snapcraft_login': 'SNAPCRAFT_LOGIN'
+    'snapcraft_store_credentials': 'SNAPCRAFT_STORE_CREDENTIALS'
   }
 
   required_envs = required_envs.merge(required_envs_release) if @branch == 'refs/heads/main'
@@ -62,14 +62,6 @@ begin
     publish_build_output = true
     puts 'Login docker cli'.colorize(:blue)
     execute_command('./scripts/docker_login.sh')
-
-    puts 'Login to snapcraft'.colorize(:blue)
-    execute_command "
-    echo $SNAPCRAFT_LOGIN | base64 -d > snap.login
-    snapcraft login --with snap.login
-    # cleanup login file
-    rm snap.login
-  "
   else
     puts 'Skipping publish as either not CI or branch != main'
   end
