@@ -27,7 +27,9 @@ if __name__ == "__main__":
         "recoveryservicesbackup": "",
         "recoveryservicessiterecovery": "",
         "automation": "package-2015-10",
-        "applicationinsights": "package-2020-02-12"
+        "applicationinsights": "package-2020-02-12",
+        # Pin at 2022-04-01 has invalid/missing common.json file
+        "compute": "package-2022-03-01"
     }
 
     # This allows you to augment the included files for each README.MD for a specific tag
