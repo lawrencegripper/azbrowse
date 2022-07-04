@@ -35,7 +35,6 @@ func init() {
 		ExitAcs:      "\x0f",
 		EnableAcs:    "\x1b(B\x1b)0",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -108,6 +107,8 @@ func init() {
 		KeyCtrlLeft:  "\x1b[Od",
 		KeyCtrlHome:  "\x1b[7^",
 		KeyCtrlEnd:   "\x1b[8^",
+		AutoMargin:   true,
+		InsertChar:   "\x1b[@",
 	})
 
 	// rxvt 2.7.9 with xterm 256-colors
@@ -139,7 +140,6 @@ func init() {
 		ExitAcs:      "\x0f",
 		EnableAcs:    "\x1b(B\x1b)0",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -212,6 +212,8 @@ func init() {
 		KeyCtrlLeft:  "\x1b[Od",
 		KeyCtrlHome:  "\x1b[7^",
 		KeyCtrlEnd:   "\x1b[8^",
+		AutoMargin:   true,
+		InsertChar:   "\x1b[@",
 	})
 
 	// rxvt 2.7.9 with xterm 88-colors
@@ -243,7 +245,6 @@ func init() {
 		ExitAcs:      "\x0f",
 		EnableAcs:    "\x1b(B\x1b)0",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -316,6 +317,8 @@ func init() {
 		KeyCtrlLeft:  "\x1b[Od",
 		KeyCtrlHome:  "\x1b[7^",
 		KeyCtrlEnd:   "\x1b[8^",
+		AutoMargin:   true,
+		InsertChar:   "\x1b[@",
 	})
 
 	// rxvt-unicode terminal (X Window System)
@@ -346,7 +349,6 @@ func init() {
 		EnterAcs:     "\x1b(0",
 		ExitAcs:      "\x1b(B",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -396,6 +398,8 @@ func init() {
 		KeyCtrlLeft:  "\x1b[Od",
 		KeyCtrlHome:  "\x1b[7^",
 		KeyCtrlEnd:   "\x1b[8^",
+		AutoMargin:   true,
+		InsertChar:   "\x1b[@",
 	})
 
 	// rxvt-unicode terminal with 256 colors (X Window System)
@@ -426,7 +430,6 @@ func init() {
 		EnterAcs:     "\x1b(0",
 		ExitAcs:      "\x1b(B",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -476,5 +479,7 @@ func init() {
 		KeyCtrlLeft:  "\x1b[Od",
 		KeyCtrlHome:  "\x1b[7^",
 		KeyCtrlEnd:   "\x1b[8^",
+		AutoMargin:   true,
+		InsertChar:   "\x1b[@",
 	})
 }

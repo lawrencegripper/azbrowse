@@ -1,4 +1,4 @@
-// Copyright 2020 The TCell Authors
+// Copyright 2021 The TCell Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use file except in compliance with the License.
@@ -150,7 +150,6 @@ type Terminfo struct {
 	KeyPrint     string // kprt
 	KeyCancel    string // kcan
 	Mouse        string // kmous
-	MouseMode    string // XM
 	AltChars     string // acsc
 	EnterAcs     string // smacs
 	ExitAcs      string // rmacs
@@ -168,57 +167,66 @@ type Terminfo struct {
 	// Terminal support for these are going to vary amongst XTerm
 	// emulations, so don't depend too much on them in your application.
 
-	StrikeThrough   string // smxx
-	SetFgBg         string // setfgbg
-	SetFgBgRGB      string // setfgbgrgb
-	SetFgRGB        string // setfrgb
-	SetBgRGB        string // setbrgb
-	KeyShfUp        string // shift-up
-	KeyShfDown      string // shift-down
-	KeyShfPgUp      string // shift-kpp
-	KeyShfPgDn      string // shift-knp
-	KeyCtrlUp       string // ctrl-up
-	KeyCtrlDown     string // ctrl-left
-	KeyCtrlRight    string // ctrl-right
-	KeyCtrlLeft     string // ctrl-left
-	KeyMetaUp       string // meta-up
-	KeyMetaDown     string // meta-left
-	KeyMetaRight    string // meta-right
-	KeyMetaLeft     string // meta-left
-	KeyAltUp        string // alt-up
-	KeyAltDown      string // alt-left
-	KeyAltRight     string // alt-right
-	KeyAltLeft      string // alt-left
-	KeyCtrlHome     string
-	KeyCtrlEnd      string
-	KeyMetaHome     string
-	KeyMetaEnd      string
-	KeyAltHome      string
-	KeyAltEnd       string
-	KeyAltShfUp     string
-	KeyAltShfDown   string
-	KeyAltShfLeft   string
-	KeyAltShfRight  string
-	KeyMetaShfUp    string
-	KeyMetaShfDown  string
-	KeyMetaShfLeft  string
-	KeyMetaShfRight string
-	KeyCtrlShfUp    string
-	KeyCtrlShfDown  string
-	KeyCtrlShfLeft  string
-	KeyCtrlShfRight string
-	KeyCtrlShfHome  string
-	KeyCtrlShfEnd   string
-	KeyAltShfHome   string
-	KeyAltShfEnd    string
-	KeyMetaShfHome  string
-	KeyMetaShfEnd   string
-	EnablePaste     string // bracketed paste mode
-	DisablePaste    string
-	PasteStart      string
-	PasteEnd        string
-	Modifiers       int
-	TrueColor       bool // true if the terminal supports direct color
+	StrikeThrough           string // smxx
+	SetFgBg                 string // setfgbg
+	SetFgBgRGB              string // setfgbgrgb
+	SetFgRGB                string // setfrgb
+	SetBgRGB                string // setbrgb
+	KeyShfUp                string // shift-up
+	KeyShfDown              string // shift-down
+	KeyShfPgUp              string // shift-kpp
+	KeyShfPgDn              string // shift-knp
+	KeyCtrlUp               string // ctrl-up
+	KeyCtrlDown             string // ctrl-left
+	KeyCtrlRight            string // ctrl-right
+	KeyCtrlLeft             string // ctrl-left
+	KeyMetaUp               string // meta-up
+	KeyMetaDown             string // meta-left
+	KeyMetaRight            string // meta-right
+	KeyMetaLeft             string // meta-left
+	KeyAltUp                string // alt-up
+	KeyAltDown              string // alt-left
+	KeyAltRight             string // alt-right
+	KeyAltLeft              string // alt-left
+	KeyCtrlHome             string
+	KeyCtrlEnd              string
+	KeyMetaHome             string
+	KeyMetaEnd              string
+	KeyAltHome              string
+	KeyAltEnd               string
+	KeyAltShfUp             string
+	KeyAltShfDown           string
+	KeyAltShfLeft           string
+	KeyAltShfRight          string
+	KeyMetaShfUp            string
+	KeyMetaShfDown          string
+	KeyMetaShfLeft          string
+	KeyMetaShfRight         string
+	KeyCtrlShfUp            string
+	KeyCtrlShfDown          string
+	KeyCtrlShfLeft          string
+	KeyCtrlShfRight         string
+	KeyCtrlShfHome          string
+	KeyCtrlShfEnd           string
+	KeyAltShfHome           string
+	KeyAltShfEnd            string
+	KeyMetaShfHome          string
+	KeyMetaShfEnd           string
+	EnablePaste             string // bracketed paste mode
+	DisablePaste            string
+	PasteStart              string
+	PasteEnd                string
+	Modifiers               int
+	InsertChar              string // string to insert a character (ich1)
+	AutoMargin              bool   // true if writing to last cell in line advances
+	TrueColor               bool   // true if the terminal supports direct color
+	CursorDefault           string
+	CursorBlinkingBlock     string
+	CursorSteadyBlock       string
+	CursorBlinkingUnderline string
+	CursorSteadyUnderline   string
+	CursorBlinkingBar       string
+	CursorSteadyBar         string
 }
 
 const (
@@ -743,6 +751,7 @@ func LookupTerminfo(name string) (*Terminfo, error) {
 	}
 
 	addtruecolor := false
+	add256color := false
 	switch os.Getenv("COLORTERM") {
 	case "truecolor", "24bit", "24-bit":
 		addtruecolor = true
@@ -767,6 +776,21 @@ func LookupTerminfo(name string) (*Terminfo, error) {
 		for _, s := range suffixes {
 			if t, _ = LookupTerminfo(base + s); t != nil {
 				addtruecolor = true
+				break
+			}
+		}
+	}
+
+	// If the name ends in -256color, maybe fabricate using the xterm 256 color sequences
+	if t == nil && strings.HasSuffix(name, "-256color") {
+		suffixes := []string{
+			"-88color",
+			"-color",
+		}
+		base := name[:len(name)-len("-256color")]
+		for _, s := range suffixes {
+			if t, _ = LookupTerminfo(base + s); t != nil {
+				add256color = true
 				break
 			}
 		}
@@ -799,5 +823,12 @@ func LookupTerminfo(name string) (*Terminfo, error) {
 			"48;2;%p4%d;%p5%d;%p6%dm"
 	}
 
+	if add256color {
+		t.Colors = 256
+		t.SetFg = "\x1b[%?%p1%{8}%<%t3%p1%d%e%p1%{16}%<%t9%p1%{8}%-%d%e38;5;%p1%d%;m"
+		t.SetBg = "\x1b[%?%p1%{8}%<%t4%p1%d%e%p1%{16}%<%t10%p1%{8}%-%d%e48;5;%p1%d%;m"
+		t.SetFgBg = "\x1b[%?%p1%{8}%<%t3%p1%d%e%p1%{16}%<%t9%p1%{8}%-%d%e38;5;%p1%d%;;%?%p2%{8}%<%t4%p2%d%e%p2%{16}%<%t10%p2%{8}%-%d%e48;5;%p2%d%;m"
+		t.ResetFgBg = "\x1b[39;49m"
+	}
 	return t, nil
 }

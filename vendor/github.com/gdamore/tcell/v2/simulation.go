@@ -1,4 +1,4 @@
-// Copyright 2020 The TCell Authors
+// Copyright 2021 The TCell Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use file except in compliance with the License.
@@ -281,6 +281,8 @@ func (s *simscreen) hideCursor() {
 	s.cursorvis = false
 }
 
+func (s *simscreen) SetCursorStyle(CursorStyle) {}
+
 func (s *simscreen) Show() {
 	s.Lock()
 	s.resize()
@@ -314,7 +316,7 @@ func (s *simscreen) draw() {
 	s.showCursor()
 }
 
-func (s *simscreen) EnableMouse() {
+func (s *simscreen) EnableMouse(...MouseFlags) {
 	s.mouse = true
 }
 
@@ -351,6 +353,26 @@ func (s *simscreen) Colors() int {
 	return 256
 }
 
+func (s *simscreen) ChannelEvents(ch chan<- Event, quit <-chan struct{}) {
+	defer close(ch)
+	for {
+		select {
+		case <-quit:
+			return
+		case <-s.quit:
+			return
+		case ev := <-s.evch:
+			select {
+			case <-quit:
+				return
+			case <-s.quit:
+				return
+			case ch <- ev:
+			}
+		}
+	}
+}
+
 func (s *simscreen) PollEvent() Event {
 	select {
 	case <-s.quit:
@@ -358,6 +380,10 @@ func (s *simscreen) PollEvent() Event {
 	case ev := <-s.evch:
 		return ev
 	}
+}
+
+func (s *simscreen) HasPendingEvent() bool {
+	return len(s.evch) > 0
 }
 
 func (s *simscreen) PostEventWait(ev Event) {
@@ -404,6 +430,7 @@ outer:
 			}
 			ev := NewEventKey(Key(b[0]), 0, mod)
 			s.PostEvent(ev)
+			b = b[1:]
 			continue
 		}
 
@@ -517,5 +544,13 @@ func (s *simscreen) HasKey(Key) bool {
 }
 
 func (s *simscreen) Beep() error {
+	return nil
+}
+
+func (s *simscreen) Suspend() error {
+	return nil
+}
+
+func (s *simscreen) Resume() error {
 	return nil
 }

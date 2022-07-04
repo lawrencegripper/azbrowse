@@ -30,7 +30,6 @@ func init() {
 		ExitAcs:      "\x0f",
 		EnableAcs:    "\x1b)0",
 		Mouse:        "\x1b[M",
-		MouseMode:    "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:    "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:  "\b",
 		CursorUp1:    "\x1b[A",
@@ -66,5 +65,7 @@ func init() {
 		KeyF19:       "\x1b[33~",
 		KeyF20:       "\x1b[34~",
 		KeyBacktab:   "\x1b[Z",
+		AutoMargin:   true,
+		InsertChar:   "\x1b[@",
 	})
 }

@@ -6,21 +6,26 @@ import (
 )
 
 // Java lexer.
-var Java = internal.Register(MustNewLexer(
+var Java = internal.Register(MustNewLazyLexer(
 	&Config{
 		Name:      "Java",
 		Aliases:   []string{"java"},
 		Filenames: []string{"*.java"},
 		MimeTypes: []string{"text/x-java"},
 		DotAll:    true,
+		EnsureNL:  true,
 	},
-	Rules{
+	javaRules,
+))
+
+func javaRules() Rules {
+	return Rules{
 		"root": {
 			{`[^\S\n]+`, Text, nil},
 			{`//.*?\n`, CommentSingle, nil},
 			{`/\*.*?\*/`, CommentMultiline, nil},
 			{`(assert|break|case|catch|continue|default|do|else|finally|for|if|goto|instanceof|new|return|switch|this|throw|try|while)\b`, Keyword, nil},
-			{`((?:(?:[^\W\d]|\$)[\w.\[\]$<>]*\s+)+?)((?:[^\W\d]|\$)[\w$]*)(\s*)`, ByGroups(UsingSelf("root"), NameFunction, Text, Operator), nil},
+			{`((?:(?:[^\W\d]|\$)[\w.\[\]$<>]*\s+)+?)((?:[^\W\d]|\$)[\w$]*)(\s*)(\()`, ByGroups(UsingSelf("root"), NameFunction, Text, Operator), nil},
 			{`@[^\W\d][\w.]*`, NameDecorator, nil},
 			{`(abstract|const|enum|extends|final|implements|native|private|protected|public|static|strictfp|super|synchronized|throws|transient|volatile)\b`, KeywordDeclaration, nil},
 			{`(boolean|byte|char|double|float|int|long|short|void)\b`, KeywordType, nil},
@@ -30,7 +35,7 @@ var Java = internal.Register(MustNewLexer(
 			{`(import(?:\s+static)?)(\s+)`, ByGroups(KeywordNamespace, Text), Push("import")},
 			{`"(\\\\|\\"|[^"])*"`, LiteralString, nil},
 			{`'\\.'|'[^\\]'|'\\u[0-9a-fA-F]{4}'`, LiteralStringChar, nil},
-			{`(\.)((?:[^\W\d]|\$)[\w$]*)`, ByGroups(Punctuation, NameAttribute), nil},
+			{`(\.)((?:[^\W\d]|\$)[\w$]*)`, ByGroups(Operator, NameAttribute), nil},
 			{`^\s*([^\W\d]|\$)[\w$]*:`, NameLabel, nil},
 			{`([^\W\d]|\$)[\w$]*`, Name, nil},
 			{`([0-9][0-9_]*\.([0-9][0-9_]*)?|\.[0-9][0-9_]*)([eE][+\-]?[0-9][0-9_]*)?[fFdD]?|[0-9][eE][+\-]?[0-9][0-9_]*[fFdD]?|[0-9]([eE][+\-]?[0-9][0-9_]*)?[fFdD]|0[xX]([0-9a-fA-F][0-9a-fA-F_]*\.?|([0-9a-fA-F][0-9a-fA-F_]*)?\.[0-9a-fA-F][0-9a-fA-F_]*)[pP][+\-]?[0-9][0-9_]*[fFdD]?`, LiteralNumberFloat, nil},
@@ -38,8 +43,7 @@ var Java = internal.Register(MustNewLexer(
 			{`0[bB][01][01_]*[lL]?`, LiteralNumberBin, nil},
 			{`0[0-7_]+[lL]?`, LiteralNumberOct, nil},
 			{`0|[1-9][0-9_]*[lL]?`, LiteralNumberInteger, nil},
-			{`[~^*!%&<>|+=:/?-]`, Operator, nil},
-			{`[\[\](){};,.]`, Punctuation, nil},
+			{`[~^*!%&\[\](){}<>|+=:;,./?-]`, Operator, nil},
 			{`\n`, Text, nil},
 		},
 		"class": {
@@ -48,5 +52,5 @@ var Java = internal.Register(MustNewLexer(
 		"import": {
 			{`[\w.]+\*?`, NameNamespace, Pop(1)},
 		},
-	},
-))
+	}
+}

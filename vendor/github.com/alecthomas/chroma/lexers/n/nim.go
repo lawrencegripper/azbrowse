@@ -6,7 +6,7 @@ import (
 )
 
 // Nim lexer.
-var Nim = internal.Register(MustNewLexer(
+var Nim = internal.Register(MustNewLazyLexer(
 	&Config{
 		Name:            "Nim",
 		Aliases:         []string{"nim", "nimrod"},
@@ -14,8 +14,13 @@ var Nim = internal.Register(MustNewLexer(
 		MimeTypes:       []string{"text/x-nim"},
 		CaseInsensitive: true,
 	},
-	Rules{
+	nimRules,
+))
+
+func nimRules() Rules {
+	return Rules{
 		"root": {
+			{`#\[[\s\S]*?\]#`, CommentMultiline, nil},
 			{`##.*$`, LiteralStringDoc, nil},
 			{`#.*$`, Comment, nil},
 			{`[*=><+\-/@$~&%!?|\\\[\]]`, Operator, nil},
@@ -88,5 +93,5 @@ var Nim = internal.Register(MustNewLexer(
 			{`\'i(8|16)`, LiteralNumberInteger, nil},
 			Default(Pop(1)),
 		},
-	},
-))
+	}
+}
