@@ -156,7 +156,7 @@ See the [docs](docs/README.md) for getting started guides, configuration docs, .
 sudo snap install snapcraft
 snapcraft login
 snapcraft export-login .snap.login
-cat .snap.login | base64
+base64 -w 0 .snap.login2
 ```
 
 Update the secret for actions on the repo with the base64 output.
