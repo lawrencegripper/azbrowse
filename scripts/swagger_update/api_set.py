@@ -118,7 +118,6 @@ def get_api_version_tag(resource_provider_name, readme_contents, overrides):
 
 code_block_end_regex = re.compile("^[\\s]*```[\\s]*$", flags=re.MULTILINE)
 def find_api_version(resource_provider_name, readme_contents, version_tag, input_file_additions):
-
     # Regex to match:   ```yaml $(tag) == 'the-version-tag`
     # Also match:       ```yaml $(tag) == 'the-version-tag` || $(tag) == 'some-other-tag'
     # But don't match   ```yaml $(tag) == 'the-version-tag' && $(another-condition)
@@ -131,6 +130,9 @@ def find_api_version(resource_provider_name, readme_contents, version_tag, input
         return None
 
     end_match = code_block_end_regex.search(readme_contents, start_match.end())
+    if end_match == None:
+        return None
+        
     yaml_contents = readme_contents[start_match.end() : end_match.start()]
 
     yaml_data = yaml.load(yaml_contents, Loader=yaml.BaseLoader)
