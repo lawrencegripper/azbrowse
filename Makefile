@@ -148,7 +148,7 @@ devcontainer:
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
-devcontainer-push:
+devcontainer-push: devcontainer
 	./scripts/docker_login.sh
 	docker push $(DEV_CONTAINER_TAG)
 	docker push $(DEV_CONTAINER_SNAPBASE_TAG)
@@ -185,7 +185,7 @@ endif
 		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
 		-e DOCKER_PASSWORD="${DOCKER_PASSWORD}" \
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
-		-e SNAPCRAFT_LOGIN="$(SNAPCRAFT_LOGIN)" \
+		-e SNAPCRAFT_STORE_CREDENTIALS="$(SNAPCRAFT_STORE_CREDENTIALS)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v ${HOME}/go/pkg/mod:/go/pkg/mod \
 		-v ${HOME}/.cache/go-build:/root/.cache/go-build \

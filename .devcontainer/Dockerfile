@@ -8,6 +8,7 @@ LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrows
 
 COPY --from=builder /snap/core /snap/core
 COPY --from=builder /snap/core18 /snap/core18
+COPY --from=builder /snap/core20 /snap/core20
 COPY --from=builder /snap/snapcraft /snap/snapcraft
 COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
 
@@ -29,11 +30,10 @@ ENV DEVCONTAINER="TRUE"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US:en"
 ENV LC_ALL="en_US.UTF-8"
-ENV PATH="/snap/bin:$PATH"
+ENV PATH="/snap/bin:/snap/snapcraft/current/usr/bin:$PATH"
 ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
-
 # Versions
 ENV DOCKER_VERSION=20.10.17
 ARG GO_PLS_VERSION=0.8.4
