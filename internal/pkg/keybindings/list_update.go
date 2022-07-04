@@ -101,10 +101,6 @@ func (h *ListUpdateHandler) Invoke() error {
 		fileExtension = ".yaml"
 		formattedContent = content // TODO: add YAML formatter
 
-	case interfaces.ResponseTerraform:
-		fileExtension = ".tf"
-		formattedContent = content // TODO: add Terraform formatter
-
 	case interfaces.ResponseXML:
 		fileExtension = ".xml"
 		formattedContent = xmlfmt.FormatXML(content, "", "  ")

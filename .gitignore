@@ -13,5 +13,3 @@ snap.login*
 __debug_bin
 .vscode/.ropeproject/config.py
 .vscode/.ropeproject/objectdb
-hack/.terraform
-hack/.terraform.lock.hcl

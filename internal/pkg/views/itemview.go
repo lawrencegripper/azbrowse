@@ -267,13 +267,6 @@ func (w *ItemWidget) SetContentWithNode(node *expanders.TreeNode, content string
 			w.content = buf.String()
 		}
 
-	case interfaces.ResponseTerraform:
-		var buf bytes.Buffer
-		err := quick.Highlight(&buf, w.content, "Terraform", "terminal", "azbrowse")
-		if err == nil {
-			w.content = buf.String()
-		}
-
 	case interfaces.ResponseXML:
 		formattedContent := strings.TrimSpace(xmlfmt.FormatXML(w.content, "", "  "))
 		formattedContent = strings.ReplaceAll(formattedContent, "\r", "")
