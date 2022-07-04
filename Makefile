@@ -153,7 +153,7 @@ devcontainer:
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
-devcontainer-push:
+devcontainer-push: devcontainer
 	./scripts/docker_login.sh
 	docker push $(DEV_CONTAINER_TAG)
 	docker push $(DEV_CONTAINER_SNAPBASE_TAG)
