@@ -7,7 +7,7 @@ GEM
       excon (>= 0.47.0)
       multi_json
     excon (0.81.0)
-    git (1.8.1)
+    git (1.11.0)
       rchardet (~> 1.8)
     kwalify (0.7.2)
     multi_json (1.15.0)
@@ -44,7 +44,7 @@ PLATFORMS
 DEPENDENCIES
   colorize
   docker-api
-  git (~> 1.8)
+  git (~> 1.11)
   reek
   rubocop
 
