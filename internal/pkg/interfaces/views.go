@@ -34,8 +34,6 @@ const (
 	ResponseYAML ExpanderResponseType = "YAML"
 	// ResponseXML indicates the response type can be parsed and colourised as XML
 	ResponseXML ExpanderResponseType = "XML"
-	// ResponseTerraform indicates the response type can be parsed and colourised as Terraform
-	ResponseTerraform ExpanderResponseType = "Terraform"
 )
 
 // ItemWidget provides an interface for the command panel widget to prevent circular references between views and expanders

@@ -19,7 +19,7 @@ help : Makefile
 
 ## test-go:
 ## 		Run short go unit tests
-test-go: terraform-hack-init
+test-go:
 	$(GO_BINARY) test -mod=vendor ./...
 
 ## test-python
@@ -85,11 +85,6 @@ fuzz-from: checks install
 ##		Build and install azbrowse on this machine
 install:
 	$(GO_BINARY) install -mod=vendor ./cmd/azbrowse
-
-## terraform-hack-init:
-##		Install terraform providers for tests
-terraform-hack-init:
-	./hack/init.sh
 
 ## ----------Advanced Targets------------
 ## docs-update:

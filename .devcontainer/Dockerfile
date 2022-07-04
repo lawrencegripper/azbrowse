@@ -35,7 +35,6 @@ ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
 # Versions
-ARG TERRAFORM_VERSION=1.0.0
 ENV DOCKER_VERSION=20.10.17
 ARG GO_PLS_VERSION=0.8.4
 ARG DLV_VERSION=1.8.3
@@ -92,13 +91,6 @@ RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
 
 # Install python deps for deving
 RUN pip3 install rope black
-
-RUN \
-    # Install Terraform
-    mkdir -p /tmp/docker-downloads \
-    && curl -sSL -o /tmp/docker-downloads/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
-    && unzip /tmp/docker-downloads/terraform.zip \
-    && mv terraform /usr/local/bin
 
 # Install ruby bunder gem to support inline gems in ruby scripts
 RUN gem install bundler
