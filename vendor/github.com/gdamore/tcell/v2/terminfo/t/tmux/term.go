@@ -38,7 +38,6 @@ func init() {
 		EnableAcs:     "\x1b(B\x1b)0",
 		StrikeThrough: "\x1b[9m",
 		Mouse:         "\x1b[M",
-		MouseMode:     "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:     "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:   "\b",
 		CursorUp1:     "\x1bM",
@@ -67,9 +66,8 @@ func init() {
 		KeyF12:        "\x1b[24~",
 		KeyBacktab:    "\x1b[Z",
 		Modifiers:     1,
+		AutoMargin:    true,
 	})
-
-	// tmux with 256 colors
 	terminfo.AddTerminfo(&terminfo.Terminfo{
 		Name:          "tmux-256color",
 		Columns:       80,
@@ -101,7 +99,6 @@ func init() {
 		EnableAcs:     "\x1b(B\x1b)0",
 		StrikeThrough: "\x1b[9m",
 		Mouse:         "\x1b[M",
-		MouseMode:     "%?%p1%{1}%=%t%'h'%Pa%e%'l'%Pa%;\x1b[?1000%ga%c\x1b[?1002%ga%c\x1b[?1003%ga%c\x1b[?1006%ga%c",
 		SetCursor:     "\x1b[%i%p1%d;%p2%dH",
 		CursorBack1:   "\b",
 		CursorUp1:     "\x1bM",
@@ -130,5 +127,6 @@ func init() {
 		KeyF12:        "\x1b[24~",
 		KeyBacktab:    "\x1b[Z",
 		Modifiers:     1,
+		AutoMargin:    true,
 	})
 }

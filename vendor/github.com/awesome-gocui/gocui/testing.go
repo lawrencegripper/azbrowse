@@ -46,11 +46,13 @@ func (g *Gui) GetTestingScreen() TestingScreen {
 // defer cleanup()
 //
 func (t *TestingScreen) StartGui() func() {
+	t.gui.testNotify = make(chan struct{})
 	go func() {
 		if err := t.gui.MainLoop(); err != nil && !errors.Is(err, ErrQuit) {
 			log.Panic(err)
 		}
 	}()
+	t.WaitSync()
 
 	t.started = true
 
@@ -76,6 +78,25 @@ func (t *TestingScreen) SendKey(key Key) {
 	t.screen.InjectKey(tcell.Key(key), rune(key), tcell.ModNone)
 }
 
+// SendsKeySync sends a key to gocui and wait until MainLoop process it.
+func (t *TestingScreen) SendKeySync(key Key) {
+	if !t.started {
+		panic("TestingScreen must be started using 'StartGui' before injecting keys")
+	}
+	t.screen.InjectKey(tcell.Key(key), rune(key), tcell.ModNone)
+	t.WaitSync()
+}
+
+// WaitSync sends time event to gocui and awaits notification that it was received.
+//
+// Notification is sent from gocui at the end of MainLoop, so after this function returns,
+// user has confirmation that all the keys sent to gocui before time event were processed.
+func (t *TestingScreen) WaitSync() {
+	ev := &tcell.EventTime{}
+	t.screen.PostEvent(ev)
+	<-t.gui.testNotify
+}
+
 // GetViewContent gets the current conent of a view from the simulated screen
 func (t *TestingScreen) GetViewContent(viewName string) (string, error) {
 	if !t.started {
@@ -83,7 +104,7 @@ func (t *TestingScreen) GetViewContent(viewName string) (string, error) {
 	}
 	view, err := t.gui.View(viewName)
 	if err != nil {
-		return "", fmt.Errorf("Failed to retreive view: %w", err)
+		return "", fmt.Errorf("failed to retreive view: %w", err)
 	}
 
 	x0, y0, x1, y1 := view.Dimensions()
@@ -114,7 +135,7 @@ func (t *TestingScreen) GetViewContent(viewName string) (string, error) {
 		// Get the content (without formatting) at that position
 		content, err := t.gui.Rune(Xcurrent, Ycurrent)
 		if err != nil {
-			return "", fmt.Errorf("Failed reading rune from simulation screen: %w", err)
+			return "", fmt.Errorf("failed reading rune from simulation screen: %w", err)
 		}
 		result.WriteRune(content)
 		Xcurrent++
@@ -136,21 +157,7 @@ func (t *TestingScreen) injectString(str string) {
 		s := i * 10
 		e := i*10 + 10
 		simulationScreen.InjectKeyBytes([]byte(str[s:e]))
-		for i := 0; i < 10; i++ {
-			// Trigger GoCUI to update with new input
-			// Todo: Is this necessary?
-			t.gui.Update(func(*Gui) error {
-				return nil
-			})
-		}
 	}
 
 	simulationScreen.InjectKeyBytes([]byte(str[len(str)-extra:]))
-	for i := 0; i < extra; i++ {
-		// Trigger GoCUI to update with new input
-		// Todo: Is this necessary?
-		t.gui.Update(func(*Gui) error {
-			return nil
-		})
-	}
 }

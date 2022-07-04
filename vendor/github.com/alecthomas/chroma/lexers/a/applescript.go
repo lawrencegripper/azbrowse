@@ -6,7 +6,7 @@ import (
 )
 
 // Applescript lexer.
-var Applescript = internal.Register(MustNewLexer(
+var Applescript = internal.Register(MustNewLazyLexer(
 	&Config{
 		Name:      "AppleScript",
 		Aliases:   []string{"applescript"},
@@ -14,7 +14,11 @@ var Applescript = internal.Register(MustNewLexer(
 		MimeTypes: []string{},
 		DotAll:    true,
 	},
-	Rules{
+	applescriptRules,
+))
+
+func applescriptRules() Rules {
+	return Rules{
 		"root": {
 			{`\s+`, Text, nil},
 			{`¬\n`, LiteralStringEscape, nil},
@@ -31,7 +35,7 @@ var Applescript = internal.Register(MustNewLexer(
 			{`\b(as )(alias |application |boolean |class |constant |date |file |integer |list |number |POSIX file |real |record |reference |RGB color |script |text |unit types|(?:Unicode )?text|string)\b`, ByGroups(Keyword, NameClass), nil},
 			{`\b(AppleScript|current application|false|linefeed|missing value|pi|quote|result|return|space|tab|text item delimiters|true|version)\b`, NameConstant, nil},
 			{`\b(ASCII (character|number)|activate|beep|choose URL|choose application|choose color|choose file( name)?|choose folder|choose from list|choose remote application|clipboard info|close( access)?|copy|count|current date|delay|delete|display (alert|dialog)|do shell script|duplicate|exists|get eof|get volume settings|info for|launch|list (disks|folder)|load script|log|make|mount volume|new|offset|open( (for access|location))?|path to|print|quit|random number|read|round|run( script)?|say|scripting components|set (eof|the clipboard to|volume)|store script|summarize|system attribute|system info|the clipboard|time to GMT|write|quoted form)\b`, NameBuiltin, nil},
-			{`\b(considering|else|error|exit|from|if|ignoring|in|repeat|tell|then|times|to|try|until|using terms from|while|whith|with timeout( of)?|with transaction|by|continue|end|its?|me|my|return|of|as)\b`, Keyword, nil},
+			{`\b(considering|else|error|exit|from|if|ignoring|in|repeat|tell|then|times|to|try|until|using terms from|while|with|with timeout( of)?|with transaction|by|continue|end|its?|me|my|return|of|as)\b`, Keyword, nil},
 			{`\b(global|local|prop(erty)?|set|get)\b`, Keyword, nil},
 			{`\b(but|put|returning|the)\b`, NameBuiltin, nil},
 			{`\b(attachment|attribute run|character|day|month|paragraph|word|year)s?\b`, NameBuiltin, nil},
@@ -51,5 +55,5 @@ var Applescript = internal.Register(MustNewLexer(
 			{`[^*(]+`, CommentMultiline, nil},
 			{`[*(]`, CommentMultiline, nil},
 		},
-	},
-))
+	}
+}

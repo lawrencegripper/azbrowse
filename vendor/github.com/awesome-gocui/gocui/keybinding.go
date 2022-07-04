@@ -154,6 +154,7 @@ var translate = map[string]Key{
 	"Backspace":      KeyBackspace,
 	"CtrlH":          KeyCtrlH,
 	"Tab":            KeyTab,
+	"Backtab":        KeyBacktab,
 	"CtrlI":          KeyCtrlI,
 	"CtrlJ":          KeyCtrlJ,
 	"CtrlK":          KeyCtrlK,
@@ -235,6 +236,7 @@ const (
 	KeyBackspace      = Key(tcell.KeyBackspace)
 	KeyCtrlH          = Key(tcell.KeyCtrlH)
 	KeyTab            = Key(tcell.KeyTab)
+	KeyBacktab        = Key(tcell.KeyBacktab)
 	KeyCtrlI          = Key(tcell.KeyCtrlI)
 	KeyCtrlJ          = Key(tcell.KeyCtrlJ)
 	KeyCtrlK          = Key(tcell.KeyCtrlK)
@@ -288,6 +290,10 @@ const (
 const (
 	ModNone Modifier = Modifier(0)
 	ModAlt           = Modifier(tcell.ModAlt)
-	// ModCtrl doesn't work with keyboard keys. Use CtrlKey in Key and ModNone. This is was for mouse clicks only (tcell.v1)
-	// ModCtrl = Modifier(tcell.ModCtrl)
+
+	// ModShift only makes sense on keys that are not characters like the
+	// arrow keys and any mouse keys
+	// Character keys will instead be triggerd as their translated variant.
+	ModShift     = Modifier(tcell.ModShift)
+	ModMouseCtrl = Modifier(tcell.ModCtrl)
 )

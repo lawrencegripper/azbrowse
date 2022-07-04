@@ -304,42 +304,44 @@ func (w *ItemWidget) SetShouldRender(val bool) {
 }
 
 func configureYAMLHighlighting() {
-	lexer := chroma.MustNewLexer(
+	lexer := chroma.MustNewLazyLexer(
 		&chroma.Config{
 			Name:      "YAML-azbrowse",
 			Aliases:   []string{"yaml"},
 			Filenames: []string{"*.yaml", "*.yml"},
 			MimeTypes: []string{"text/x-yaml"},
 		},
-		chroma.Rules{
-			"root": {
-				chroma.Include("whitespace"),
-				{Pattern: `#.*`, Type: chroma.Comment, Mutator: nil},
-				{Pattern: `!![^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
-				{Pattern: `&[^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
-				{Pattern: `\*[^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
-				{Pattern: `^%include\s+[^\n\r]+`, Type: chroma.CommentPreproc, Mutator: nil},
-				{Pattern: `([>|+-]\s+)(\s+)((?:(?:.*?$)(?:[\n\r]*?)?)*)`, Type: chroma.ByGroups(chroma.StringDoc, chroma.StringDoc, chroma.StringDoc), Mutator: nil},
-				chroma.Include("value"),
-				{Pattern: `[?:,\[\]]`, Type: chroma.Punctuation, Mutator: nil},
-				{Pattern: `.`, Type: chroma.Text, Mutator: nil},
-			},
-			"value": {
-				{Pattern: chroma.Words(``, `\b`, "true", "false", "null"), Type: chroma.KeywordConstant, Mutator: nil},
-				{Pattern: `"(?:\\.|[^"])*"`, Type: chroma.StringDouble, Mutator: nil},
-				{Pattern: `'(?:\\.|[^'])*'`, Type: chroma.StringSingle, Mutator: nil},
-				{Pattern: `\d\d\d\d-\d\d-\d\d([T ]\d\d:\d\d:\d\d(\.\d+)?(Z|\s+[-+]\d+)?)?`, Type: chroma.LiteralDate, Mutator: nil},
-				{Pattern: `\b[+\-]?(0x[\da-f]+|0o[0-7]+|(\d+\.?\d*|\.?\d+)(e[\+\-]?\d+)?|\.inf|\.nan)\b`, Type: chroma.Number, Mutator: nil},
-				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(\d+\.?\d*|\.?\d+)(\s)`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.Number, chroma.Whitespace), Mutator: nil},
-				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(true)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), Mutator: nil},
-				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(false)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), Mutator: nil},
-				{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)([\w\./\-_]+)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.StringDouble), Mutator: nil},
-				// {Pattern: `\b(?:[\w]+)(?:[:\b]+)(?:[\w+])\b`, Type: ByGroups(KeywordReserved, Punctuation, StringDouble), Mutator: nil},
-				{Pattern: `\b[\w]+\b`, Type: chroma.Text, Mutator: nil},
-			},
-			"whitespace": {
-				{Pattern: `\s+`, Type: chroma.Whitespace, Mutator: nil},
-			},
+		func() chroma.Rules {
+			return chroma.Rules{
+				"root": {
+					chroma.Include("whitespace"),
+					{Pattern: `#.*`, Type: chroma.Comment, Mutator: nil},
+					{Pattern: `!![^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
+					{Pattern: `&[^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
+					{Pattern: `\*[^\s]+`, Type: chroma.CommentPreproc, Mutator: nil},
+					{Pattern: `^%include\s+[^\n\r]+`, Type: chroma.CommentPreproc, Mutator: nil},
+					{Pattern: `([>|+-]\s+)(\s+)((?:(?:.*?$)(?:[\n\r]*?)?)*)`, Type: chroma.ByGroups(chroma.StringDoc, chroma.StringDoc, chroma.StringDoc), Mutator: nil},
+					chroma.Include("value"),
+					{Pattern: `[?:,\[\]]`, Type: chroma.Punctuation, Mutator: nil},
+					{Pattern: `.`, Type: chroma.Text, Mutator: nil},
+				},
+				"value": {
+					{Pattern: chroma.Words(``, `\b`, "true", "false", "null"), Type: chroma.KeywordConstant, Mutator: nil},
+					{Pattern: `"(?:\\.|[^"])*"`, Type: chroma.StringDouble, Mutator: nil},
+					{Pattern: `'(?:\\.|[^'])*'`, Type: chroma.StringSingle, Mutator: nil},
+					{Pattern: `\d\d\d\d-\d\d-\d\d([T ]\d\d:\d\d:\d\d(\.\d+)?(Z|\s+[-+]\d+)?)?`, Type: chroma.LiteralDate, Mutator: nil},
+					{Pattern: `\b[+\-]?(0x[\da-f]+|0o[0-7]+|(\d+\.?\d*|\.?\d+)(e[\+\-]?\d+)?|\.inf|\.nan)\b`, Type: chroma.Number, Mutator: nil},
+					{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(\d+\.?\d*|\.?\d+)(\s)`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.Number, chroma.Whitespace), Mutator: nil},
+					{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(true)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), Mutator: nil},
+					{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)(false)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.LiteralStringBoolean), Mutator: nil},
+					{Pattern: `\b([\w]+)([ \t]*)([:]+)([ \t]*)([\w\./\-_]+)\b`, Type: chroma.ByGroups(chroma.Text, chroma.Whitespace, chroma.Punctuation, chroma.Whitespace, chroma.StringDouble), Mutator: nil},
+					// {Pattern: `\b(?:[\w]+)(?:[:\b]+)(?:[\w+])\b`, Type: ByGroups(KeywordReserved, Punctuation, StringDouble), Mutator: nil},
+					{Pattern: `\b[\w]+\b`, Type: chroma.Text, Mutator: nil},
+				},
+				"whitespace": {
+					{Pattern: `\s+`, Type: chroma.Whitespace, Mutator: nil},
+				},
+			}
 		},
 	)
 

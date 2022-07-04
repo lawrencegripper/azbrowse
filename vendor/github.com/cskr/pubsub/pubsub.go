@@ -1,6 +1,6 @@
 // Copyright 2013, Chandra Sekar S.  All rights reserved.
 // Use of this source code is governed by a BSD-style
-// license that can be found in the README.md file.
+// license that can be found in the LICENSE file.
 
 // Package pubsub implements a simple multi-topic pub-sub
 // library.
@@ -15,6 +15,7 @@ type operation int
 const (
 	sub operation = iota
 	subOnce
+	subOnceEach
 	pub
 	tryPub
 	unsub
@@ -56,6 +57,12 @@ func (ps *PubSub) SubOnce(topics ...string) chan interface{} {
 	return ps.sub(subOnce, topics...)
 }
 
+// SubOnceEach returns a channel on which callers receive, at most, one message
+// for each topic.
+func (ps *PubSub) SubOnceEach(topics ...string) chan interface{} {
+	return ps.sub(subOnceEach, topics...)
+}
+
 func (ps *PubSub) sub(op operation, topics ...string) chan interface{} {
 	ch := make(chan interface{}, ps.capacity)
 	ps.cmdChan <- cmd{op: op, topics: topics, ch: ch}
@@ -65,6 +72,12 @@ func (ps *PubSub) sub(op operation, topics ...string) chan interface{} {
 // AddSub adds subscriptions to an existing channel.
 func (ps *PubSub) AddSub(ch chan interface{}, topics ...string) {
 	ps.cmdChan <- cmd{op: sub, topics: topics, ch: ch}
+}
+
+// AddSubOnceEach adds subscriptions to an existing channel with SubOnceEach
+// behavior.
+func (ps *PubSub) AddSubOnceEach(ch chan interface{}, topics ...string) {
+	ps.cmdChan <- cmd{op: subOnceEach, topics: topics, ch: ch}
 }
 
 // Pub publishes the given message to all subscribers of
@@ -82,6 +95,10 @@ func (ps *PubSub) TryPub(msg interface{}, topics ...string) {
 // Unsub unsubscribes the given channel from the specified
 // topics. If no topic is specified, it is unsubscribed
 // from all topics.
+//
+// Unsub must be called from a goroutine that is different from the subscriber.
+// The subscriber must consume messages from the channel until it reaches the
+// end. Not doing so can result in a deadlock.
 func (ps *PubSub) Unsub(ch chan interface{}, topics ...string) {
 	if len(topics) == 0 {
 		ps.cmdChan <- cmd{op: unsubAll, ch: ch}
@@ -105,7 +122,7 @@ func (ps *PubSub) Shutdown() {
 
 func (ps *PubSub) start() {
 	reg := registry{
-		topics:    make(map[string]map[chan interface{}]bool),
+		topics:    make(map[string]map[chan interface{}]subType),
 		revTopics: make(map[chan interface{}]map[string]bool),
 	}
 
@@ -126,10 +143,13 @@ loop:
 		for _, topic := range cmd.topics {
 			switch cmd.op {
 			case sub:
-				reg.add(topic, cmd.ch, false)
+				reg.add(topic, cmd.ch, normal)
 
 			case subOnce:
-				reg.add(topic, cmd.ch, true)
+				reg.add(topic, cmd.ch, onceAny)
+
+			case subOnceEach:
+				reg.add(topic, cmd.ch, onceEach)
 
 			case tryPub:
 				reg.sendNoWait(topic, cmd.msg)
@@ -156,15 +176,23 @@ loop:
 // registry maintains the current subscription state. It's not
 // safe to access a registry from multiple goroutines simultaneously.
 type registry struct {
-	topics    map[string]map[chan interface{}]bool
+	topics    map[string]map[chan interface{}]subType
 	revTopics map[chan interface{}]map[string]bool
 }
 
-func (reg *registry) add(topic string, ch chan interface{}, once bool) {
+type subType int
+
+const (
+	onceAny subType = iota
+	onceEach
+	normal
+)
+
+func (reg *registry) add(topic string, ch chan interface{}, st subType) {
 	if reg.topics[topic] == nil {
-		reg.topics[topic] = make(map[chan interface{}]bool)
+		reg.topics[topic] = make(map[chan interface{}]subType)
 	}
-	reg.topics[topic][ch] = once
+	reg.topics[topic][ch] = st
 
 	if reg.revTopics[ch] == nil {
 		reg.revTopics[ch] = make(map[string]bool)
@@ -173,24 +201,30 @@ func (reg *registry) add(topic string, ch chan interface{}, once bool) {
 }
 
 func (reg *registry) send(topic string, msg interface{}) {
-	for ch, once := range reg.topics[topic] {
+	for ch, st := range reg.topics[topic] {
 		ch <- msg
-		if once {
+		switch st {
+		case onceAny:
 			for topic := range reg.revTopics[ch] {
 				reg.remove(topic, ch)
 			}
+		case onceEach:
+			reg.remove(topic, ch)
 		}
 	}
 }
 
 func (reg *registry) sendNoWait(topic string, msg interface{}) {
-	for ch, once := range reg.topics[topic] {
+	for ch, st := range reg.topics[topic] {
 		select {
 		case ch <- msg:
-			if once {
+			switch st {
+			case onceAny:
 				for topic := range reg.revTopics[ch] {
 					reg.remove(topic, ch)
 				}
+			case onceEach:
+				reg.remove(topic, ch)
 			}
 		default:
 		}

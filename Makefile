@@ -98,8 +98,7 @@ swagger-update: swagger-update-requirements
 	python3 ./scripts/swagger_update/app.py
 	
 swagger-update-requirements:
-	pip3 install -q -r scripts/swagger_update/requirements.txt 
-
+	pip3 install -q -r scripts/swagger_update/requirements.txt
 ## swagger-codegen:
 ##		Generate the code needed for browse services from the swagger definitions
 ##		set VERBOSE=true to see full output

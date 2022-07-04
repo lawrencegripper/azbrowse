@@ -6,7 +6,7 @@ import (
 )
 
 // CPP lexer.
-var CPP = internal.Register(MustNewLexer(
+var CPP = internal.Register(MustNewLazyLexer(
 	&Config{
 		Name:      "C++",
 		Aliases:   []string{"cpp", "c++"},
@@ -14,7 +14,11 @@ var CPP = internal.Register(MustNewLexer(
 		MimeTypes: []string{"text/x-c++hdr", "text/x-c++src"},
 		EnsureNL:  true,
 	},
-	Rules{
+	cppRules,
+))
+
+func cppRules() Rules {
+	return Rules{
 		"statements": {
 			{Words(``, `\b`, `catch`, `const_cast`, `delete`, `dynamic_cast`, `explicit`, `export`, `friend`, `mutable`, `namespace`, `new`, `operator`, `private`, `protected`, `public`, `reinterpret_cast`, `restrict`, `static_cast`, `template`, `this`, `throw`, `throws`, `try`, `typeid`, `typename`, `using`, `virtual`, `constexpr`, `nullptr`, `decltype`, `thread_local`, `alignas`, `alignof`, `static_assert`, `noexcept`, `override`, `final`, `concept`, `requires`, `consteval`, `co_await`, `co_return`, `co_yield`), Keyword, nil},
 			{`(enum)\b(\s+)(class)\b(\s*)`, ByGroups(Keyword, Text, Keyword, Text), Push("classname")},
@@ -24,7 +28,8 @@ var CPP = internal.Register(MustNewLexer(
 			{`(u8|u|U)(")`, ByGroups(LiteralStringAffix, LiteralString), Push("string")},
 			{`(L?)(")`, ByGroups(LiteralStringAffix, LiteralString), Push("string")},
 			{`(L?)(')(\\.|\\[0-7]{1,3}|\\x[a-fA-F0-9]{1,2}|[^\\\'\n])(')`, ByGroups(LiteralStringAffix, LiteralStringChar, LiteralStringChar, LiteralStringChar), nil},
-			{`(\.([0-9](?:'?[0-9]+)*)([eE][+-]?([0-9]('?[0-9]+)*))?|([0-9]('?[0-9]+)*)(([eE][+-]?([0-9]('?[0-9]+)*))|\.([0-9]('?[0-9]+)*)?([eE][+-]?([0-9]('?[0-9]+)*))?)|0[xX](\.([0-9A-Fa-f]('?[0-9A-Fa-f]+)*)([pP][-+]?([0-9]('?[0-9]+)*))?|([0-9A-Fa-f]('?[0-9A-Fa-f]+)*)(([pP][-+]?([0-9]('?[0-9]+)*))|\.([0-9A-Fa-f]('?[0-9A-Fa-f]+)*)?([pP][-+]?([0-9]('?[0-9]+)*))?)))[fFLlUu]*`, LiteralNumberFloat, nil},
+			{`(\d+\.\d*|\.\d+|\d+)[eE][+-]?\d+[LlUu]*`, LiteralNumberFloat, nil},
+			{`(\d+\.\d*|\.\d+|\d+[fF])[fF]?`, LiteralNumberFloat, nil},
 			{`0[xX]([0-9A-Fa-f]('?[0-9A-Fa-f]+)*)[LlUu]*`, LiteralNumberHex, nil},
 			{`0('?[0-7]+)+[LlUu]*`, LiteralNumberOct, nil},
 			{`0[Bb][01]('?[01]+)*[LlUu]*`, LiteralNumberBin, nil},
@@ -101,5 +106,5 @@ var CPP = internal.Register(MustNewLexer(
 			{`^\s*#endif.*?(?<!\\)\n`, CommentPreproc, Pop(1)},
 			{`.*?\n`, Comment, nil},
 		},
-	},
-))
+	}
+}
