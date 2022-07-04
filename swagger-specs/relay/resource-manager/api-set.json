@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Relay/stable/2017-04-01/relay.json"], "name": "package-2017-04"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Relay/stable/2021-11-01/authorizationRules.json", "Microsoft.Relay/stable/2021-11-01/hybridConnections.json", "Microsoft.Relay/stable/2021-11-01/Namespaces.json", "Microsoft.Relay/stable/2021-11-01/NetworkRuleSets.json", "Microsoft.Relay/stable/2021-11-01/operations.json", "Microsoft.Relay/stable/2021-11-01/wcfRelays.json"], "name": "package-2021-11"}

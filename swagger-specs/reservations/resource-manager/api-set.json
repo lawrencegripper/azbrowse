@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Capacity/stable/2021-07-01/reservations.json", "Microsoft.Capacity/stable/2020-10-25/quota.json"], "name": "package-2021-07-01"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Capacity/stable/2022-03-01/reservations.json", "Microsoft.Capacity/stable/2020-10-25/quota.json"], "name": "package-2022-03"}
