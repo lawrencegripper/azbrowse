@@ -3,11 +3,12 @@ FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
-FROM golang:1.17-bullseye
+FROM golang:1.18-bullseye
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 COPY --from=builder /snap/core /snap/core
 COPY --from=builder /snap/core18 /snap/core18
+COPY --from=builder /snap/core20 /snap/core20
 COPY --from=builder /snap/snapcraft /snap/snapcraft
 COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
 
@@ -29,18 +30,16 @@ ENV DEVCONTAINER="TRUE"
 ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US:en"
 ENV LC_ALL="en_US.UTF-8"
-ENV PATH="/snap/bin:$PATH"
+ENV PATH="/snap/bin:/snap/snapcraft/current/usr/bin:$PATH"
 ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
-
 # Versions
-ARG TERRAFORM_VERSION=1.0.0
-ENV DOCKER_VERSION=20.10.7
-ARG GO_PLS_VERSION=0.7.2
-ARG DLV_VERSION=1.7.2
-ARG GO_RELEASER_VERSION=1.1.0
-ARG GOLANGCI_LINT_VERSION=1.42.1
+ENV DOCKER_VERSION=20.10.17
+ARG GO_PLS_VERSION=0.8.4
+ARG DLV_VERSION=1.8.3
+ARG GO_RELEASER_VERSION=1.9.2
+ARG GOLANGCI_LINT_VERSION=1.46.2
 
 RUN \
     apt-get update \
@@ -87,32 +86,11 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${
                  -C /usr/local/bin docker/docker \
   && rm docker-${DOCKER_VERSION}.tgz
 
-# Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
-RUN \
-    # --> Delve for debugging
-    go get github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
-    # --> Go language server
-    && go get golang.org/x/tools/gopls@v${GO_PLS_VERSION} \
-    # --> Go symbols and outline for go to symbol support and test support 
-    && go get github.com/acroca/go-symbols@v0.1.1 && go get github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
-    # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
-    # --> Go releaser 
-    && curl -sfL https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh -s -- v${GO_RELEASER_VERSION} \
-    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
-
 # Install autocompletion for azbrowse
 RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
 
 # Install python deps for deving
 RUN pip3 install rope black
-
-RUN \
-    # Install Terraform
-    mkdir -p /tmp/docker-downloads \
-    && curl -sSL -o /tmp/docker-downloads/terraform.zip https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip \
-    && unzip /tmp/docker-downloads/terraform.zip \
-    && mv terraform /usr/local/bin
 
 # Install ruby bunder gem to support inline gems in ruby scripts
 RUN gem install bundler
@@ -120,3 +98,17 @@ RUN gem install bundler
 # azure-cli-no-mount
 COPY scripts/azure-cli.sh /tmp/
 RUN /tmp/azure-cli.sh
+
+# Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
+RUN \
+    # --> Delve for debugging
+    go install github.com/go-delve/delve/cmd/dlv@v${DLV_VERSION}\
+    # --> Go language server
+    && go install golang.org/x/tools/gopls@v${GO_PLS_VERSION} \
+    # --> Go symbols and outline for go to symbol support and test support 
+    && go install github.com/acroca/go-symbols@v0.1.1 && go install github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
+    # --> GolangCI-lint
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
+    # --> Go releaser 
+    && go install github.com/goreleaser/goreleaser@v${GO_RELEASER_VERSION} \
+    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**

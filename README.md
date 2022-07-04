@@ -150,3 +150,13 @@ See the [docs](docs/README.md) for getting started guides, configuration docs, .
 [golangdep]: https://github.com/golang/dep
 [gopath]: https://golang.org/doc/code.html#GOPATH
 
+## Updating Snap login for goreleaser
+
+```
+sudo snap install snapcraft
+snapcraft login
+snapcraft export-login .snap.login
+cat .snap.login
+```
+
+Update the `SNAPCRAFT_STORE_CREDENTIALS` secret for actions on the repo with the content of `.snap.login`

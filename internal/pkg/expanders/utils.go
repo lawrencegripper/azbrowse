@@ -1,6 +1,8 @@
 package expanders
 
 import (
+	"encoding/json"
+
 	"github.com/valyala/fastjson"
 
 	"strings"
@@ -47,4 +49,33 @@ func DrawStatus(s string) string {
 
 func getNamespaceFromARMType(s string) string {
 	return strings.Split(s, "/")[0]
+}
+
+func getJSONProperty(jsonData interface{}, properties ...string) (interface{}, error) {
+	switch jsonData := jsonData.(type) {
+	case map[string]interface{}:
+		jsonMap := jsonData
+		name := properties[0]
+		jsonSubtree, ok := jsonMap[name]
+		if ok {
+			if len(properties) == 1 {
+				return jsonSubtree, nil
+			}
+			return getJSONProperty(jsonSubtree, properties[1:]...)
+		} else {
+			return nil, nil // TODO - error if not found?
+		}
+	default:
+		return nil, nil // TODO - error if not able to walk the tree?
+	}
+}
+
+func getJSONPropertyFromString(jsonString string, properties ...string) (interface{}, error) {
+	var jsonData map[string]interface{}
+
+	if err := json.Unmarshal([]byte(jsonString), &jsonData); err != nil {
+		return nil, err
+	}
+
+	return getJSONProperty(jsonData, properties...)
 }

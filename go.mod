@@ -1,6 +1,6 @@
 module github.com/lawrencegripper/azbrowse
 
-go 1.17
+go 1.18
 
 require (
 	github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3 // indirect
@@ -16,11 +16,6 @@ require (
 	github.com/go-openapi/spec v0.20.3
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20191208150333-d5b6f63a941b
 	github.com/guptarohit/asciigraph v0.4.2-0.20190112130928-1bc9b2452856
-	github.com/hashicorp/go-hclog v0.15.0
-	github.com/hashicorp/go-plugin v1.4.0
-	github.com/hashicorp/hcl/v2 v2.9.1
-	github.com/hashicorp/terraform v0.13.7
-	github.com/hashicorp/terraform-exec v0.13.3
 	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe // indirect
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
 	github.com/opentracing/basictracer-go v1.0.0 // indirect

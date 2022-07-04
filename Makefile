@@ -19,7 +19,7 @@ help : Makefile
 
 ## test-go:
 ## 		Run short go unit tests
-test-go: terraform-hack-init
+test-go:
 	$(GO_BINARY) test -mod=vendor ./...
 
 ## test-python
@@ -86,11 +86,6 @@ fuzz-from: checks install
 install:
 	$(GO_BINARY) install -mod=vendor ./cmd/azbrowse
 
-## terraform-hack-init:
-##		Install terraform providers for tests
-terraform-hack-init:
-	./hack/init.sh
-
 ## ----------Advanced Targets------------
 ## docs-update:
 ##		Generate the docs for the command line
@@ -153,7 +148,7 @@ devcontainer:
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
-devcontainer-push:
+devcontainer-push: devcontainer
 	./scripts/docker_login.sh
 	docker push $(DEV_CONTAINER_TAG)
 	docker push $(DEV_CONTAINER_SNAPBASE_TAG)
@@ -190,7 +185,7 @@ endif
 		-e DOCKER_USERNAME="${DOCKER_USERNAME}" \
 		-e DOCKER_PASSWORD="${DOCKER_PASSWORD}" \
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
-		-e SNAPCRAFT_LOGIN="$(SNAPCRAFT_LOGIN)" \
+		-e SNAPCRAFT_STORE_CREDENTIALS="$(SNAPCRAFT_STORE_CREDENTIALS)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v ${HOME}/go/pkg/mod:/go/pkg/mod \
 		-v ${HOME}/.cache/go-build:/root/.cache/go-build \
