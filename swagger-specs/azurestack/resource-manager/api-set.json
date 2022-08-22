@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.AzureStack/stable/2016-01-01/AzureStack.json", "Microsoft.AzureStack/stable/2016-01-01/Product.json", "Microsoft.AzureStack/stable/2016-01-01/Registration.json"], "name": "package-2016-01"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.AzureStack/stable/2022-06-01/AzureStack.json", "Microsoft.AzureStack/stable/2022-06-01/CustomerSubscription.json", "Microsoft.AzureStack/stable/2022-06-01/Product.json", "Microsoft.AzureStack/stable/2022-06-01/Registration.json"], "name": "package-2022-06"}
