@@ -3,7 +3,7 @@
   "info": {
     "title": "ContainerServiceClient",
     "description": "The Container Service Client.",
-    "version": "2022-06-01"
+    "version": "2022-07-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -326,7 +326,7 @@
         },
         "x-ms-examples": {
           "Get Managed Cluster": {
-            "$ref": "./examples/ManagedClustersListClusterCredentialResult.json"
+            "$ref": "./examples/ManagedClustersListClusterAdminCredentials.json"
           }
         }
       }
@@ -374,7 +374,7 @@
         },
         "x-ms-examples": {
           "Get Managed Cluster": {
-            "$ref": "./examples/ManagedClustersListClusterCredentialResult.json"
+            "$ref": "./examples/ManagedClustersListClusterUserCredentials.json"
           }
         }
       }
@@ -419,7 +419,7 @@
         },
         "x-ms-examples": {
           "Get Managed Cluster": {
-            "$ref": "./examples/ManagedClustersListClusterCredentialResult.json"
+            "$ref": "./examples/ManagedClustersListClusterMonitoringUserCredentials.json"
           }
         }
       }
@@ -554,6 +554,9 @@
           },
           "Create Managed Cluster with Node Public IP Prefix": {
             "$ref": "./examples/ManagedClustersCreate_NodePublicIPPrefix.json"
+          },
+          "Create Managed Cluster with Azure KeyVault Secrets Provider Addon": {
+            "$ref": "./examples/ManagedClustersCreate_AzureKeyvaultSecretsProvider.json"
           },
           "Create Managed Cluster with FIPS enabled OS": {
             "$ref": "./examples/ManagedClustersCreate_EnabledFIPS.json"
@@ -1041,6 +1044,9 @@
           "Create Agent Pool with OSSKU": {
             "$ref": "./examples/AgentPoolsCreate_OSSKU.json"
           },
+          "Create Agent Pool with Windows OSSKU": {
+            "$ref": "./examples/AgentPoolsCreate_WindowsOSSKU.json"
+          },
           "Create Agent Pool with GPUMIG": {
             "$ref": "./examples/AgentPoolsCreate_GPUMIG.json"
           },
@@ -1201,6 +1207,12 @@
             "description": "OK",
             "schema": {
               "$ref": "#/definitions/AgentPoolAvailableVersions"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -4643,13 +4655,15 @@
       "type": "string",
       "enum": [
         "Ubuntu",
-        "CBLMariner"
+        "CBLMariner",
+        "Windows2019",
+        "Windows2022"
       ],
       "x-ms-enum": {
         "name": "OSSKU",
         "modelAsString": true
       },
-      "description": "Specifies an OS SKU. This value must not be specified if OSType is Windows."
+      "description": "Specifies the OS SKU used by the agent pool. The default is Ubuntu if OSType is Linux. The default is Windows2019 when Kubernetes <= 1.24 or Windows2022 when Kubernetes >= 1.25 if OSType is Windows."
     },
     "ScaleSetPriority": {
       "type": "string",
