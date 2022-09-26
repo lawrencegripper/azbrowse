@@ -3,7 +3,7 @@
   "info": {
     "title": "CognitiveServicesManagementClient",
     "description": "Cognitive Services Management Client",
-    "version": "2022-03-01"
+    "version": "2022-10-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -416,7 +416,7 @@
         "operationId": "DeletedAccounts_List",
         "x-ms-examples": {
           "List Deleted Accounts by Subscription": {
-            "$ref": "./examples/ListAccountsBySubscription.json"
+            "$ref": "./examples/ListDeletedAccountsBySubscription.json"
           }
         },
         "parameters": [
@@ -2730,6 +2730,22 @@
         "scaleSettings": {
           "type": "object",
           "$ref": "#/definitions/DeploymentScaleSettings"
+        },
+        "capabilities": {
+          "readOnly": true,
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "The capabilities."
+        },
+        "raiPolicyName": {
+          "type": "string",
+          "description": "The name of RAI policy."
+        },
+        "callRateLimit": {
+          "readOnly": true,
+          "$ref": "#/definitions/CallRateLimit"
         }
       },
       "description": "Properties of Cognitive Services account deployment."
@@ -2748,6 +2764,10 @@
         "version": {
           "type": "string",
           "description": "Deployment model version."
+        },
+        "callRateLimit": {
+          "readOnly": true,
+          "$ref": "#/definitions/CallRateLimit"
         }
       },
       "description": "Properties of Cognitive Services account deployment model."
