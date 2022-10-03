@@ -3,7 +3,7 @@
   "info": {
     "title": "Azure Machine Learning Workspaces",
     "description": "These APIs allow end users to operate on Azure Machine Learning Workspace resources.",
-    "version": "2022-05-01"
+    "version": "2022-10-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -821,6 +821,9 @@
           },
           "Create an ComputeInstance Compute": {
             "$ref": "./examples/Compute/createOrUpdate/ComputeInstance.json"
+          },
+          "Create an ComputeInstance Compute with Schedules": {
+            "$ref": "./examples/Compute/createOrUpdate/ComputeInstanceWithSchedules.json"
           },
           "Create an AKS Compute": {
             "$ref": "./examples/Compute/createOrUpdate/BasicAKSCompute.json"
@@ -4839,11 +4842,13 @@
       "description": "Compute start stop schedule properties",
       "properties": {
         "id": {
-          "description": "Schedule id.",
-          "readOnly": true,
-          "type": "string"
+          "description": "A system assigned id for the schedule.",
+          "type": "string",
+          "x-nullable": true,
+          "readOnly": true
         },
         "provisioningStatus": {
+          "description": "The current deployment state of schedule.",
           "type": "string",
           "enum": [
             "Completed",
@@ -4852,15 +4857,42 @@
           ],
           "x-ms-enum": {
             "name": "provisioningStatus",
-            "modelAsString": true
+            "modelAsString": true,
+            "values": [
+              {
+                "value": "Completed"
+              },
+              {
+                "value": "Provisioning"
+              },
+              {
+                "value": "Failed"
+              }
+            ]
           },
-          "readOnly": true,
-          "description": "The current deployment state of schedule."
+          "readOnly": true
+        },
+        "status": {
+          "$ref": "#/definitions/ScheduleStatus"
         },
         "action": {
+          "description": "[Required] The compute power action.",
           "$ref": "#/definitions/ComputePowerAction"
         },
+        "triggerType": {
+          "description": "[Required] The schedule trigger type.",
+          "$ref": "./mfe.json#/definitions/TriggerType"
+        },
+        "recurrence": {
+          "description": "Required if triggerType is Recurrence.",
+          "$ref": "./mfe.json#/definitions/RecurrenceTrigger"
+        },
+        "cron": {
+          "description": "Required if triggerType is Cron.",
+          "$ref": "./mfe.json#/definitions/CronTrigger"
+        },
         "schedule": {
+          "description": "[Deprecated] Not used any more.",
           "$ref": "#/definitions/ScheduleBase"
         }
       }
@@ -4869,6 +4901,7 @@
       "type": "object",
       "properties": {
         "id": {
+          "description": "A system assigned id for the schedule.",
           "type": "string",
           "x-nullable": true
         },
@@ -4887,6 +4920,7 @@
         "Provisioning",
         "Failed"
       ],
+      "description": "The current deployment state of schedule.",
       "type": "string",
       "x-ms-enum": {
         "name": "ScheduleProvisioningState",
@@ -4910,6 +4944,7 @@
         "Enabled",
         "Disabled"
       ],
+      "description": "Is the schedule enabled or disabled?",
       "type": "string",
       "x-ms-enum": {
         "name": "ScheduleStatus",
