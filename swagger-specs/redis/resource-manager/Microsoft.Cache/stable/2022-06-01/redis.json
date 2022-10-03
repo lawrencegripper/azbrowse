@@ -3,7 +3,7 @@
   "info": {
     "title": "RedisManagementClient",
     "description": "REST API for Azure Redis Cache Service.",
-    "version": "2022-05-01"
+    "version": "2022-06-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -1904,7 +1904,7 @@
             },
             "rdb-backup-frequency": {
               "type": "string",
-              "description": "Specifies the frequency for creating rdb backup"
+              "description": "Specifies the frequency for creating rdb backup in minutes. Valid values: (15, 30, 60, 360, 720, 1440)"
             },
             "rdb-backup-max-snapshot-count": {
               "type": "string",
@@ -2666,6 +2666,16 @@
             "name": "ReplicationRole",
             "modelAsString": false
           }
+        },
+        "geoReplicatedPrimaryHostName": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The unchanging DNS name which will always point to current geo-primary cache among the linked redis caches for seamless Geo Failover experience."
+        },
+        "primaryHostName": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The changing DNS name that resolves to the current geo-primary cache among the linked redis caches before or after the Geo Failover."
         }
       },
       "required": [

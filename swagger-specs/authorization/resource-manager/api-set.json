@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Authorization/preview/2021-12-01-preview/authorization-AccessReviewCalls.json"], "name": "package-2021-12-01-preview-only"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Authorization/preview/2021-12-01-preview/authorization-AccessReviewCalls.json", "Microsoft.Authorization/preview/2022-08-01-preview/RoleManagementAlerts.json"], "name": "package-2021-12-01-preview-only"}

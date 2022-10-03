@@ -6,7 +6,7 @@
     "contact": {
       "email": "acsdevexdisc@microsoft.com"
     },
-    "version": "2022-09-01-preview"
+    "version": "2022-10-01-preview"
   },
   "paths": {
     "/sip": {
@@ -34,7 +34,7 @@
           "default": {
             "description": "Failure",
             "schema": {
-              "$ref": "../../../Common/stable/2021-03-07/common.json#/definitions/CommunicationErrorResponse"
+              "$ref": "../../../Common/stable/2022-07-13/common.json#/definitions/CommunicationErrorResponse"
             },
             "headers": {
               "x-ms-error-code": {
@@ -85,7 +85,7 @@
           "default": {
             "description": "Failure",
             "schema": {
-              "$ref": "../../../Common/stable/2021-03-07/common.json#/definitions/CommunicationErrorResponse"
+              "$ref": "../../../Common/stable/2022-07-13/common.json#/definitions/CommunicationErrorResponse"
             },
             "headers": {
               "x-ms-error-code": {
@@ -98,6 +98,62 @@
         "x-ms-examples": {
           "Patch SIP configuration for resource": {
             "$ref": "./examples/PatchSipConfiguration.json"
+          }
+        }
+      }
+    },
+    "/sip:testRoutesWithNumber": {
+      "post": {
+        "tags": [
+          "NumberRoutingValidation"
+        ],
+        "summary": "Gets the list of routes matching the target phone number, ordered by priority.",
+        "operationId": "SipRouting_TestRoutesWithNumber",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "targetPhoneNumber",
+            "description": "Phone number to test routing patterns against",
+            "required": true,
+            "type": "string",
+            "x-example": "+11234567890"
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          },
+          {
+            "in": "body",
+            "name": "sipConfiguration",
+            "description": "Sip configuration object to test with targetPhoneNumber.",
+            "schema": {
+              "$ref": "#/definitions/SipConfiguration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of matching routes",
+            "schema": {
+              "$ref": "#/definitions/RoutesForNumber"
+            }
+          },
+          "default": {
+            "description": "Failure",
+            "schema": {
+              "$ref": "../../../Common/stable/2022-07-13/common.json#/definitions/CommunicationErrorResponse"
+            },
+            "x-ms-error-response": true
+          }
+        },
+        "x-ms-examples": {
+          "Validate target phone number routing": {
+            "$ref": "./examples/TestRoutesWithNumber.json"
           }
         }
       }
@@ -163,7 +219,7 @@
         },
         "trunks": {
           "description": "Gets or sets list of SIP trunks for routing calls. Trunks are represented as FQDN.",
-          "maxLength": 250,
+          "maxItems": 250,
           "type": "array",
           "items": {
             "type": "string"
@@ -194,7 +250,7 @@
       "properties": {
         "domains": {
           "description": "Validated Domains.\r\nMap key is domain.",
-          "maxLength": 250,
+          "maxProperties": 250,
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/Domain"
@@ -202,7 +258,7 @@
         },
         "trunks": {
           "description": "SIP trunks for routing calls.\r\nMap key is trunk's FQDN (1-249 characters).",
-          "maxLength": 250,
+          "maxProperties": 250,
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/Trunk"
@@ -210,7 +266,7 @@
         },
         "routes": {
           "description": "Trunk routes for routing calls.",
-          "maxLength": 250,
+          "maxItems": 250,
           "type": "array",
           "items": {
             "$ref": "#/definitions/TrunkRoute"
@@ -241,7 +297,7 @@
         },
         "trunks": {
           "description": "SIP trunks for routing calls.\r\nMap key is trunk's FQDN (1-249 characters).",
-          "maxLength": 250,
+          "maxProperties": 250,
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/TrunkPatch"
@@ -249,7 +305,21 @@
         },
         "routes": {
           "description": "Trunk routes for routing calls.",
-          "maxLength": 250,
+          "maxItems": 250,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TrunkRoute"
+          }
+        }
+      }
+    },
+    "RoutesForNumber": {
+      "description": "Represents number routing validation details.",
+      "type": "object",
+      "properties": {
+        "matchingRoutes": {
+          "description": "The list of routes whose number patterns are matched by the target number. The routes are displayed and apply in the same order as in SipConfiguration.",
+          "maxItems": 250,
           "type": "array",
           "items": {
             "$ref": "#/definitions/TrunkRoute"
