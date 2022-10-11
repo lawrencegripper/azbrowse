@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2022-08-01",
+    "version": "2022-11-01",
     "title": "Azure Traffic Collector",
     "description": "Azure Traffic Collector service",
     "license": {
@@ -546,6 +546,58 @@
         "x-ms-long-running-operation-options": {
           "final-state-via": "location"
         }
+      },
+      "patch": {
+        "tags": [
+          "CollectorPolicies"
+        ],
+        "operationId": "CollectorPolicies_UpdateTags",
+        "x-ms-examples": {
+          "Update Collector Policy tags": {
+            "$ref": "./examples/CollectorPolicyUpdateTags.json"
+          }
+        },
+        "description": "Updates the specified Collector Policy tags.",
+        "parameters": [
+          {
+            "$ref": "#/parameters/resourceGroupName"
+          },
+          {
+            "name": "parameters",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/TagsObject"
+            },
+            "description": "Parameters supplied to update Collector Policy tags."
+          },
+          {
+            "$ref": "#/parameters/subscriptionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/apiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/azureTrafficCollectorNameParameter"
+          },
+          {
+            "$ref": "#/parameters/collectorPolicyNameParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Update successful. The operation returns the resulting Collector Policy resource.",
+            "schema": {
+              "$ref": "#/definitions/CollectorPolicy"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        }
       }
     }
   },
@@ -588,9 +640,10 @@
         "collectorPolicies": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/CollectorPolicy"
+            "$ref": "#/definitions/ResourceReference"
           },
-          "description": "Collector Policies for Azure Traffic Collector."
+          "description": "Collector Policies for Azure Traffic Collector.",
+          "readOnly": true
         },
         "virtualHub": {
           "$ref": "#/definitions/ResourceReference",
@@ -814,6 +867,9 @@
           "readOnly": true
         }
       },
+      "required": [
+        "location"
+      ],
       "description": "Common resource representation.",
       "x-ms-azure-resource": true
     },
@@ -1021,7 +1077,8 @@
       "type": "string",
       "enum": [
         "2022-05-01",
-        "2022-08-01"
+        "2022-08-01",
+        "2022-11-01"
       ],
       "default": "2022-05-01",
       "x-ms-enum": {
