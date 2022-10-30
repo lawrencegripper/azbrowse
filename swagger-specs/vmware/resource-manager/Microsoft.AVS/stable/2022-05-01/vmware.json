@@ -3,7 +3,7 @@
   "info": {
     "title": "Azure VMware Solution API",
     "description": "Azure VMware Solution API",
-    "version": "2021-12-01"
+    "version": "2022-05-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -286,6 +286,21 @@
       },
       "description": "Name of the desired output stream to return. If not provided, will return all. An empty array will return nothing",
       "x-ms-parameter-location": "method"
+    },
+    "workloadNetworkName": {
+      "name": "workloadNetworkName",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "enum": [
+        "default"
+      ],
+      "x-ms-enum": {
+        "name": "WorkloadNetworkName",
+        "modelAsString": true
+      },
+      "description": "Name for the workload network in the private cloud",
+      "x-ms-parameter-location": "method"
     }
   },
   "paths": {
@@ -345,6 +360,15 @@
           },
           {
             "$ref": "../../../../../common-types/resource-management/v1/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "sku",
+            "in": "body",
+            "required": false,
+            "description": "The sku to check for trial availability",
+            "schema": {
+              "$ref": "#/definitions/Sku"
+            }
           }
         ],
         "responses": {
@@ -364,6 +388,9 @@
         "x-ms-examples": {
           "Locations_CheckTrialAvailability": {
             "$ref": "./examples/Locations_CheckTrialAvailability.json"
+          },
+          "Locations_CheckTrialAvailabilityWithSku": {
+            "$ref": "./examples/Locations_CheckTrialAvailabilityWithSku.json"
           }
         }
       }
@@ -1046,6 +1073,55 @@
         "x-ms-examples": {
           "Clusters_Delete": {
             "$ref": "./examples/Clusters_Delete.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/clusters/{clusterName}/listZones": {
+      "post": {
+        "operationId": "Clusters_ListZones",
+        "tags": [
+          "Cluster",
+          "Zone"
+        ],
+        "summary": "List hosts by zone in a cluster",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/privateCloudName"
+          },
+          {
+            "$ref": "#/parameters/clusterName"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, zones information is returned",
+            "schema": {
+              "$ref": "#/definitions/ClusterZoneList"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Clusters_ListZoneData": {
+            "$ref": "./examples/Clusters_ListZones.json"
+          },
+          "Clusters_ListZoneData_Stretched": {
+            "$ref": "./examples/Clusters_ListZones_Stretched.json"
           }
         }
       }
@@ -1891,6 +1967,96 @@
         "x-ms-examples": {
           "GlobalReachConnections_Delete": {
             "$ref": "./examples/GlobalReachConnections_Delete.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks/{workloadNetworkName}": {
+      "get": {
+        "operationId": "WorkloadNetworks_Get",
+        "tags": [
+          "WorkloadNetworks"
+        ],
+        "summary": "Get a private cloud workload network.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/privateCloudName"
+          },
+          {
+            "$ref": "#/parameters/workloadNetworkName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/WorkloadNetwork"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "WorkloadNetworks_Get": {
+            "$ref": "./examples/WorkloadNetworks_Get.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AVS/privateClouds/{privateCloudName}/workloadNetworks": {
+      "get": {
+        "operationId": "WorkloadNetworks_List",
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        },
+        "tags": [
+          "WorkloadNetworks"
+        ],
+        "summary": "List of workload networks in a private cloud.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/privateCloudName"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/WorkloadNetworkList"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "WorkloadNetworks_List": {
+            "$ref": "./examples/WorkloadNetworks_List.json"
           }
         }
       }
@@ -4075,6 +4241,9 @@
           },
           "Addons_Get_HCX": {
             "$ref": "./examples/Addons_Get_HCX.json"
+          },
+          "Addons_Get_ArcReg": {
+            "$ref": "./examples/Addons_Get_ArcReg.json"
           }
         }
       },
@@ -4144,6 +4313,9 @@
           },
           "Addons_CreateOrUpdate_HCX": {
             "$ref": "./examples/Addons_CreateOrUpdate_HCX.json"
+          },
+          "Addons_CreateOrUpdate_Arc": {
+            "$ref": "./examples/Addons_CreateOrUpdate_ArcReg.json"
           }
         }
       },
@@ -5168,8 +5340,7 @@
         {
           "$ref": "#/definitions/Resource"
         }
-      ],
-      "properties": {}
+      ]
     },
     "CloudError": {
       "type": "object",
@@ -5192,7 +5363,10 @@
           "readOnly": true,
           "items": {
             "$ref": "#/definitions/Operation"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "nextLink": {
           "description": "URL to get the next page if any",
@@ -5271,7 +5445,10 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/LogSpecification"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "metricSpecifications": {
           "description": "Specifications of the Metrics for Azure Monitoring",
@@ -5279,7 +5456,10 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/MetricSpecification"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         }
       }
     },
@@ -5355,7 +5535,10 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/MetricDimension"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "enableRegionalMdmAccount": {
           "description": "Whether or not the service is using regional MDM accounts.",
@@ -5421,7 +5604,8 @@
           "enum": [
             "Succeeded",
             "Failed",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "ExpressRouteAuthorizationProvisioningState",
@@ -5500,6 +5684,11 @@
         "keyVersion": {
           "type": "string",
           "description": "The version of the key."
+        },
+        "autoDetectedKeyVersion": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The auto-detected version of the key if versionType is auto-detected."
         },
         "keyVaultUrl": {
           "type": "string",
@@ -5732,7 +5921,10 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/IdentitySource"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "availability": {
           "description": "Properties describing how the cloud is distributed across availability zones",
@@ -5772,7 +5964,8 @@
             "Pending",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "PrivateCloudProvisioningState",
@@ -5842,6 +6035,19 @@
         "secondaryCircuit": {
           "description": "A secondary expressRoute circuit from a separate AZ. Only present in a stretched private cloud",
           "$ref": "#/definitions/Circuit"
+        },
+        "nsxPublicIpQuotaRaised": {
+          "description": "Flag to indicate whether the private cloud has the quota for provisioned NSX Public IP count raised from 64 to 1024",
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "x-ms-enum": {
+            "name": "nsxPublicIpQuotaRaisedEnum",
+            "modelAsString": true
+          }
         }
       }
     },
@@ -5906,7 +6112,8 @@
         "Failed",
         "Cancelled",
         "Deleting",
-        "Updating"
+        "Updating",
+        "Canceled"
       ],
       "x-ms-enum": {
         "name": "ClusterProvisioningState",
@@ -5960,8 +6167,7 @@
         {
           "$ref": "#/definitions/CommonClusterProperties"
         }
-      ],
-      "properties": {}
+      ]
     },
     "PrivateCloudList": {
       "type": "object",
@@ -6028,7 +6234,8 @@
           "enum": [
             "SRM",
             "VR",
-            "HCX"
+            "HCX",
+            "Arc"
           ],
           "x-ms-enum": {
             "name": "AddonType",
@@ -6045,7 +6252,8 @@
             "Cancelled",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "AddonProvisioningState",
@@ -6111,6 +6319,22 @@
       "required": [
         "offer"
       ]
+    },
+    "AddonArcProperties": {
+      "type": "object",
+      "description": "The properties of an Arc addon",
+      "x-ms-discriminator-value": "Arc",
+      "allOf": [
+        {
+          "$ref": "#/definitions/AddonProperties"
+        }
+      ],
+      "properties": {
+        "vCenter": {
+          "description": "The VMware vCenter resource ID",
+          "type": "string"
+        }
+      }
     },
     "AddonList": {
       "type": "object",
@@ -6181,7 +6405,8 @@
             "Pending",
             "Creating",
             "Updating",
-            "Deleting"
+            "Deleting",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "DatastoreProvisioningState",
@@ -6414,7 +6639,8 @@
           "enum": [
             "Succeeded",
             "Failed",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "GlobalReachConnectionProvisioningState",
@@ -6564,6 +6790,9 @@
           "items": {
             "$ref": "#/definitions/WorkloadNetworkSegmentPortVif"
           },
+          "x-ms-identifiers": [
+            "portName"
+          ],
           "readOnly": true
         },
         "status": {
@@ -6588,7 +6817,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkSegmentProvisioningState",
@@ -6601,6 +6831,15 @@
           "format": "int64"
         }
       }
+    },
+    "WorkloadNetwork": {
+      "type": "object",
+      "description": "Workload Network",
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProxyResource"
+        }
+      ]
     },
     "WorkloadNetworkSegment": {
       "type": "object",
@@ -6615,6 +6854,25 @@
           "description": "The properties of a Workload Segment proxy resource.",
           "$ref": "#/definitions/WorkloadNetworkSegmentProperties",
           "x-ms-client-flatten": true
+        }
+      }
+    },
+    "WorkloadNetworkList": {
+      "type": "object",
+      "description": "A list of workload networks",
+      "properties": {
+        "value": {
+          "description": "The items on the page",
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "$ref": "#/definitions/WorkloadNetwork"
+          }
+        },
+        "nextLink": {
+          "description": "URL to get the next page if any",
+          "type": "string",
+          "readOnly": true
         }
       }
     },
@@ -6675,7 +6933,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkDhcpProvisioningState",
@@ -6820,7 +7079,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkPortMirroringProvisioningState",
@@ -6906,7 +7166,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkVMGroupProvisioningState",
@@ -7124,7 +7385,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkDnsServiceProvisioningState",
@@ -7213,7 +7475,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkDnsZoneProvisioningState",
@@ -7289,7 +7552,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "WorkloadNetworkPublicIPProvisioningState",
@@ -7456,7 +7720,8 @@
             "Failed",
             "Building",
             "Deleting",
-            "Updating"
+            "Updating",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "PlacementPolicyProvisioningState",
@@ -7522,6 +7787,14 @@
         "affinityType": {
           "description": "placement policy affinity type",
           "$ref": "#/definitions/AffinityType"
+        },
+        "affinityStrength": {
+          "description": "vm-host placement policy affinity strength (should/must)",
+          "$ref": "#/definitions/AffinityStrength"
+        },
+        "azureHybridBenefitType": {
+          "description": "placement policy azure hybrid benefit opt-in type",
+          "$ref": "#/definitions/AzureHybridBenefitType"
         }
       },
       "required": [
@@ -7605,6 +7878,14 @@
           "items": {
             "type": "string"
           }
+        },
+        "affinityStrength": {
+          "description": "vm-host placement policy affinity strength (should/must)",
+          "$ref": "#/definitions/AffinityStrength"
+        },
+        "azureHybridBenefitType": {
+          "description": "placement policy azure hybrid benefit opt-in type",
+          "$ref": "#/definitions/AzureHybridBenefitType"
         }
       }
     },
@@ -7620,6 +7901,30 @@
         "modelAsString": true
       }
     },
+    "AffinityStrength": {
+      "description": "VM-Host placement policy affinity strength (should/must)",
+      "type": "string",
+      "enum": [
+        "Should",
+        "Must"
+      ],
+      "x-ms-enum": {
+        "name": "AffinityStrength",
+        "modelAsString": true
+      }
+    },
+    "AzureHybridBenefitType": {
+      "description": "Placement policy hosts opt-in Azure Hybrid Benefit type",
+      "type": "string",
+      "enum": [
+        "SqlHost",
+        "None"
+      ],
+      "x-ms-enum": {
+        "name": "AzureHybridBenefitType",
+        "modelAsString": true
+      }
+    },
     "ScriptPackageProperties": {
       "type": "object",
       "description": "Properties of a Script Package subresource",
@@ -7631,6 +7936,16 @@
         },
         "version": {
           "description": "Module version",
+          "type": "string",
+          "readOnly": true
+        },
+        "company": {
+          "description": "Company that created and supports the package",
+          "type": "string",
+          "readOnly": true
+        },
+        "uri": {
+          "description": "Link to support by the package vendor",
           "type": "string",
           "readOnly": true
         }
@@ -7765,7 +8080,10 @@
           "readOnly": true,
           "items": {
             "$ref": "#/definitions/ScriptParameter"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         }
       }
     },
@@ -7845,14 +8163,20 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/ScriptExecutionParameter"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "hiddenParameters": {
           "description": "Parameters that will be hidden/not visible to ARM, such as passwords and credentials",
           "type": "array",
           "items": {
             "$ref": "#/definitions/ScriptExecutionParameter"
-          }
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "failureReason": {
           "type": "string",
@@ -7895,7 +8219,8 @@
             "Failed",
             "Cancelling",
             "Cancelled",
-            "Deleting"
+            "Deleting",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "ScriptExecutionProvisioningState",
@@ -8046,6 +8371,41 @@
         }
       },
       "description": "Identity for the virtual machine."
+    },
+    "ClusterZone": {
+      "type": "object",
+      "properties": {
+        "hosts": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of hosts belonging to the availability zone in a cluster"
+        },
+        "zone": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Availability zone identifier"
+        }
+      },
+      "description": "Zone and associated hosts info"
+    },
+    "ClusterZoneList": {
+      "type": "object",
+      "properties": {
+        "zones": {
+          "type": "array",
+          "description": "Zone and associated hosts info",
+          "items": {
+            "$ref": "#/definitions/ClusterZone"
+          },
+          "x-ms-identifiers": [
+            "zone"
+          ]
+        }
+      },
+      "description": "List of all zones and associated hosts for a cluster"
     }
   }
 }
