@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Azure Blob Storage",
-    "version": "2021-08-06",
+    "version": "2021-12-02",
     "x-ms-code-generation-settings": {
       "header": "MIT",
       "strictSpecAdherence": false
@@ -9675,7 +9675,8 @@
         "Hot",
         "Cool",
         "Archive",
-        "Premium"
+        "Premium",
+        "Cold"
       ],
       "x-ms-enum": {
         "name": "AccessTier",
@@ -11081,7 +11082,7 @@
       "type": "string",
       "description": "Specifies the version of the operation to use for this request.",
       "enum": [
-        "2021-08-06"
+        "2021-12-02"
       ]
     },
     "Blob": {
@@ -11188,7 +11189,8 @@
         "P80",
         "Hot",
         "Cool",
-        "Archive"
+        "Archive",
+        "Cold"
       ],
       "x-ms-enum": {
         "name": "AccessTier",
@@ -11217,7 +11219,8 @@
         "P80",
         "Hot",
         "Cool",
-        "Archive"
+        "Archive",
+        "Cold"
       ],
       "x-ms-enum": {
         "name": "AccessTier",

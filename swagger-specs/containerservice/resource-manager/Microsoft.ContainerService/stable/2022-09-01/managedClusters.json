@@ -3,7 +3,7 @@
   "info": {
     "title": "ContainerServiceClient",
     "description": "The Container Service Client.",
-    "version": "2022-07-01"
+    "version": "2022-09-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -1368,6 +1368,57 @@
         "x-ms-examples": {
           "Rotate Cluster Certificates": {
             "$ref": "./examples/ManagedClustersRotateClusterCertificates.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ContainerService/managedClusters/{resourceName}/rotateServiceAccountSigningKeys": {
+      "post": {
+        "tags": [
+          "ManagedClusters"
+        ],
+        "operationId": "ManagedClusters_RotateServiceAccountSigningKeys",
+        "summary": "Rotates the service account signing keys of a managed cluster.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/ResourceNameParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "headers": {
+              "Location": {
+                "type": "string"
+              }
+            }
+          },
+          "204": {
+            "description": "NoContent"
+          },
+          "default": {
+            "description": "Error response describing why the operation failed. If the cluster doesn't exist, 404 (Not found) is returned.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        },
+        "x-ms-examples": {
+          "Rotate Cluster Service Account Signing Keys": {
+            "$ref": "./examples/ManagedClustersRotateServiceAccountSigningKeys.json"
           }
         }
       }
@@ -3769,6 +3820,10 @@
           "title": "The pod identity profile of the Managed Cluster.",
           "description": "See [use AAD pod identity](https://docs.microsoft.com/azure/aks/use-azure-ad-pod-identity) for more details on AAD pod identity integration."
         },
+        "oidcIssuerProfile": {
+          "$ref": "#/definitions/ManagedClusterOIDCIssuerProfile",
+          "description": "The OIDC issuer profile of the Managed Cluster."
+        },
         "nodeResourceGroup": {
           "type": "string",
           "description": "The name of the resource group containing agent pool nodes."
@@ -4473,6 +4528,21 @@
       },
       "title": "The pod identity profile of the Managed Cluster.",
       "description": "See [use AAD pod identity](https://docs.microsoft.com/azure/aks/use-azure-ad-pod-identity) for more details on pod identity integration."
+    },
+    "ManagedClusterOIDCIssuerProfile": {
+      "type": "object",
+      "properties": {
+        "issuerURL": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The OIDC issuer url of the Managed Cluster."
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the OIDC issuer is enabled."
+        }
+      },
+      "description": "The OIDC issuer profile of the Managed Cluster."
     },
     "ManagedClusterUpgradeProfile": {
       "type": "object",
@@ -5595,6 +5665,10 @@
         "snapshotController": {
           "$ref": "#/definitions/ManagedClusterStorageProfileSnapshotController",
           "description": "Snapshot Controller settings for the storage profile."
+        },
+        "blobCSIDriver": {
+          "$ref": "#/definitions/ManagedClusterStorageProfileBlobCSIDriver",
+          "description": "AzureBlob CSI Driver settings for the storage profile."
         }
       },
       "description": "Storage profile for the container service cluster."
@@ -5660,6 +5734,16 @@
         }
       },
       "description": "Snapshot Controller settings for the storage profile."
+    },
+    "ManagedClusterStorageProfileBlobCSIDriver": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether to enable AzureBlob CSI Driver. The default value is false."
+        }
+      },
+      "description": "AzureBlob CSI Driver settings for the storage profile."
     },
     "CreationData": {
       "description": "Data used when creating a target resource from a source resource.",

@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Azure Web PubSub Service REST API",
-    "version": "2021-10-01"
+    "version": "2022-11-01"
   },
   "paths": {
     "/api/health": {
@@ -44,9 +44,7 @@
         "summary": "Close the connections in the hub.",
         "operationId": "WebPubSub_CloseAllConnections",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -158,6 +156,16 @@
             "description": "The version of the REST APIs.",
             "required": true,
             "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "group",
+            "description": "Groups that the connection will join when it connects.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "responses": {
@@ -201,9 +209,7 @@
           "application/json"
         ],
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -240,6 +246,12 @@
               "format": "binary",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Following OData filter syntax to filter out the subscribers receiving the messages.",
+            "type": "string"
           }
         ],
         "responses": {
@@ -275,9 +287,7 @@
         "summary": "Close the client connection.",
         "operationId": "WebPubSub_CloseConnection",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -403,9 +413,7 @@
           "application/json"
         ],
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -467,6 +475,66 @@
         }
       }
     },
+    "/api/hubs/{hub}/connections/{connectionId}/groups": {
+      "delete": {
+        "tags": [
+          "webpubsub"
+        ],
+        "summary": "Remove a connection from all groups.",
+        "operationId": "WebPubSub_RemoveConnectionFromAllGroups",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "hub",
+            "description": "Target hub name, which should start with alphabetic characters and only contain alpha-numeric characters or underscore.",
+            "required": true,
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_`,.[\\]]{0,127}$"
+          },
+          {
+            "in": "path",
+            "name": "connectionId",
+            "description": "Target connection Id.",
+            "required": true,
+            "type": "string",
+            "minLength": 1
+          },
+          {
+            "in": "query",
+            "name": "api-version",
+            "description": "The version of the REST APIs.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The connection is removed from all groups."
+          },
+          "default": {
+            "description": "Error response",
+            "schema": {
+              "$ref": "#/definitions/ErrorDetail"
+            },
+            "x-ms-error-response": true,
+            "headers": {
+              "x-ms-error-code": {
+                "x-ms-client-name": "ErrorCode",
+                "type": "string"
+              }
+            }
+          }
+        },
+        "x-ms-examples": {
+          "WebPubSub_RemoveConnectionFromAllGroups": {
+            "$ref": "./examples/WebPubSub_RemoveConnectionFromAllGroups.json"
+          }
+        }
+      }
+    },
     "/api/hubs/{hub}/groups/{group}": {
       "head": {
         "tags": [
@@ -490,7 +558,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "query",
@@ -533,9 +602,7 @@
         "summary": "Close connections in the specific group.",
         "operationId": "WebPubSub_CloseGroupConnections",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -553,7 +620,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "query",
@@ -617,9 +685,7 @@
           "application/json"
         ],
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -637,7 +703,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "query",
@@ -665,6 +732,12 @@
               "format": "binary",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Following OData filter syntax to filter out the subscribers receiving the messages.",
+            "type": "string"
           }
         ],
         "responses": {
@@ -700,9 +773,7 @@
         "summary": "Remove a connection from the target group.",
         "operationId": "WebPubSub_RemoveConnectionFromGroup",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -720,7 +791,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "path",
@@ -769,9 +841,7 @@
         "summary": "Add a connection to the target group.",
         "operationId": "WebPubSub_AddConnectionToGroup",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -789,7 +859,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "path",
@@ -840,9 +911,7 @@
         "summary": "Revoke permission for the connection.",
         "operationId": "WebPubSub_RevokePermission",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -997,9 +1066,7 @@
         "summary": "Grant permission to the connection.",
         "operationId": "WebPubSub_GrantPermission",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -1137,9 +1204,7 @@
         "summary": "Close connections for the specific user.",
         "operationId": "WebPubSub_CloseUserConnections",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -1220,9 +1285,7 @@
           "application/json"
         ],
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -1257,6 +1320,12 @@
               "format": "binary",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "filter",
+            "description": "Following OData filter syntax to filter out the subscribers receiving the messages.",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1292,9 +1361,7 @@
         "summary": "Remove a user from all groups.",
         "operationId": "WebPubSub_RemoveUserFromAllGroups",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -1354,9 +1421,7 @@
         "summary": "Remove a user from the target group.",
         "operationId": "WebPubSub_RemoveUserFromGroup",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -1374,7 +1439,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "path",
@@ -1423,9 +1489,7 @@
         "summary": "Add a user to the target group.",
         "operationId": "WebPubSub_AddUserToGroup",
         "produces": [
-          "text/plain",
-          "application/json",
-          "text/json"
+          "application/json"
         ],
         "parameters": [
           {
@@ -1443,7 +1507,8 @@
             "required": true,
             "type": "string",
             "maxLength": 1024,
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "^(?!\\s+$).+$"
           },
           {
             "in": "path",
