@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2022-03-01",
+    "version": "2022-10-01",
     "title": "ContainerApps API Client"
   },
   "host": "management.azure.com",
@@ -290,7 +290,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Ok.",
+            "description": "Ok",
             "schema": {
               "$ref": "#/definitions/ManagedEnvironment"
             }
@@ -343,7 +343,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/CertificateCollection"
+              "$ref": "./CommonDefinitions.json#/definitions/CertificateCollection"
             }
           },
           "default": {
@@ -400,7 +400,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Certificate"
+              "$ref": "./CommonDefinitions.json#/definitions/Certificate"
             }
           },
           "default": {
@@ -449,7 +449,7 @@
             "in": "body",
             "description": "Certificate to be created or updated",
             "schema": {
-              "$ref": "#/definitions/Certificate"
+              "$ref": "./CommonDefinitions.json#/definitions/Certificate"
             }
           },
           {
@@ -460,7 +460,7 @@
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/Certificate"
+              "$ref": "./CommonDefinitions.json#/definitions/Certificate"
             }
           },
           "default": {
@@ -563,7 +563,7 @@
             "required": true,
             "description": "Properties of a certificate that need to be updated",
             "schema": {
-              "$ref": "#/definitions/CertificatePatch"
+              "$ref": "./CommonDefinitions.json#/definitions/CertificatePatch"
             }
           },
           {
@@ -572,9 +572,9 @@
         ],
         "responses": {
           "200": {
-            "description": "Container App updated successfully.",
+            "description": "Certificate updated successfully.",
             "schema": {
-              "$ref": "#/definitions/Certificate"
+              "$ref": "./CommonDefinitions.json#/definitions/Certificate"
             }
           },
           "default": {
@@ -649,9 +649,131 @@
           }
         }
       }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/getAuthtoken": {
+      "post": {
+        "tags": [
+          "ManagedEnvironments"
+        ],
+        "summary": "Get auth token for a managed environment",
+        "description": "Checks if resource name is available.",
+        "operationId": "ManagedEnvironments_GetAuthToken",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "name": "environmentName",
+            "in": "path",
+            "description": "Name of the Managed Environment.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/EnvironmentAuthToken"
+            }
+          },
+          "default": {
+            "description": "Error response.",
+            "schema": {
+              "$ref": "./CommonDefinitions.json#/definitions/DefaultErrorResponse"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "Get Managed Environment Auth Token": {
+            "$ref": "./examples/ManagedEnvironments_GetAuthToken.json"
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/workloadProfileStates": {
+      "get": {
+        "tags": [
+          "ManagedEnvironments"
+        ],
+        "summary": "Get all workload Profile States for a Premium Managed Environment..",
+        "description": "Get all workload Profile States for a Premium Managed Environment.",
+        "operationId": "ManagedEnvironments_ListWorkloadProfileStates",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "environmentName",
+            "in": "path",
+            "description": "Name of the Managed Environment.",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/workloadProfileStatesCollection"
+            }
+          },
+          "default": {
+            "description": "Common error response.",
+            "schema": {
+              "$ref": "./CommonDefinitions.json#/definitions/DefaultErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        },
+        "x-ms-examples": {
+          "List environments by subscription": {
+            "$ref": "./examples/ManagedEnvironments_ListWorkloadProfileStates.json"
+          }
+        }
+      }
     }
   },
   "definitions": {
+    "ManagedEnvironmentOutboundSettings": {
+      "type": "object",
+      "description": "Configuration used to control the Environment Egress outbound traffic",
+      "properties": {
+        "outBoundType": {
+          "$ref": "#/definitions/ManagedEnvironmentOutBoundType"
+        },
+        "virtualNetworkApplianceIp": {
+          "description": "Virtual Appliance IP used as the Egress controller for the Environment",
+          "type": "string"
+        }
+      }
+    },
+    "ManagedEnvironmentOutBoundType": {
+      "enum": [
+        "LoadBalancer",
+        "UserDefinedRouting"
+      ],
+      "description": "Outbound type for the cluster",
+      "type": "string",
+      "x-ms-enum": {
+        "name": "ManagedEnvironmentOutBoundType",
+        "modelAsString": true
+      }
+    },
     "AppLogsConfiguration": {
       "description": "Configuration of application logs",
       "type": "object",
@@ -717,6 +839,10 @@
             "create",
             "read"
           ]
+        },
+        "outboundSettings": {
+          "$ref": "#/definitions/ManagedEnvironmentOutboundSettings",
+          "description": "Configuration used to control the Environment Egress outbound traffic"
         }
       }
     },
@@ -729,6 +855,14 @@
         }
       ],
       "properties": {
+        "kind": {
+          "type": "string",
+          "description": "Kind of the Environment."
+        },
+        "sku": {
+          "$ref": "#/definitions/EnvironmentSkuProperties",
+          "description": "SKU properties of the Environment."
+        },
         "properties": {
           "description": "Managed environment resource specific properties",
           "type": "object",
@@ -757,19 +891,11 @@
             "daprAIInstrumentationKey": {
               "type": "string",
               "description": "Azure Monitor instrumentation key used by Dapr to export Service to Service communication telemetry",
-              "x-ms-mutability": [
-                "create",
-                "read"
-              ],
               "x-ms-secret": true
             },
             "daprAIConnectionString": {
               "type": "string",
               "description": "Application Insights connection string used by Dapr to export Service to Service communication telemetry",
-              "x-ms-mutability": [
-                "create",
-                "read"
-              ],
               "x-ms-secret": true
             },
             "vnetConfiguration": {
@@ -801,6 +927,25 @@
               "x-ms-mutability": [
                 "create",
                 "read"
+              ]
+            },
+            "customDomainConfiguration": {
+              "$ref": "./CommonDefinitions.json#/definitions/CustomDomainConfiguration",
+              "description": "Custom domain configuration for the environment"
+            },
+            "eventStreamEndpoint": {
+              "description": "The endpoint of the eventstream of the Environment.",
+              "type": "string",
+              "readOnly": true
+            },
+            "workloadProfiles": {
+              "description": "Workload profiles configured for the Managed Environment.",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/WorkloadProfile"
+              },
+              "x-ms-identifiers": [
+                "workloadProfileType"
               ]
             }
           },
@@ -848,8 +993,8 @@
         }
       }
     },
-    "Certificate": {
-      "description": "Certificate used for Custom Domain bindings of Container Apps in a Managed Environment",
+    "EnvironmentAuthToken": {
+      "description": "Environment Auth Token.",
       "type": "object",
       "allOf": [
         {
@@ -858,86 +1003,119 @@
       ],
       "properties": {
         "properties": {
-          "description": "Certificate resource specific properties",
+          "description": "Environment auth token resource specific properties",
           "type": "object",
           "properties": {
-            "provisioningState": {
-              "description": "Provisioning state of the certificate.",
-              "enum": [
-                "Succeeded",
-                "Failed",
-                "Canceled",
-                "DeleteFailed",
-                "Pending"
-              ],
+            "token": {
+              "description": "Auth token value.",
               "type": "string",
-              "readOnly": true,
-              "x-ms-enum": {
-                "name": "CertificateProvisioningState",
-                "modelAsString": true
-              }
-            },
-            "password": {
-              "description": "Certificate password.",
-              "type": "string",
-              "x-ms-mutability": [
-                "create"
-              ],
-              "x-ms-secret": true
-            },
-            "subjectName": {
-              "description": "Subject name of the certificate.",
-              "type": "string",
+              "x-ms-secret": true,
               "readOnly": true
             },
-            "value": {
-              "format": "byte",
-              "description": "PFX or PEM blob",
-              "type": "string",
-              "x-ms-mutability": [
-                "create"
-              ],
-              "x-ms-secret": true
-            },
-            "issuer": {
-              "description": "Certificate issuer.",
-              "type": "string",
-              "readOnly": true
-            },
-            "issueDate": {
+            "expires": {
               "format": "date-time",
-              "description": "Certificate issue Date.",
-              "type": "string",
-              "readOnly": true
-            },
-            "expirationDate": {
-              "format": "date-time",
-              "description": "Certificate expiration date.",
-              "type": "string",
-              "readOnly": true
-            },
-            "thumbprint": {
-              "description": "Certificate thumbprint.",
-              "type": "string",
-              "readOnly": true
-            },
-            "valid": {
-              "description": "Is the certificate valid?.",
-              "type": "boolean",
-              "readOnly": true
-            },
-            "publicKeyHash": {
-              "description": "Public key hash.",
+              "description": "Token expiration date.",
               "type": "string",
               "readOnly": true
             }
+          },
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "WorkloadProfile": {
+      "description": "Workload profile to scope container app execution.",
+      "type": "object",
+      "properties": {
+        "workloadProfileType": {
+          "$ref": "./CommonDefinitions.json#/definitions/WorkloadProfileType",
+          "description": "Workload profile type for the workloads to run on."
+        },
+        "minimumCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The minimum capacity."
+        },
+        "maximumCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The maximum capacity."
+        }
+      },
+      "required": [
+        "workloadProfileType",
+        "minimumCount",
+        "maximumCount"
+      ]
+    },
+    "EnvironmentSkuProperties": {
+      "description": "Managed Environment resource SKU properties.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the Sku.",
+          "externalDocs": {
+            "url": "https://aka.ms/container-apps-pricing"
+          },
+          "enum": [
+            "Consumption",
+            "Premium"
+          ],
+          "x-ms-enum": {
+            "name": "SkuName",
+            "modelAsString": true,
+            "values": [
+              {
+                "value": "Consumption",
+                "description": "Consumption SKU of Managed Environment."
+              },
+              {
+                "value": "Premium",
+                "description": "Premium SKU of Managed Environment."
+              }
+            ]
           }
         }
       },
-      "x-ms-client-flatten": true
+      "required": [
+        "name"
+      ]
     },
-    "CertificateCollection": {
-      "description": "Collection of Certificates.",
+    "workloadProfileStates": {
+      "description": "Collection of all the workload Profile States for a Premium Managed Environment..",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ProxyResource"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "description": "Workload Profile resource specific properties.",
+          "type": "object",
+          "properties": {
+            "minimumCount": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Minimum count of instances."
+            },
+            "maximumCount": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Maximum count of nodes."
+            },
+            "currentCount": {
+              "type": "integer",
+              "format": "int32",
+              "description": "Current count of nodes."
+            }
+          }
+        }
+      }
+    },
+    "workloadProfileStatesCollection": {
+      "description": "Collection of workloadProfileStates",
       "required": [
         "value"
       ],
@@ -947,26 +1125,13 @@
           "description": "Collection of resources.",
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Certificate"
+            "$ref": "#/definitions/workloadProfileStates"
           }
         },
         "nextLink": {
           "description": "Link to next page of resources.",
           "type": "string",
           "readOnly": true
-        }
-      }
-    },
-    "CertificatePatch": {
-      "description": "A certificate to update",
-      "type": "object",
-      "properties": {
-        "tags": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Application-specific metadata in the form of key-value pairs."
         }
       }
     }

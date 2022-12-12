@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2022-03-01",
+    "version": "2022-10-01",
     "title": "ContainerApps API Client"
   },
   "host": "management.azure.com",
@@ -406,6 +406,12 @@
             "createdTime": {
               "format": "date-time",
               "description": "Timestamp describing when the revision was created\nby controller",
+              "type": "string",
+              "readOnly": true
+            },
+            "lastActiveTime": {
+              "format": "date-time",
+              "description": "Timestamp describing when the revision was last active. Only meaningful when revision is inactive",
               "type": "string",
               "readOnly": true
             },

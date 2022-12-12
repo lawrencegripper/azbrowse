@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2022-03-01",
+    "version": "2022-10-01",
     "title": "ContainerApps API Client"
   },
   "host": "management.azure.com",
@@ -34,8 +34,12 @@
         }
       }
     },
-    "Container": {
-      "description": "Container App container definition.",
+    "WorkloadProfileType": {
+      "description": "Workload profile type for container apps to execute.",
+      "type": "string"
+    },
+    "BaseContainer": {
+      "description": "Container App base container definition.",
       "type": "object",
       "properties": {
         "image": {
@@ -74,16 +78,6 @@
           "$ref": "#/definitions/ContainerResources",
           "description": "Container resource requirements."
         },
-        "probes": {
-          "description": "List of probes for the container.",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/ContainerAppProbe"
-          },
-          "x-ms-identifiers": [
-            "type"
-          ]
-        },
         "volumeMounts": {
           "description": "Container volume mounts.",
           "type": "array",
@@ -92,6 +86,36 @@
           },
           "x-ms-identifiers": [
             "volumeName"
+          ]
+        }
+      }
+    },
+    "InitContainer": {
+      "description": "Container App init container definition",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseContainer"
+        }
+      ]
+    },
+    "Container": {
+      "description": "Container App container definition",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BaseContainer"
+        }
+      ],
+      "properties": {
+        "probes": {
+          "description": "List of probes for the container.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContainerAppProbe"
+          },
+          "x-ms-identifiers": [
+            "type"
           ]
         }
       }
@@ -269,6 +293,52 @@
         }
       }
     },
+    "CustomDomainConfiguration": {
+      "type": "object",
+      "description": "Configuration properties for apps environment custom domain",
+      "properties": {
+        "customDomainVerificationId": {
+          "description": "Id used to verify domain name ownership",
+          "type": "string",
+          "readOnly": true
+        },
+        "dnsSuffix": {
+          "type": "string",
+          "description": "Dns suffix for the environment domain",
+          "x-ms-mutability": [
+            "create",
+            "read"
+          ]
+        },
+        "certificateValue": {
+          "format": "byte",
+          "description": "PFX or PEM blob",
+          "type": "string",
+          "x-ms-secret": true
+        },
+        "certificatePassword": {
+          "description": "Certificate password",
+          "type": "string",
+          "x-ms-secret": true
+        },
+        "expirationDate": {
+          "format": "date-time",
+          "description": "Certificate expiration date.",
+          "type": "string",
+          "readOnly": true
+        },
+        "thumbprint": {
+          "description": "Certificate thumbprint.",
+          "type": "string",
+          "readOnly": true
+        },
+        "subjectName": {
+          "description": "Subject name of the certificate.",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
     "DefaultErrorResponse": {
       "description": "App Service error response.",
       "type": "object",
@@ -332,7 +402,7 @@
       }
     },
     "HttpScaleRule": {
-      "description": "Container App container Custom scaling rule.",
+      "description": "Container App container Http scaling rule.",
       "type": "object",
       "properties": {
         "metadata": {
@@ -344,6 +414,29 @@
         },
         "auth": {
           "description": "Authentication secrets for the custom scale rule.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ScaleRuleAuth"
+          },
+          "x-ms-identifiers": [
+            "triggerParameter"
+          ]
+        }
+      }
+    },
+    "TcpScaleRule": {
+      "description": "Container App container Tcp scaling rule.",
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "description": "Metadata properties to describe tcp scale rule.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "auth": {
+          "description": "Authentication secrets for the tcp scale rule.",
           "type": "array",
           "items": {
             "$ref": "#/definitions/ScaleRuleAuth"
@@ -425,6 +518,10 @@
         "http": {
           "$ref": "#/definitions/HttpScaleRule",
           "description": "HTTP requests based scaling."
+        },
+        "tcp": {
+          "$ref": "#/definitions/TcpScaleRule",
+          "description": "Tcp requests based scaling."
         }
       }
     },
@@ -468,6 +565,16 @@
         "revisionSuffix": {
           "description": "User friendly suffix that is appended to the revision name",
           "type": "string"
+        },
+        "initContainers": {
+          "description": "List of specialized containers that run before app containers.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InitContainer"
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
         },
         "containers": {
           "description": "List of container definitions for the Container App.",
@@ -532,6 +639,333 @@
         "mountPath": {
           "description": "Path within the container at which the volume should be mounted.Must not contain ':'.",
           "type": "string"
+        }
+      }
+    },
+    "DaprComponentsCollection": {
+      "description": "Dapr Components ARM resource.",
+      "required": [
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "value": {
+          "description": "Collection of resources.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DaprComponent"
+          }
+        },
+        "nextLink": {
+          "description": "Link to next page of resources.",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "DaprComponent": {
+      "description": "Dapr Component.",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/ProxyResource"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "description": "Dapr Component resource specific properties",
+          "type": "object",
+          "properties": {
+            "componentType": {
+              "description": "Component type",
+              "type": "string"
+            },
+            "version": {
+              "description": "Component version",
+              "type": "string"
+            },
+            "ignoreErrors": {
+              "description": "Boolean describing if the component errors are ignores",
+              "type": "boolean",
+              "default": false
+            },
+            "initTimeout": {
+              "description": "Initialization timeout",
+              "type": "string"
+            },
+            "secrets": {
+              "description": "Collection of secrets used by a Dapr component",
+              "type": "array",
+              "items": {
+                "$ref": "./CommonDefinitions.json#/definitions/Secret"
+              },
+              "x-ms-identifiers": [
+                "name"
+              ]
+            },
+            "secretStoreComponent": {
+              "description": "Name of a Dapr component to retrieve component secrets from",
+              "type": "string"
+            },
+            "metadata": {
+              "description": "Component metadata",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/DaprMetadata"
+              },
+              "x-ms-identifiers": [
+                "name"
+              ]
+            },
+            "scopes": {
+              "description": "Names of container apps that can use this Dapr component",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "x-ms-client-flatten": true
+        }
+      }
+    },
+    "DaprMetadata": {
+      "description": "Dapr component metadata.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Metadata property name.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Metadata property value.",
+          "type": "string"
+        },
+        "secretRef": {
+          "description": "Name of the Dapr Component secret from which to pull the metadata property value.",
+          "type": "string"
+        }
+      }
+    },
+    "DaprSecretsCollection": {
+      "description": "Dapr component Secrets Collection for ListSecrets Action.",
+      "required": [
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "value": {
+          "description": "Collection of secrets used by a Dapr component",
+          "type": "array",
+          "items": {
+            "$ref": "./CommonDefinitions.json#/definitions/DaprSecret"
+          },
+          "x-ms-identifiers": [
+            "name"
+          ]
+        }
+      }
+    },
+    "DaprSecret": {
+      "description": "Dapr component Secret for ListSecrets Action",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Secret Name.",
+          "type": "string",
+          "readOnly": true
+        },
+        "value": {
+          "description": "Secret Value.",
+          "type": "string",
+          "x-ms-secret": true,
+          "readOnly": true
+        }
+      }
+    },
+    "ExtendedLocation": {
+      "type": "object",
+      "description": "The complex type of the extended location.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the extended location."
+        },
+        "type": {
+          "$ref": "#/definitions/ExtendedLocationType",
+          "description": "The type of the extended location."
+        }
+      }
+    },
+    "ExtendedLocationType": {
+      "type": "string",
+      "description": "The type of extendedLocation.",
+      "enum": [
+        "CustomLocation"
+      ],
+      "x-ms-enum": {
+        "name": "ExtendedLocationTypes",
+        "modelAsString": true
+      }
+    },
+    "AzureFileProperties": {
+      "description": "Azure File Properties.",
+      "type": "object",
+      "properties": {
+        "accountName": {
+          "description": "Storage account name for azure file.",
+          "type": "string"
+        },
+        "accountKey": {
+          "description": "Storage account key for azure file.",
+          "type": "string",
+          "x-ms-secret": true
+        },
+        "accessMode": {
+          "description": "Access mode for storage",
+          "enum": [
+            "ReadOnly",
+            "ReadWrite"
+          ],
+          "type": "string",
+          "x-ms-enum": {
+            "name": "AccessMode",
+            "modelAsString": true
+          }
+        },
+        "shareName": {
+          "description": "Azure file share name.",
+          "type": "string"
+        }
+      }
+    },
+    "Certificate": {
+      "description": "Certificate used for Custom Domain bindings of Container Apps in a Managed Environment",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "../../../../../common-types/resource-management/v3/types.json#/definitions/TrackedResource"
+        }
+      ],
+      "properties": {
+        "properties": {
+          "description": "Certificate resource specific properties",
+          "type": "object",
+          "properties": {
+            "provisioningState": {
+              "description": "Provisioning state of the certificate.",
+              "enum": [
+                "Succeeded",
+                "Failed",
+                "Canceled",
+                "DeleteFailed",
+                "Pending"
+              ],
+              "type": "string",
+              "readOnly": true,
+              "x-ms-enum": {
+                "name": "CertificateProvisioningState",
+                "modelAsString": true
+              }
+            },
+            "password": {
+              "description": "Certificate password.",
+              "type": "string",
+              "x-ms-mutability": [
+                "create"
+              ],
+              "x-ms-secret": true
+            },
+            "subjectName": {
+              "description": "Subject name of the certificate.",
+              "type": "string",
+              "readOnly": true
+            },
+            "subjectAlternativeNames": {
+              "description": "Subject alternative names the certificate applies to.",
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "readOnly": true
+            },
+            "value": {
+              "format": "byte",
+              "description": "PFX or PEM blob",
+              "type": "string",
+              "x-ms-mutability": [
+                "create"
+              ],
+              "x-ms-secret": true
+            },
+            "issuer": {
+              "description": "Certificate issuer.",
+              "type": "string",
+              "readOnly": true
+            },
+            "issueDate": {
+              "format": "date-time",
+              "description": "Certificate issue Date.",
+              "type": "string",
+              "readOnly": true
+            },
+            "expirationDate": {
+              "format": "date-time",
+              "description": "Certificate expiration date.",
+              "type": "string",
+              "readOnly": true
+            },
+            "thumbprint": {
+              "description": "Certificate thumbprint.",
+              "type": "string",
+              "readOnly": true
+            },
+            "valid": {
+              "description": "Is the certificate valid?.",
+              "type": "boolean",
+              "readOnly": true
+            },
+            "publicKeyHash": {
+              "description": "Public key hash.",
+              "type": "string",
+              "readOnly": true
+            }
+          }
+        }
+      },
+      "x-ms-client-flatten": true
+    },
+    "CertificateCollection": {
+      "description": "Collection of Certificates.",
+      "required": [
+        "value"
+      ],
+      "type": "object",
+      "properties": {
+        "value": {
+          "description": "Collection of resources.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Certificate"
+          }
+        },
+        "nextLink": {
+          "description": "Link to next page of resources.",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "CertificatePatch": {
+      "description": "A certificate to update",
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Application-specific metadata in the form of key-value pairs."
         }
       }
     }
