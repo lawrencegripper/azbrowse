@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.AAD/stable/2022-09-01/domainservices.json", "Microsoft.AAD/stable/2022-09-01/oucontainer.json"], "name": "package-2022-09"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.AAD/stable/2022-12-01/domainservices.json", "Microsoft.AAD/stable/2022-12-01/oucontainer.json"], "name": "package-2022-12"}
