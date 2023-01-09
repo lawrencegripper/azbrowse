@@ -1,13 +1,16 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
     colorize (0.8.1)
     docker-api (2.1.0)
       excon (>= 0.47.0)
       multi_json
     excon (0.81.0)
-    git (1.11.0)
+    git (1.13.0)
+      addressable (~> 2.8)
       rchardet (~> 1.8)
     kwalify (0.7.2)
     multi_json (1.15.0)
@@ -15,6 +18,7 @@ GEM
     parser (3.0.1.0)
       ast (~> 2.4.1)
     psych (3.3.1)
+    public_suffix (4.0.7)
     rainbow (3.0.0)
     rchardet (1.8.0)
     reek (6.0.4)
@@ -44,7 +48,7 @@ PLATFORMS
 DEPENDENCIES
   colorize
   docker-api
-  git (~> 1.11)
+  git (~> 1.13)
   reek
   rubocop
 
