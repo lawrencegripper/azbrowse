@@ -20,11 +20,11 @@ type AzCLIToken struct {
 
 var currentToken *AzCLIToken
 
-func acquireToken(scope string, tenantID string, subscriptionId string) (AzCLIToken, error) {
+func acquireToken(scope string, tenantID string, subscriptionID string) (AzCLIToken, error) {
 	if scope == "" {
 		return AzCLIToken{}, fmt.Errorf("no scope specified")
 	}
-	var credOptions *azidentity.DefaultAzureCredentialOptions = nil
+	var credOptions *azidentity.DefaultAzureCredentialOptions
 	if tenantID != "" {
 		credOptions = &azidentity.DefaultAzureCredentialOptions{
 			TenantID: tenantID,
@@ -42,14 +42,17 @@ func acquireToken(scope string, tenantID string, subscriptionId string) (AzCLITo
 
 	ctx := context.Background()
 
-	if subscriptionId == "" {
+	if subscriptionID == "" {
 		subscriptionPager := subscriptionClient.NewListPager(nil)
 		for subscriptionPager.More() {
 			subscriptionList, err := subscriptionPager.NextPage(ctx)
 			if err != nil {
 				return AzCLIToken{}, fmt.Errorf("failed to get subscription list: %v", err)
 			}
-			subscriptionId = *subscriptionList.Value[0].SubscriptionID
+			if subscriptionList.Value != nil && len(subscriptionList.Value) > 0 {
+				subscriptionID = *subscriptionList.Value[0].SubscriptionID
+				break
+			}
 		}
 	}
 
@@ -66,7 +69,7 @@ func acquireToken(scope string, tenantID string, subscriptionId string) (AzCLITo
 		AccessToken:  token.Token,
 		TokenType:    "Bearer",
 		Tenant:       tenantID,
-		Subscription: subscriptionId,
+		Subscription: subscriptionID,
 	}, nil
 }
 
