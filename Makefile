@@ -186,8 +186,8 @@ endif
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-e SNAPCRAFT_STORE_CREDENTIALS="$(SNAPCRAFT_STORE_CREDENTIALS)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v ${HOME}/go/pkg/mod:/go/pkg/mod \
-		-v ${HOME}/.cache/go-build:/root/.cache/go-build \
+		-v azbrowse-gomodcache-ci:/go/pkg/mod \
+		-v azbrowse-gobuildcache-ci:/root/.cache/go-build \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		${CMD}

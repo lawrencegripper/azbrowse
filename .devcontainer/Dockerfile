@@ -15,14 +15,6 @@ COPY --from=builder /snap/bin/snapcraft /snap/bin/snapcraft
 # Avoid warnings by switching to noninteractive
 ENV DEBIAN_FRONTEND=noninteractive
 
-# This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
-# this user's GID/UID must match your local user UID/GID to avoid permission issues
-# with bind mounts. Update USER_UID / USER_GID if yours is not 1000. See
-# https://aka.ms/vscode-remote/containers/non-root-user for details.
-ARG USERNAME=vscode
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-
 # Envs
 ENV GO111MODULE=on
 ENV DEVCONTAINER="TRUE"
@@ -92,7 +84,21 @@ RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
 # Install python deps for deving
 RUN pip3 install rope black
 
+# This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
+# this user's GID/UID must match your local user UID/GID to avoid permission issues
+# with bind mounts. Update USER_UID / USER_GID if yours is not 1000. See
+# https://aka.ms/vscode-remote/containers/non-root-user for details.
+ARG USERNAME=vscode
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USERNAME
+USER $USERNAME
+
 # Install ruby bunder gem to support inline gems in ruby scripts
+RUN mkdir /home/$USERNAME/.ruby
+ENV GEM_HOME=/home/$USERNAME/.ruby/
+ENV PATH="$HOME/gems/bin:$PATH"
 RUN gem install bundler
 
 # azure-cli-no-mount
@@ -108,7 +114,7 @@ RUN \
     # --> Go symbols and outline for go to symbol support and test support 
     && go install github.com/acroca/go-symbols@v0.1.1 && go install github.com/ramya-rao-a/go-outline@7182a932836a71948db4a81991a494751eccfe77 \
     # --> GolangCI-lint
-    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
+    && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
     && go install github.com/goreleaser/goreleaser@v${GO_RELEASER_VERSION} \
-    && rm -rf /go/src/ && rm -rf /go/pkg/mod/**
+    && sudo rm -rf /go/src/ && sudo rm -rf /go/pkg/mod/**

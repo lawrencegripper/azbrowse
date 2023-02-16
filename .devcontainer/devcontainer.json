@@ -3,7 +3,10 @@
 {
 	"name": "azbrowse",
 	"dockerFile": "Dockerfile",
-	"cacheFrom": ["ghcr.io/lawrencegripper/azbrowse/devcontainer:latest", "ghcr.io/lawrencegripper/azbrowse/snapbase:latest"],
+	"remoteUser": "vscode",
+	"build": {
+		"cacheFrom": ["ghcr.io/lawrencegripper/azbrowse/devcontainer:latest", "ghcr.io/lawrencegripper/azbrowse/snapbase:latest"],
+	},
 	"runArgs": [
 		// Uncomment the next line to use a non-root user. On Linux, this will prevent
 		// new files getting created as root, but you may need to update the USER_UID
@@ -13,8 +16,6 @@
 		"--security-opt",
 		"seccomp=unconfined",
 		"--privileged",
-		"--device", "/dev/fuse",
-
 		"--name", "azbdev",
 		// Mount go mod cache
 		"-v", "azbrowse-gomodcache:/go/pkg",
@@ -29,34 +30,38 @@
 	],
 	// Use 'settings' to set *default* container specific settings.json values on container create. 
 	// You can edit these settings after create using File > Preferences > Settings > Remote.
-	"settings": {
-		"terminal.integrated.shell.linux": "/bin/bash",
-		"go.gopath": "/go",
-		"go.useLanguageServer": true,
-		"[go]": {
-			"editor.snippetSuggestions": "none",
-			"editor.formatOnSave": true,
-			"editor.codeActionsOnSave": {
-				"source.organizeImports": true,
-			}
-		},
-		"gopls": {
-			"usePlaceholders": true, // add parameter placeholders when completing a function
-			// Experimental settings
-			"completeUnimported": true, // autocomplete unimported packages
-			"deepCompletion": true, // enable deep completion
-		},
-		"files.eol": "\n", // formatting only supports LF line endings		
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"golang.go",
+				"ms-python.python",
+				"rebornix.ruby"
+			],
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+				"go.gopath": "/go",
+				"go.useLanguageServer": true,
+				"[go]": {
+					"editor.snippetSuggestions": "none",
+					"editor.formatOnSave": true,
+					"editor.codeActionsOnSave": {
+						"source.organizeImports": true,
+					}
+				},
+				"gopls": {
+					"usePlaceholders": true, // add parameter placeholders when completing a function
+					// Experimental settings
+					"completeUnimported": true, // autocomplete unimported packages
+					"deepCompletion": true, // enable deep completion
+				},
+				"files.eol": "\n", // formatting only supports LF line endings		
+			},
+		}
 	},
 	// Uncomment the next line if you want to publish any ports.
 	// "appPort": [],
 	// Uncomment the next line to run commands after the container is created.
 	// "postCreateCommand": "go version",
 	// Add the IDs of extensions you want installed when the container is created in the array below.
-	"extensions": [
-		"golang.go",
-		"ms-python.python",
-		"rebornix.ruby"
-	],
 	"postStartCommand": "bundler install"
 }
