@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
@@ -134,7 +134,7 @@ func (c SwaggerAPISetDatabricks) DoRequestWithBodyAndHeaders(verb string, url st
 		return "", err
 	}
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		err = fmt.Errorf("Failed to read body: %s", err)
 		return "", err

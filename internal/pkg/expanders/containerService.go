@@ -7,7 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -224,7 +224,7 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 	}
 
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		return swaggerResourceTypes, err
 	}
@@ -272,7 +272,7 @@ func (e *AzureKubernetesServiceExpander) getSwaggerResourceTypes(httpClient http
 			tmpDir = "/tmp"
 		}
 		tmpPath := tmpDir + "/k8s-paths.yml"
-		ioutil.WriteFile(tmpPath, tempBuf, 0600) //nolint:errcheck
+		os.WriteFile(tmpPath, tempBuf, 0600) //nolint:errcheck
 	}
 
 	swaggerResourceTypes = swagger.ConvertToSwaggerResourceTypes(paths)

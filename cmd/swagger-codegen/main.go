@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -81,7 +80,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 	var paths []*swagger.Path
 	processAPISet := func(apiSetFolder string) bool {
 		apiSetPath := fmt.Sprintf("%s/api-set.json", apiSetFolder)
-		buf, err := ioutil.ReadFile(apiSetPath)
+		buf, err := os.ReadFile(apiSetPath)
 		if err != nil {
 			return false
 		}
@@ -111,7 +110,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 		return false
 	}
 
-	resourceProviderFileInfos, err := ioutil.ReadDir("swagger-specs")
+	resourceProviderFileInfos, err := os.ReadDir("swagger-specs")
 	if err != nil {
 		panic(err)
 	}
@@ -121,7 +120,7 @@ func loadARMSwagger(config *swagger.Config) []*swagger.Path {
 		if resourceProviderFileInfo.IsDir() && resourceProviderFileInfo.Name() != "common-types" {
 			print(fmt.Sprintf("Processing resource provider folder: %s\n", resourceProviderFileInfo.Name()))
 			resourceProviderFolderPath := fmt.Sprintf("swagger-specs/%s/resource-manager", resourceProviderFileInfo.Name())
-			resourceTypeFileInfos, err := ioutil.ReadDir(resourceProviderFolderPath)
+			resourceTypeFileInfos, err := os.ReadDir(resourceProviderFolderPath)
 			_ = resourceTypeFileInfos
 			if err != nil {
 				continue // may just be data-plane folder
@@ -247,7 +246,7 @@ func loadAzureSearchDataPlaneSpecs(config *swagger.Config) []*swagger.Path {
 	directoryNames := []string{"Microsoft.Azure.Search.Service", "Microsoft.Azure.Search.Data"} // need to control the document load order
 	for _, directoryName := range directoryNames {
 		swaggerPath := getFirstNonCommonPath(getFirstNonCommonPath(fmt.Sprintf("swagger-specs/search/data-plane/%s", directoryName)))
-		swaggerFileInfos, err := ioutil.ReadDir(swaggerPath)
+		swaggerFileInfos, err := os.ReadDir(swaggerPath)
 		if err != nil {
 			panic(err)
 		}
@@ -408,7 +407,7 @@ func writeTemplate(w io.Writer, paths []*swagger.Path, config *swagger.Config, s
 func getFirstNonCommonPath(path string) string {
 	// get the first non `common` path
 
-	subfolders, err := ioutil.ReadDir(path)
+	subfolders, err := os.ReadDir(path)
 	if err != nil {
 		panic(err)
 	}

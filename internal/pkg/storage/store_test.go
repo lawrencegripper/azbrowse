@@ -1,7 +1,6 @@
 package storage
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -15,7 +14,7 @@ var testTime = time.Date(2019, 01, 01, 01, 00, 00, 00, time.UTC)
 
 func TestCacheWithTTL(t *testing.T) {
 	// Create a test instance of the DB
-	dirName, err := ioutil.TempDir(os.TempDir(), "azb-storagetests.db")
+	dirName, err := os.MkdirTemp(os.TempDir(), "azb-storagetests.db")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,7 +78,7 @@ func TestCacheWithTTL(t *testing.T) {
 
 func TestGetCacheWithTTL_withNonexistentKey_ExpectErr(t *testing.T) {
 	// Create a test instance of the DB
-	file, err := ioutil.TempFile(os.TempDir(), "azb-storagetests.db")
+	file, err := os.CreateTemp(os.TempDir(), "azb-storagetests.db")
 	if err != nil {
 		log.Fatal(err)
 	}

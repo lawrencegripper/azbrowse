@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -215,7 +215,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 	}
 
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 
 	// Call the response Processors
 	for _, responseProcessor := range c.responseProcessors {

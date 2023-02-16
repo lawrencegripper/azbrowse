@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 
@@ -570,7 +570,7 @@ func (e *ContainerRegistryExpander) doRequest(ctx context.Context, verb string, 
 	}
 
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		return []byte{}, fmt.Errorf("Failed to read body: %s", err)
 	}
@@ -634,7 +634,7 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 		return "", fmt.Errorf("Error making accesstoken request: %s", err)
 	}
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		return "", fmt.Errorf("Failed to read body: %s", err)
 	}
@@ -663,7 +663,7 @@ func (e *ContainerRegistryExpander) getRegistryToken(ctx context.Context, loginS
 		return "", fmt.Errorf("Error making refreshtoken request: %s", err)
 	}
 	defer response.Body.Close() //nolint: errcheck
-	buf, err = ioutil.ReadAll(response.Body)
+	buf, err = io.ReadAll(response.Body)
 	if err != nil {
 		return "", fmt.Errorf("Failed to read body: %s", err)
 	}
