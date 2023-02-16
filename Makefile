@@ -138,6 +138,7 @@ selfupdate-test:
 	AZBROWSE_FORCE_UPDATE=true azbrowse
 
 SHELL = /bin/sh
+USERNAME=$(shell whoami)
 CURRENT_UID := $(shell id -u)
 CURRENT_GID := $(shell id -g)
 
