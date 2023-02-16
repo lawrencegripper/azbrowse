@@ -57,32 +57,12 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
 
-ENV GIT_PROMPT_START='\033[1;36mazb-devcon>\033[0m\033[0;33m\w\a\033[0m'
-
-# Save command line history 
-RUN echo "export HISTFILE=/root/commandhistory/.bash_history" >> "/root/.bashrc" \
-    && echo "export PROMPT_COMMAND='history -a'" >> "/root/.bashrc" \
-    && mkdir -p /root/commandhistory \
-    && touch /root/commandhistory/.bash_history
-
-RUN echo "source /usr/share/bash-completion/bash_completion" >> "/root/.bashrc"
-
-# Git command prompt
-RUN git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1 \
-    && echo "if [ -f \"$HOME/.bash-git-prompt/gitprompt.sh\" ]; then GIT_PROMPT_ONLY_IN_REPO=1 && source $HOME/.bash-git-prompt/gitprompt.sh; fi" >> "/root/.bashrc"
-
 # Install docker used by go releaser
 ENV DOCKER_BUILDKIT=1
 RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
   && tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 \
                  -C /usr/local/bin docker/docker \
   && rm docker-${DOCKER_VERSION}.tgz
-
-# Install autocompletion for azbrowse
-RUN echo 'source <(azbrowse completion bash)' >> "/root/.bashrc"
-
-# Install python deps for deving
-RUN pip3 install rope black
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
@@ -95,10 +75,12 @@ ARG USER_GID=$USER_UID
 RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USERNAME
 USER $USERNAME
 
+# Install python deps for deving
+RUN pip3 install rope black
+
 # Install ruby bunder gem to support inline gems in ruby scripts
 RUN mkdir /home/$USERNAME/.ruby
 ENV GEM_HOME=/home/$USERNAME/.ruby/
-ENV PATH="$HOME/gems/bin:$PATH"
 RUN gem install bundler
 
 # azure-cli-no-mount

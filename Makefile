@@ -25,7 +25,7 @@ test-go:
 ## test-python
 ##		Run python tests, mostly used for swagger gen
 test-python: swagger-update-requirements
-	pytest ./scripts/swagger_update/test_swagger_update.py
+	$(HOME)/.local/bin/pytest ./scripts/swagger_update/test_swagger_update.py
 
 ## test:
 ## 		Run all tests
@@ -177,6 +177,7 @@ endif
 	# - Build/CI/PR etc for controlling build vs build and publish release
 	# - "-v var/rundocker.socket" to allow docker builds via mounted docker socket
 	@docker run -v ${PWD}:${PWD} \
+		--user vscode \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
 		-e BRANCH="${BRANCH}" \
@@ -186,8 +187,6 @@ endif
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-e SNAPCRAFT_STORE_CREDENTIALS="$(SNAPCRAFT_STORE_CREDENTIALS)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v azbrowse-gomodcache-ci:/go/pkg/mod \
-		-v azbrowse-gobuildcache-ci:/root/.cache/go-build \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		${CMD}
