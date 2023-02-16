@@ -141,6 +141,7 @@ SHELL = /bin/sh
 USERNAME=$(shell whoami)
 CURRENT_UID := $(shell id -u)
 CURRENT_GID := $(shell id -g)
+DOCKER_GID := $(shell getent group docker | cut -d: -f3)
 
 ## devcontainer:
 ##		Builds the devcontainer used for VSCode and CI
@@ -151,7 +152,8 @@ devcontainer:
 	docker buildx build -f ./.devcontainer/Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_TAG)' -t $(DEV_CONTAINER_TAG) \
 		--build-arg USERNAME=$(USERNAME) \
 		--build-arg USER_UID=$(CURRENT_UID) \
-		--build-arg USER_GID=$(CURRENT_GID)
+		--build-arg USER_GID=$(CURRENT_GID) \
+		--build-arg DOCKER_GID=$(DOCKER_GID)
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
@@ -185,7 +187,8 @@ endif
 	# - Build/CI/PR etc for controlling build vs build and publish release
 	# - "-v var/rundocker.socket" to allow docker builds via mounted docker socket
 	@docker run -v ${PWD}:${PWD} \
-		--user $(USERNAME) \
+		--user $(USERNAME):$(CURRENT_GID) \
+		--group-add docker \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
 		-e BRANCH="${BRANCH}" \

@@ -72,7 +72,10 @@ ARG USERNAME=vscode
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
-RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USERNAME
+ARG DOCKER_GID=997
+RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USERNAME && \
+    groupadd --gid $DOCKER_GID docker && \
+    usermod -aG docker $USERNAME
 USER $USERNAME
 
 # Install python deps for deving
