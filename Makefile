@@ -25,7 +25,7 @@ test-go:
 ## test-python
 ##		Run python tests, mostly used for swagger gen
 test-python: swagger-update-requirements
-	pytest ./scripts/swagger_update/test_swagger_update.py
+	$(HOME)/.local/bin/pytest ./scripts/swagger_update/test_swagger_update.py
 
 ## test:
 ## 		Run all tests
@@ -137,13 +137,23 @@ selfupdate-test:
 	$(GO_BINARY) install -mod=vendor -i -ldflags "-X main.version=0.0.1-testupdate" ./cmd/azbrowse 
 	AZBROWSE_FORCE_UPDATE=true azbrowse
 
+SHELL = /bin/sh
+USERNAME=$(shell whoami)
+CURRENT_UID := $(shell id -u)
+CURRENT_GID := $(shell id -g)
+DOCKER_GID := $(shell getent group docker | cut -d: -f3)
+
 ## devcontainer:
 ##		Builds the devcontainer used for VSCode and CI
 devcontainer:
 	@echo "Building devcontainer using tag: $(DEV_CONTAINER_TAG)"
 	# Build the devcontainer: Hide output if it builds to keep things clean
 	docker buildx build -f ./.devcontainer/snapbase.Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_SNAPBASE_TAG)' -t $(DEV_CONTAINER_SNAPBASE_TAG)
-	docker buildx build -f ./.devcontainer/Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_TAG)' -t $(DEV_CONTAINER_TAG)
+	docker buildx build -f ./.devcontainer/Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_TAG)' -t $(DEV_CONTAINER_TAG) \
+		--build-arg USERNAME=$(USERNAME) \
+		--build-arg USER_UID=$(CURRENT_UID) \
+		--build-arg USER_GID=$(CURRENT_GID) \
+		--build-arg DOCKER_GID=$(DOCKER_GID)
 
 ## devcontainer-push:
 ##		Pushes the devcontainer image for caching to speed up builds
@@ -177,6 +187,8 @@ endif
 	# - Build/CI/PR etc for controlling build vs build and publish release
 	# - "-v var/rundocker.socket" to allow docker builds via mounted docker socket
 	@docker run -v ${PWD}:${PWD} \
+		--user $(USERNAME):$(CURRENT_GID) \
+		--group-add docker \
 		-e BUILD_NUMBER="${BUILD_NUMBER}" \
 		-e IS_CI="${IS_CI}" \
 		-e BRANCH="${BRANCH}" \
@@ -186,8 +198,6 @@ endif
 		-e DEV_CONTAINER_TAG="$(DEV_CONTAINER_TAG)" \
 		-e SNAPCRAFT_STORE_CREDENTIALS="$(SNAPCRAFT_STORE_CREDENTIALS)" \
 		-v /var/run/docker.sock:/var/run/docker.sock \
-		-v ${HOME}/go/pkg/mod:/go/pkg/mod \
-		-v ${HOME}/.cache/go-build:/root/.cache/go-build \
 		--workdir "${PWD}" \
 		$(DEV_CONTAINER_TAG) \
 		${CMD}
