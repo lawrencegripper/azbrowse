@@ -80,15 +80,6 @@ begin
   puts 'Changed files since last release:'
   puts changes_since_last_release
 
-  vendor_changes = changes_since_last_release.select { |i| i.include?('vendor/') || i.include?('go.mod') || i.include?('go.sum') }
-  if vendor_changes.empty?
-    puts 'Skipping vendor checks as not changes in relevant files'
-  else
-    print_header('Ensure go vendor file is up-to-date')
-    execute_command('go mod vendor')
-    error_if_git_has_changes(git_instance, 'The /vendor file is out of date. Run "go mod vendor" and commit the changes to resolve this issue')
-  end
-
   print_header('Generation - Checking docs and swagger/openapi')
   codegen_changes = changes_since_last_release.select do |i|
     i.include?('.generated.go') or
@@ -156,10 +147,6 @@ begin
     print_header('Run goreleaser: Dry run')
     execute_command 'goreleaser --skip-publish --rm-dist --snapshot'
   end
-
-  puts 'Clean up file permissions on ./dist folder'
-  execute_command("/bin/bash -c 'chown -R $(whoami) ./'")
-  execute_command("/bin/bash -c 'chmod 777 -R ./'")
 
   print_header('Smoke test: Check released docker image starts')
   execute_command('docker run -e AZBROWSE_SKIP_UPDATE=rue ghcr.io/lawrencegripper/azbrowse/azbrowse:latest version')

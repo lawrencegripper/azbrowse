@@ -18,20 +18,11 @@ jobs:
     - name: Set up Docker BuildKit
       uses: docker/setup-buildx-action@v1
 
-    - uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
     - name: Build devcontainer for tooling
-      run: sudo -E make devcontainer
+      run: make devcontainer
 
     - name: Build the Docker image, run tests and publish(on master only)
-      run: CMD='ruby ${PWD}/scripts/release.rb' sudo -E make devcontainer-run
+      run: CMD='ruby ${PWD}/scripts/release.rb' make devcontainer-run
       env:
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
