@@ -45,6 +45,9 @@ issues:
   max-same-issues: 0
   exclude: []
   exclude-rules:
+    - text: "package-comments: should have a package comment"
+      linters: 
+        - revive
       #Ignore gocui funcs
     - text: Error return value of `g.DeleteView` is not checked
       linters:

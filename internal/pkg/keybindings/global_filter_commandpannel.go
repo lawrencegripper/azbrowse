@@ -24,12 +24,12 @@ func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) 
 	return handler
 }
 
-//  Hack to work around circular import
+// Hack to work around circular import
 func (h *CommandPanelFilterHandler) SetItemWidget(w *views.ItemWidget) {
 	h.itemView = w
 }
 
-//  Hack #2 to work around circular import
+// Hack #2 to work around circular import
 func (h *CommandPanelFilterHandler) SetListWidget(w *views.ListWidget) {
 	h.list = w
 }
