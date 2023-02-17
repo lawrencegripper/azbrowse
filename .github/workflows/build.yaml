@@ -18,7 +18,7 @@ jobs:
     - name: Pre-build image and run make ci-build in dev container
       uses: devcontainers/ci@v0.2
       with:
-        imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer:latest
-        cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer:latest
+        imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer
+        cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer
         push: always
         runCmd: ruby scripts/release.rb
