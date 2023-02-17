@@ -19,11 +19,11 @@ jobs:
       run: sudo -E make devcontainer
 
     - name: Run swagger-update to pull latest specs from azure specs repo
-      run: CMD='make swagger-update' sudo -E make devcontainer-run
+      run: CMD='make swagger-update' make devcontainer-run
 
 
     - name: Run swagger-codegen to gen go types
-      run: CMD='make swagger-codegen' sudo -E make devcontainer-run
+      run: CMD='make swagger-codegen' make devcontainer-run
 
     - name: Sort file permissions
       run: sudo chown -R $(whoami) .
