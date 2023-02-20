@@ -9,7 +9,7 @@ GEM
       excon (>= 0.47.0)
       multi_json
     excon (0.81.0)
-    git (1.13.0)
+    git (1.13.2)
       addressable (~> 2.8)
       rchardet (~> 1.8)
     kwalify (0.7.2)
@@ -18,7 +18,7 @@ GEM
     parser (3.0.1.0)
       ast (~> 2.4.1)
     psych (3.3.1)
-    public_suffix (4.0.7)
+    public_suffix (5.0.1)
     rainbow (3.0.0)
     rchardet (1.8.0)
     reek (6.0.4)
