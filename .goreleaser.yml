@@ -1,3 +1,4 @@
+project_name: azbrowse
 builds:
   - id: all
     env:

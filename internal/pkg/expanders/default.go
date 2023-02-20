@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -188,7 +188,7 @@ func (e *DefaultExpander) testCases() (bool, *[]expanderTestCase) {
 				st.Expect(t, r.Err, nil)
 				st.Expect(t, len(r.Nodes), 0)
 
-				dat, err := ioutil.ReadFile(testResponseFile)
+				dat, err := os.ReadFile(testResponseFile)
 				if err != nil {
 					t.Error(err)
 					t.FailNow()

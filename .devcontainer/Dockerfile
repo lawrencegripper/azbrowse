@@ -3,7 +3,7 @@ FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
-FROM golang:1.18-bullseye
+FROM golang:1.20-bullseye
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 COPY --from=builder /snap/core /snap/core
@@ -27,11 +27,11 @@ ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
 # Versions
-ENV DOCKER_VERSION=20.10.17
-ARG GO_PLS_VERSION=0.8.4
-ARG DLV_VERSION=1.8.3
-ARG GO_RELEASER_VERSION=1.9.2
-ARG GOLANGCI_LINT_VERSION=1.46.2
+ENV DOCKER_VERSION=23.0.1
+ARG GO_PLS_VERSION=0.11.0
+ARG DLV_VERSION=1.20.1
+ARG GO_RELEASER_VERSION=1.15.2
+ARG GOLANGCI_LINT_VERSION=1.51.1
 
 RUN \
     apt-get update \
@@ -58,7 +58,6 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     update-locale LANG=en_US.UTF-8
 
 # Install docker used by go releaser
-ENV DOCKER_BUILDKIT=1
 RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
   && tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 \
                  -C /usr/local/bin docker/docker \

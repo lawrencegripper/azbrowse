@@ -10,7 +10,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"sort"
@@ -720,7 +720,7 @@ func (e *StorageBlobExpander) doRequestWithHeadersIncludeResponseHeaders(ctx con
 	}
 
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		return []byte{}, nil, fmt.Errorf("Failed to read body: %s", err)
 	}

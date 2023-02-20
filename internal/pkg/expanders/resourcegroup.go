@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -258,7 +258,7 @@ func (e *ResourceGroupResourceExpander) testCases() (bool, *[]expanderTestCase) 
 	const testResponseFile = "./testdata/armsamples/resourcegroups/resourcelist.json"
 
 	gockConfig := func(t *testing.T) {
-		dat, err := ioutil.ReadFile(testResponseFile)
+		dat, err := os.ReadFile(testResponseFile)
 		if err != nil {
 			t.Error(err)
 			t.FailNow()

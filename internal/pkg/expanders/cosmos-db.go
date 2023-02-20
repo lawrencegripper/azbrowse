@@ -10,7 +10,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"strings"
 	"time"
 
@@ -1008,7 +1007,7 @@ func (e *CosmosDbExpander) doRequestWithHeadersAndBody(ctx context.Context, verb
 	}
 
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to read body: %s", err)
 	}

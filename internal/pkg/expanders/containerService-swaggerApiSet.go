@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -94,7 +94,7 @@ func (c SwaggerAPISetContainerService) doRequestWithBody(ctx context.Context, ve
 		return "", err
 	}
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		err = fmt.Errorf("Failed to read body: %s", err)
 		return "", err
