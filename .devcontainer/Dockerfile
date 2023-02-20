@@ -84,6 +84,8 @@ RUN pip3 install rope black
 RUN mkdir /home/$USERNAME/.ruby
 ENV GEM_HOME=/home/$USERNAME/.ruby/
 RUN gem install bundler
+ENV PATH="/home/$USERNAME/.ruby/bin:$PATH"
+
 
 # azure-cli-no-mount
 COPY scripts/azure-cli.sh /tmp/
