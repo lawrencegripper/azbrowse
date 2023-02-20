@@ -138,6 +138,14 @@ selfupdate-test:
 	AZBROWSE_FORCE_UPDATE=true azbrowse
 
 ## local-ci
-##		This can be used to test the full CI process locally, the build won't be published but the same process will be followed as PR builds
+##		Run CI from inside a devcontainer or codespace, the build won't be published but the same process will be followed as PR builds
 local-ci:
 	./scripts/local-ci.sh
+
+## devcontainer-local-ci
+##     Run CI from outside a devcontainer on a box with docker and the devcontainer/cli installed https://github.com/devcontainers/cli/
+devcontainer-local-ci:
+	# Run 'npm install -g @devcontainers/cli' to install the CLI
+	devcontainer up --workspace-folder ${PWD}
+	devcontainer run-user-commands --workspace-folder ${PWD}
+	devcontainer exec --workspace-folder ${PWD} ./scripts/local-ci.sh
