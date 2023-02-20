@@ -148,4 +148,4 @@ devcontainer-local-ci:
 	# Run 'npm install -g @devcontainers/cli' to install the CLI
 	devcontainer up --workspace-folder ${PWD}
 	devcontainer run-user-commands --workspace-folder ${PWD}
-	devcontainer exec --workspace-folder ${PWD} ./scripts/local-ci.sh
+	devcontainer exec --workspace-folder ${PWD} '/workspaces/azbrowse/scripts/local-ci.sh'
