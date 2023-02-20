@@ -148,8 +148,8 @@ DOCKER_GID := $(shell getent group docker | cut -d: -f3)
 devcontainer:
 	@echo "Building devcontainer using tag: $(DEV_CONTAINER_TAG)"
 	# Build the devcontainer: Hide output if it builds to keep things clean
-	docker build -f ./.devcontainer/snapbase.Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_SNAPBASE_TAG)' -t $(DEV_CONTAINER_SNAPBASE_TAG)
-	docker build -f ./.devcontainer/Dockerfile ./.devcontainer --output=type=docker --cache-to=type=inline --cache-from 'type=registry,ref=$(DEV_CONTAINER_TAG)' -t $(DEV_CONTAINER_TAG) \
+	docker build -f ./.devcontainer/snapbase.Dockerfile ./.devcontainer -t $(DEV_CONTAINER_SNAPBASE_TAG)
+	docker build -f ./.devcontainer/Dockerfile ./.devcontainer -t $(DEV_CONTAINER_TAG) \
 		--build-arg USERNAME=$(USERNAME) \
 		--build-arg USER_UID=$(CURRENT_UID) \
 		--build-arg USER_GID=$(CURRENT_GID) \
