@@ -17,20 +17,30 @@ jobs:
 
     - name: Pre-build image and run make ci-build in dev container
       uses: devcontainers/ci@v0.2
-      with:
-        imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer
-        cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer
-        push: always
-        runCmd: ruby scripts/release.rb
       env:
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
         BUILD_NUMBER: ${{ github.run_number }}
-        IS_CI: "true"
         IS_PR: ${{ github.head_ref }}
         BRANCH: ${{ github.ref }}
+      with:
+        imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer
+        cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer
+        push: always
+        runCmd: ruby scripts/release.rb
+        # Map through the envs from above into the devcontain
+        # empty items mean it takes value from the `env` on stage
+        env: |
+            GITHUB_TOKEN
+            DOCKER_USERNAME
+            DOCKER_PASSWORD
+            SNAPCRAFT_STORE_CREDENTIALS
+            BUILD_NUMBER
+            IS_CI="true"
+            IS_PR
+            BRANCH
 
     - name: Upload azbrowse build as artifact
       uses: actions/upload-artifact@v2
