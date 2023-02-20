@@ -72,7 +72,8 @@ func RegisterGuiAndStartHistoryTracking(ctx context.Context, g *gocui.Gui) {
 // RecoveryWithCleanup cleans up a go routine panic
 // ensuring the terminal is left usable
 // Example: (required on all go routines)
-//  `defer errorhandling.RecoveryWithCleanup(recover())`
+//
+//	`defer errorhandling.RecoveryWithCleanup(recover())`
 func RecoveryWithCleanup() {
 	if r := recover(); r != nil {
 		guiClose()

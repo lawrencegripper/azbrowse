@@ -2,8 +2,8 @@ package expanders
 
 import (
 	"context"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/storage"
@@ -39,7 +39,7 @@ func Test_Expanders(t *testing.T) {
 
 				expectedJSONResponse := "Error No response content supplied to test framework"
 				if tt.responseFile != "" {
-					dat, err := ioutil.ReadFile(tt.responseFile)
+					dat, err := os.ReadFile(tt.responseFile)
 					if err != nil {
 						t.Error(err)
 						t.FailNow()

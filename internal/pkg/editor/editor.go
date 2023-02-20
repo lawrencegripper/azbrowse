@@ -2,7 +2,6 @@ package editor
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 
@@ -23,7 +22,7 @@ func OpenForContent(content string, fileExtension string) (string, error) {
 	if tempDir == "" {
 		tempDir = os.TempDir() // fall back to Temp dir as default
 	}
-	tmpFile, err := ioutil.TempFile(tempDir, "azbrowse-*"+fileExtension)
+	tmpFile, err := os.CreateTemp(tempDir, "azbrowse-*"+fileExtension)
 	if err != nil {
 		return "", fmt.Errorf("Cannot create temporary file: %s", err)
 	}
@@ -66,7 +65,7 @@ func OpenForContent(content string, fileExtension string) (string, error) {
 		return "", fmt.Errorf("Cannot open editor (ensure https://code.visualstudio.com is installed): %s", editorErr)
 	}
 
-	updatedContentBuf, err := ioutil.ReadFile(tmpFile.Name())
+	updatedContentBuf, err := os.ReadFile(tmpFile.Name())
 	if err != nil {
 		return "", fmt.Errorf("Cannot open edited file: %s", err)
 	}

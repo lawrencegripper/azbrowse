@@ -1,7 +1,6 @@
 package config
 
 import (
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -32,7 +31,7 @@ func GetCustomResourceGraphQueries() ([]GraphQuery, error) {
 		return []GraphQuery{}, nil
 	}
 
-	files, err := ioutil.ReadDir(queryDirLocation)
+	files, err := os.ReadDir(queryDirLocation)
 	if err != nil {
 		return []GraphQuery{}, err
 	}

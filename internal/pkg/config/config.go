@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"os"
 	"os/user"
 )
@@ -61,7 +61,7 @@ func Load() (Config, error) {
 		return config, err
 	}
 	defer configFile.Close() //nolint: errcheck
-	bytes, _ := ioutil.ReadAll(configFile)
+	bytes, _ := io.ReadAll(configFile)
 	if err := json.Unmarshal(bytes, &config); err != nil {
 		return config, err
 	}

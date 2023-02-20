@@ -1,4 +1,4 @@
-ruby "2.5.5"
+ruby "2.7.4"
 
 source 'https://rubygems.org'
 gem 'git', '~> 1.13'

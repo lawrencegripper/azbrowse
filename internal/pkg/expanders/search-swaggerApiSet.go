@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
@@ -103,7 +103,7 @@ func (c SwaggerAPISetSearch) DoRequestWithBodyAndHeaders(verb string, url string
 		return "", err
 	}
 	defer response.Body.Close() //nolint: errcheck
-	buf, err := ioutil.ReadAll(response.Body)
+	buf, err := io.ReadAll(response.Body)
 	if err != nil {
 		err = fmt.Errorf("Failed to read body: %s", err)
 		return "", err
