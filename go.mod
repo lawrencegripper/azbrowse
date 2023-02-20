@@ -12,7 +12,7 @@ require (
 	github.com/cskr/pubsub v1.0.2
 	github.com/fatih/color v1.13.0
 	github.com/go-openapi/loads v0.21.1
-	github.com/go-openapi/spec v0.20.6
+	github.com/go-openapi/spec v0.20.8
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20220206211657-0a94163c4677
 	github.com/guptarohit/asciigraph v0.5.5
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
@@ -33,12 +33,14 @@ require (
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20211028080628-e2786a622600
 )
 
-require github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.1
+require (
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.1
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions v1.0.0
+)
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.0.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.0.0 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions v1.0.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v0.8.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
