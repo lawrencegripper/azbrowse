@@ -1,7 +1,4 @@
 name: release
-permissions:
-  packages: write
-  contents: read
 
 on:
   push:
@@ -25,7 +22,7 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GHACTIONS_SECRET }}
 
-    - name: Pre-build image and run make ci-build in dev container
+    - name: Run Checks, Tests and Build
       uses: devcontainers/ci@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
