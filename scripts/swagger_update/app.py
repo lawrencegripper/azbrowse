@@ -29,7 +29,9 @@ if __name__ == "__main__":
         "automation": "package-2015-10",
         "applicationinsights": "package-2020-02-12",
         # Pin at 2022-04-01 has invalid/missing common.json file
-        "compute": "package-2022-03-01"
+        "compute": "package-2022-03-01",
+        # Pin as has missing/invalid Microsoft.Databricks/preview/2022-04-01-preview/databricks.json file
+        "databricks": "package-2021-04-01-preview"
     }
 
     # This allows you to augment the included files for each README.MD for a specific tag
@@ -37,6 +39,9 @@ if __name__ == "__main__":
     resource_provider_input_file_additions = {
         "cosmos-db" : {
             "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
+        },
+        "postgresql": {
+            "package-flexibleserver-2022-12-01": ["./postgresql/resource-manager/types/common-types.json"]
         }
     }
 
