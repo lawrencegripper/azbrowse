@@ -69,7 +69,8 @@ begin
   puts "Is release to be published? #{publish_build_output}"
 
   git_instance = Git.open(repo_root)
-  error_if_git_has_changes(git_instance,
+  error_if_git_has_changes(
+    git_instance,
     'Uncommitted changes found, release.rb requires a clean git state. Commit your changes then re-run.'
   )
 
@@ -92,7 +93,8 @@ begin
     puts 'Skipping swagger-codegen as no changes in relevant files'
   else
     execute_command 'make swagger-codegen'
-    error_if_git_has_changes(git_instance,
+    error_if_git_has_changes(
+      git_instance,
       'Codegen caused changes to files. Run "make swagger-codegen" and commit the results to resolve this issue')
   end
 
@@ -102,7 +104,8 @@ begin
   else
     print_header('Generate docs')
     execute_command 'make docs-update'
-    error_if_git_has_changes(git_instance,
+    error_if_git_has_changes(
+      git_instance,
       'Docs generation caused git changes. Run "make docs-update" and commit the results to resolve this issue.')
   end
 
