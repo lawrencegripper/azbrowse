@@ -51,6 +51,9 @@ begin
   ENV['GOVERSION'] = go_version
 
   print_header('Configuration')
+  puts 'Whoami:'
+  execute_command('whoami')
+  puts "GOPATH: #{ENV['GOPATH']}"
   puts "Is running in CI? #{@is_ci}"
   puts "Branch: #{@branch}"
   puts "Go version: #{go_version}"

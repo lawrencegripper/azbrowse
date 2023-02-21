@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Insights/stable/2023-01-01/actionGroups_API.json"], "name": "package-2023-01-only"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Insights/preview/2023-03-01-preview/tenantActionGroups_API.json"], "name": "package-2023-03-01-preview-only"}

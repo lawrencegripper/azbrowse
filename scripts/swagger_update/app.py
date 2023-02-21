@@ -22,7 +22,8 @@ if __name__ == "__main__":
         "automation": "package-2015-10",
         "applicationinsights": "package-2020-02-12",
         # Pin as has missing/invalid Microsoft.Databricks/preview/2022-04-01-preview/databricks.json file
-        "databricks": "package-2021-04-01-preview"
+        "databricks": "package-2021-04-01-preview",
+        "billing":""
     }
 
     # This allows you to augment the included files for each README.MD for a specific tag

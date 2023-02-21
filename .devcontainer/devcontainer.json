@@ -16,11 +16,8 @@
 		"--security-opt",
 		"seccomp=unconfined",
 		"--privileged",
-		"--name", "azbdev",
-		// Keep command history 
-		"-v", "azbrowse-bashhistory:/root/commandhistory",
-		// Mount docker socket for docker builds
-		"-v", "/var/run/docker.sock:/var/run/docker.sock",
+		"--name",
+		"azbdev",
 		// Use host network
 		"--network=host",
 		// Mount azure, git and docker config
@@ -36,8 +33,7 @@
 				"rebornix.ruby"
 			],
 			"settings": {
-				"terminal.integrated.shell.linux": "/bin/bash",
-				"go.gopath": "/go",
+				"go.gopath": "${env:GOPATH}/go",
 				"go.useLanguageServer": true,
 				"[go]": {
 					"editor.snippetSuggestions": "none",
@@ -56,13 +52,9 @@
 			},
 		}
 	},
-	// Uncomment the next line if you want to publish any ports.
-	// "appPort": [],
-	// Uncomment the next line to run commands after the container is created.
-	// "postCreateCommand": "go version",
-	// Add the IDs of extensions you want installed when the container is created in the array below.
 	"postStartCommand": "bundler install",
 	"features": {
-		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {}
+		"ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
 }

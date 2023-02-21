@@ -19,9 +19,12 @@ end
 
 def error_if_git_has_changes(git_instance, error_to_show_if_changes)
   git_changes = git_instance.status.changed
-  return unless git_changes.count.positive?
+  return unless git_changes.keys.length.positive?
 
-  git_changes.keys { |key| puts "Changes in file #{key}" }
+  puts 'File changes:'
+  git_changes.keys.each { |key| puts "Changes in file #{key}" }
+  print_header("Diff")
+  execute_command("git diff")
   exit_with_error error_to_show_if_changes
 end
 
