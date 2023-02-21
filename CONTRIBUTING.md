@@ -10,12 +10,43 @@
 
 The repository has a pre-configured `devcontainer` which can be used with VSCode to setup and run a fully configured build environment. 
 
-
 1. Install [Remote Extensions Pack](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.vscode-remote-extensionpack)
 2. Clone the Repo and open in VSCode 
 4. `CTRL`+`Shift`+`P` -> `Reopen in container` (or `cmd` on mac / however you get to your command panel in VSCode)
 
 The first time you launch with the container a build will occur which can take some time, subsequent launches will use the cache so start immediately. 
+
+### Without VSCode
+
+Using [`devcontainer cli`](https://github.com/devcontainers/cli/) you can get the full development environment without VSCode.
+
+```bash
+	Run 'npm install -g @devcontainers/cli' to install the CLI
+	devcontainer up --workspace-folder ${PWD}
+	devcontainer run-user-commands --workspace-folder ${PWD}
+	devcontainer exec --workspace-folder ${PWD} '/workspaces/azbrowse/scripts/local-ci.sh'
+```
+
+## Running full CI locally
+
+### Inside VSCode
+
+1. Start the repo and build the devcontainer using [Environment Setup](#environment-setup)
+1. Open a terminal
+1. Run `make local-ci`
+
+### Without VSCode
+
+Prereqs:
+- Docker
+- [`devcontainer cli`](https://github.com/devcontainers/cli/)
+
+
+```
+make devcontainer-local-ci
+```
+
+This will spin up a docker container and execute the CI within it.
 
 ## Building
 
@@ -27,7 +58,12 @@ Run `make help` to see what `targets` exist and what they do or take a look at t
 
 Below are the simples ones to get you started.
 
-### Run Tests and Build
+### Run Checks, Tests and Build
+
+```bash
+# Runs linting and formatting checks
+make checks
+```
 
 ``` bash
 make build
