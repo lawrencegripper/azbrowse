@@ -193,6 +193,13 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
             "/common",
         )
 
+        # Look for `types` folder under the `resource-manager` folder
+        file_helper.copy_child_folder_if_exists(
+            resource_provider_source,
+            resource_provider_target,
+            "/types",
+        )
+
         # Look for `common` folders under the resource type folder
         resource_type_folders = set(
             [x[0 : x.index("/")] for x in api_version.get_input_files()]

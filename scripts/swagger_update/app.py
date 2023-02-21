@@ -40,9 +40,6 @@ if __name__ == "__main__":
         "cosmos-db" : {
             "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
         },
-        "postgresql": {
-            "package-flexibleserver-2022-12-01": ["./postgresql/resource-manager/types/common-types.json"]
-        }
     }
 
     print(
