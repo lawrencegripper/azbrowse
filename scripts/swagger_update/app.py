@@ -28,8 +28,6 @@ if __name__ == "__main__":
         "recoveryservicessiterecovery": "",
         "automation": "package-2015-10",
         "applicationinsights": "package-2020-02-12",
-        # Pin at 2022-04-01 has invalid/missing common.json file
-        "compute": "package-2022-03-01",
         # Pin as has missing/invalid Microsoft.Databricks/preview/2022-04-01-preview/databricks.json file
         "databricks": "package-2021-04-01-preview"
     }
