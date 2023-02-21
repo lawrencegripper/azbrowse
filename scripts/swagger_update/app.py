@@ -10,7 +10,6 @@ import os
 if __name__ == "__main__":
     # resource_provider_version_overrides is keyed on RP name with the value being the tag to force
     resource_provider_version_overrides = {
-        "cosmos-db": "package-2020-04",
         # azureactivedirectory 2020-07-01-preview references files from 2020-03-01-preview which are not listed in the input files
         "azureactivedirectory": "package-2020-03-01-preview",
         # ./azsadmin seems very broken, lots of references to files cross versions
@@ -29,9 +28,10 @@ if __name__ == "__main__":
     # This allows you to augment the included files for each README.MD for a specific tag
     # this is useful when files which are needed are incorrectly left out of the 'input-file'
     resource_provider_input_file_additions = {
-        "cosmos-db" : {
-            "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
-        },
+        # Example:
+        # "cosmos-db" : {
+        #     "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
+        # },
     }
 
     print(

@@ -3,7 +3,7 @@
   "info": {
     "title": "Cosmos DB",
     "description": "Azure Cosmos DB Database Service Resource Provider REST API",
-    "version": "2019-08-01-preview"
+    "version": "2022-11-15"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -155,7 +155,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/ErrorResponse"
+              "$ref": "../../stable/2022-11-15/cosmos-db.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -199,7 +199,7 @@
           "default": {
             "description": "Error response describing why the operation failed.",
             "schema": {
-              "$ref": "#/definitions/ErrorResponse"
+              "$ref": "../../stable/2022-11-15/cosmos-db.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -213,19 +213,6 @@
     }
   },
   "definitions": {
-    "ErrorResponse": {
-      "properties": {
-        "code": {
-          "description": "Error code.",
-          "type": "string"
-        },
-        "message": {
-          "description": "Error message indicating why the operation failed.",
-          "type": "string"
-        }
-      },
-      "description": "Error Response."
-    },
     "PrivateEndpointConnectionListResult": {
       "description": "A list of private endpoint connections",
       "type": "object",

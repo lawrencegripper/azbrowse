@@ -3,7 +3,7 @@
   "info": {
     "title": "Cosmos DB",
     "description": "Azure Cosmos DB Database Service Resource Provider REST API",
-    "version": "2020-04-01"
+    "version": "2022-11-15"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -115,6 +115,9 @@
           },
           "CosmosDBDatabaseAccountCreateMax": {
             "$ref": "./examples/CosmosDBDatabaseAccountCreateMax.json"
+          },
+          "CosmosDBRestoreDatabaseAccountCreateUpdate.json": {
+            "$ref": "./examples/CosmosDBRestoreDatabaseAccountCreateUpdate.json"
           }
         },
         "description": "Creates or updates an Azure Cosmos DB database account. The \"Update\" method is preferred when performing updates on an account.",
@@ -176,7 +179,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The database account delete operation will complete asynchronously."
+            "description": "The database account delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The specified account does not exist in the subscription."
@@ -219,7 +232,17 @@
         ],
         "responses": {
           "202": {
-            "description": "Accepted. The failover policy change operation will complete asynchronously."
+            "description": "Accepted. The failover policy change operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "No Content"
@@ -397,7 +420,17 @@
             "description": "The offline region operation is completed successfully."
           },
           "202": {
-            "description": "Accepted. The offline region operation will complete asynchronously."
+            "description": "Accepted. The offline region operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "default": {
             "description": "Error response describing why the operation failed.",
@@ -446,7 +479,17 @@
             "description": "The online region operation is completed successfully."
           },
           "202": {
-            "description": "Accepted. The online region operation will complete asynchronously."
+            "description": "Accepted. The online region operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "default": {
             "description": "Error response describing why the operation failed.",
@@ -559,7 +602,17 @@
             "description": "OK"
           },
           "202": {
-            "description": "Accepted. The regenerate key operation will complete asynchronously."
+            "description": "Accepted. The regenerate key operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           }
         }
       }
@@ -1551,7 +1604,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL database create or update operation will complete asynchronously."
+            "description": "The SQL database create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL database create or update operation was completed successfully.",
@@ -1589,7 +1652,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL database delete operation will complete asynchronously."
+            "description": "The SQL database delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The SQL database delete operation was completed successfully."
@@ -1669,7 +1742,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the SQL database update operation will complete asynchronously."
+            "description": "The RUs per second of the SQL database update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the SQL database update operation was completed successfully.",
@@ -1709,12 +1792,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL database migrate operation will complete asynchronously."
+            "description": "The SQL database migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL database migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -1749,12 +1848,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL database migrate operation will complete asynchronously."
+            "description": "The SQL database migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL database migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -1877,7 +1992,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL container create or update operation will complete asynchronously."
+            "description": "The SQL container create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL container create or update operation was completed successfully.",
@@ -1918,7 +2043,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL container delete operation will complete asynchronously."
+            "description": "The SQL container delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The SQL container delete operation was completed successfully."
@@ -2004,7 +2139,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the SQL container update operation will complete asynchronously."
+            "description": "The RUs per second of the SQL container update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the SQL container update operation was completed successfully.",
@@ -2047,12 +2192,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL container migrate operation will complete asynchronously."
+            "description": "The SQL container migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL container migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -2090,12 +2251,166 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL container migrate operation will complete asynchronously."
+            "description": "The SQL container migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL container migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/clientEncryptionKeys": {
+      "get": {
+        "operationId": "SqlResources_ListClientEncryptionKeys",
+        "x-ms-examples": {
+          "CosmosDBClientEncryptionKeysList": {
+            "$ref": "./examples/CosmosDBSqlClientEncryptionKeysList.json"
+          }
+        },
+        "description": "Lists the ClientEncryptionKeys under an existing Azure Cosmos DB SQL database.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/accountNameParameter"
+          },
+          {
+            "$ref": "#/parameters/databaseNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The ClientEncryptionKeys were retrieved successfully.",
+            "schema": {
+              "$ref": "#/definitions/ClientEncryptionKeysListResult"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": null
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/sqlDatabases/{databaseName}/clientEncryptionKeys/{clientEncryptionKeyName}": {
+      "get": {
+        "operationId": "SqlResources_GetClientEncryptionKey",
+        "x-ms-examples": {
+          "CosmosDBClientEncryptionKeyGet": {
+            "$ref": "./examples/CosmosDBSqlClientEncryptionKeyGet.json"
+          }
+        },
+        "description": "Gets the ClientEncryptionKey under an existing Azure Cosmos DB SQL database.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/accountNameParameter"
+          },
+          {
+            "$ref": "#/parameters/databaseNameParameter"
+          },
+          {
+            "$ref": "#/parameters/clientEncryptionKeyNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The ClientEncryptionKey was retrieved successfully.",
+            "schema": {
+              "$ref": "#/definitions/ClientEncryptionKeyGetResults"
+            }
+          }
+        }
+      },
+      "put": {
+        "operationId": "SqlResources_CreateUpdateClientEncryptionKey",
+        "x-ms-examples": {
+          "CosmosDBClientEncryptionKeyCreateUpdate": {
+            "$ref": "./examples/CosmosDBSqlClientEncryptionKeyCreateUpdate.json"
+          }
+        },
+        "description": "Create or update a ClientEncryptionKey. This API is meant to be invoked via tools such as the Azure Powershell (instead of directly).",
+        "x-ms-long-running-operation": true,
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/accountNameParameter"
+          },
+          {
+            "$ref": "#/parameters/databaseNameParameter"
+          },
+          {
+            "$ref": "#/parameters/clientEncryptionKeyNameParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "createUpdateClientEncryptionKeyParameters",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ClientEncryptionKeyCreateUpdateParameters"
+            },
+            "description": "The parameters to provide for the client encryption key."
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "The client encryption key create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
+          },
+          "200": {
+            "description": "The client encryption key create or update operation was completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/ClientEncryptionKeyGetResults"
             }
           }
         }
@@ -2135,6 +2450,12 @@
             "description": "The SQL stored procedure properties were retrieved successfully.",
             "schema": {
               "$ref": "#/definitions/SqlStoredProcedureListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         },
@@ -2227,7 +2548,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL storedProcedure create or update operation will complete asynchronously."
+            "description": "The SQL storedProcedure create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL storedProcedure create or update operation was completed successfully.",
@@ -2271,7 +2602,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL storedProcedure delete operation will complete asynchronously."
+            "description": "The SQL storedProcedure delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The SQL storedProcedure delete operation was completed successfully."
@@ -2405,7 +2746,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL userDefinedFunction create or update operation will complete asynchronously."
+            "description": "The SQL userDefinedFunction create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL userDefinedFunction create or update operation was completed successfully.",
@@ -2449,7 +2800,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL userDefinedFunction delete operation will complete asynchronously."
+            "description": "The SQL userDefinedFunction delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The SQL userDefinedFunction delete operation was completed successfully."
@@ -2583,7 +2944,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL trigger create or update operation will complete asynchronously."
+            "description": "The SQL trigger create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The SQL trigger create or update operation was completed successfully.",
@@ -2627,7 +2998,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The SQL trigger delete operation will complete asynchronously."
+            "description": "The SQL trigger delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The SQL trigger delete operation was completed successfully."
@@ -2743,7 +3124,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB database create or update operation will complete asynchronously."
+            "description": "The MongoDB database create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The MongoDB database create or update operation was completed successfully.",
@@ -2781,7 +3172,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB database delete operation will complete asynchronously."
+            "description": "The MongoDB database delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The MongoDB database delete operation was completed successfully."
@@ -2861,12 +3262,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the MongoDB database update operation will complete asynchronously."
+            "description": "The RUs per second of the MongoDB database update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the MongoDB database update operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -2901,12 +3318,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB database migrate operation will complete asynchronously."
+            "description": "The MongoDB database migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The MongoDB database migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -2941,12 +3374,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB database migrate operation will complete asynchronously."
+            "description": "The MongoDB database migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The MongoDB database migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -3069,7 +3518,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB Collection create or update operation will complete asynchronously."
+            "description": "The MongoDB Collection create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The MongoDB Collection create or update operation was completed successfully.",
@@ -3110,7 +3569,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB collection delete operation will complete asynchronously."
+            "description": "The MongoDB collection delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The MongoDB collection delete operation was completed successfully."
@@ -3196,7 +3665,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the MongoDB collection update operation will complete asynchronously."
+            "description": "The RUs per second of the MongoDB collection update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the MongoDB collection update operation was completed successfully.",
@@ -3239,12 +3718,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB collection migrate operation will complete asynchronously."
+            "description": "The MongoDB collection migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The MongoDB collection migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -3282,12 +3777,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The MongoDB collection migrate operation will complete asynchronously."
+            "description": "The MongoDB collection migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The MongoDB collection migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -3401,7 +3912,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Table create or update operation will complete asynchronously."
+            "description": "The Table create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Table create or update operation was completed successfully.",
@@ -3439,7 +3960,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Table delete operation will complete asynchronously."
+            "description": "The Table delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The Table delete operation was completed successfully."
@@ -3519,7 +4050,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the Table update operation will complete asynchronously."
+            "description": "The RUs per second of the Table update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the Table update operation was completed successfully.",
@@ -3559,12 +4100,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Table migrate operation will complete asynchronously."
+            "description": "The Table migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Table migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -3599,12 +4156,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Table migrate operation will complete asynchronously."
+            "description": "The Table migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Table migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -3718,7 +4291,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra keyspace create or update operation will complete asynchronously."
+            "description": "The Cassandra keyspace create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Cassandra keyspace create or update operation was completed successfully.",
@@ -3756,7 +4339,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra keyspace delete operation will complete asynchronously."
+            "description": "The Cassandra keyspace delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The Cassandra keyspace delete operation was completed successfully."
@@ -3836,7 +4429,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the Cassandra Keyspace update operation will complete asynchronously."
+            "description": "The RUs per second of the Cassandra Keyspace update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the Cassandra Keyspace update operation was completed successfully.",
@@ -3876,12 +4479,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra Keyspace migrate operation will complete asynchronously."
+            "description": "The Cassandra Keyspace migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Cassandra Keyspace migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -3916,12 +4535,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra Keyspace migrate operation will complete asynchronously."
+            "description": "The Cassandra Keyspace migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Cassandra Keyspace migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4044,7 +4679,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra Table create or update operation will complete asynchronously."
+            "description": "The Cassandra Table create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Cassandra Table create or update operation was completed successfully.",
@@ -4085,7 +4730,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra table delete operation will complete asynchronously."
+            "description": "The Cassandra table delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The Cassandra table delete operation was completed successfully."
@@ -4171,7 +4826,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the Cassandra table update operation will complete asynchronously."
+            "description": "The RUs per second of the Cassandra table update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the Cassandra table update operation was completed successfully.",
@@ -4214,12 +4879,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra table migrate operation will complete asynchronously."
+            "description": "The Cassandra table migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Cassandra table migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4257,12 +4938,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Cassandra table migrate operation will complete asynchronously."
+            "description": "The Cassandra table migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Cassandra table migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4376,7 +5073,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin database create or update operation will complete asynchronously."
+            "description": "The Gremlin database create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Gremlin database create or update operation was completed successfully.",
@@ -4414,7 +5121,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin database delete operation will complete asynchronously."
+            "description": "The Gremlin database delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The Gremlin database delete operation was completed successfully."
@@ -4494,7 +5211,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the Gremlin database update operation will complete asynchronously."
+            "description": "The RUs per second of the Gremlin database update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the Gremlin database update operation was completed successfully.",
@@ -4534,12 +5261,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin database migrate operation will complete asynchronously."
+            "description": "The Gremlin database migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Gremlin database migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4574,12 +5317,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin database migrate operation will complete asynchronously."
+            "description": "The Gremlin database migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Gremlin database migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4702,7 +5461,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin graph create or update operation will complete asynchronously."
+            "description": "The Gremlin graph create or update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Gremlin graph create or update operation was completed successfully.",
@@ -4743,7 +5512,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin graph delete operation will complete asynchronously."
+            "description": "The Gremlin graph delete operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "204": {
             "description": "The Gremlin graph delete operation was completed successfully."
@@ -4829,7 +5608,17 @@
         ],
         "responses": {
           "202": {
-            "description": "The RUs per second of the Gremlin graph update operation will complete asynchronously."
+            "description": "The RUs per second of the Gremlin graph update operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The RUs per second of the Gremlin graph update operation was completed successfully.",
@@ -4872,12 +5661,28 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin graph migrate operation will complete asynchronously."
+            "description": "The Gremlin graph migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Gremlin graph migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4915,12 +5720,100 @@
         ],
         "responses": {
           "202": {
-            "description": "The Gremlin graph migrate operation will complete asynchronously."
+            "description": "The Gremlin graph migrate operation will complete asynchronously.",
+            "headers": {
+              "azure-AsyncOperation": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              },
+              "location": {
+                "type": "string",
+                "description": "URI to poll for completion status."
+              }
+            }
           },
           "200": {
             "description": "The Gremlin graph migrate operation was completed successfully.",
             "schema": {
               "$ref": "#/definitions/ThroughputSettingsGetResults"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.DocumentDB/locations": {
+      "get": {
+        "operationId": "Locations_List",
+        "x-ms-examples": {
+          "CosmosDBLocationList": {
+            "$ref": "./examples/CosmosDBLocationList.json"
+          }
+        },
+        "description": "List Cosmos DB locations and their properties",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v1/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v1/types.json#/parameters/SubscriptionIdParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The operation completed successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": null
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.DocumentDB/locations/{location}": {
+      "get": {
+        "operationId": "Locations_Get",
+        "x-ms-examples": {
+          "CosmosDBLocationGet": {
+            "$ref": "./examples/CosmosDBLocationGet.json"
+          }
+        },
+        "description": "Get the properties of an existing Cosmos DB location",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v1/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v1/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/locationParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Cosmos DB location properties were retrieved successfully.",
+            "schema": {
+              "$ref": "#/definitions/LocationGetResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
             }
           }
         }
@@ -4928,6 +5821,20 @@
     }
   },
   "definitions": {
+    "ClientEncryptionKeysListResult": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientEncryptionKeyGetResults"
+          },
+          "description": "List of client encryption keys and their properties."
+        }
+      },
+      "description": "The List operation response, that contains the client encryption keys and their properties."
+    },
     "DatabaseAccountsListResult": {
       "properties": {
         "value": {
@@ -5110,6 +6017,15 @@
       },
       "description": "Error Response."
     },
+    "CloudError": {
+      "x-ms-external": true,
+      "description": "An error response from the service.",
+      "properties": {
+        "error": {
+          "$ref": "#/definitions/ErrorResponse"
+        }
+      }
+    },
     "FailoverPolicies": {
       "properties": {
         "failoverPolicies": {
@@ -5242,6 +6158,65 @@
       },
       "x-ms-azure-resource": true
     },
+    "ClientEncryptionKeyCreateUpdateParameters": {
+      "description": "Parameters to create and update ClientEncryptionKey.",
+      "type": "object",
+      "properties": {
+        "properties": {
+          "x-ms-client-flatten": true,
+          "description": "Properties to create and update ClientEncryptionKey.",
+          "$ref": "#/definitions/ClientEncryptionKeyCreateUpdateProperties"
+        }
+      },
+      "required": [
+        "properties"
+      ]
+    },
+    "ClientEncryptionKeyCreateUpdateProperties": {
+      "description": "Properties to create and update ClientEncryptionKey.",
+      "type": "object",
+      "properties": {
+        "resource": {
+          "description": "The standard JSON format of a ClientEncryptionKey",
+          "$ref": "#/definitions/ClientEncryptionKeyResource"
+        }
+      },
+      "required": [
+        "resource"
+      ]
+    },
+    "ClientEncryptionKeyGetResults": {
+      "description": "Client Encryption Key.",
+      "type": "object",
+      "properties": {
+        "properties": {
+          "x-ms-client-flatten": true,
+          "description": "The properties of a ClientEncryptionKey",
+          "$ref": "#/definitions/ClientEncryptionKeyGetProperties"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/ARMProxyResource"
+        }
+      ]
+    },
+    "ClientEncryptionKeyGetProperties": {
+      "description": "The properties of a ClientEncryptionKey resource",
+      "type": "object",
+      "properties": {
+        "resource": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/ClientEncryptionKeyResource"
+            },
+            {
+              "$ref": "#/definitions/ExtendedResourceProperties"
+            }
+          ]
+        }
+      }
+    },
     "DatabaseAccountGetResults": {
       "description": "An Azure Cosmos DB database account.",
       "type": "object",
@@ -5260,9 +6235,17 @@
             "modelAsString": true
           }
         },
+        "identity": {
+          "$ref": "#/definitions/ManagedServiceIdentity"
+        },
         "properties": {
           "x-ms-client-flatten": true,
           "$ref": "#/definitions/DatabaseAccountGetProperties"
+        },
+        "systemData": {
+          "readOnly": true,
+          "description": "The system meta data relating to this resource.",
+          "$ref": "../../../../../common-types/resource-management/v1/types.json#/definitions/systemData"
         }
       },
       "allOf": [
@@ -5281,6 +6264,7 @@
           "readOnly": true
         },
         "_ts": {
+          "type": "number",
           "description": "A system generated property that denotes the last updated timestamp of the resource.",
           "readOnly": true
         },
@@ -5934,7 +6918,7 @@
           "readOnly": true,
           "description": "List of Private Endpoint Connections configured for the Cosmos DB account.",
           "items": {
-            "$ref": "#/definitions/PrivateEndpointConnection"
+            "$ref": "../../stable/2022-11-15/privateEndpointConnection.json#/definitions/PrivateEndpointConnection"
           }
         },
         "enableMultipleWriteLocations": {
@@ -5957,6 +6941,10 @@
           "description": "The URI of the key vault",
           "type": "string"
         },
+        "defaultIdentity": {
+          "description": "The default identity for accessing key vault used in features like customer managed keys. The default identity needs to be explicitly set by the users. It can be \"FirstPartyIdentity\", \"SystemAssignedIdentity\" and more.",
+          "type": "string"
+        },
         "publicNetworkAccess": {
           "description": "Whether requests from Public Network are allowed",
           "$ref": "#/definitions/PublicNetworkAccess"
@@ -5974,12 +6962,73 @@
           "description": "Flag to indicate whether to enable storage analytics.",
           "type": "boolean"
         },
+        "analyticalStorageConfiguration": {
+          "description": "Analytical storage specific properties.",
+          "type": "object",
+          "$ref": "#/definitions/AnalyticalStorageConfiguration"
+        },
+        "instanceId": {
+          "description": "A unique identifier assigned to the database account",
+          "type": "string",
+          "readOnly": true
+        },
+        "createMode": {
+          "description": "Enum to indicate the mode of account creation.",
+          "type": "string",
+          "default": "Default",
+          "$ref": "#/definitions/CreateMode"
+        },
+        "restoreParameters": {
+          "description": "Parameters to indicate the information about the restore.",
+          "type": "object",
+          "$ref": "#/definitions/RestoreParameters"
+        },
+        "backupPolicy": {
+          "description": "The object representing the policy for taking backups on an account.",
+          "type": "object",
+          "$ref": "#/definitions/BackupPolicy"
+        },
         "cors": {
           "type": "array",
           "description": "The CORS policy for the Cosmos DB database account.",
           "items": {
             "$ref": "#/definitions/CorsPolicy"
           }
+        },
+        "networkAclBypass": {
+          "description": "Indicates what services are allowed to bypass firewall checks.",
+          "$ref": "#/definitions/NetworkAclBypass"
+        },
+        "networkAclBypassResourceIds": {
+          "type": "array",
+          "description": "An array that contains the Resource Ids for Network Acl Bypass for the Cosmos DB account.",
+          "items": {
+            "type": "string",
+            "format": "arm-id"
+          }
+        },
+        "disableLocalAuth": {
+          "description": "Opt-out of local authentication and ensure only MSI and AAD can be used exclusively for authentication.",
+          "type": "boolean"
+        },
+        "capacity": {
+          "description": "The object that represents all properties related to capacity enforcement on an account.",
+          "type": "object",
+          "$ref": "#/definitions/Capacity"
+        },
+        "keysMetadata": {
+          "description": "The object that represents the metadata for the Account Keys of the Cosmos DB account.",
+          "type": "object",
+          "$ref": "#/definitions/DatabaseAccountKeysMetadata"
+        },
+        "enablePartitionMerge": {
+          "description": "Flag to indicate enabling/disabling of Partition Merge feature on the account",
+          "type": "boolean"
+        },
+        "minimalTlsVersion": {
+          "description": "Indicates the minimum allowed Tls version. The default is Tls 1.0, except for Cassandra and Mongo API's, which only work with Tls 1.2.",
+          "type": "string",
+          "$ref": "#/definitions/MinimalTlsVersion"
         }
       }
     },
@@ -6048,6 +7097,10 @@
           "description": "The URI of the key vault",
           "type": "string"
         },
+        "defaultIdentity": {
+          "description": "The default identity for accessing key vault used in features like customer managed keys. The default identity needs to be explicitly set by the users. It can be \"FirstPartyIdentity\", \"SystemAssignedIdentity\" and more.",
+          "type": "string"
+        },
         "publicNetworkAccess": {
           "description": "Whether requests from Public Network are allowed",
           "$ref": "#/definitions/PublicNetworkAccess"
@@ -6065,12 +7118,67 @@
           "description": "Flag to indicate whether to enable storage analytics.",
           "type": "boolean"
         },
+        "analyticalStorageConfiguration": {
+          "description": "Analytical storage specific properties.",
+          "type": "object",
+          "$ref": "#/definitions/AnalyticalStorageConfiguration"
+        },
+        "createMode": {
+          "description": "Enum to indicate the mode of account creation.",
+          "type": "string",
+          "default": "Default",
+          "$ref": "#/definitions/CreateMode"
+        },
+        "backupPolicy": {
+          "description": "The object representing the policy for taking backups on an account.",
+          "type": "object",
+          "$ref": "#/definitions/BackupPolicy"
+        },
         "cors": {
           "type": "array",
           "description": "The CORS policy for the Cosmos DB database account.",
           "items": {
             "$ref": "#/definitions/CorsPolicy"
           }
+        },
+        "networkAclBypass": {
+          "description": "Indicates what services are allowed to bypass firewall checks.",
+          "$ref": "#/definitions/NetworkAclBypass"
+        },
+        "networkAclBypassResourceIds": {
+          "type": "array",
+          "description": "An array that contains the Resource Ids for Network Acl Bypass for the Cosmos DB account.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disableLocalAuth": {
+          "description": "Opt-out of local authentication and ensure only MSI and AAD can be used exclusively for authentication.",
+          "type": "boolean"
+        },
+        "restoreParameters": {
+          "description": "Parameters to indicate the information about the restore.",
+          "type": "object",
+          "$ref": "#/definitions/RestoreParameters"
+        },
+        "capacity": {
+          "description": "The object that represents all properties related to capacity enforcement on an account.",
+          "type": "object",
+          "$ref": "#/definitions/Capacity"
+        },
+        "keysMetadata": {
+          "description": "This property is ignored during the update/create operation, as the metadata is read-only. The object represents the metadata for the Account Keys of the Cosmos DB account.",
+          "type": "object",
+          "$ref": "#/definitions/DatabaseAccountKeysMetadata"
+        },
+        "enablePartitionMerge": {
+          "description": "Flag to indicate enabling/disabling of Partition Merge feature on the account",
+          "type": "boolean"
+        },
+        "minimalTlsVersion": {
+          "description": "Indicates the minimum allowed Tls version. The default is Tls 1.0, except for Cassandra and Mongo API's, which only work with Tls 1.2.",
+          "type": "string",
+          "$ref": "#/definitions/MinimalTlsVersion"
         }
       },
       "required": [
@@ -6095,6 +7203,9 @@
             "name": "DatabaseAccountKind",
             "modelAsString": true
           }
+        },
+        "identity": {
+          "$ref": "#/definitions/ManagedServiceIdentity"
         },
         "properties": {
           "x-ms-client-flatten": true,
@@ -6171,6 +7282,10 @@
           "description": "The URI of the key vault",
           "type": "string"
         },
+        "defaultIdentity": {
+          "description": "The default identity for accessing key vault used in features like customer managed keys. The default identity needs to be explicitly set by the users. It can be \"FirstPartyIdentity\", \"SystemAssignedIdentity\" and more.",
+          "type": "string"
+        },
         "publicNetworkAccess": {
           "description": "Whether requests from Public Network are allowed",
           "$ref": "#/definitions/PublicNetworkAccess"
@@ -6188,12 +7303,56 @@
           "description": "Flag to indicate whether to enable storage analytics.",
           "type": "boolean"
         },
+        "analyticalStorageConfiguration": {
+          "description": "Analytical storage specific properties.",
+          "type": "object",
+          "$ref": "#/definitions/AnalyticalStorageConfiguration"
+        },
+        "backupPolicy": {
+          "description": "The object representing the policy for taking backups on an account.",
+          "type": "object",
+          "$ref": "#/definitions/BackupPolicy"
+        },
         "cors": {
           "type": "array",
           "description": "The CORS policy for the Cosmos DB database account.",
           "items": {
             "$ref": "#/definitions/CorsPolicy"
           }
+        },
+        "networkAclBypass": {
+          "description": "Indicates what services are allowed to bypass firewall checks.",
+          "$ref": "#/definitions/NetworkAclBypass"
+        },
+        "networkAclBypassResourceIds": {
+          "type": "array",
+          "description": "An array that contains the Resource Ids for Network Acl Bypass for the Cosmos DB account.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "disableLocalAuth": {
+          "description": "Opt-out of local authentication and ensure only MSI and AAD can be used exclusively for authentication.",
+          "type": "boolean"
+        },
+        "capacity": {
+          "description": "The object that represents all properties related to capacity enforcement on an account.",
+          "type": "object",
+          "$ref": "#/definitions/Capacity"
+        },
+        "keysMetadata": {
+          "description": "This property is ignored during the update operation, as the metadata is read-only. The object represents the metadata for the Account Keys of the Cosmos DB account.",
+          "type": "object",
+          "$ref": "#/definitions/DatabaseAccountKeysMetadata"
+        },
+        "enablePartitionMerge": {
+          "description": "Flag to indicate enabling/disabling of Partition Merge feature on the account",
+          "type": "boolean"
+        },
+        "minimalTlsVersion": {
+          "description": "Indicates the minimum allowed Tls version. The default is Tls 1.0, except for Cassandra and Mongo API's, which only work with Tls 1.2.",
+          "type": "string",
+          "$ref": "#/definitions/MinimalTlsVersion"
         }
       }
     },
@@ -6207,6 +7366,9 @@
         "location": {
           "type": "string",
           "description": "The location of the resource group to which the resource belongs."
+        },
+        "identity": {
+          "$ref": "#/definitions/ManagedServiceIdentity"
         },
         "properties": {
           "x-ms-client-flatten": true,
@@ -6375,8 +7537,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "SqlContainerCreateUpdateParameters": {
@@ -6412,8 +7573,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "SqlStoredProcedureCreateUpdateParameters": {
@@ -6449,8 +7609,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "SqlUserDefinedFunctionCreateUpdateParameters": {
@@ -6486,8 +7645,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "SqlTriggerCreateUpdateParameters": {
@@ -6523,8 +7681,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "MongoDBDatabaseCreateUpdateParameters": {
@@ -6560,8 +7717,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "MongoDBCollectionCreateUpdateParameters": {
@@ -6597,8 +7753,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "TableCreateUpdateParameters": {
@@ -6634,8 +7789,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "CassandraKeyspaceCreateUpdateParameters": {
@@ -6671,8 +7825,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "CassandraTableCreateUpdateParameters": {
@@ -6708,8 +7861,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "GremlinDatabaseCreateUpdateParameters": {
@@ -6745,8 +7897,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "GremlinGraphCreateUpdateParameters": {
@@ -6782,8 +7933,7 @@
         }
       },
       "required": [
-        "resource",
-        "options"
+        "resource"
       ]
     },
     "ThroughputSettingsResource": {
@@ -6872,6 +8022,51 @@
         }
       }
     },
+    "ClientEncryptionKeyResource": {
+      "type": "object",
+      "description": "Cosmos DB client encryption key resource object.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Name of the ClientEncryptionKey"
+        },
+        "encryptionAlgorithm": {
+          "type": "string",
+          "description": "Encryption algorithm that will be used along with this client encryption key to encrypt/decrypt data."
+        },
+        "wrappedDataEncryptionKey": {
+          "type": "string",
+          "format": "byte",
+          "description": "Wrapped (encrypted) form of the key represented as a byte array."
+        },
+        "keyWrapMetadata": {
+          "description": "Metadata for the wrapping provider that can be used to unwrap the wrapped client encryption key.",
+          "$ref": "#/definitions/KeyWrapMetadata"
+        }
+      }
+    },
+    "KeyWrapMetadata": {
+      "type": "object",
+      "description": "Represents key wrap metadata that a key wrapping provider can use to wrap/unwrap a client encryption key.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of associated KeyEncryptionKey (aka CustomerManagedKey)."
+        },
+        "type": {
+          "type": "string",
+          "description": "ProviderName of KeyStoreProvider."
+        },
+        "value": {
+          "type": "string",
+          "description": "Reference / link to the KeyEncryptionKey."
+        },
+        "algorithm": {
+          "type": "string",
+          "description": "Algorithm used in wrapping and unwrapping of the data encryption key."
+        }
+      }
+    },
     "SqlDatabaseResource": {
       "type": "object",
       "description": "Cosmos DB SQL database resource object",
@@ -6913,6 +8108,10 @@
           "$ref": "#/definitions/ConflictResolutionPolicy",
           "description": "The conflict resolution policy for the container."
         },
+        "clientEncryptionPolicy": {
+          "$ref": "#/definitions/ClientEncryptionPolicy",
+          "description": "The client encryption policy for the container."
+        },
         "analyticalStorageTtl": {
           "type": "integer",
           "format": "int64",
@@ -6934,11 +8133,11 @@
         "indexingMode": {
           "description": "Indicates the indexing mode.",
           "type": "string",
-          "default": "Consistent",
+          "default": "consistent",
           "enum": [
-            "Consistent",
-            "Lazy",
-            "None"
+            "consistent",
+            "lazy",
+            "none"
           ],
           "x-ms-enum": {
             "name": "IndexingMode",
@@ -7060,8 +8259,8 @@
           "description": "Sort order for composite paths.",
           "type": "string",
           "enum": [
-            "Ascending",
-            "Descending"
+            "ascending",
+            "descending"
           ],
           "x-ms-enum": {
             "name": "CompositePathSortOrder",
@@ -7112,12 +8311,13 @@
           }
         },
         "kind": {
-          "description": "Indicates the kind of algorithm used for partitioning",
+          "description": "Indicates the kind of algorithm used for partitioning. For MultiHash, multiple partition keys (upto three maximum) are supported for container create",
           "type": "string",
           "default": "Hash",
           "enum": [
             "Hash",
-            "Range"
+            "Range",
+            "MultiHash"
           ],
           "x-ms-enum": {
             "name": "PartitionKind",
@@ -7130,6 +8330,11 @@
           "minimum": 1,
           "maximum": 2,
           "format": "int32"
+        },
+        "systemKey": {
+          "description": "Indicates if the container is using a system generated partition key",
+          "type": "boolean",
+          "readOnly": true
         }
       }
     },
@@ -7189,6 +8394,59 @@
           "description": "The procedure to resolve conflicts in the case of custom mode."
         }
       }
+    },
+    "ClientEncryptionPolicy": {
+      "type": "object",
+      "description": "Cosmos DB client encryption policy.",
+      "properties": {
+        "includedPaths": {
+          "description": "Paths of the item that need encryption along with path-specific settings.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ClientEncryptionIncludedPath"
+          },
+          "x-ms-identifiers": []
+        },
+        "policyFormatVersion": {
+          "description": "Version of the client encryption policy definition. Supported versions are 1 and 2. Version 2 supports id and partition key path encryption. ",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2,
+          "format": "int32"
+        }
+      },
+      "required": [
+        "includedPaths",
+        "policyFormatVersion"
+      ]
+    },
+    "ClientEncryptionIncludedPath": {
+      "type": "object",
+      "description": ".",
+      "properties": {
+        "path": {
+          "description": "Path that needs to be encrypted.",
+          "type": "string"
+        },
+        "clientEncryptionKeyId": {
+          "description": "The identifier of the Client Encryption Key to be used to encrypt the path.",
+          "type": "string"
+        },
+        "encryptionType": {
+          "description": "The type of encryption to be performed. Eg - Deterministic, Randomized.",
+          "type": "string"
+        },
+        "encryptionAlgorithm": {
+          "description": "The encryption algorithm which will be used. Eg - AEAD_AES_256_CBC_HMAC_SHA256.",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "clientEncryptionKeyId",
+        "encryptionType",
+        "encryptionAlgorithm"
+      ]
     },
     "SqlStoredProcedureResource": {
       "type": "object",
@@ -7517,6 +8775,11 @@
         "conflictResolutionPolicy": {
           "$ref": "#/definitions/ConflictResolutionPolicy",
           "description": "The conflict resolution policy for the graph."
+        },
+        "analyticalStorageTtl": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Analytical TTL."
         }
       },
       "required": [
@@ -7556,12 +8819,72 @@
         }
       }
     },
+    "Capacity": {
+      "type": "object",
+      "description": "The object that represents all properties related to capacity enforcement on an account.",
+      "properties": {
+        "totalThroughputLimit": {
+          "type": "integer",
+          "minimum": -1,
+          "format": "int32",
+          "description": "The total throughput limit imposed on the account. A totalThroughputLimit of 2000 imposes a strict limit of max throughput that can be provisioned on that account to be 2000. A totalThroughputLimit of -1 indicates no limits on provisioning of throughput."
+        }
+      }
+    },
     "Tags": {
       "type": "object",
       "additionalProperties": {
         "type": "string"
       },
       "description": "Tags are a list of key-value pairs that describe the resource. These tags can be used in viewing and grouping this resource (across resource groups). A maximum of 15 tags can be provided for a resource. Each tag must have a key no greater than 128 characters and value no greater than 256 characters. For example, the default experience for a template type is set with \"defaultExperience\": \"Cassandra\". Current \"defaultExperience\" values also include \"Table\", \"Graph\", \"DocumentDB\", and \"MongoDB\"."
+    },
+    "ManagedServiceIdentity": {
+      "properties": {
+        "principalId": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The principal id of the system assigned identity. This property will only be provided for a system assigned identity."
+        },
+        "tenantId": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The tenant id of the system assigned identity. This property will only be provided for a system assigned identity."
+        },
+        "type": {
+          "type": "string",
+          "description": "The type of identity used for the resource. The type 'SystemAssigned,UserAssigned' includes both an implicitly created identity and a set of user assigned identities. The type 'None' will remove any identities from the service.",
+          "enum": [
+            "SystemAssigned",
+            "UserAssigned",
+            "SystemAssigned,UserAssigned",
+            "None"
+          ],
+          "x-ms-enum": {
+            "name": "ResourceIdentityType",
+            "modelAsString": false
+          }
+        },
+        "userAssignedIdentities": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "principalId": {
+                "readOnly": true,
+                "type": "string",
+                "description": "The principal id of user assigned identity."
+              },
+              "clientId": {
+                "readOnly": true,
+                "type": "string",
+                "description": "The client id of user assigned identity."
+              }
+            }
+          },
+          "description": "The list of user identities associated with resource. The user identity dictionary key references will be ARM resource ids in the form: '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedIdentity/userAssignedIdentities/{identityName}'."
+        }
+      },
+      "description": "Identity for the resource."
     },
     "ProvisioningState": {
       "type": "string",
@@ -7591,6 +8914,14 @@
       "properties": {
         "id": {
           "type": "string",
+          "format": "arm-id",
+          "x-ms-arm-id-details": {
+            "allowedResources": [
+              {
+                "type": "Microsoft.Network/virtualNetworks/subnets"
+              }
+            ]
+          },
           "description": "Resource ID of a subnet, for example: /subscriptions/{subscriptionId}/resourceGroups/{groupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/subnets/{subnetName}."
         },
         "ignoreMissingVNetServiceEndpoint": {
@@ -7599,58 +8930,54 @@
         }
       }
     },
-    "PrivateEndpointConnection": {
-      "description": "A private endpoint connection",
-      "type": "object",
-      "properties": {
-        "properties": {
-          "$ref": "#/definitions/PrivateEndpointConnectionProperties",
-          "description": "Resource properties.",
-          "x-ms-client-flatten": true
-        }
-      },
-      "allOf": [
-        {
-          "$ref": "../../../../../common-types/resource-management/v1/types.json#/definitions/ProxyResource"
-        }
-      ]
+    "NetworkAclBypass": {
+      "description": "Indicates what services are allowed to bypass firewall checks.",
+      "type": "string",
+      "enum": [
+        "None",
+        "AzureServices"
+      ],
+      "x-ms-enum": {
+        "name": "NetworkAclBypass",
+        "modelAsString": false
+      }
     },
-    "PrivateEndpointConnectionProperties": {
-      "description": "Properties of a private endpoint connection.",
+    "AccountKeyMetadata": {
+      "description": "The metadata related to an access key for a given database account.",
       "type": "object",
       "properties": {
-        "privateEndpoint": {
-          "$ref": "#/definitions/PrivateEndpointProperty",
-          "description": "Private endpoint which the connection belongs to."
-        },
-        "privateLinkServiceConnectionState": {
-          "$ref": "#/definitions/PrivateLinkServiceConnectionStateProperty",
-          "description": "Connection State of the Private Endpoint Connection."
+        "generationTime": {
+          "readOnly": true,
+          "type": "string",
+          "format": "date-time",
+          "description": "Generation time in UTC of the key in ISO-8601 format. If the value is missing from the object, it means that the last key regeneration was triggered before 2022-06-18."
         }
       }
     },
-    "PrivateEndpointProperty": {
+    "DatabaseAccountKeysMetadata": {
+      "description": "The metadata related to each access key for the given Cosmos DB database account.",
       "type": "object",
-      "description": "Private endpoint which the connection belongs to.",
+      "readOnly": true,
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Resource id of the private endpoint."
-        }
-      }
-    },
-    "PrivateLinkServiceConnectionStateProperty": {
-      "type": "object",
-      "description": "Connection State of the Private Endpoint Connection.",
-      "properties": {
-        "status": {
-          "type": "string",
-          "description": "The private link service connection status."
+        "primaryMasterKey": {
+          "readOnly": true,
+          "description": "The metadata related to the Primary Read-Write Key for the given Cosmos DB database account.",
+          "$ref": "#/definitions/AccountKeyMetadata"
         },
-        "actionsRequired": {
-          "type": "string",
-          "description": "Any action that is required beyond basic workflow (approve/ reject/ disconnect)",
-          "readOnly": true
+        "secondaryMasterKey": {
+          "readOnly": true,
+          "description": "The metadata related to the Secondary Read-Write Key for the given Cosmos DB database account.",
+          "$ref": "#/definitions/AccountKeyMetadata"
+        },
+        "primaryReadonlyMasterKey": {
+          "readOnly": true,
+          "description": "The metadata related to the Primary Read-Only Key for the given Cosmos DB database account.",
+          "$ref": "#/definitions/AccountKeyMetadata"
+        },
+        "secondaryReadonlyMasterKey": {
+          "readOnly": true,
+          "description": "The metadata related to the Secondary Read-Only Key for the given Cosmos DB database account.",
+          "$ref": "#/definitions/AccountKeyMetadata"
         }
       }
     },
@@ -8126,7 +9453,6 @@
     },
     "PublicNetworkAccess": {
       "type": "string",
-      "readOnly": true,
       "description": "Whether requests from Public Network are allowed",
       "enum": [
         "Enabled",
@@ -8144,7 +9470,9 @@
           "type": "string",
           "enum": [
             "3.2",
-            "3.6"
+            "3.6",
+            "4.0",
+            "4.2"
           ],
           "description": "Describes the ServerVersion of an a MongoDB account.",
           "x-ms-enum": {
@@ -8152,6 +9480,335 @@
             "name": "ServerVersion"
           }
         }
+      }
+    },
+    "AnalyticalStorageConfiguration": {
+      "type": "object",
+      "description": "Analytical storage specific properties.",
+      "properties": {
+        "schemaType": {
+          "type": "string",
+          "$ref": "#/definitions/AnalyticalStorageSchemaType"
+        }
+      }
+    },
+    "AnalyticalStorageSchemaType": {
+      "type": "string",
+      "description": "Describes the types of schema for analytical storage.",
+      "enum": [
+        "WellDefined",
+        "FullFidelity"
+      ],
+      "x-ms-enum": {
+        "modelAsString": true,
+        "name": "AnalyticalStorageSchemaType"
+      }
+    },
+    "CreateMode": {
+      "description": "Enum to indicate the mode of account creation.",
+      "type": "string",
+      "default": "Default",
+      "enum": [
+        "Default",
+        "Restore"
+      ],
+      "x-ms-enum": {
+        "name": "CreateMode",
+        "modelAsString": true
+      }
+    },
+    "RestoreParameters": {
+      "type": "object",
+      "description": "Parameters to indicate the information about the restore.",
+      "x-ms-mutability": [
+        "read",
+        "create"
+      ],
+      "properties": {
+        "restoreMode": {
+          "type": "string",
+          "enum": [
+            "PointInTime"
+          ],
+          "description": "Describes the mode of the restore.",
+          "x-ms-enum": {
+            "modelAsString": true,
+            "name": "RestoreMode"
+          }
+        },
+        "restoreSource": {
+          "type": "string",
+          "description": "The id of the restorable database account from which the restore has to be initiated. For example: /subscriptions/{subscriptionId}/providers/Microsoft.DocumentDB/locations/{location}/restorableDatabaseAccounts/{restorableDatabaseAccountName}"
+        },
+        "restoreTimestampInUtc": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time to which the account has to be restored (ISO-8601 format)."
+        },
+        "databasesToRestore": {
+          "type": "array",
+          "description": "List of specific databases available for restore.",
+          "items": {
+            "$ref": "#/definitions/DatabaseRestoreResource"
+          }
+        },
+        "gremlinDatabasesToRestore": {
+          "type": "array",
+          "description": "List of specific gremlin databases available for restore.",
+          "items": {
+            "$ref": "#/definitions/GremlinDatabaseRestoreResource"
+          }
+        },
+        "tablesToRestore": {
+          "type": "array",
+          "description": "List of specific tables available for restore.",
+          "items": {
+            "$ref": "#/definitions/TableName"
+          }
+        }
+      }
+    },
+    "DatabaseRestoreResource": {
+      "type": "object",
+      "description": "Specific Databases to restore.",
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "description": "The name of the database available for restore."
+        },
+        "collectionNames": {
+          "type": "array",
+          "description": "The names of the collections available for restore.",
+          "items": {
+            "$ref": "#/definitions/CollectionName"
+          }
+        }
+      }
+    },
+    "GremlinDatabaseRestoreResource": {
+      "type": "object",
+      "description": "Specific Gremlin Databases to restore.",
+      "properties": {
+        "databaseName": {
+          "type": "string",
+          "description": "The name of the gremlin database available for restore."
+        },
+        "graphNames": {
+          "type": "array",
+          "description": "The names of the graphs available for restore.",
+          "items": {
+            "$ref": "#/definitions/GraphName"
+          }
+        }
+      }
+    },
+    "CollectionName": {
+      "type": "string",
+      "description": "The name of the collection."
+    },
+    "GraphName": {
+      "type": "string",
+      "description": "The name of the graph."
+    },
+    "TableName": {
+      "type": "string",
+      "description": "The name of the table."
+    },
+    "BackupPolicy": {
+      "type": "object",
+      "description": "The object representing the policy for taking backups on an account.",
+      "discriminator": "type",
+      "properties": {
+        "type": {
+          "description": "Describes the mode of backups.",
+          "type": "string",
+          "$ref": "#/definitions/BackupPolicyType"
+        },
+        "migrationState": {
+          "description": "The object representing the state of the migration between the backup policies.",
+          "type": "object",
+          "$ref": "#/definitions/BackupPolicyMigrationState"
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "BackupPolicyType": {
+      "description": "Describes the mode of backups.",
+      "type": "string",
+      "enum": [
+        "Periodic",
+        "Continuous"
+      ],
+      "x-ms-enum": {
+        "modelAsString": true,
+        "name": "BackupPolicyType"
+      }
+    },
+    "BackupPolicyMigrationState": {
+      "type": "object",
+      "description": "The object representing the state of the migration between the backup policies.",
+      "properties": {
+        "status": {
+          "description": "Describes the status of migration between backup policy types.",
+          "type": "string",
+          "$ref": "#/definitions/BackupPolicyMigrationStatus"
+        },
+        "targetType": {
+          "description": "Describes the target backup policy type of the backup policy migration.",
+          "type": "string",
+          "$ref": "#/definitions/BackupPolicyType"
+        },
+        "startTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Time at which the backup policy migration started (ISO-8601 format)."
+        }
+      }
+    },
+    "BackupPolicyMigrationStatus": {
+      "description": "Describes the status of migration between backup policy types.",
+      "type": "string",
+      "enum": [
+        "Invalid",
+        "InProgress",
+        "Completed",
+        "Failed"
+      ],
+      "x-ms-enum": {
+        "modelAsString": true,
+        "name": "BackupPolicyMigrationStatus"
+      }
+    },
+    "PeriodicModeBackupPolicy": {
+      "description": "The object representing periodic mode backup policy.",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BackupPolicy"
+        }
+      ],
+      "properties": {
+        "periodicModeProperties": {
+          "type": "object",
+          "description": "Configuration values for periodic mode backup",
+          "$ref": "#/definitions/PeriodicModeProperties"
+        }
+      },
+      "x-ms-discriminator-value": "Periodic"
+    },
+    "ContinuousModeBackupPolicy": {
+      "description": "The object representing continuous mode backup policy.",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/definitions/BackupPolicy"
+        }
+      ],
+      "x-ms-discriminator-value": "Continuous"
+    },
+    "PeriodicModeProperties": {
+      "type": "object",
+      "description": "Configuration values for periodic mode backup",
+      "properties": {
+        "backupIntervalInMinutes": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0,
+          "description": "An integer representing the interval in minutes between two backups"
+        },
+        "backupRetentionIntervalInHours": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 0,
+          "description": "An integer representing the time (in hours) that each backup is retained"
+        },
+        "backupStorageRedundancy": {
+          "description": "Enum to indicate type of backup residency",
+          "type": "string",
+          "$ref": "#/definitions/BackupStorageRedundancy"
+        }
+      }
+    },
+    "LocationListResult": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/LocationGetResult"
+          },
+          "description": "List of Cosmos DB locations and their properties."
+        }
+      },
+      "description": "The List operation response, that contains Cosmos DB locations and their properties."
+    },
+    "LocationGetResult": {
+      "description": "Cosmos DB location get result",
+      "type": "object",
+      "properties": {
+        "properties": {
+          "type": "object",
+          "description": "Cosmos DB location metadata",
+          "$ref": "#/definitions/LocationProperties"
+        }
+      },
+      "allOf": [
+        {
+          "$ref": "#/definitions/ARMProxyResource"
+        }
+      ]
+    },
+    "LocationProperties": {
+      "description": "Cosmos DB location metadata",
+      "type": "object",
+      "properties": {
+        "supportsAvailabilityZone": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Flag indicating whether the location supports availability zones or not."
+        },
+        "isResidencyRestricted": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Flag indicating whether the location is residency sensitive."
+        },
+        "backupStorageRedundancies": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BackupStorageRedundancy"
+          },
+          "description": "The properties of available backup storage redundancies."
+        }
+      }
+    },
+    "BackupStorageRedundancy": {
+      "description": "Enum to indicate type of backup storage redundancy.",
+      "type": "string",
+      "enum": [
+        "Geo",
+        "Local",
+        "Zone"
+      ],
+      "x-ms-enum": {
+        "name": "BackupStorageRedundancy",
+        "modelAsString": true
+      }
+    },
+    "MinimalTlsVersion": {
+      "description": "Indicates the minimum allowed Tls version. The default is Tls 1.0, except for Cassandra and Mongo API's, which only work with Tls 1.2.",
+      "type": "string",
+      "enum": [
+        "Tls",
+        "Tls11",
+        "Tls12"
+      ],
+      "x-ms-enum": {
+        "name": "MinimalTlsVersion",
+        "modelAsString": true
       }
     }
   },
@@ -8217,6 +9874,14 @@
       "type": "string",
       "x-ms-parameter-location": "method",
       "description": "Cosmos DB database name."
+    },
+    "clientEncryptionKeyNameParameter": {
+      "name": "clientEncryptionKeyName",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "description": "Cosmos DB ClientEncryptionKey name."
     },
     "containerNameParameter": {
       "name": "containerName",
@@ -8313,6 +9978,14 @@
       "type": "string",
       "x-ms-parameter-location": "method",
       "description": "Partition Key Range Id for which to get data."
+    },
+    "locationParameter": {
+      "name": "location",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method",
+      "description": "Cosmos DB region, with spaces between words and each word capitalized."
     }
   }
 }
