@@ -12,7 +12,7 @@ require (
 	github.com/cskr/pubsub v1.0.2
 	github.com/fatih/color v1.14.1
 	github.com/go-openapi/loads v0.21.1
-	github.com/go-openapi/spec v0.20.6
+	github.com/go-openapi/spec v0.20.8
 	github.com/go-xmlfmt/xmlfmt v0.0.0-20220206211657-0a94163c4677
 	github.com/guptarohit/asciigraph v0.5.5
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
