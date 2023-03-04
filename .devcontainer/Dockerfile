@@ -27,7 +27,6 @@ ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
 # Versions
-ENV DOCKER_VERSION=23.0.1
 ARG GO_PLS_VERSION=0.11.0
 ARG DLV_VERSION=1.20.1
 ARG GO_RELEASER_VERSION=1.15.2
@@ -59,26 +58,6 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
 
-# # Install docker used by go releaser
-# RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
-#   && tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 \
-#                  -C /usr/local/bin docker/docker \
-#   && rm docker-${DOCKER_VERSION}.tgz
-
-# This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
-# this user's GID/UID must match your local user UID/GID to avoid permission issues
-# with bind mounts. Update USER_UID / USER_GID if yours is not 1000. See
-# https://aka.ms/vscode-remote/containers/non-root-user for details.
-ARG USERNAME=vscode
-RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-ARG DOCKER_GID=997
-RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USERNAME && \
-    groupadd --gid $DOCKER_GID docker && \
-    usermod -aG docker $USERNAME
-USER $USERNAME
-
 # Install python deps for deving
 RUN pip3 install rope black
 
@@ -87,11 +66,6 @@ RUN mkdir /home/$USERNAME/.ruby
 ENV GEM_HOME=/home/$USERNAME/.ruby/
 RUN gem install bundler
 ENV PATH="/home/$USERNAME/.ruby/bin:$PATH"
-
-
-# azure-cli-no-mount
-COPY scripts/azure-cli.sh /tmp/
-RUN /tmp/azure-cli.sh
 
 # Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
 RUN \
