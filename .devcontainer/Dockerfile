@@ -58,6 +58,20 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
 
+# This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
+# this user's GID/UID must match your local user UID/GID to avoid permission issues
+# with bind mounts. Update USER_UID / USER_GID if yours is not 1000. See
+# https://aka.ms/vscode-remote/containers/non-root-user for details.
+ARG USERNAME=vscode
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+ARG DOCKER_GID=997
+RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USERNAME && \
+    groupadd --gid $DOCKER_GID docker && \
+    usermod -aG docker $USERNAME
+USER $USERNAME
+
 # Install python deps for deving
 RUN pip3 install rope black
 
