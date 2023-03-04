@@ -27,18 +27,19 @@ ENV SNAP="/snap/snapcraft/current"
 ENV SNAP_NAME="snapcraft"
 ENV SNAP_ARCH="amd64"
 # Versions
-ENV DOCKER_VERSION=23.0.1
 ARG GO_PLS_VERSION=0.11.0
 ARG DLV_VERSION=1.20.1
 ARG GO_RELEASER_VERSION=1.15.2
 ARG GOLANGCI_LINT_VERSION=1.51.1
 
 RUN \
-    apt-get update \
+    # # Add backports to get updated tool versions (like git)
+    echo 'deb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list.d/backports.list \
+    && apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
-    && apt-get -y install git iproute2 procps lsb-release unzip \
+    && apt-get -y install git/bullseye-backports iproute2 procps lsb-release unzip \
     # 
     # Install Release Tools
     #
@@ -56,12 +57,6 @@ RUN \
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
-
-# Install docker used by go releaser
-RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz \
-  && tar xzvf docker-${DOCKER_VERSION}.tgz --strip 1 \
-                 -C /usr/local/bin docker/docker \
-  && rm docker-${DOCKER_VERSION}.tgz
 
 # This Dockerfile adds a non-root 'vscode' user with sudo access. However, for Linux,
 # this user's GID/UID must match your local user UID/GID to avoid permission issues
@@ -86,11 +81,6 @@ ENV GEM_HOME=/home/$USERNAME/.ruby/
 RUN gem install bundler
 ENV PATH="/home/$USERNAME/.ruby/bin:$PATH"
 
-
-# azure-cli-no-mount
-COPY scripts/azure-cli.sh /tmp/
-RUN /tmp/azure-cli.sh
-
 # Install Go tools (with cache https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md#example-cache-go-packages)
 RUN \
     # --> Delve for debugging
@@ -103,4 +93,8 @@ RUN \
     && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sudo sh -s -- -b $(go env GOPATH)/bin v${GOLANGCI_LINT_VERSION} \
     # --> Go releaser 
     && go install github.com/goreleaser/goreleaser@v${GO_RELEASER_VERSION} \
-    && sudo rm -rf /go/src/ && sudo rm -rf /go/pkg/mod/**
+    # --> Tidy up so container image isn't too large
+    && sudo rm -rf /go/src/ && sudo rm -rf /go/pkg/mod/
+
+# Avoid permissions issues when user UID is mapped see: https://github.com/devcontainers/ci/issues/176
+ENV GOPATH="/home/$USERNAME/go"

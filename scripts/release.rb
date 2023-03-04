@@ -51,6 +51,9 @@ begin
   ENV['GOVERSION'] = go_version
 
   print_header('Configuration')
+  puts 'Whoami:'
+  execute_command('whoami')
+  puts "GOPATH: #{ENV['GOPATH']}"
   puts "Is running in CI? #{@is_ci}"
   puts "Branch: #{@branch}"
   puts "Go version: #{go_version}"
@@ -80,6 +83,15 @@ begin
   changes_since_last_release = git_instance.gtree(last_release_tag).diff('HEAD').map(&:path)
   puts 'Changed files since last release:'
   puts changes_since_last_release
+
+  vendor_changes = changes_since_last_release.select { |i| i.include?('vendor/') || i.include?('go.mod') || i.include?('go.sum') }
+  if vendor_changes.empty?
+    puts 'Skipping vendor checks as not changes in relevant files'
+  else
+    print_header('Ensure go vendor file is up-to-date')
+    execute_command('go mod vendor')
+    error_if_git_has_changes(git_instance, 'The /vendor file is out of date. Run "go mod vendor" and commit the changes to resolve this issue')
+  end
 
   print_header('Generation - Checking docs and swagger/openapi')
   codegen_changes = changes_since_last_release.select do |i|
