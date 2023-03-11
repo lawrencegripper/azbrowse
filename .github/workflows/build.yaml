@@ -17,7 +17,7 @@ jobs:
         
     - name: Assign variable
       id: secret
-      run: echo '::set-output name=secret::${{secrets.SECRET}}'
+      run: echo '::set-output name=secret::${{secrets.GHACTIONS_SECRET}}'
 
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v2 
