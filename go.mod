@@ -23,7 +23,7 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.6.1
 	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
-	github.com/stretchr/testify v1.8.1
+	github.com/stretchr/testify v1.8.2
 	github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 	github.com/valyala/fastjson v1.6.4
 	golang.org/x/time v0.3.0
@@ -54,7 +54,6 @@ require (
 	github.com/go-openapi/jsonreference v0.20.2 // indirect
 	github.com/go-openapi/strfmt v0.21.3 // indirect
 	github.com/go-openapi/swag v0.22.3 // indirect
-	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
