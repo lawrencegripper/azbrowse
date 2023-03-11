@@ -197,8 +197,6 @@ github.com/go-openapi/strfmt
 # github.com/go-openapi/swag v0.22.3
 ## explicit; go 1.18
 github.com/go-openapi/swag
-# github.com/go-stack/stack v1.8.1
-## explicit; go 1.17
 # github.com/go-xmlfmt/xmlfmt v1.1.2
 ## explicit
 github.com/go-xmlfmt/xmlfmt
@@ -335,7 +333,7 @@ github.com/spf13/pflag
 # github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 ## explicit
 github.com/stephanos/clock
-# github.com/stretchr/testify v1.8.1
+# github.com/stretchr/testify v1.8.2
 ## explicit; go 1.13
 github.com/stretchr/testify/assert
 # github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
