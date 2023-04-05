@@ -8,26 +8,26 @@ on:
 jobs:
   stale:
 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
 
-    - name: Set up Docker BuildKit
-      uses: docker/setup-buildx-action@v1
-
-    - name: Build devcontainer for tooling
-      run: make devcontainer
-
-    - name: Run swagger-update to pull latest specs from azure specs repo
-      run: CMD='make swagger-update' make devcontainer-run
-
-
-    - name: Run swagger-codegen to gen go types
-      run: CMD='make swagger-codegen' make devcontainer-run
-
+    - name: Run Checks, Tests and Build
+      uses: devcontainers/ci@v0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      with:
+        imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer
+        cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer
+        push: false
+        refFilterForPush: refs/heads/main
+        runCmd: make swagger-codegen
+        
     - name: Sort file permissions
       run: sudo chown -R $(whoami) .
 
