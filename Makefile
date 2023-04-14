@@ -114,6 +114,15 @@ swagger-codegen:
 	# Test the generated code initalizes
 	$(GO_BINARY) test -mod=vendor -v internal/pkg/expanders/swagger-armspecs_test.go internal/pkg/expanders/swagger-armspecs.generated.go internal/pkg/expanders/swagger-armspecs.go internal/pkg/expanders/swagger.go internal/pkg/expanders/types.go
 
+## swagger-create-pr
+##		Generate the code needed for browse services from the swagger definitions
+##		set VERBOSE=true to see full output
+swagger-create-pr:
+	git checkout -b auto/$(shell date --iso=date)-arm-update
+	git add .
+	git commit -m "🧹 Update ARM Specs $(shell date --iso=date)"
+	gh pr create --fill
+
 ## autocomplete-install:
 ## 		Add autocompletion for azbrowse to your bash prompt
 autocomplete-install: install
