@@ -118,9 +118,10 @@ swagger-codegen:
 ##		Generate the code needed for browse services from the swagger definitions
 ##		set VERBOSE=true to see full output
 swagger-create-pr:
-	git checkout -b auto/$(shell date --iso=date)-arm2-update
+	git checkout -b auto/arm-update-$(shell date +%s)
 	git add .
 	git commit -m "🧹 Update ARM Specs $(shell date --iso=date)"
+	git push
 	gh pr create --fill --base main
 
 ## autocomplete-install:
