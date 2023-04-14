@@ -24,7 +24,7 @@ jobs:
       with:
         imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer
         cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer
-        push: false
+        push: never
         refFilterForPush: refs/heads/main
         runCmd: make swagger-codegen
         
