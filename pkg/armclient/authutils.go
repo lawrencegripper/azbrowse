@@ -24,13 +24,13 @@ func acquireToken(scope string, tenantID string, subscriptionID string) (AzCLITo
 	if scope == "" {
 		return AzCLIToken{}, fmt.Errorf("no scope specified")
 	}
-	var credOptions *azidentity.DefaultAzureCredentialOptions
+	var credOptionsCLI *azidentity.AzureCLICredentialOptions
 	if tenantID != "" {
-		credOptions = &azidentity.DefaultAzureCredentialOptions{
+		credOptionsCLI = &azidentity.AzureCLICredentialOptions{
 			TenantID: tenantID,
 		}
 	}
-	cred, err := azidentity.NewDefaultAzureCredential(credOptions)
+	cred, err := azidentity.NewAzureCLICredential(credOptionsCLI)
 	if err != nil {
 		return AzCLIToken{}, fmt.Errorf("failed to get credential: %v", err)
 	}
