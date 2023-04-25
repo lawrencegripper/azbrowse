@@ -120,6 +120,7 @@ swagger-codegen:
 swagger-create-pr:
 	git config --global user.email "info@grippers.co.uk"
 	git config --global user.name "lawrencegripper"
+	git config --global --add --bool push.autoSetupRemote true
 	git checkout -b auto/arm-update-$(shell date +%s)
 	git add .
 	git commit -m "🧹 Update ARM Specs $(shell date --iso=date)"
