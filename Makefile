@@ -125,7 +125,6 @@ swagger-create-pr:
 	git add .
 	git commit -m "🧹 Update ARM Specs $(shell date --iso=date)"
 	git push
-	gh auth login
 	gh pr create --fill --base main
 
 ## autocomplete-install:

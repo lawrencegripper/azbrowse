@@ -18,7 +18,7 @@ jobs:
     - name: Run Checks, Tests and Build
       uses: devcontainers/ci@v0.2
       env:
-        GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GH_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
@@ -28,3 +28,8 @@ jobs:
         push: never
         refFilterForPush: refs/heads/main
         runCmd: make swagger-update && make swagger-codegen && make swagger-create-pr
+        # Map through the envs from above into the devcontain
+        # empty items mean it takes value from the `env` on stage
+        env: |
+            GITHUB_TOKEN
+            GH_TOKEN
