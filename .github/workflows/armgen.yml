@@ -19,6 +19,7 @@ jobs:
       uses: devcontainers/ci@v0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
+        GH_TOKEN: ${{ secrets.GHACTIONS_SECRET }}
         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       with:
