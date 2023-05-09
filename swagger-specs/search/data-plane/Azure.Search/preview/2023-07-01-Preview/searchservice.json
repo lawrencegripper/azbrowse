@@ -3,7 +3,7 @@
   "info": {
     "title": "SearchServiceClient",
     "description": "Client that can be used to manage and query indexes and documents, as well as manage other resources, on a search service.",
-    "version": "2021-04-30-Preview",
+    "version": "2023-07-01-Preview",
     "x-ms-code-generation-settings": {
       "useDateTimeOffset": true
     }
@@ -3144,7 +3144,8 @@
         "Edm.Boolean",
         "Edm.DateTimeOffset",
         "Edm.GeographyPoint",
-        "Edm.ComplexType"
+        "Edm.ComplexType",
+        "Edm.Single"
       ],
       "x-ms-enum": {
         "name": "SearchFieldDataType",
@@ -3189,6 +3190,11 @@
             "value": "Edm.ComplexType",
             "name": "Complex",
             "description": "Indicates that a field contains one or more complex objects that in turn have sub-fields of other types."
+          },
+          {
+            "value": "Edm.Single",
+            "name": "Single",
+            "description": "Indicates that a field contains a single-precision floating point number. This is only valid when used with Collection(Edm.Single)."
           }
         ]
       },
@@ -6044,6 +6050,10 @@
     },
     "SemanticSettings": {
       "properties": {
+        "defaultConfiguration": {
+          "type": "string",
+          "description": "Allows you to set the name of a default semantic configuration in your index, making it optional to pass it on as a query parameter every time."
+        },
         "configurations": {
           "type": "array",
           "items": {
@@ -6117,6 +6127,111 @@
         }
       },
       "description": "A field that is used as part of the semantic configuration."
+    },
+    "VectorSearch": {
+      "type": "object",
+      "properties": {
+        "algorithmConfigurations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VectorSearchAlgorithmConfiguration"
+          },
+          "description": "Contains configuration options specific to the algorithm used during indexing time."
+        }
+      },
+      "description": "Contains configuration options related to vector search."
+    },
+    "VectorSearchAlgorithmConfiguration": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "externalDocs": {
+            "url": "https://docs.microsoft.com/rest/api/searchservice/Naming-rules"
+          },
+          "type": "string",
+          "description": "The name to associate with this particular configuration.",
+          "x-nullable": false
+        },
+        "kind": {
+          "type": "string",
+          "description": "The name of the kind of algorithm being configured for use with vector search. Only `hnsw` is supported in the current preview.",
+          "x-nullable": false
+        },
+        "hnswParameters": {
+          "$ref": "#/definitions/HnswParameters",
+          "description": "Contains the parameters specific to hnsw algorithm."
+        }
+      },
+      "required": [
+        "name",
+        "kind"
+      ],
+      "description": "Contains configuration options specific to the algorithm used during indexing time."
+    },
+    "HnswParameters": {
+      "type": "object",
+      "properties": {
+        "m": {
+          "type": "integer",
+          "format": "int32",
+          "x-nullable": true,
+          "minimum": 4,
+          "maximum": 10,
+          "default": 4,
+          "description": "The number of bi-directional links created for every new element during construction. Increasing this parameter value may improve recall and reduce retrieval times for datasets with high intrinsic dimensionality at the expense of increased memory consumption and longer indexing time."
+        },
+        "efConstruction": {
+          "type": "integer",
+          "format": "int32",
+          "x-nullable": true,
+          "minimum": 100,
+          "maximum": 1000,
+          "default": 400,
+          "description": "The size of the dynamic list containing the nearest neighbors, which is used during index time. Increasing this parameter may improve index quality, at the expense of increased indexing time. At a certain point, increasing this parameter leads to diminishing returns."
+        },
+        "efSearch": {
+          "type": "integer",
+          "format": "int32",
+          "x-nullable": true,
+          "minimum": 100,
+          "maximum": 1000,
+          "default": 500,
+          "description": "The size of the dynamic list containing the nearest neighbors, which is used during search time. Increasing this parameter may improve search results, at the expense of slower search. Increasing this parameter leads to diminishing returns.."
+        },
+        "metric": {
+          "$ref": "#/definitions/VectorSearchAlgorithmMetric",
+          "x-nullable": true,
+          "description": "The similarity metric to use for vector comparisons."
+        }
+      },
+      "description": "Contains the parameters specific to hnsw algorithm."
+    },
+    "VectorSearchAlgorithmMetric": {
+      "type": "string",
+      "enum": [
+        "cosine",
+        "euclidean",
+        "dotProduct"
+      ],
+      "x-ms-enum": {
+        "name": "VectorSearchAlgorithmMetric",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "cosine",
+            "name": "Cosine"
+          },
+          {
+            "value": "euclidean",
+            "name": "Euclidean"
+          },
+          {
+            "value": "dotProduct",
+            "name": "DotProduct"
+          }
+        ]
+      },
+      "description": "The similarity metric to use for vector comparisons."
     },
     "DataSourceCredentials": {
       "properties": {
@@ -6505,9 +6620,7 @@
           "description": "Increases the timeout beyond the 5-minute default for Azure SQL database data sources, specified in the format \"hh:mm:ss\"."
         }
       },
-      "additionalProperties": {
-        "type": "object"
-      },
+      "additionalProperties": true,
       "description": "A dictionary of indexer-specific configuration properties. Each name is the name of a specific property. Each value must be of a primitive type.",
       "externalDocs": {
         "url": "https://docs.microsoft.com/rest/api/searchservice/create-indexer#parameters"
@@ -6683,9 +6796,7 @@
         "parameters": {
           "type": "object",
           "x-nullable": true,
-          "additionalProperties": {
-            "type": "object"
-          },
+          "additionalProperties": true,
           "description": "A dictionary of parameter name/value pairs to pass to the function. Each value must be of a primitive type."
         }
       },
@@ -7277,6 +7388,19 @@
           "description": "The name of the normalizer to use for the field. This option can be used only with fields with filterable, sortable, or facetable enabled. Once the normalizer is chosen, it cannot be changed for the field. Must be null for complex fields.",
           "x-nullable": true
         },
+        "dimensions": {
+          "type": "integer",
+          "format": "int32",
+          "x-nullable": true,
+          "minimum": 2,
+          "maximum": 2048,
+          "description": "The dimensionality of the vector field."
+        },
+        "vectorSearchConfiguration": {
+          "type": "string",
+          "x-nullable": false,
+          "description": "The name of the vector search algorithm configuration that specifies the algorithm and optional parameters for searching the vector field."
+        },
         "synonymMaps": {
           "externalDocs": {
             "url": "https://docs.microsoft.com/rest/api/searchservice/Synonym-Map-operations"
@@ -7796,6 +7920,12 @@
           "x-ms-client-name": "SemanticSettings",
           "x-nullable": true
         },
+        "vectorSearch": {
+          "$ref": "#/definitions/VectorSearch",
+          "description": "Contains configuration options related to vector search.",
+          "x-ms-client-name": "VectorSearch",
+          "x-nullable": true
+        },
         "@odata.etag": {
           "x-ms-client-name": "ETag",
           "type": "string",
@@ -7972,6 +8102,11 @@
             "x-nullable": false
           },
           "description": "A list of additional projections to perform during indexing."
+        },
+        "identity": {
+          "$ref": "#/definitions/SearchIndexerDataIdentity",
+          "x-nullable": true,
+          "description": "The user-assigned managed identity used for connections to Azure Storage when writing knowledge store projections. If the connection string indicates an identity (ResourceId) and it's not specified, the system-assigned managed identity is used. On updates to the indexer, if the identity is unspecified, the value remains unchanged. If set to \"none\", the value of this property is cleared."
         }
       },
       "required": [
@@ -8506,7 +8641,8 @@
       "externalDocs": {
         "url": "https://docs.microsoft.com/azure/search/cognitive-search-skill-entity-recognition"
       },
-      "description": "Text analytics entity recognition."
+      "description": "This skill is deprecated. Use the V3.EntityRecognitionSkill instead.",
+      "x-az-search-deprecated": true
     },
     "SentimentSkill": {
       "x-ms-discriminator-value": "#Microsoft.Skills.Text.SentimentSkill",
@@ -8524,7 +8660,8 @@
       "externalDocs": {
         "url": "https://docs.microsoft.com/azure/search/cognitive-search-skill-sentiment"
       },
-      "description": "Text analytics positive-negative sentiment analysis, scored as a floating point value in a range of zero to 1."
+      "description": "This skill is deprecated. Use the V3.SentimentSkill instead.",
+      "x-az-search-deprecated": true
     },
     "SentimentSkillV3": {
       "x-ms-discriminator-value": "#Microsoft.Skills.Text.V3.SentimentSkill",
@@ -8809,9 +8946,7 @@
         },
         "configuration": {
           "type": "object",
-          "additionalProperties": {
-            "type": "object"
-          },
+          "additionalProperties": true,
           "x-nullable": true,
           "description": "A dictionary of configurations for the skill."
         }
@@ -8857,6 +8992,16 @@
           "format": "int32",
           "x-nullable": true,
           "description": "If set, the number of parallel calls that can be made to the Web API."
+        },
+        "authResourceId": {
+          "type": "string",
+          "x-nullable": true,
+          "description": "Applies to custom skills that connect to external code in an Azure function or some other application that provides the transformations. This value should be the application ID created for the function or app when it was registered with Azure Active Directory. When specified, the custom skill connects to the function or app using a managed ID (either system or user-assigned) of the search service and the access token of the function or app, using this value as the resource id for creating the scope of the access token."
+        },
+        "authIdentity": {
+          "$ref": "#/definitions/SearchIndexerDataIdentity",
+          "x-nullable": true,
+          "description": "The user-assigned managed identity used for outbound connections. If an authResourceId is provided and it's not specified, the system-assigned managed identity is used. On updates to the indexer, if the identity is unspecified, the value remains unchanged. If set to \"none\", the value of this property is cleared."
         }
       },
       "required": [
@@ -9205,7 +9350,8 @@
           }
         ]
       },
-      "description": "The language codes supported for input text by SentimentSkill."
+      "description": "Deprecated. The language codes supported for input text by SentimentSkill.",
+      "x-az-search-deprecated": true
     },
     "KeyPhraseExtractionSkillLanguage": {
       "type": "string",
@@ -10436,7 +10582,8 @@
           }
         ]
       },
-      "description": "The language codes supported for input text by EntityRecognitionSkill."
+      "description": "Deprecated. The language codes supported for input text by EntityRecognitionSkill.",
+      "x-az-search-deprecated": true
     },
     "TextTranslationSkillLanguage": {
       "type": "string",
@@ -11201,6 +11348,11 @@
           "type": "boolean",
           "x-nullable": true,
           "description": "Specifies whether incremental reprocessing is enabled."
+        },
+        "identity": {
+          "$ref": "#/definitions/SearchIndexerDataIdentity",
+          "x-nullable": true,
+          "description": "The user-assigned managed identity used for connections to the enrichment cache.  If the connection string indicates an identity (ResourceId) and it's not specified, the system-assigned managed identity is used. On updates to the indexer, if the identity is unspecified, the value remains unchanged. If set to \"none\", the value of this property is cleared."
         }
       }
     },

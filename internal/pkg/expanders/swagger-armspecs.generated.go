@@ -9720,65 +9720,96 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "operations",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Maintenance/operations", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.Maintenance/operations", "2023-04-01"),
 		},
 		{
 			Display:  "applyUpdates",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/applyUpdates", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/applyUpdates", "2023-04-01"),
+		},
+		{
+			Display:  "configurationAssignments",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments", "2023-04-01"),
+			SubResources: []swagger.ResourceType{
+				{
+					Display:        "{configurationAssignmentName}",
+					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+				}},
 		},
 		{
 			Display:  "maintenanceConfigurations",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/maintenanceConfigurations", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/maintenanceConfigurations", "2023-04-01"),
 		},
 		{
 			Display:  "publicMaintenanceConfigurations",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations", "2023-04-01"),
 			SubResources: []swagger.ResourceType{
 				{
 					Display:  "{resourceName}",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/{resourceName}", "2021-05-01"),
+					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/{resourceName}", "2023-04-01"),
 				}},
 		},
 		{
 			Display:  "applyUpdates",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/applyUpdates", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/applyUpdates", "2023-04-01"),
 		},
 		{
 			Display:  "maintenanceConfigurations",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations", "2023-04-01"),
+		},
+		{
+			Display:        "{configurationAssignmentName}",
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+			PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
 		},
 		{
 			Display:        "{resourceName}",
-			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2021-05-01"),
-			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2021-05-01"),
-			PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2021-05-01"),
-			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2021-05-01"),
+			Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2023-04-01"),
+			DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2023-04-01"),
+			PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2023-04-01"),
+			PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.Maintenance/maintenanceConfigurations/{resourceName}", "2023-04-01"),
 		},
 		{
 			Display:  "{applyUpdateName}",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/applyUpdates/{applyUpdateName}", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/applyUpdates/{applyUpdateName}", "2023-04-01"),
 		},
 		{
-			Display:      "configurationAssignments",
-			Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments", "2021-05-01"),
-			SubResources: []swagger.ResourceType{},
+			Display:  "configurationAssignments",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments", "2023-04-01"),
+			SubResources: []swagger.ResourceType{
+				{
+					Display:        "{configurationAssignmentName}",
+					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+				}},
 		},
 		{
 			Display:  "updates",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/updates", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceParentType}/{resourceParentName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/updates", "2023-04-01"),
 		},
 		{
 			Display:  "{applyUpdateName}",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/applyUpdates/{applyUpdateName}", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/applyUpdates/{applyUpdateName}", "2023-04-01"),
 		},
 		{
-			Display:      "configurationAssignments",
-			Endpoint:     endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments", "2021-05-01"),
-			SubResources: []swagger.ResourceType{},
+			Display:  "configurationAssignments",
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments", "2023-04-01"),
+			SubResources: []swagger.ResourceType{
+				{
+					Display:        "{configurationAssignmentName}",
+					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/configurationAssignments/{configurationAssignmentName}", "2023-04-01"),
+				}},
 		},
 		{
 			Display:  "updates",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/updates", "2021-05-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/{providerName}/{resourceType}/{resourceName}/providers/Microsoft.Maintenance/updates", "2023-04-01"),
 		},
 		{
 			Display:  "operations",
@@ -14115,74 +14146,74 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "{operationId}",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Cache/locations/{location}/asyncOperations/{operationId}", "2022-06-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Cache/locations/{location}/asyncOperations/{operationId}", "2023-04-01"),
 		},
 		{
 			Display:  "redis",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Cache/redis", "2022-06-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.Cache/redis", "2023-04-01"),
 		},
 		{
 			Display:  "redis",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis", "2022-06-01"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis", "2023-04-01"),
 			SubResources: []swagger.ResourceType{
 				{
 					Display:  "firewallRules",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules", "2022-06-01"),
+					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules", "2023-04-01"),
 					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{ruleName}",
-							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules/{ruleName}", "2022-06-01"),
-							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules/{ruleName}", "2022-06-01"),
-							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules/{ruleName}", "2022-06-01"),
+							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules/{ruleName}", "2023-04-01"),
+							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules/{ruleName}", "2023-04-01"),
+							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/firewallRules/{ruleName}", "2023-04-01"),
 						}},
 				},
 				{
 					Display:  "patchSchedules",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/patchSchedules", "2022-06-01"),
+					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/patchSchedules", "2023-04-01"),
 				},
 				{
 					Display:  "privateEndpointConnections",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections", "2022-06-01"),
+					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections", "2023-04-01"),
 					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{privateEndpointConnectionName}",
-							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections/{privateEndpointConnectionName}", "2022-06-01"),
-							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections/{privateEndpointConnectionName}", "2022-06-01"),
-							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections/{privateEndpointConnectionName}", "2022-06-01"),
+							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections/{privateEndpointConnectionName}", "2023-04-01"),
+							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections/{privateEndpointConnectionName}", "2023-04-01"),
+							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateEndpointConnections/{privateEndpointConnectionName}", "2023-04-01"),
 						}},
 				},
 				{
 					Display:  "privateLinkResources",
-					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateLinkResources", "2022-06-01"),
+					Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{cacheName}/privateLinkResources", "2023-04-01"),
 				},
 				{
 					Display:        "{name}",
-					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2022-06-01"),
-					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2022-06-01"),
-					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2022-06-01"),
-					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2022-06-01"),
+					Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2023-04-01"),
+					DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2023-04-01"),
+					PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2023-04-01"),
+					PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}", "2023-04-01"),
 					Children: []swagger.ResourceType{
 						{
 							Display:  "linkedServers",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers", "2022-06-01"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers", "2023-04-01"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{linkedServerName}",
-									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers/{linkedServerName}", "2022-06-01"),
-									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers/{linkedServerName}", "2022-06-01"),
-									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers/{linkedServerName}", "2022-06-01"),
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers/{linkedServerName}", "2023-04-01"),
+									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers/{linkedServerName}", "2023-04-01"),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/linkedServers/{linkedServerName}", "2023-04-01"),
 								}},
 						},
 						{
 							Display:  "listUpgradeNotifications",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/listUpgradeNotifications", "2022-06-01"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/listUpgradeNotifications", "2023-04-01"),
 						}},
 					SubResources: []swagger.ResourceType{
 						{
 							Display:        "{default}",
-							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}", "2022-06-01"),
-							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}", "2022-06-01"),
-							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}", "2022-06-01"),
+							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}", "2023-04-01"),
+							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}", "2023-04-01"),
+							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cache/redis/{name}/patchSchedules/{default}", "2023-04-01"),
 						}},
 				}},
 		},
@@ -14936,7 +14967,7 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 						},
 						{
 							Display:  "managedClusters",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/managedClusters", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/managedClusters", "2023-03-01-preview"),
 						},
 						{
 							Display:  "applications",
@@ -14960,7 +14991,7 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 						},
 						{
 							Display:  "trafficControllers",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceNetworking/trafficControllers", "2022-10-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceNetworking/trafficControllers", "2023-05-01-preview"),
 						},
 						{
 							Display:  "signalR",
@@ -16204,117 +16235,117 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 						},
 						{
 							Display:  "managedClusterVersions",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/managedClusterVersions", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/managedClusterVersions", "2023-03-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{clusterVersion}",
-									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/managedClusterVersions/{clusterVersion}", "2023-02-01-preview"),
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/environments/{environment}/managedClusterVersions/{clusterVersion}", "2023-03-01-preview"),
 								}},
 						},
 						{
 							Display:  "{operationId}",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterOperationResults/{operationId}", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterOperationResults/{operationId}", "2023-03-01-preview"),
 						},
 						{
 							Display:  "{operationId}",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterOperations/{operationId}", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterOperations/{operationId}", "2023-03-01-preview"),
 						},
 						{
 							Display:  "managedClusterVersions",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterVersions", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterVersions", "2023-03-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{clusterVersion}",
-									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterVersions/{clusterVersion}", "2023-02-01-preview"),
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedClusterVersions/{clusterVersion}", "2023-03-01-preview"),
 								}},
 						},
 						{
 							Display:  "managedUnsupportedVMSizes",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedUnsupportedVMSizes", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedUnsupportedVMSizes", "2023-03-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:  "{vmSize}",
-									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedUnsupportedVMSizes/{vmSize}", "2023-02-01-preview"),
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/providers/Microsoft.ServiceFabric/locations/{location}/managedUnsupportedVMSizes/{vmSize}", "2023-03-01-preview"),
 								}},
 						},
 						{
 							Display:        "{clusterName}",
-							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-02-01-preview"),
-							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-02-01-preview"),
-							PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-02-01-preview"),
-							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-02-01-preview"),
+							Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-03-01-preview"),
+							DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-03-01-preview"),
+							PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-03-01-preview"),
+							PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}", "2023-03-01-preview"),
 							Children:       []swagger.ResourceType{},
 							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{nodeTypeName}",
-									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-02-01-preview"),
-									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-02-01-preview"),
-									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-02-01-preview"),
-									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-02-01-preview"),
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-03-01-preview"),
+									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-03-01-preview"),
+									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-03-01-preview"),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}", "2023-03-01-preview"),
 									Children: []swagger.ResourceType{
 										{
 											Display:  "skus",
-											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}/skus", "2023-02-01-preview"),
+											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes/{nodeTypeName}/skus", "2023-03-01-preview"),
 										}},
 								}},
 						},
 						{
 							Display:  "applicationTypes",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes", "2023-03-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{applicationTypeName}",
-									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-02-01-preview"),
-									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-02-01-preview"),
-									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-02-01-preview"),
-									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-02-01-preview"),
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-03-01-preview"),
+									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-03-01-preview"),
+									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-03-01-preview"),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}", "2023-03-01-preview"),
 									Children: []swagger.ResourceType{
 										{
 											Display:  "versions",
-											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions", "2023-02-01-preview"),
+											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions", "2023-03-01-preview"),
 											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{version}",
-													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-02-01-preview"),
-													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-02-01-preview"),
-													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-02-01-preview"),
-													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-02-01-preview"),
+													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-03-01-preview"),
+													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-03-01-preview"),
+													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-03-01-preview"),
+													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applicationTypes/{applicationTypeName}/versions/{version}", "2023-03-01-preview"),
 												}},
 										}},
 								}},
 						},
 						{
 							Display:  "applications",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications", "2023-03-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{applicationName}",
-									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-02-01-preview"),
-									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-02-01-preview"),
-									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-02-01-preview"),
-									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-02-01-preview"),
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-03-01-preview"),
+									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-03-01-preview"),
+									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-03-01-preview"),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}", "2023-03-01-preview"),
 									Children: []swagger.ResourceType{
 										{
 											Display:  "services",
-											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services", "2023-02-01-preview"),
+											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services", "2023-03-01-preview"),
 											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{serviceName}",
-													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-02-01-preview"),
-													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-02-01-preview"),
-													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-02-01-preview"),
-													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-02-01-preview"),
+													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-03-01-preview"),
+													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-03-01-preview"),
+													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-03-01-preview"),
+													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedclusters/{clusterName}/applications/{applicationName}/services/{serviceName}", "2023-03-01-preview"),
 												}},
 										}},
 								}},
 						},
 						{
 							Display:  "managedClusters",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters", "2023-02-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters", "2023-03-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:  "nodeTypes",
-									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes", "2023-02-01-preview"),
+									Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourcegroups/{resourceGroupName}/providers/Microsoft.ServiceFabric/managedClusters/{clusterName}/nodeTypes", "2023-03-01-preview"),
 								}},
 						},
 						{
@@ -16412,37 +16443,37 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 						},
 						{
 							Display:  "trafficControllers",
-							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers", "2022-10-01-preview"),
+							Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers", "2023-05-01-preview"),
 							SubResources: []swagger.ResourceType{
 								{
 									Display:        "{trafficControllerName}",
-									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2022-10-01-preview"),
-									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2022-10-01-preview"),
-									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2022-10-01-preview"),
-									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2022-10-01-preview"),
+									Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2023-05-01-preview"),
+									DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2023-05-01-preview"),
+									PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2023-05-01-preview"),
+									PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}", "2023-05-01-preview"),
 									Children: []swagger.ResourceType{
 										{
 											Display:  "associations",
-											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations", "2022-10-01-preview"),
+											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations", "2023-05-01-preview"),
 											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{associationName}",
-													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2022-10-01-preview"),
-													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2022-10-01-preview"),
-													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2022-10-01-preview"),
-													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2022-10-01-preview"),
+													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2023-05-01-preview"),
+													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2023-05-01-preview"),
+													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2023-05-01-preview"),
+													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/associations/{associationName}", "2023-05-01-preview"),
 												}},
 										},
 										{
 											Display:  "frontends",
-											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends", "2022-10-01-preview"),
+											Endpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends", "2023-05-01-preview"),
 											SubResources: []swagger.ResourceType{
 												{
 													Display:        "{frontendName}",
-													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2022-10-01-preview"),
-													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2022-10-01-preview"),
-													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2022-10-01-preview"),
-													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2022-10-01-preview"),
+													Endpoint:       endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2023-05-01-preview"),
+													DeleteEndpoint: endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2023-05-01-preview"),
+													PatchEndpoint:  endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2023-05-01-preview"),
+													PutEndpoint:    endpoints.MustGetEndpointInfoFromURL("/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ServiceNetworking/trafficControllers/{trafficControllerName}/frontends/{frontendName}", "2023-05-01-preview"),
 												}},
 										}},
 								}},
@@ -21394,7 +21425,7 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "operations",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ServiceFabric/operations", "2023-02-01-preview"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ServiceFabric/operations", "2023-03-01-preview"),
 		},
 		{
 			Display:  "operations",
@@ -21402,7 +21433,7 @@ func (e *SwaggerAPISetARMResources) loadResourceTypes() []swagger.ResourceType {
 		},
 		{
 			Display:  "operations",
-			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ServiceNetworking/operations", "2022-10-01-preview"),
+			Endpoint: endpoints.MustGetEndpointInfoFromURL("/providers/Microsoft.ServiceNetworking/operations", "2023-05-01-preview"),
 		},
 		{
 			Display:  "operations",

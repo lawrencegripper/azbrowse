@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Azure File Storage",
-    "version": "2022-11-02",
+    "version": "2023-01-03",
     "x-ms-code-generation-settings": {
       "header": "MIT",
       "strictSpecAdherence": false
@@ -5653,6 +5653,19 @@
     }
   },
   "definitions": {
+    "AccessRight": {
+      "description": "Access rights of the access policy.",
+      "type": "string",
+      "enum": [
+        "Read",
+        "Write",
+        "Delete"
+      ],
+      "x-ms-enum": {
+        "name": "AccessRight",
+        "modelAsString": false
+      }
+    },
     "AccessPolicy": {
       "description": "An Access policy.",
       "type": "object",
@@ -5965,6 +5978,15 @@
           "type": "string",
           "format": "date-time-rfc1123",
           "description": "Time handle was last connected to (UTC)"
+        },
+        "AccessRightList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AccessRight"
+          },
+          "xml": {
+            "wrapped": true
+          }
         }
       }
     },
@@ -6539,7 +6561,7 @@
       "required": true,
       "type": "string",
       "enum": [
-        "2022-11-02"
+        "2023-01-03"
       ]
     },
     "ClientRequestId": {

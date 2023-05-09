@@ -3,7 +3,7 @@
   "info": {
     "title": "SearchIndexClient",
     "description": "Client that can be used to query an index and upload, merge, or delete documents.",
-    "version": "2021-04-30-Preview",
+    "version": "2023-07-01-Preview",
     "x-ms-code-generation-settings": {
       "useDateTimeOffset": true,
       "syncMethods": "None"
@@ -249,6 +249,75 @@
             }
           },
           {
+            "name": "semanticErrorHandling",
+            "in": "query",
+            "type": "string",
+            "enum": [
+              "partial",
+              "fail"
+            ],
+            "x-ms-enum": {
+              "name": "SemanticErrorHandling",
+              "modelAsString": true,
+              "values": [
+                {
+                  "value": "partial",
+                  "name": "Partial",
+                  "description": "If the semantic processing fails, partial results still return. The definition of partial results depends on what semantic step failed and what was the reason for failure."
+                },
+                {
+                  "value": "fail",
+                  "name": "Fail",
+                  "description": "If there is an exception during the semantic processing step, the query will fail and return the appropriate HTTP code depending on the error."
+                }
+              ]
+            },
+            "description": "Allows the user to choose whether a semantic call should fail completely, or to return partial results.",
+            "x-ms-parameter-grouping": {
+              "name": "SearchOptions"
+            }
+          },
+          {
+            "name": "semanticMaxWaitInMilliseconds",
+            "in": "query",
+            "type": "integer",
+            "format": "int32",
+            "minimum": 700,
+            "description": "Allows the user to set an upper bound on the amount of time it takes for semantic enrichment to finish processing before the request fails.",
+            "x-ms-parameter-grouping": {
+              "name": "SearchOptions"
+            }
+          },
+          {
+            "name": "debug",
+            "in": "query",
+            "type": "string",
+            "enum": [
+              "disabled",
+              "semantic"
+            ],
+            "x-ms-enum": {
+              "name": "QueryDebugMode",
+              "modelAsString": true,
+              "values": [
+                {
+                  "value": "disabled",
+                  "name": "Disabled",
+                  "description": "No query debugging information will be returned."
+                },
+                {
+                  "value": "semantic",
+                  "name": "Semantic",
+                  "description": "Allows the user to further explore their Semantic search results."
+                }
+              ]
+            },
+            "description": "Enables a debugging tool that can be used to further explore your search results.",
+            "x-ms-parameter-grouping": {
+              "name": "SearchOptions"
+            }
+          },
+          {
             "name": "searchFields",
             "in": "query",
             "type": "array",
@@ -342,7 +411,7 @@
                 }
               ]
             },
-            "description": "This parameter is only valid if the query type is 'semantic'. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character '|' followed by the 'count-<number of answers>' option after the answers parameter value, such as 'extractive|count-3'. Default count is 1.",
+            "description": "This parameter is only valid if the query type is 'semantic'. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character '|' followed by the 'count-<number of answers>' option after the answers parameter value, such as 'extractive|count-3'. Default count is 1. The confidence threshold can be configured by appending the pipe character '|' followed by the 'threshold-<confidence threshold>' option after the answers parameter value, such as 'extractive|threshold-0.9'. Default threshold is 0.7.",
             "x-ms-parameter-grouping": {
               "name": "SearchOptions"
             }
@@ -607,7 +676,7 @@
           "200": {
             "description": "Response containing the requested document.",
             "schema": {
-              "type": "object"
+              "$ref": "#/definitions/LookupDocument"
             }
           },
           "default": {
@@ -1180,6 +1249,169 @@
       "additionalProperties": true,
       "description": "Captions are the most representative passages from the document relatively to the search query. They are often used as document summary. Captions are only returned for queries of type 'semantic'.."
     },
+    "SemanticPartialResponseReason": {
+      "type": "string",
+      "enum": [
+        "maxWaitExceeded",
+        "capacityOverloaded",
+        "transient"
+      ],
+      "x-ms-enum": {
+        "name": "SemanticPartialResponseReason",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "maxWaitExceeded",
+            "name": "MaxWaitExceeded",
+            "description": "If 'semanticMaxWaitInMilliseconds' was set and the semantic processing duration exceeded that value. Only the base results were returned."
+          },
+          {
+            "value": "capacityOverloaded",
+            "name": "CapacityOverloaded",
+            "description": "The request was throttled. Only the base results were returned."
+          },
+          {
+            "value": "transient",
+            "name": "Transient",
+            "description": "At least one step of the semantic process failed."
+          }
+        ]
+      },
+      "description": "Reason that a partial response was returned for a semantic search request."
+    },
+    "SemanticPartialResponseType": {
+      "type": "string",
+      "enum": [
+        "baseResults",
+        "rerankedResults"
+      ],
+      "x-ms-enum": {
+        "name": "SemanticPartialResponseType",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "baseResults",
+            "name": "BaseResults",
+            "description": "Results without any semantic enrichment or reranking."
+          },
+          {
+            "value": "rerankedResults",
+            "name": "RerankedResults",
+            "description": "Results have been reranked with the reranker model and will include semantic captions. They will not include any answers, answers highlights or caption highlights."
+          }
+        ]
+      },
+      "description": "Type of partial response that was returned for a semantic search request."
+    },
+    "DocumentDebugInfo": {
+      "type": "object",
+      "properties": {
+        "semantic": {
+          "$ref": "#/definitions/SemanticDebugInfo",
+          "readOnly": true,
+          "description": "Contains debugging information specific to semantic search queries."
+        }
+      },
+      "description": "Contains debugging information that can be used to further explore your search results."
+    },
+    "SemanticDebugInfo": {
+      "type": "object",
+      "properties": {
+        "titleField": {
+          "$ref": "#/definitions/QueryResultDocumentSemanticField",
+          "readOnly": true,
+          "description": "The title field that was sent to the semantic enrichment process, as well as how it was used"
+        },
+        "contentFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueryResultDocumentSemanticField"
+          },
+          "readOnly": true,
+          "description": "The content fields that were sent to the semantic enrichment process, as well as how they were used"
+        },
+        "keywordFields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/QueryResultDocumentSemanticField"
+          },
+          "readOnly": true,
+          "description": "The keyword fields that were sent to the semantic enrichment process, as well as how they were used"
+        },
+        "rerankerInput": {
+          "$ref": "#/definitions/QueryResultDocumentRerankerInput",
+          "readOnly": true,
+          "description": "The raw concatenated strings that were sent to the semantic enrichment process."
+        }
+      }
+    },
+    "QueryResultDocumentSemanticField": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The name of the field that was sent to the semantic enrichment process"
+        },
+        "state": {
+          "$ref": "#/definitions/QueryResultDocumentSemanticFieldState",
+          "readOnly": true,
+          "description": "The way the field was used for the semantic enrichment process (fully used, partially used, or unused)"
+        }
+      },
+      "description": "Description of fields that were sent to the semantic enrichment process, as well as how they were used"
+    },
+    "QueryResultDocumentSemanticFieldState": {
+      "type": "string",
+      "enum": [
+        "used",
+        "unused",
+        "partial"
+      ],
+      "x-ms-enum": {
+        "name": "QueryResultDocumentSemanticFieldState",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "used",
+            "name": "Used",
+            "description": "The field was fully used for semantic enrichment."
+          },
+          {
+            "value": "unused",
+            "name": "Unused",
+            "description": "The field was not used for semantic enrichment."
+          },
+          {
+            "value": "partial",
+            "name": "Partial",
+            "description": "The field was partially used for semantic enrichment."
+          }
+        ]
+      },
+      "description": "The way the field was used for the semantic enrichment process."
+    },
+    "QueryResultDocumentRerankerInput": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The raw string for the title field that was used for semantic enrichment."
+        },
+        "content": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The raw concatenated strings for the content fields that were used for semantic enrichment."
+        },
+        "keywords": {
+          "type": "string",
+          "readOnly": true,
+          "description": "The raw concatenated strings for the keyword fields that were used for semantic enrichment."
+        }
+      },
+      "description": "The raw concatenated strings that were sent to the semantic enrichment process."
+    },
     "SearchDocumentsResult": {
       "properties": {
         "@odata.count": {
@@ -1223,6 +1455,18 @@
           "readOnly": true,
           "x-ms-client-name": "NextPageParameters",
           "description": "Continuation JSON payload returned when Azure Cognitive Search can't return all the requested results in a single Search response. You can use this JSON along with @odata.nextLink to formulate another POST Search request to get the next part of the search response."
+        },
+        "@search.semanticPartialResponseReason": {
+          "$ref": "#/definitions/SemanticPartialResponseReason",
+          "readOnly": true,
+          "x-ms-client-name": "SemanticPartialResponseReason",
+          "description": "Reason that a partial response was returned for a semantic search request."
+        },
+        "@search.semanticPartialResponseType": {
+          "$ref": "#/definitions/SemanticPartialResponseType",
+          "readOnly": true,
+          "x-ms-client-name": "SemanticPartialResponseType",
+          "description": "Type of partial response that was returned for a semantic search request."
         },
         "value": {
           "type": "array",
@@ -1284,6 +1528,16 @@
           "x-ms-client-name": "Captions",
           "x-nullable": true,
           "description": "Captions are the most representative passages from the document relatively to the search query. They are often used as document summary. Captions are only returned for queries of type 'semantic'."
+        },
+        "@search.documentDebugInfo": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DocumentDebugInfo"
+          },
+          "readOnly": true,
+          "x-ms-client-name": "DocumentDebugInfo",
+          "x-nullable": true,
+          "description": "Contains debugging information that can be used to further explore your search results."
         }
       },
       "required": [
@@ -1291,6 +1545,11 @@
       ],
       "additionalProperties": true,
       "description": "Contains a document found by a search query, plus associated metadata."
+    },
+    "LookupDocument": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "A document retrieved via a document lookup operation."
     },
     "IndexBatch": {
       "properties": {
@@ -1403,6 +1662,54 @@
       ],
       "description": "Response containing the status of operations for all documents in the indexing request."
     },
+    "SemanticErrorHandling": {
+      "type": "string",
+      "enum": [
+        "partial",
+        "fail"
+      ],
+      "x-ms-enum": {
+        "name": "SemanticErrorHandling",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "partial",
+            "name": "Partial",
+            "description": "If the semantic processing fails, partial results still return. The definition of partial results depends on what semantic step failed and what was the reason for failure."
+          },
+          {
+            "value": "fail",
+            "name": "Fail",
+            "description": "If there is an exception during the semantic processing step, the query will fail and return the appropriate HTTP code depending on the error."
+          }
+        ]
+      },
+      "description": "Allows the user to choose whether a semantic call should fail completely, or to return partial results."
+    },
+    "QueryDebugMode": {
+      "type": "string",
+      "enum": [
+        "disabled",
+        "semantic"
+      ],
+      "x-ms-enum": {
+        "name": "QueryDebugMode",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "disabled",
+            "name": "Disabled",
+            "description": "No query debugging information will be returned."
+          },
+          {
+            "value": "semantic",
+            "name": "Semantic",
+            "description": "Allows the user to further explore their Semantic search results."
+          }
+        ]
+      },
+      "description": "Enables a debugging tool that can be used to further explore your search results."
+    },
     "SearchMode": {
       "type": "string",
       "enum": [
@@ -1503,7 +1810,7 @@
           }
         ]
       },
-      "description": "This parameter is only valid if the query type is 'semantic'. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character '|' followed by the 'count-<number of answers>' option after the answers parameter value, such as 'extractive|count-3'. Default count is 1."
+      "description": "This parameter is only valid if the query type is 'semantic'. If set, the query returns answers extracted from key passages in the highest ranked documents. The number of answers returned can be configured by appending the pipe character '|' followed by the 'count-<number of answers>' option after the answers parameter value, such as 'extractive|count-3'. Default count is 1. The confidence threshold can be configured by appending the pipe character '|' followed by the 'threshold-<confidence threshold>' option after the answers parameter value, such as 'extractive|threshold-0.9'. Default threshold is 0.7."
     },
     "Captions": {
       "type": "string",
@@ -1528,6 +1835,29 @@
         ]
       },
       "description": "This parameter is only valid if the query type is 'semantic'. If set, the query returns captions extracted from key passages in the highest ranked documents. When Captions is set to 'extractive', highlighting is enabled by default, and can be configured by appending the pipe character '|' followed by the 'highlight-<true/false>' option, such as 'extractive|highlight-true'. Defaults to 'None'."
+    },
+    "Vector": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "format": "float"
+          },
+          "description": "The vector representation of a search query."
+        },
+        "k": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of nearest neighbors to return as top hits."
+        },
+        "fields": {
+          "type": "string",
+          "description": "Vector Fields of type Collection(Edm.Single) to be included in the vector searched."
+        }
+      },
+      "description": "The query parameters for vector and hybrid search queries."
     },
     "QueryLanguage": {
       "type": "string",
@@ -2101,6 +2431,21 @@
           "type": "string",
           "description": "The name of a semantic configuration that will be used when processing documents for queries of type semantic."
         },
+        "semanticErrorHandling": {
+          "$ref": "#/definitions/SemanticErrorHandling",
+          "description": "Allows the user to choose whether a semantic call should fail completely (default / current behavior), or to return partial results."
+        },
+        "semanticMaxWaitInMilliseconds": {
+          "type": "integer",
+          "format": "int32",
+          "x-nullable": true,
+          "minimum": 700,
+          "description": "Allows the user to set an upper bound on the amount of time it takes for semantic enrichment to finish processing before the request fails."
+        },
+        "debug": {
+          "$ref": "#/definitions/QueryDebugMode",
+          "description": "Enables a debugging tool that can be used to further explore your Semantic search results."
+        },
         "search": {
           "type": "string",
           "description": "A full-text search query expression; Use \"*\" or omit this parameter to match all documents.",
@@ -2147,6 +2492,10 @@
         "semanticFields": {
           "type": "string",
           "description": "The comma-separated list of field names used for semantic search."
+        },
+        "vector": {
+          "$ref": "#/definitions/Vector",
+          "description": "The query parameters for vector and hybrid search queries."
         }
       },
       "description": "Parameters for filtering, sorting, faceting, paging, and other search query behaviors."
