@@ -23,7 +23,7 @@ require (
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/spf13/cobra v1.7.0
 	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 	github.com/valyala/fastjson v1.6.4
 	golang.org/x/time v0.3.0
