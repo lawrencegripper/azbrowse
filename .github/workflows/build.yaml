@@ -37,6 +37,7 @@ jobs:
         BUILD_NUMBER: ${{ github.run_number }}
         IS_PR: ${{ github.head_ref }}
         BRANCH: ${{ github.ref }}
+        IS_CI: "true"
       with:
         imageName: ghcr.io/lawrencegripper/azbrowse/devcontainer
         cacheFrom: ghcr.io/lawrencegripper/azbrowse/devcontainer
@@ -51,7 +52,7 @@ jobs:
             DOCKER_PASSWORD
             SNAPCRAFT_STORE_CREDENTIALS
             BUILD_NUMBER
-            IS_CI="true"
+            IS_CI
             IS_PR
             BRANCH
 
