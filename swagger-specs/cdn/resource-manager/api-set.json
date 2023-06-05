@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Cdn/stable/2021-06-01/afdx.json", "Microsoft.Cdn/stable/2021-06-01/cdn.json", "Microsoft.Cdn/stable/2021-06-01/cdnwebapplicationfirewall.json"], "name": "package-2021-06"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Cdn/stable/2023-05-01/afdx.json", "Microsoft.Cdn/stable/2023-05-01/cdn.json", "Microsoft.Cdn/stable/2023-05-01/cdnwebapplicationfirewall.json"], "name": "package-2023-05"}
