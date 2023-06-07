@@ -3,7 +3,7 @@
   "info": {
     "title": "CognitiveServicesManagementClient",
     "description": "Cognitive Services Management Client",
-    "version": "2022-12-01"
+    "version": "2023-05-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -622,6 +622,51 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.CognitiveServices/locations/{location}/usages": {
+      "get": {
+        "tags": [
+          "Usages"
+        ],
+        "description": "Get usages for the requested subscription",
+        "x-ms-examples": {
+          "Get Usages": {
+            "$ref": "./examples/ListUsages.json"
+          }
+        },
+        "operationId": "Usages_List",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/locationParameter"
+          },
+          {
+            "$ref": "#/parameters/usageFilterParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "schema": {
+              "$ref": "#/definitions/UsageListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CognitiveServices/accounts/{accountName}/usages": {
       "get": {
         "tags": [
@@ -826,6 +871,48 @@
             "description": "OK.",
             "schema": {
               "$ref": "#/definitions/CommitmentTierListResult"
+            }
+          },
+          "default": {
+            "description": "Error response describing why the operation failed.",
+            "schema": {
+              "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.CognitiveServices/locations/{location}/models": {
+      "get": {
+        "tags": [
+          "Models"
+        ],
+        "operationId": "Models_List",
+        "description": "List Models.",
+        "x-ms-examples": {
+          "ListModels": {
+            "$ref": "./examples/ListModels.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "$ref": "#/parameters/locationParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK.",
+            "schema": {
+              "$ref": "#/definitions/ModelListResult"
             }
           },
           "default": {
@@ -1267,7 +1354,10 @@
             }
           }
         },
-        "x-ms-long-running-operation": true
+        "x-ms-long-running-operation": true,
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        }
       },
       "delete": {
         "tags": [
@@ -2271,7 +2361,11 @@
           }
         },
         "restore": {
-          "type": "boolean"
+          "type": "boolean",
+          "x-ms-mutability": [
+            "create",
+            "update"
+          ]
         },
         "deletionDate": {
           "type": "string",
@@ -2297,6 +2391,10 @@
           ],
           "description": "The commitment plan associations of Cognitive Services account.",
           "readOnly": true
+        },
+        "abusePenalty": {
+          "readOnly": true,
+          "$ref": "#/definitions/AbusePenalty"
         }
       },
       "description": "Properties of Cognitive Services account."
@@ -2404,6 +2502,33 @@
         }
       ]
     },
+    "AbusePenalty": {
+      "description": "The abuse penalty.",
+      "type": "object",
+      "properties": {
+        "action": {
+          "type": "string",
+          "enum": [
+            "Throttle",
+            "Block"
+          ],
+          "x-ms-enum": {
+            "name": "AbusePenaltyAction",
+            "modelAsString": true
+          },
+          "description": "The action of AbusePenalty."
+        },
+        "rateLimitPercentage": {
+          "type": "number",
+          "description": "The percentage of rate limit."
+        },
+        "expiration": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The datetime of expiration of the AbusePenalty."
+        }
+      }
+    },
     "CommitmentPlanAccountAssociationProperties": {
       "type": "object",
       "properties": {
@@ -2473,6 +2598,32 @@
         }
       },
       "description": "The call rate limit Cognitive Services account."
+    },
+    "CapacityConfig": {
+      "type": "object",
+      "properties": {
+        "minimum": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The minimum capacity."
+        },
+        "maximum": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The maximum capacity."
+        },
+        "step": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The minimal incremental between allowed values for capacity."
+        },
+        "default": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The default capacity."
+        }
+      },
+      "description": "The capacity configuration."
     },
     "CallRateLimit": {
       "type": "object",
@@ -2645,6 +2796,10 @@
     "UsageListResult": {
       "type": "object",
       "properties": {
+        "nextLink": {
+          "description": "The link used to get the next page of Usages.",
+          "type": "string"
+        },
         "value": {
           "type": "array",
           "items": {
@@ -3316,6 +3471,9 @@
       "description": "Cognitive Services account deployment.",
       "type": "object",
       "properties": {
+        "sku": {
+          "$ref": "#/definitions/Sku"
+        },
         "systemData": {
           "$ref": "../../../../../common-types/resource-management/v2/types.json#/definitions/systemData",
           "readOnly": true
@@ -3349,7 +3507,9 @@
             "Deleting",
             "Moving",
             "Failed",
-            "Succeeded"
+            "Succeeded",
+            "Disabled",
+            "Canceled"
           ],
           "x-ms-enum": {
             "name": "DeploymentProvisioningState",
@@ -3379,6 +3539,29 @@
         "callRateLimit": {
           "readOnly": true,
           "$ref": "#/definitions/CallRateLimit"
+        },
+        "rateLimits": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ThrottlingRule"
+          },
+          "x-ms-identifiers": [
+            "key"
+          ]
+        },
+        "versionUpgradeOption": {
+          "type": "string",
+          "description": "Deployment model version upgrade option.",
+          "enum": [
+            "OnceNewDefaultVersionAvailable",
+            "OnceCurrentVersionExpired",
+            "NoAutoUpgrade"
+          ],
+          "x-ms-enum": {
+            "name": "DeploymentModelVersionUpgradeOption",
+            "modelAsString": true
+          }
         }
       },
       "description": "Properties of Cognitive Services account deployment."
@@ -3396,7 +3579,11 @@
         },
         "version": {
           "type": "string",
-          "description": "Deployment model version."
+          "description": "Optional. Deployment model version. If version is not specified, a default version will be assigned. The default version is different for different models and might change when there is new version available for a model. Default version for a model could be found from list models API."
+        },
+        "source": {
+          "type": "string",
+          "description": "Optional. Deployment model source ARM resource ID."
         },
         "callRateLimit": {
           "readOnly": true,
@@ -3645,6 +3832,14 @@
           "type": "object",
           "$ref": "#/definitions/CommitmentPeriod",
           "readOnly": true
+        },
+        "provisioningIssues": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of ProvisioningIssue."
         }
       },
       "description": "Properties of Cognitive Services account commitment plan."
@@ -3655,7 +3850,8 @@
       "enum": [
         "Web",
         "ConnectedContainer",
-        "DisconnectedContainer"
+        "DisconnectedContainer",
+        "ProvisionedWeb"
       ],
       "x-ms-enum": {
         "name": "HostingModel",
@@ -3692,6 +3888,81 @@
       },
       "description": "Cognitive Services account commitment period."
     },
+    "ModelListResult": {
+      "type": "object",
+      "properties": {
+        "nextLink": {
+          "description": "The link used to get the next page of Model.",
+          "type": "string"
+        },
+        "value": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Model"
+          },
+          "x-ms-identifiers": [
+            "kind",
+            "skuName",
+            "/model/name",
+            "/model/format",
+            "/model/version"
+          ],
+          "description": "Gets the list of Cognitive Services accounts Model and their properties."
+        }
+      },
+      "description": "The list of cognitive services models."
+    },
+    "Model": {
+      "description": "Cognitive Services Model.",
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "object",
+          "description": "Model Metadata.",
+          "$ref": "#/definitions/AccountModel"
+        },
+        "kind": {
+          "$ref": "#/definitions/Kind",
+          "description": "The Kind of the Model."
+        },
+        "skuName": {
+          "$ref": "#/definitions/SkuName",
+          "description": "The SKU of the Model."
+        }
+      }
+    },
+    "ModelSku": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The name of the model SKU."
+        },
+        "usageName": {
+          "type": "string",
+          "description": "The usage name of the model SKU."
+        },
+        "deprecationDate": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The datetime of deprecation of the model SKU."
+        },
+        "capacity": {
+          "type": "object",
+          "description": "The capacity configuration.",
+          "$ref": "#/definitions/CapacityConfig"
+        },
+        "rateLimits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CallRateLimit"
+          },
+          "x-ms-identifiers": [],
+          "description": "The list of rateLimit."
+        }
+      },
+      "description": "Describes an available Cognitive Services Model SKU."
+    },
     "AccountModelListResult": {
       "type": "object",
       "properties": {
@@ -3722,6 +3993,20 @@
           "type": "object",
           "description": "Base Model Identifier.",
           "$ref": "#/definitions/DeploymentModel"
+        },
+        "isDefaultVersion": {
+          "type": "boolean",
+          "description": "If the model is default version."
+        },
+        "skus": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModelSku"
+          },
+          "x-ms-identifiers": [
+            "name"
+          ],
+          "description": "The list of Model Sku."
         },
         "maxCapacity": {
           "type": "integer",

@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2021-06-01",
+    "version": "2023-05-01",
     "title": "CdnManagementClient",
     "description": "Use these APIs to manage Azure CDN resources through the Azure Resource Manager. You must make sure that requests made to these resources are secure."
   },
@@ -213,6 +213,11 @@
           },
           "202": {
             "description": "Accepted. The request has been accepted for processing and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Profile"
             }
@@ -273,6 +278,11 @@
           },
           "202": {
             "description": "Accepted. The request has been accepted for processing and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Profile"
             }
@@ -320,7 +330,12 @@
             "description": "OK. The request has succeeded."
           },
           "202": {
-            "description": "Accepted. The request has been accepted for processing and the operation will complete asynchronously."
+            "description": "Accepted. The request has been accepted for processing and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
           },
           "204": {
             "description": "No Content. The request has been accepted but the profile was not found."
@@ -333,6 +348,184 @@
           }
         },
         "x-ms-long-running-operation": true
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/canMigrate": {
+      "post": {
+        "tags": [
+          "Profiles"
+        ],
+        "description": "Checks if CDN profile can be migrated to Azure Frontdoor(Standard/Premium) profile.",
+        "operationId": "Profiles_CanMigrate",
+        "x-ms-examples": {
+          "Profiles_CanMigrate": {
+            "$ref": "./examples/Profiles_CanMigrate.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/resourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/subscriptionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/apiVersionParameter"
+          },
+          {
+            "description": "Properties needed to check if cdn profile or classic frontdoor can be migrated.",
+            "in": "body",
+            "name": "canMigrateParameters",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CanMigrateParameters"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK. The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/CanMigrateResult"
+            }
+          },
+          "202": {
+            "description": "Accepted. The request has been accepted for processing and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "CDN error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/migrate": {
+      "post": {
+        "tags": [
+          "Profiles"
+        ],
+        "description": "Migrate the CDN profile to Azure Frontdoor(Standard/Premium) profile. The change need to be committed after this.",
+        "operationId": "Profiles_Migrate",
+        "x-ms-examples": {
+          "Profiles_Migrate": {
+            "$ref": "./examples/Profiles_Migrate.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/resourceGroupNameParameter"
+          },
+          {
+            "$ref": "#/parameters/subscriptionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/apiVersionParameter"
+          },
+          {
+            "description": "Properties needed to migrate the profile.",
+            "in": "body",
+            "name": "migrationParameters",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/MigrationParameters"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK. The request has succeeded.",
+            "schema": {
+              "$ref": "#/definitions/MigrateResult"
+            }
+          },
+          "202": {
+            "description": "Accepted. The request has been accepted for processing and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/MigrateResult"
+            }
+          },
+          "default": {
+            "description": "CDN error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "location"
+        }
+      }
+    },
+    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/migrationCommit": {
+      "post": {
+        "tags": [
+          "Profiles"
+        ],
+        "description": "Commit the migrated Azure Frontdoor(Standard/Premium) profile.",
+        "operationId": "Profiles_MigrationCommit",
+        "x-ms-examples": {
+          "Profiles_MigrationCommit": {
+            "$ref": "./examples/Profiles_MigrationCommit.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/resourceGroupNameParameter"
+          },
+          {
+            "name": "profileName",
+            "in": "path",
+            "description": "Name of the CDN profile which is unique within the resource group.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "$ref": "#/parameters/subscriptionIdParameter"
+          },
+          {
+            "$ref": "#/parameters/apiVersionParameter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK. The request has succeeded."
+          },
+          "202": {
+            "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
+          },
+          "default": {
+            "description": "CDN error response describing why the operation failed.",
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-long-running-operation": true,
+        "x-ms-long-running-operation-options": {
+          "final-state-via": "azure-async-operation"
+        }
       }
     },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Cdn/profiles/{profileName}/generateSsoUri": {
@@ -637,6 +830,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Endpoint"
             }
@@ -704,6 +902,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Endpoint"
             }
@@ -758,7 +961,12 @@
             "description": "OK. The request has succeeded."
           },
           "202": {
-            "description": "Accepted and the operation will complete asynchronously."
+            "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
           },
           "204": {
             "description": "No Content. The request has been accepted but the endpoint was not found."
@@ -819,6 +1027,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Endpoint"
             }
@@ -879,6 +1092,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Endpoint"
             }
@@ -944,7 +1162,12 @@
             "description": "OK. The request has succeeded."
           },
           "202": {
-            "description": "Accepted and the operation will complete asynchronously."
+            "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
           },
           "default": {
             "description": "CDN error response describing why the operation failed.",
@@ -1007,7 +1230,12 @@
             "description": "OK. The request has succeeded."
           },
           "202": {
-            "description": "Accepted and the operation will complete asynchronously."
+            "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
           },
           "default": {
             "description": "CDN error response describing why the operation failed.",
@@ -1319,6 +1547,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Origin"
             }
@@ -1393,6 +1626,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/Origin"
             }
@@ -1454,7 +1692,12 @@
             "description": "OK. The request has succeeded."
           },
           "202": {
-            "description": "Accepted and the operation will complete asynchronously."
+            "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
           },
           "204": {
             "description": "No Content. The request has been accepted but the origin was not found."
@@ -1651,6 +1894,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/OriginGroup"
             }
@@ -1725,6 +1973,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/OriginGroup"
             }
@@ -1786,7 +2039,12 @@
             "description": "OK. The request has succeeded."
           },
           "202": {
-            "description": "Accepted and the operation will complete asynchronously."
+            "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            }
           },
           "204": {
             "description": "No Content. The request has been accepted but the origin was not found."
@@ -1983,6 +2241,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/CustomDomain"
             }
@@ -2045,6 +2308,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/CustomDomain"
             }
@@ -2115,6 +2383,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/CustomDomain"
             }
@@ -2194,6 +2467,11 @@
           },
           "202": {
             "description": "Accepted and the operation will complete asynchronously.",
+            "headers": {
+              "location": {
+                "type": "string"
+              }
+            },
             "schema": {
               "$ref": "#/definitions/CustomDomain"
             }
@@ -2471,6 +2749,11 @@
           "type": "string",
           "description": "Kind of the profile. Used by portal to differentiate traditional CDN profile and new AFD profile."
         },
+        "identity": {
+          "description": "Managed service identity (system assigned and/or user assigned identities).",
+          "type": "object",
+          "$ref": "../../../../../common-types/resource-management/v4/managedidentity.json#/definitions/ManagedServiceIdentity"
+        },
         "properties": {
           "x-ms-client-flatten": true,
           "$ref": "#/definitions/ProfileProperties"
@@ -2490,7 +2773,12 @@
             "Creating",
             "Active",
             "Deleting",
-            "Disabled"
+            "Disabled",
+            "Migrating",
+            "Migrated",
+            "PendingMigrationCommit",
+            "CommittingMigration",
+            "AbortingMigration"
           ],
           "type": "string",
           "x-ms-enum": {
@@ -2513,6 +2801,14 @@
             "name": "ProfileProvisioningState",
             "modelAsString": true
           }
+        },
+        "extendedProperties": {
+          "description": "Key-Value pair representing additional properties for profiles.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "readOnly": true
         },
         "frontDoorId": {
           "readOnly": true,
@@ -2556,6 +2852,11 @@
             "type": "string"
           }
         },
+        "identity": {
+          "description": "Managed service identity (system assigned and/or user assigned identities).",
+          "type": "object",
+          "$ref": "../../../../../common-types/resource-management/v4/managedidentity.json#/definitions/ManagedServiceIdentity"
+        },
         "properties": {
           "x-ms-client-flatten": true,
           "$ref": "#/definitions/ProfilePropertiesUpdateParameters"
@@ -2573,6 +2874,176 @@
           "format": "int32",
           "minimum": 16,
           "exclusiveMinimum": false
+        }
+      }
+    },
+    "CanMigrateResult": {
+      "type": "object",
+      "description": "Result for canMigrate operation.",
+      "properties": {
+        "id": {
+          "description": "Resource ID.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "type": {
+          "description": "Resource type.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "properties": {
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/CanMigrateProperties"
+        }
+      },
+      "x-ms-azure-resource": true
+    },
+    "CanMigrateProperties": {
+      "type": "object",
+      "properties": {
+        "canMigrate": {
+          "readOnly": true,
+          "description": "Flag that says if the profile can be migrated",
+          "type": "boolean"
+        },
+        "defaultSku": {
+          "readOnly": true,
+          "description": "Recommended sku for the migration",
+          "type": "string",
+          "enum": [
+            "Standard_AzureFrontDoor",
+            "Premium_AzureFrontDoor"
+          ],
+          "x-ms-enum": {
+            "name": "CanMigrateDefaultSku",
+            "modelAsString": true
+          }
+        },
+        "errors": {
+          "items": {
+            "description": "List of migration errors",
+            "$ref": "#/definitions/MigrationErrorType"
+          },
+          "type": "array",
+          "x-ms-identifiers": []
+        }
+      }
+    },
+    "MigrationErrorType": {
+      "description": "Error response indicates CDN service is not able to process the incoming request. The reason is provided in the error message.",
+      "type": "object",
+      "properties": {
+        "code": {
+          "description": "Error code.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "resourceName": {
+          "description": "Resource which has the problem.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "errorMessage": {
+          "description": "Error message indicating why the operation failed.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "nextSteps": {
+          "description": "Describes what needs to be done to fix the problem",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "CanMigrateParameters": {
+      "type": "object",
+      "description": "Request body for CanMigrate operation.",
+      "required": [
+        "classicResourceReference"
+      ],
+      "properties": {
+        "classicResourceReference": {
+          "description": "Resource reference of the classic cdn profile or classic frontdoor that need to be migrated.",
+          "$ref": "#/definitions/ResourceReference"
+        }
+      },
+      "x-ms-azure-resource": true
+    },
+    "MigrationParameters": {
+      "type": "object",
+      "description": "Request body for Migrate operation.",
+      "required": [
+        "classicResourceReference",
+        "sku",
+        "profileName"
+      ],
+      "properties": {
+        "sku": {
+          "description": "Sku for the migration",
+          "$ref": "#/definitions/Sku"
+        },
+        "classicResourceReference": {
+          "description": "Resource reference of the classic cdn profile or classic frontdoor that need to be migrated.",
+          "$ref": "#/definitions/ResourceReference"
+        },
+        "profileName": {
+          "description": "Name of the new profile that need to be created.",
+          "type": "string"
+        },
+        "migrationWebApplicationFirewallMappings": {
+          "description": "Waf mapping for the migrated profile",
+          "type": "array",
+          "items": {
+            "description": "List of waf mappings",
+            "$ref": "#/definitions/MigrationWebApplicationFirewallMapping"
+          },
+          "x-ms-identifiers": []
+        }
+      },
+      "x-ms-azure-resource": true
+    },
+    "MigrationWebApplicationFirewallMapping": {
+      "description": "Web Application Firewall Mapping ",
+      "type": "object",
+      "properties": {
+        "migratedFrom": {
+          "description": "Migration From Waf policy",
+          "$ref": "#/definitions/ResourceReference"
+        },
+        "migratedTo": {
+          "description": "Migration to Waf policy",
+          "$ref": "#/definitions/ResourceReference"
+        }
+      }
+    },
+    "MigrateResult": {
+      "type": "object",
+      "description": "Result for migrate operation.",
+      "properties": {
+        "id": {
+          "description": "Resource ID.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "type": {
+          "description": "Resource type.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "properties": {
+          "x-ms-client-flatten": true,
+          "$ref": "#/definitions/MigrateResultProperties"
+        }
+      },
+      "x-ms-azure-resource": true
+    },
+    "MigrateResultProperties": {
+      "type": "object",
+      "properties": {
+        "migratedProfileResourceId": {
+          "readOnly": true,
+          "description": "Arm resource id of the migrated profile",
+          "$ref": "#/definitions/ResourceReference"
         }
       }
     },
@@ -6612,7 +7083,7 @@
       "in": "query",
       "required": true,
       "type": "string",
-      "description": "Version of the API to be used with the client request. Current version is 2021-06-01."
+      "description": "Version of the API to be used with the client request. Current version is 2023-05-01."
     },
     "resourceGroupNameParameter": {
       "name": "resourceGroupName",

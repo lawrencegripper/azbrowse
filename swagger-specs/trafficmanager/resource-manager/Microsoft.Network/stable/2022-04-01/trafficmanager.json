@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "TrafficManagerManagementClient",
-    "version": "2018-08-01"
+    "version": "2022-04-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -24,11 +24,7 @@
         "description": "Update a Traffic Manager endpoint.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager endpoint to be updated."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -70,10 +66,10 @@
             "description": "The Traffic Manager endpoint parameters supplied to the Update operation."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -104,11 +100,7 @@
         "description": "Gets a Traffic Manager endpoint.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager endpoint."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -141,10 +133,10 @@
             "description": "The name of the Traffic Manager endpoint."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -181,11 +173,7 @@
         "description": "Create or update a Traffic Manager endpoint.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager endpoint to be created or updated."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -227,10 +215,10 @@
             "description": "The Traffic Manager endpoint parameters supplied to the CreateOrUpdate operation."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -265,6 +253,9 @@
           },
           "Endpoint-PUT-External-WithCustomHeaders": {
             "$ref": "./examples/Endpoint-PUT-External-WithCustomHeaders.json"
+          },
+          "Endpoint-PUT-External-WithAlwaysServe": {
+            "$ref": "./examples/Endpoint-PUT-External-WithAlwaysServe.json"
           }
         }
       },
@@ -276,11 +267,7 @@
         "description": "Deletes a Traffic Manager endpoint.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager endpoint to be deleted."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -313,10 +300,10 @@
             "description": "The name of the Traffic Manager endpoint to be deleted."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -361,7 +348,7 @@
             "description": "The Traffic Manager name parameters supplied to the CheckTrafficManagerNameAvailability operation."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -388,6 +375,54 @@
         }
       }
     },
+    "/subscriptions/{subscriptionId}/providers/Microsoft.Network/checkTrafficManagerNameAvailabilityV2": {
+      "post": {
+        "tags": [
+          "Profiles"
+        ],
+        "operationId": "Profiles_checkTrafficManagerNameAvailabilityV2",
+        "description": "Checks the availability of a Traffic Manager Relative DNS name.",
+        "parameters": [
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
+          },
+          {
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
+          },
+          {
+            "name": "parameters",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CheckTrafficManagerRelativeDnsNameAvailabilityParameters"
+            },
+            "description": "The Traffic Manager name parameters supplied to the CheckTrafficManagerNameAvailability operation."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The Traffic Manager Name Availability.",
+            "schema": {
+              "$ref": "#/definitions/TrafficManagerNameAvailability"
+            }
+          },
+          "default": {
+            "description": "Default response. It will be deserialized as per the Error definition.",
+            "schema": {
+              "$ref": "#/definitions/CloudError"
+            }
+          }
+        },
+        "x-ms-examples": {
+          "NameAvailabilityV2Test_NameAvailablePOST21": {
+            "$ref": "./examples/NameAvailabilityV2Test_NameAvailable-POST-example-21.json"
+          },
+          "NameAvailabilityV2Test_NameNotAvailablePOST23": {
+            "$ref": "./examples/NameAvailabilityV2Test_NameNotAvailable-POST-example-23.json"
+          }
+        }
+      }
+    },
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/trafficmanagerprofiles": {
       "get": {
         "tags": [
@@ -400,17 +435,13 @@
         "description": "Lists all Traffic Manager profiles within a resource group.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager profiles to be listed."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -446,10 +477,10 @@
         "description": "Lists all Traffic Manager profiles within a subscription.",
         "parameters": [
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -482,11 +513,7 @@
         "description": "Gets a Traffic Manager profile.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager profile."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -496,10 +523,10 @@
             "description": "The name of the Traffic Manager profile."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -536,11 +563,7 @@
         "description": "Create or update a Traffic Manager profile.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager profile."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -559,10 +582,10 @@
             "description": "The Traffic Manager profile parameters supplied to the CreateOrUpdate operation."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -614,11 +637,7 @@
         "description": "Deletes a Traffic Manager profile.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager profile to be deleted."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -628,10 +647,10 @@
             "description": "The name of the Traffic Manager profile to be deleted."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -665,11 +684,7 @@
         "description": "Update a Traffic Manager profile.",
         "parameters": [
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager profile."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -688,10 +703,10 @@
             "description": "The Traffic Manager profile parameters supplied to the Update operation."
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -724,7 +739,7 @@
         "description": "Gets the default Geographic Hierarchy used by the Geographic traffic routing method.",
         "parameters": [
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -757,14 +772,10 @@
         "description": "Gets latest heatmap for Traffic Manager profile.",
         "parameters": [
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           },
           {
-            "name": "resourceGroupName",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The name of the resource group containing the Traffic Manager endpoint."
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ResourceGroupNameParameter"
           },
           {
             "name": "profileName",
@@ -818,7 +829,7 @@
             }
           },
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -857,10 +868,10 @@
         "description": "Get the subscription-level key used for Real User Metrics collection.",
         "parameters": [
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -891,10 +902,10 @@
         "description": "Create or update a subscription-level key used for Real User Metrics collection.",
         "parameters": [
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -925,10 +936,10 @@
         "description": "Delete a subscription-level key used for Real User Metrics collection.",
         "parameters": [
           {
-            "$ref": "#/parameters/ApiVersionParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/ApiVersionParameter"
           },
           {
-            "$ref": "#/parameters/SubscriptionIdParameter"
+            "$ref": "../../../../../common-types/resource-management/v3/types.json#/parameters/SubscriptionIdParameter"
           }
         ],
         "responses": {
@@ -1010,7 +1021,8 @@
             "Degraded",
             "Disabled",
             "Inactive",
-            "Stopped"
+            "Stopped",
+            "Unmonitored"
           ],
           "x-ms-enum": {
             "name": "EndpointMonitorStatus",
@@ -1078,6 +1090,18 @@
             "description": "Custom header name and value."
           },
           "description": "List of custom headers."
+        },
+        "alwaysServe": {
+          "type": "string",
+          "description": "If Always Serve is enabled, probing for endpoint health will be disabled and endpoints will be included in the traffic routing method.",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "x-ms-enum": {
+            "name": "AlwaysServe",
+            "modelAsString": true
+          }
         }
       },
       "description": "Class representing a Traffic Manager endpoint properties."
@@ -1627,22 +1651,6 @@
       "x-ms-external": true
     }
   },
-  "parameters": {
-    "SubscriptionIdParameter": {
-      "name": "subscriptionId",
-      "in": "path",
-      "required": true,
-      "type": "string",
-      "description": "Gets subscription credentials which uniquely identify Microsoft Azure subscription. The subscription ID forms part of the URI for every service call."
-    },
-    "ApiVersionParameter": {
-      "name": "api-version",
-      "in": "query",
-      "required": true,
-      "type": "string",
-      "description": "Client Api Version."
-    }
-  },
   "security": [
     {
       "azure_auth": [
@@ -1659,6 +1667,24 @@
       "scopes": {
         "user_impersonation": "impersonate your user account"
       }
+    }
+  },
+  "parameters": {
+    "SubscriptionIdParameter": {
+      "name": "subscriptionId",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "description": "Gets subscription credentials which uniquely identify Microsoft Azure subscription. The subscription ID forms part of the URI for every service call.",
+      "x-ms-parameter-location": "client"
+    },
+    "ApiVersionParameter": {
+      "name": "api-version",
+      "in": "query",
+      "required": true,
+      "type": "string",
+      "description": "Client Api Version.",
+      "x-ms-parameter-location": "client"
     }
   }
 }
