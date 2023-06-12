@@ -3,7 +3,7 @@
   "info": {
     "title": "Azure Communication Room Service",
     "description": "Azure Communication Room Service",
-    "version": "2023-03-31-preview"
+    "version": "2023-06-14"
   },
   "paths": {
     "/rooms": {
