@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Azure Maps Route Service",
-    "version": "2023-08-01-preview",
+    "version": "2023-09-01-preview",
     "description": "Azure Maps Route REST APIs"
   },
   "host": "atlas.microsoft.com",
@@ -25,11 +25,11 @@
         "https://atlas.microsoft.com/.default": "https://atlas.microsoft.com/.default"
       }
     },
-    "SharedKey": {
+    "AzureKey": {
       "type": "apiKey",
-      "description": "This is a shared key that is provisioned when you [Create an Azure Maps account](https://docs.microsoft.com/azure/azure-maps/quick-demo-map-app#create-an-azure-maps-account) in the Azure portal or using PowerShell, CLI, Azure SDKs, or REST API.\n\n With this key, any application can access all REST API. In other words, this key can be used as a master key in the account that they are issued in.\n\n For publicly exposed applications, our recommendation is to use the [confidential client applications](https://docs.microsoft.com/azure/azure-maps/authentication-best-practices#confidential-client-applications) approach to access Azure Maps REST APIs so your key can be securely stored.",
+      "description": "This is a shared key that is provisioned when creating an [Azure Maps resource](https://aka.ms/amauth) through the Azure management plane  via Azure portal, PowerShell, CLI, Azure SDKs, or REST APIs.\n\n With this key, any application is authorized to access  all REST APIs. In other words, these can currently be treated as master keys to the account which they are issued for.\n\n For publicly exposed applications, our recommendation is to use server-to-server access of Azure Maps REST APIs where this key can be  securely stored.",
       "name": "subscription-key",
-      "in": "query"
+      "in": "header"
     },
     "SasToken": {
       "type": "apiKey",
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "SharedKey": []
+      "AzureKey": []
     },
     {
       "SasToken": []
@@ -607,7 +607,7 @@
           "$ref": "#/definitions/FeatureProperties"
         },
         {
-          "$ref": "#/definitions/ManeuverPointProperties"
+          "$ref": "#/definitions/NavigationPointProperties"
         }
       ]
     },
@@ -620,62 +620,68 @@
           "$ref": "#/definitions/FeatureProperties"
         },
         {
-          "description": "ManeuverPoint Properties",
-          "type": "object",
-          "properties": {
-            "legPointIndex": {
-              "$ref": "#/definitions/LegPointIndex"
-            },
-            "compassDirection": {
-              "description": "The direction of travel associated with a maneuver on a route, such as south or southwest.",
-              "type": "string",
-              "readOnly": true
-            },
-            "steps": {
-              "description": "steps between two consecutive maneuver points",
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Step"
-              }
-            },
-            "instruction": {
-              "$ref": "#/definitions/Instruction"
-            },
-            "sideOfStreet": {
-              "$ref": "#/definitions/SideOfStreetEnum"
-            },
-            "signs": {
-              "description": "Signage text for the route. There may be more than one sign value",
-              "type": "array",
-              "readOnly": true,
-              "items": {
-                "type": "string"
-              }
-            },
-            "towardsRoadName": {
-              "description": "The name of the street that the route goes towards in the first ManeuverPoint.",
-              "type": "string",
-              "readOnly": true
-            },
-            "exitIdentifier": {
-              "description": "The name or number of the exit associated with this route step.",
-              "type": "string",
-              "readOnly": true
-            },
-            "distanceInMeters": {
-              "description": "The physical distance in meters covered by this route step.",
-              "type": "number",
-              "readOnly": true
-            },
-            "durationInSeconds": {
-              "description": "The time that it takes, in seconds, to travel a corresponding TravelDistance.",
-              "format": "int64",
-              "type": "integer",
-              "readOnly": true
-            }
-          }
+          "$ref": "#/definitions/NavigationPointProperties"
         }
       ]
+    },
+    "NavigationPointProperties": {
+      "description": "Waypoint and ManeuverPoint properties",
+      "type": "object",
+      "properties": {
+        "legPointIndex": {
+          "$ref": "#/definitions/LegPointIndex"
+        },
+        "compassDirection": {
+          "description": "The direction of travel associated with a maneuver on a route, such as south or southwest.",
+          "type": "string",
+          "readOnly": true
+        },
+        "steps": {
+          "description": "steps between two consecutive maneuver points",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Step"
+          }
+        },
+        "instruction": {
+          "$ref": "#/definitions/Instruction"
+        },
+        "sideOfStreet": {
+          "$ref": "#/definitions/SideOfStreetEnum"
+        },
+        "signs": {
+          "description": "Signage text for the route. There may be more than one sign value",
+          "type": "array",
+          "readOnly": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "towardsRoadName": {
+          "description": "The name of the street that the route goes towards in the first ManeuverPoint.",
+          "type": "string",
+          "readOnly": true
+        },
+        "exitIdentifier": {
+          "description": "The name or number of the exit associated with this route step.",
+          "type": "string",
+          "readOnly": true
+        },
+        "distanceInMeters": {
+          "description": "The physical distance in meters covered by this route step.",
+          "type": "number",
+          "readOnly": true
+        },
+        "durationInSeconds": {
+          "description": "The time that it takes, in seconds, to travel a corresponding TravelDistance.",
+          "format": "int64",
+          "type": "integer",
+          "readOnly": true
+        },
+        "travelMode": {
+          "$ref": "#/definitions/RouteTravelMode"
+        }
+      }
     },
     "ViaWaypointProperties": {
       "x-ms-discriminator-value": "ViaWaypoint",
@@ -1727,6 +1733,39 @@
           "description": "id of the request which would show in corresponding batchItem",
           "type": "string"
         }
+      }
+    },
+    "RouteTravelMode": {
+      "description": "The mode of travel for the route path",
+      "type": "string",
+      "default": "driving",
+      "enum": [
+        "driving",
+        "truck",
+        "walking",
+        "other"
+      ],
+      "x-ms-enum": {
+        "name": "RouteTravelMode",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "driving",
+            "description": "driving"
+          },
+          {
+            "value": "truck",
+            "description": "truck"
+          },
+          {
+            "value": "walking",
+            "description": "walking"
+          },
+          {
+            "value": "other",
+            "description": "Other"
+          }
+        ]
       }
     },
     "DirectionsBatchRequestItem": {
