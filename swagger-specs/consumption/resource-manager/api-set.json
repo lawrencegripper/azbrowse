@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Consumption/stable/2023-03-01/consumption.json"], "name": "package-2023-03"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Consumption/stable/2023-03-01/consumption.json", "Microsoft.Consumption/stable/2023-03-01/consumption_pricesheet.json"], "name": "package-2023-03"}
