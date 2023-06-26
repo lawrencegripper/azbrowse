@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2021-08-08",
+    "version": "2023-05-01-preview",
     "title": "Azure Alerts Management Service Resource Provider",
     "description": "APIs for Azure alert processing rules CRUD operations."
   },
@@ -36,7 +36,7 @@
             "$ref": "#/parameters/subscriptionId"
           },
           {
-            "$ref": "#/parameters/api-version"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -81,7 +81,7 @@
             "$ref": "#/parameters/resourceGroupName"
           },
           {
-            "$ref": "#/parameters/api-version"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -133,7 +133,7 @@
             "type": "string"
           },
           {
-            "$ref": "#/parameters/api-version"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -189,7 +189,7 @@
             }
           },
           {
-            "$ref": "#/parameters/api-version"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -242,6 +242,9 @@
           },
           "Create or update a rule that removes all action groups from all alerts in a subscription coming from a specific alert rule": {
             "$ref": "./examples/AlertProcessingRules_Create_or_update_remove_all_action_groups_from_specific_alert_rule.json"
+          },
+          "Create or update a rule that adds alerts correlation": {
+            "$ref": "./examples/AlertProcessingRules_Create_or_update_add_correlation.json"
           }
         }
       },
@@ -263,7 +266,7 @@
             "type": "string"
           },
           {
-            "$ref": "#/parameters/api-version"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -325,7 +328,7 @@
             "description": "Parameters supplied to the operation."
           },
           {
-            "$ref": "#/parameters/api-version"
+            "$ref": "../../../../../common-types/resource-management/v2/types.json#/parameters/ApiVersionParameter"
           }
         ],
         "responses": {
@@ -372,20 +375,6 @@
       "in": "path",
       "required": true,
       "x-ms-parameter-location": "method"
-    },
-    "api-version": {
-      "name": "api-version",
-      "description": "Client API version.",
-      "type": "string",
-      "in": "query",
-      "required": true,
-      "enum": [
-        "2021-08-08"
-      ],
-      "x-ms-enum": {
-        "name": "api-version",
-        "modelAsString": true
-      }
     }
   },
   "definitions": {
@@ -736,7 +725,8 @@
           "description": "Action that should be applied.",
           "enum": [
             "AddActionGroups",
-            "RemoveAllActionGroups"
+            "RemoveAllActionGroups",
+            "CorrelateAlerts"
           ],
           "x-ms-enum": {
             "name": "actionType",
@@ -776,6 +766,63 @@
           "$ref": "#/definitions/Action"
         }
       ]
+    },
+    "CorrelateAlerts": {
+      "x-ms-discriminator-value": "CorrelateAlerts",
+      "type": "object",
+      "description": "Add logic for alerts correlation.",
+      "required": [
+        "correlateBy",
+        "correlationInterval",
+        "priority"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/definitions/Action"
+        }
+      ],
+      "properties": {
+        "correlateBy": {
+          "type": "array",
+          "description": "The list of conditions for the alerts correlations.",
+          "items": {
+            "$ref": "#/definitions/CorrelateBy"
+          },
+          "x-ms-identifiers": []
+        },
+        "correlationInterval": {
+          "type": "string",
+          "description": "The required duration (in ISO8601 format) for the alerts correlation."
+        },
+        "priority": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The priority of this correlation."
+        },
+        "notificationsForCorrelatedAlerts": {
+          "type": "string",
+          "default": "SuppressAlways",
+          "description": "Indicates how to handle child alerts notifications.",
+          "enum": [
+            "NotifyAlways",
+            "SuppressAlways"
+          ],
+          "x-ms-enum": {
+            "name": "NotificationsForCorrelatedAlerts",
+            "modelAsString": true
+          }
+        }
+      }
+    },
+    "CorrelateBy": {
+      "type": "object",
+      "description": "The logic for the correlation.",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "The JPath of the property that the alerts should be correlated by."
+        }
+      }
     },
     "AlertProcessingRulesList": {
       "type": "object",
