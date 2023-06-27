@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2023-03-01",
+    "version": "2023-05-01",
     "title": "ConsumptionManagementClient",
     "description": "Consumption management client provides access to consumption resources for Azure Enterprise Subscriptions."
   },
@@ -1170,6 +1170,9 @@
           },
           {
             "$ref": "#/parameters/productParameter"
+          },
+          {
+            "$ref": "#/parameters/recommendationDetailsFilterParameter"
           }
         ],
         "responses": {
@@ -5872,6 +5875,14 @@
       "name": "$filter",
       "in": "query",
       "description": "May be used to filter reservationRecommendations by: properties/scope with allowed values ['Single', 'Shared'] and default value 'Single'; properties/resourceType with allowed values ['VirtualMachines', 'SQLDatabases', 'PostgreSQL', 'ManagedDisk', 'MySQL', 'RedHat', 'MariaDB', 'RedisCache', 'CosmosDB', 'SqlDataWarehouse', 'SUSELinux', 'AppService', 'BlockBlob', 'AzureDataExplorer', 'VMwareCloudSimple'] and default value 'VirtualMachines'; and properties/lookBackPeriod with allowed values ['Last7Days', 'Last30Days', 'Last60Days'] and default value 'Last7Days'.",
+      "required": false,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
+    "recommendationDetailsFilterParameter": {
+      "name": "$filter",
+      "in": "query",
+      "description": "Used to filter reservation recommendation details by: properties/subscriptionId can be specified for billing account and billing profile paths.",
       "required": false,
       "type": "string",
       "x-ms-parameter-location": "method"
