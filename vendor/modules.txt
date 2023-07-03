@@ -1,6 +1,6 @@
 # github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3
 ## explicit
-# github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.0
+# github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.1
 ## explicit; go 1.18
 github.com/Azure/azure-sdk-for-go/sdk/azcore
 github.com/Azure/azure-sdk-for-go/sdk/azcore/arm
@@ -33,7 +33,7 @@ github.com/Azure/azure-sdk-for-go/sdk/internal/log
 github.com/Azure/azure-sdk-for-go/sdk/internal/poller
 github.com/Azure/azure-sdk-for-go/sdk/internal/temporal
 github.com/Azure/azure-sdk-for-go/sdk/internal/uuid
-# github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions v1.1.1
+# github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions v1.2.0
 ## explicit; go 1.18
 github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armsubscriptions
 # github.com/AzureAD/microsoft-authentication-library-for-go v1.0.0
@@ -336,8 +336,8 @@ github.com/spf13/pflag
 # github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 ## explicit
 github.com/stephanos/clock
-# github.com/stretchr/testify v1.8.2
-## explicit; go 1.13
+# github.com/stretchr/testify v1.8.4
+## explicit; go 1.20
 github.com/stretchr/testify/assert
 # github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 ## explicit
