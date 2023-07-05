@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.HardwareSecurityModules/stable/2021-11-30/dedicatedhsm.json"], "name": "package-2021-11"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.HardwareSecurityModules/preview/2018-10-31-preview/dedicatedhsm.json"], "name": "package-2018-10"}
