@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2023-06-30",
+    "version": "2023-10-31",
     "title": "Azure Digital Twins API",
     "description": "A service for managing and querying digital twins and digital twin models."
   },
@@ -1537,7 +1537,7 @@
           "Jobs"
         ],
         "operationId": "ImportJobs_Delete",
-        "description": "Deletes an import job.\nStatus codes:\n* 204 No Content\n* 400 Bad Request\n  * ValidationFailed - The import job request is not valid.",
+        "description": "Deletes an import job. This is simply used to remove a job id, so it may be reused later. It can not be used to stop entities from being imported.\nStatus codes:\n* 204 No Content\n* 400 Bad Request\n  * ValidationFailed - The import job request is not valid.",
         "x-ms-examples": {
           "Delete an import job": {
             "$ref": "./examples/ImportJobDelete.json"
@@ -1584,7 +1584,7 @@
           "Jobs"
         ],
         "operationId": "ImportJobs_Cancel",
-        "description": "Cancels an import job.\nStatus codes:\n* 200 Request Accepted\n* 400 Bad Request\n  * ValidationFailed - The import job request is not valid.",
+        "description": "Cancels an import job that is currently running. Service will stop any import operations triggered by the current import job that are in progress, and go to a cancelled state. Please note that this will leave your instance in an unknown state as there won't be any rollback operation. \nStatus codes:\n* 200 Request Accepted\n* 400 Bad Request\n  * ValidationFailed - The import job request is not valid.",
         "x-ms-examples": {
           "Cancel a job": {
             "$ref": "./examples/ImportJobCancel.json"
@@ -1603,6 +1603,159 @@
             "description": "Success",
             "schema": {
               "$ref": "#/definitions/ImportJob"
+            }
+          },
+          "default": {
+            "description": "Default response.",
+            "headers": {
+              "x-ms-error-code": {
+                "type": "string",
+                "description": "Error code for specific error that occurred."
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/jobs/deletions": {
+      "parameters": [
+        {
+          "$ref": "#/parameters/traceparent"
+        },
+        {
+          "$ref": "#/parameters/tracestate"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "DeleteJobs_Add",
+        "x-ms-long-running-operation": true,
+        "description": "Initiates a job which deletes all models, twins, and relationships on the instance. Does not delete any other types of entities.\nStatus codes:\n* 202 Created\n* 400 Bad Request\n  * JobLimitReached - The maximum number of delete jobs allowed has been reached. \n  * ValidationFailed - Operation-Id already exists.",
+        "x-ms-examples": {
+          "Add a job": {
+            "$ref": "./examples/DeleteJobPost.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/api-version"
+          },
+          {
+            "$ref": "#/parameters/operation-id"
+          },
+          {
+            "$ref": "#/parameters/timeoutInMinutes"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Job Accepted",
+            "schema": {
+              "$ref": "#/definitions/DeleteJob"
+            },
+            "headers": {
+              "Operation-Location": {
+                "type": "string",
+                "description": "The URL to track the status of the long running operation."
+              }
+            }
+          },
+          "default": {
+            "description": "Default response.",
+            "headers": {
+              "x-ms-error-code": {
+                "type": "string",
+                "description": "Error code for specific error that occurred."
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "DeleteJobs_List",
+        "description": "Retrieves all deletion jobs. This may be useful to find a delete job that was previously requested, or to view a history of delete jobs that have run or are currently running on the instance.\nStatus codes:\n* 200 OK",
+        "x-ms-examples": {
+          "Get all import jobs": {
+            "$ref": "./examples/DeleteJobList.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/api-version"
+          },
+          {
+            "$ref": "#/parameters/max-items-per-page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/DeleteJobCollection"
+            }
+          },
+          "default": {
+            "description": "Default response.",
+            "headers": {
+              "x-ms-error-code": {
+                "type": "string",
+                "description": "Error code for specific error that occurred."
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/ErrorResponse"
+            }
+          }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
+        }
+      }
+    },
+    "/jobs/deletions/{id}": {
+      "parameters": [
+        {
+          "$ref": "#/parameters/traceparent"
+        },
+        {
+          "$ref": "#/parameters/tracestate"
+        }
+      ],
+      "get": {
+        "tags": [
+          "Jobs"
+        ],
+        "operationId": "DeleteJobs_GetById",
+        "description": "Retrieves a delete job.\nStatus codes:\n* 200 OK\n* 404 Not Found\n  * DeleteJobNotFound - The delete job was not found.",
+        "x-ms-examples": {
+          "Get an import job by id": {
+            "$ref": "./examples/DeleteJobGet.json"
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/parameters/deleteJobId"
+          },
+          {
+            "$ref": "#/parameters/api-version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "schema": {
+              "$ref": "#/definitions/DeleteJob"
             }
           },
           "default": {
@@ -1933,6 +2086,75 @@
         }
       }
     },
+    "DeleteJob": {
+      "description": "A job which contains a reference to the operations to perform, results, and execution metadata.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "The identifier of the delete job.",
+          "type": "string",
+          "readOnly": true
+        },
+        "status": {
+          "description": "Status of the job.",
+          "enum": [
+            "notstarted",
+            "running",
+            "failed",
+            "succeeded"
+          ],
+          "type": "string",
+          "readOnly": true,
+          "x-ms-enum": {
+            "name": "delete-job-status",
+            "modelAsExtensible": true,
+            "modelAsString": false
+          }
+        },
+        "createdDateTime": {
+          "description": "Start time of the job. The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "finishedDateTime": {
+          "description": "End time of the job. The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "purgeDateTime": {
+          "description": "Time at which job will be purged by the service from the system. The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "error": {
+          "$ref": "#/definitions/Error",
+          "description": "Details of the error(s) that occurred executing the import job."
+        }
+      }
+    },
+    "DeleteJobCollection": {
+      "description": "A collection of delete job objects.",
+      "type": "object",
+      "required": [
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "description": "The list of delete job objects.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DeleteJob"
+          }
+        },
+        "nextLink": {
+          "description": "A URI to retrieve the next page of results.",
+          "type": "string"
+        }
+      }
+    },
     "ErrorResponse": {
       "description": "Error response.",
       "required": [
@@ -2043,6 +2265,14 @@
       "type": "string",
       "x-ms-parameter-location": "method"
     },
+    "deleteJobId": {
+      "name": "id",
+      "in": "path",
+      "description": "The id for the delete job. The id is unique within the service and case sensitive.",
+      "required": true,
+      "type": "string",
+      "x-ms-parameter-location": "method"
+    },
     "componentPath": {
       "name": "componentPath",
       "in": "path",
@@ -2070,6 +2300,21 @@
       "x-ms-parameter-grouping": {
         "postfix": "Options"
       }
+    },
+    "operation-id": {
+      "name": "operation-id",
+      "in": "header",
+      "description": "ID for the operation's status monitor. The ID is generated if header was not passed by the client.",
+      "required": false,
+      "type": "string"
+    },
+    "timeoutInMinutes": {
+      "name": "timeoutInMinutes",
+      "in": "query",
+      "description": "Desired timeout for the delete job. Once the specified timeout is reached, service will stop any delete operations triggered by the current delete job that are in progress, and go to a failed state. Please note that this will leave your instance in an unknown state as there won't be any rollback operation.",
+      "required": false,
+      "type": "integer",
+      "format": "int32"
     },
     "if-none-match-star": {
       "name": "If-None-Match",
