@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.ServiceNetworking/preview/2023-05-01-preview/TrafficController.json"], "name": "package-2023-05-01-preview"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ServiceNetworking/stable/2023-11-01/TrafficController.json"], "name": "package-2023-11-01"}

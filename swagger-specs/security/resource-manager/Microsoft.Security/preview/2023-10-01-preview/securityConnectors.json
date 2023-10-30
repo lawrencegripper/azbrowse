@@ -3,7 +3,7 @@
   "info": {
     "title": "Security Center",
     "description": "API spec for Microsoft.Security (Azure Security Center) resource provider",
-    "version": "2023-03-01-preview"
+    "version": "2023-10-01-preview"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -431,6 +431,11 @@
           "type": "string",
           "description": "The AWS account name",
           "readOnly": true
+        },
+        "scanInterval": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Scan interval in hours (value should be between 1-hour to 24-hours)"
         }
       }
     },
@@ -515,6 +520,11 @@
           "type": "object",
           "description": "The Gcp project's details",
           "$ref": "#/definitions/GcpProjectDetails"
+        },
+        "scanInterval": {
+          "type": "integer",
+          "format": "int64",
+          "description": "Scan interval in hours (value should be between 1-hour to 24-hours)"
         }
       }
     },
@@ -800,6 +810,34 @@
         "scubaExternalId": {
           "type": "string",
           "description": "The externalId used by the data reader to prevent the confused deputy attack"
+        },
+        "mdcContainersImageAssessment": {
+          "type": "object",
+          "description": "The Microsoft Defender container image assessment configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container image assessment enabled"
+            },
+            "cloudRoleArn": {
+              "type": "string",
+              "description": "The cloud role ARN in AWS for this feature"
+            }
+          }
+        },
+        "mdcContainersAgentlessDiscoveryK8s": {
+          "type": "object",
+          "description": "The Microsoft Defender container agentless discovery K8s configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container agentless discovery K8s enabled"
+            },
+            "cloudRoleArn": {
+              "type": "string",
+              "description": "The cloud role ARN in AWS for this feature"
+            }
+          }
         }
       }
     },
@@ -1312,6 +1350,42 @@
         "policyAgentAutoProvisioningFlag": {
           "type": "boolean",
           "description": "Is Policy Kubernetes agent auto provisioning enabled"
+        },
+        "mdcContainersImageAssessment": {
+          "type": "object",
+          "description": "The Microsoft Defender Container image assessment configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container image assessment enabled"
+            },
+            "workloadIdentityProviderId": {
+              "type": "string",
+              "description": "The workload identity provider id in GCP for this feature"
+            },
+            "serviceAccountEmailAddress": {
+              "type": "string",
+              "description": "The service account email address in GCP for this feature"
+            }
+          }
+        },
+        "mdcContainersAgentlessDiscoveryK8s": {
+          "type": "object",
+          "description": "The Microsoft Defender Container agentless discovery configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container agentless discovery enabled"
+            },
+            "workloadIdentityProviderId": {
+              "type": "string",
+              "description": "The workload identity provider id in GCP for this feature"
+            },
+            "serviceAccountEmailAddress": {
+              "type": "string",
+              "description": "The service account email address in GCP for this feature"
+            }
+          }
         }
       }
     },
@@ -1412,6 +1486,64 @@
               "description": "The cloud role ARN in AWS for this feature"
             }
           }
+        },
+        "ciem": {
+          "type": "object",
+          "description": "Defenders CSPM Cloud infrastructure entitlement management (CIEM) offering configurations",
+          "properties": {
+            "ciemDiscovery": {
+              "type": "object",
+              "description": "Defender CSPM CIEM discovery configuration",
+              "properties": {
+                "cloudRoleArn": {
+                  "type": "string",
+                  "description": "The cloud role ARN in AWS for CIEM discovery"
+                }
+              }
+            },
+            "ciemOidc": {
+              "type": "object",
+              "description": "Defender CSPM CIEM AWS OIDC (open id connect) configuration",
+              "properties": {
+                "cloudRoleArn": {
+                  "type": "string",
+                  "description": "The cloud role ARN in AWS for CIEM oidc connection"
+                },
+                "azureActiveDirectoryAppName": {
+                  "type": "string",
+                  "description": "the azure active directory app name used of authenticating against AWS"
+                }
+              }
+            }
+          }
+        },
+        "mdcContainersImageAssessment": {
+          "type": "object",
+          "description": "The Microsoft Defender container image assessment configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container image assessment enabled"
+            },
+            "cloudRoleArn": {
+              "type": "string",
+              "description": "The cloud role ARN in AWS for this feature"
+            }
+          }
+        },
+        "mdcContainersAgentlessDiscoveryK8s": {
+          "type": "object",
+          "description": "The Microsoft Defender container agentless discovery K8s configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container agentless discovery K8s enabled"
+            },
+            "cloudRoleArn": {
+              "type": "string",
+              "description": "The cloud role ARN in AWS for this feature"
+            }
+          }
         }
       }
     },
@@ -1424,7 +1556,114 @@
           "$ref": "#/definitions/cloudOffering"
         }
       ],
-      "properties": {}
+      "properties": {
+        "ciemDiscovery": {
+          "type": "object",
+          "description": "GCP Defenders CSPM Cloud infrastructure entitlement management (CIEM) discovery offering configurations",
+          "properties": {
+            "workloadIdentityProviderId": {
+              "type": "string",
+              "description": "The GCP workload identity provider id for CIEM discovery offering"
+            },
+            "serviceAccountEmailAddress": {
+              "type": "string",
+              "description": "The service account email address in GCP for CIEM discovery offering"
+            },
+            "azureActiveDirectoryAppName": {
+              "type": "string",
+              "description": "the azure active directory app name used of authenticating against GCP workload identity federation"
+            }
+          }
+        },
+        "vmScanners": {
+          "type": "object",
+          "description": "The Microsoft Defender for Server VM scanning configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender for Server VM scanning enabled"
+            },
+            "configuration": {
+              "type": "object",
+              "description": "configuration for Microsoft Defender for Server VM scanning",
+              "properties": {
+                "scanningMode": {
+                  "type": "string",
+                  "description": "The scanning mode for the VM scan.",
+                  "enum": [
+                    "Default"
+                  ],
+                  "x-ms-enum": {
+                    "name": "scanningMode",
+                    "modelAsString": true
+                  }
+                },
+                "exclusionTags": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "description": "VM tags that indicates that VM should not be scanned"
+                }
+              }
+            }
+          }
+        },
+        "dataSensitivityDiscovery": {
+          "type": "object",
+          "description": "The Microsoft Defender Data Sensitivity discovery configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender Data Sensitivity discovery enabled"
+            },
+            "workloadIdentityProviderId": {
+              "type": "string",
+              "description": "The workload identity provider id in GCP for this feature"
+            },
+            "serviceAccountEmailAddress": {
+              "type": "string",
+              "description": "The service account email address in GCP for this feature"
+            }
+          }
+        },
+        "mdcContainersImageAssessment": {
+          "type": "object",
+          "description": "The Microsoft Defender Container image assessment configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container image assessment enabled"
+            },
+            "workloadIdentityProviderId": {
+              "type": "string",
+              "description": "The workload identity provider id in GCP for this feature"
+            },
+            "serviceAccountEmailAddress": {
+              "type": "string",
+              "description": "The service account email address in GCP for this feature"
+            }
+          }
+        },
+        "mdcContainersAgentlessDiscoveryK8s": {
+          "type": "object",
+          "description": "The Microsoft Defender Container agentless discovery configuration",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Is Microsoft Defender container agentless discovery enabled"
+            },
+            "workloadIdentityProviderId": {
+              "type": "string",
+              "description": "The workload identity provider id in GCP for this feature"
+            },
+            "serviceAccountEmailAddress": {
+              "type": "string",
+              "description": "The service account email address in GCP for this feature"
+            }
+          }
+        }
+      }
     },
     "defenderForDevOpsGithubOffering": {
       "type": "object",

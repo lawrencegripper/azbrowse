@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "Common Types",
-    "version": "2023-04-15-preview"
+    "version": "2023-11-01"
   },
   "paths": {},
   "definitions": {
@@ -62,6 +62,43 @@
       "description": "Optional string that represents a URL.",
       "maxLength": 2048,
       "x-nullable": true
+    },
+    "provisioningState": {
+      "enum": [
+        "Succeeded",
+        "Failed",
+        "Canceled",
+        "Creating",
+        "Updating",
+        "Deleting"
+      ],
+      "type": "string",
+      "description": "Current provisioning state for a given Azure Chaos resource.",
+      "example": "Succeeded",
+      "x-ms-enum": {
+        "name": "ProvisioningState",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "Succeeded"
+          },
+          {
+            "value": "Failed"
+          },
+          {
+            "value": "Canceled"
+          },
+          {
+            "value": "Creating"
+          },
+          {
+            "value": "Updating"
+          },
+          {
+            "value": "Deleting"
+          }
+        ]
+      }
     }
   },
   "parameters": {
