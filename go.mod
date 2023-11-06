@@ -21,7 +21,7 @@ require (
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/satori/go.uuid v1.2.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 	github.com/stretchr/testify v1.8.4
 	github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
@@ -43,7 +43,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
