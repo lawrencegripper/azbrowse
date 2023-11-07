@@ -10,7 +10,7 @@ require (
 	github.com/awesome-gocui/gocui v1.1.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cskr/pubsub v1.0.2
-	github.com/fatih/color v1.15.0
+	github.com/fatih/color v1.16.0
 	github.com/go-openapi/loads v0.21.2
 	github.com/go-openapi/spec v0.20.8
 	github.com/go-xmlfmt/xmlfmt v1.1.2
@@ -21,12 +21,12 @@ require (
 	github.com/rhysd/go-github-selfupdate v1.2.3
 	github.com/satori/go.uuid v1.2.0
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 	github.com/stretchr/testify v1.8.4
 	github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 	github.com/valyala/fastjson v1.6.4
-	golang.org/x/time v0.3.0
+	golang.org/x/time v0.4.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
@@ -43,7 +43,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/internal v1.3.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.1.1 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20210307081110-f21760c49a8d // indirect
-	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
+	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.8.0 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
@@ -72,7 +72,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
@@ -89,9 +89,9 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	go.mongodb.org/mongo-driver v1.11.2 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
-	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/sys v0.14.0 // indirect
 	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect

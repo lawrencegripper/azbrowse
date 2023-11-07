@@ -109,7 +109,7 @@ github.com/awesome-gocui/gocui
 # github.com/blang/semver v3.5.1+incompatible
 ## explicit
 github.com/blang/semver
-# github.com/cpuguy83/go-md2man/v2 v2.0.2
+# github.com/cpuguy83/go-md2man/v2 v2.0.3
 ## explicit; go 1.11
 github.com/cpuguy83/go-md2man/v2/md2man
 # github.com/cskr/pubsub v1.0.2
@@ -122,7 +122,7 @@ github.com/davecgh/go-spew/spew
 ## explicit; go 1.13
 github.com/dlclark/regexp2
 github.com/dlclark/regexp2/syntax
-# github.com/fatih/color v1.15.0
+# github.com/fatih/color v1.16.0
 ## explicit; go 1.17
 github.com/fatih/color
 # github.com/gdamore/encoding v1.0.0
@@ -269,7 +269,7 @@ github.com/mailru/easyjson/jwriter
 # github.com/mattn/go-colorable v0.1.13
 ## explicit; go 1.15
 github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.17
+# github.com/mattn/go-isatty v0.0.20
 ## explicit; go 1.15
 github.com/mattn/go-isatty
 # github.com/mattn/go-runewidth v0.0.14
@@ -326,7 +326,7 @@ github.com/shurcooL/vfsgen
 # github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 ## explicit
 github.com/skratchdot/open-golang/open
-# github.com/spf13/cobra v1.7.0
+# github.com/spf13/cobra v1.8.0
 ## explicit; go 1.15
 github.com/spf13/cobra
 github.com/spf13/cobra/doc
@@ -375,7 +375,7 @@ golang.org/x/crypto/openpgp/packet
 golang.org/x/crypto/openpgp/s2k
 golang.org/x/crypto/pkcs12
 golang.org/x/crypto/pkcs12/internal/rc2
-# golang.org/x/net v0.15.0
+# golang.org/x/net v0.17.0
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/http/httpguts
@@ -384,8 +384,8 @@ golang.org/x/net/idna
 ## explicit; go 1.17
 golang.org/x/oauth2
 golang.org/x/oauth2/internal
-# golang.org/x/sys v0.13.0
-## explicit; go 1.17
+# golang.org/x/sys v0.14.0
+## explicit; go 1.18
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -400,8 +400,8 @@ golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
-# golang.org/x/time v0.3.0
-## explicit
+# golang.org/x/time v0.4.0
+## explicit; go 1.18
 golang.org/x/time/rate
 # google.golang.org/appengine v1.6.7
 ## explicit; go 1.11
