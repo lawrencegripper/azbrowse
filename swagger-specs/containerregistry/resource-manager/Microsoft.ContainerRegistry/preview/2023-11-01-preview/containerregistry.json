@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2023-08-01-preview",
+    "version": "2023-11-01-preview",
     "title": "ContainerRegistryManagementClient"
   },
   "host": "management.azure.com",
@@ -6191,6 +6191,19 @@
           "description": "Enables registry-wide pull from unauthenticated clients.",
           "default": false,
           "type": "boolean"
+        },
+        "metadataSearch": {
+          "description": "Determines whether registry artifacts are indexed for metadata search.",
+          "default": "Disabled",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "type": "string",
+          "x-ms-enum": {
+            "name": "MetadataSearch",
+            "modelAsString": true
+          }
         }
       }
     },
@@ -6608,6 +6621,19 @@
         "anonymousPullEnabled": {
           "description": "Enables registry-wide pull from unauthenticated clients.",
           "type": "boolean"
+        },
+        "metadataSearch": {
+          "description": "Determines whether registry artifacts are indexed for metadata search.",
+          "default": "Disabled",
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ],
+          "type": "string",
+          "x-ms-enum": {
+            "name": "MetadataSearch",
+            "modelAsString": true
+          }
         }
       }
     },
