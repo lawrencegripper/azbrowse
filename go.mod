@@ -12,7 +12,7 @@ require (
 	github.com/cskr/pubsub v1.0.2
 	github.com/fatih/color v1.16.0
 	github.com/go-openapi/loads v0.21.2
-	github.com/go-openapi/spec v0.20.8
+	github.com/go-openapi/spec v0.20.14
 	github.com/go-xmlfmt/xmlfmt v1.1.2
 	github.com/guptarohit/asciigraph v0.5.5
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
@@ -50,10 +50,10 @@ require (
 	github.com/gdamore/tcell/v2 v2.6.0 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
 	github.com/go-openapi/errors v0.20.3 // indirect
-	github.com/go-openapi/jsonpointer v0.19.6 // indirect
-	github.com/go-openapi/jsonreference v0.20.2 // indirect
+	github.com/go-openapi/jsonpointer v0.20.2 // indirect
+	github.com/go-openapi/jsonreference v0.20.4 // indirect
 	github.com/go-openapi/strfmt v0.21.3 // indirect
-	github.com/go-openapi/swag v0.22.3 // indirect
+	github.com/go-openapi/swag v0.22.6 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
