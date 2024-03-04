@@ -183,23 +183,23 @@ github.com/go-openapi/analysis/internal/flatten/sortref
 # github.com/go-openapi/errors v0.20.3
 ## explicit; go 1.14
 github.com/go-openapi/errors
-# github.com/go-openapi/jsonpointer v0.20.2
+# github.com/go-openapi/jsonpointer v0.20.3
 ## explicit; go 1.19
 github.com/go-openapi/jsonpointer
-# github.com/go-openapi/jsonreference v0.20.4
+# github.com/go-openapi/jsonreference v0.20.5
 ## explicit; go 1.19
 github.com/go-openapi/jsonreference
 github.com/go-openapi/jsonreference/internal
 # github.com/go-openapi/loads v0.21.2
 ## explicit; go 1.13
 github.com/go-openapi/loads
-# github.com/go-openapi/spec v0.20.14
+# github.com/go-openapi/spec v0.20.15
 ## explicit; go 1.19
 github.com/go-openapi/spec
 # github.com/go-openapi/strfmt v0.21.3
 ## explicit; go 1.13
 github.com/go-openapi/strfmt
-# github.com/go-openapi/swag v0.22.6
+# github.com/go-openapi/swag v0.22.10
 ## explicit; go 1.19
 github.com/go-openapi/swag
 # github.com/go-xmlfmt/xmlfmt v1.1.2
@@ -338,8 +338,8 @@ github.com/spf13/pflag
 # github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 ## explicit
 github.com/stephanos/clock
-# github.com/stretchr/testify v1.8.4
-## explicit; go 1.20
+# github.com/stretchr/testify v1.9.0
+## explicit; go 1.17
 github.com/stretchr/testify/assert
 # github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 ## explicit
