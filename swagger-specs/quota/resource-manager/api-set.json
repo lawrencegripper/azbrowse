@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Quota/stable/2023-02-01/quota.json"], "name": "package-2023-02-01"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Quota/preview/2023-06-01-preview/groupquota.json", "Microsoft.Quota/preview/2023-06-01-preview/quota.json"], "name": "package-2023-06-01-preview"}
