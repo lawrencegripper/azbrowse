@@ -29,6 +29,9 @@ if __name__ == "__main__":
     # This allows you to augment the included files for each README.MD for a specific tag
     # this is useful when files which are needed are incorrectly left out of the 'input-file'
     resource_provider_input_file_additions = {
+        "compute": {
+            "package-2024-03-01": ["./Microsoft.Compute/ComputeRP/stable/2023-09-01/virtualMachineScaleSet.json"]
+        }
         # Example:
         # "cosmos-db" : {
         #     "package-2020-04" : ["./Microsoft.DocumentDB/stable/2019-08-01/cosmos-db.json"]
