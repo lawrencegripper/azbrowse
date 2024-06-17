@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.NetApp/stable/2023-11-01/netapp.json"], "name": "package-netapp-2023-11-01"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.NetApp/preview/2017-08-15/netapp.json"], "name": "package-2017-08-15"}
