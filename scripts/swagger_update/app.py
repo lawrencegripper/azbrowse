@@ -23,7 +23,9 @@ if __name__ == "__main__":
         "applicationinsights": "package-2020-02-12",
         # Pin as has missing/invalid Microsoft.Databricks/preview/2022-04-01-preview/databricks.json file
         "databricks": "package-2021-04-01-preview",
-        "billing":""
+        "billing":"",
+        # ai/dataplane readme references package-2023-11-06-beta but the files do not exist
+        "ai": "package-2024-05-01-preview"
     }
 
     # This allows you to augment the included files for each README.MD for a specific tag
