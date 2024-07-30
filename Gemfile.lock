@@ -5,10 +5,10 @@ GEM
       public_suffix (>= 2.0.2, < 6.0)
     ast (2.4.2)
     colorize (1.1.0)
-    docker-api (2.2.0)
-      excon (>= 0.47.0)
+    docker-api (2.3.0)
+      excon (>= 0.64.0)
       multi_json
-    excon (0.99.0)
+    excon (0.111.0)
     git (1.19.0)
       addressable (~> 2.8)
       rchardet (~> 1.8)
@@ -62,4 +62,4 @@ RUBY VERSION
    ruby 2.7.4p191
 
 BUNDLED WITH
-   2.4.7
+   2.4.22
