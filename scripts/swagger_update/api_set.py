@@ -210,6 +210,11 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
                 resource_provider_target,
                 resource_type_folder + "/common",
             )
+            file_helper.copy_child_folder_if_exists(
+                resource_provider_source,
+                resource_provider_target,
+                resource_type_folder + "/common-types",
+            )
 
         # Look for `entityTypes` or `definitions` folders under api versions
         api_version_folders = set(
