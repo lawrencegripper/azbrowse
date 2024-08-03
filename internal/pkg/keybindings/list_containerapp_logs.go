@@ -92,8 +92,6 @@ func (h *CommandPanelContainerAppLogsHandler) Invoke() error {
 }
 
 func (h *CommandPanelContainerAppLogsHandler) getLogs(ctx context.Context, logStreamEndpoint string, authToken string) error {
-	// TODO - actually get the logs!
-
 	url, err := url.Parse(logStreamEndpoint)
 	if err != nil {
 		return fmt.Errorf("failed to parse log stream endpoint: %s", err)

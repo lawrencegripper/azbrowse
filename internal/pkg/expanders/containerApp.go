@@ -235,26 +235,6 @@ func (e *ContainerAppExpander) GetAuthToken(ctx context.Context, currentItem *Tr
 	return authTokenResponse.Properties.Token, nil
 }
 
-// func (e *ContainerAppExpander) getLogs(ctx context.Context, logStreamEndpoint string, authToken string) (string, error) {
-// 	// TODO - actually get the logs!
-
-// 	request, err := http.NewRequestWithContext(ctx, "GET", logStreamEndpoint, nil)
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to create request: %s", err)
-// 	}
-// 	request.Header.Set("Authorization", "Bearer "+authToken)
-
-// 	httpClient := http.DefaultClient
-
-// 	response, err := httpClient.Do(request)
-// 	if err != nil {
-// 		return "", fmt.Errorf("failed to make request: %s", err)
-// 	}
-
-// 	defer response.Body.Close() //nolint: errcheck
-
-// }
-
 type ContainerAppReplicaContainer struct {
 	ContainerID         string `json:"containerId"`
 	ExecEndpoint        string `json:"execEndpoint"`
