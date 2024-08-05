@@ -3,7 +3,7 @@
   "info": {
     "title": "ComputeManagementClient",
     "description": "The Compute Management Client.",
-    "version": "2024-03-01"
+    "version": "2024-07-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -262,6 +262,9 @@
           "Create a scale set with priority mix policy": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithPriorityMixPolicy.json"
           },
+          "Create a scale set with sku profile": {
+            "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithSkuProfile.json"
+          },
           "Create a VMSS with an extension with protectedSettingsFromKeyVault": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithProtectedSettingsFromKeyVault.json"
           },
@@ -291,6 +294,9 @@
           },
           "Create a scale set with SecurityType as ConfidentialVM and NonPersistedTPM securityEncryptionType": {
             "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithSecurityTypeConfidentialVMWithNonPersistedTPM.json"
+          },
+          "Create a scale set with zonalPlatformFaultDomainAlignMode as Aligned": {
+            "$ref": "./examples/virtualMachineScaleSetExamples/VirtualMachineScaleSet_Create_WithZonalPlatformFaultDomainAlignMode.json"
           }
         }
       },
@@ -4052,6 +4058,44 @@
       },
       "description": "Specifies the target splits for Spot and Regular priority VMs within a scale set with flexible orchestration mode. With this property the customer is able to specify the base number of regular priority VMs created as the VMSS flex instance scales out and the split between Spot and Regular priority VMs after this base target has been reached."
     },
+    "SkuProfile": {
+      "type": "object",
+      "properties": {
+        "vmSizes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SkuProfileVMSize"
+          },
+          "x-ms-identifiers": [
+            "name"
+          ],
+          "description": "Specifies the VM sizes for the virtual machine scale set."
+        },
+        "allocationStrategy": {
+          "type": "string",
+          "description": "Specifies the allocation strategy for the virtual machine scale set based on which the VMs will be allocated.",
+          "enum": [
+            "LowestPrice",
+            "CapacityOptimized"
+          ],
+          "x-ms-enum": {
+            "name": "AllocationStrategy",
+            "modelAsString": true
+          }
+        }
+      },
+      "description": "Specifies the sku profile for the virtual machine scale set. With this property the customer is able to specify a list of VM sizes and an allocation strategy."
+    },
+    "SkuProfileVMSize": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Specifies the name of the VM Size."
+        }
+      },
+      "description": "Specifies the VM Size."
+    },
     "OrchestrationMode": {
       "type": "string",
       "description": "Specifies the orchestration mode for the virtual machine scale set.",
@@ -5187,7 +5231,7 @@
           "readOnly": true,
           "type": "string",
           "format": "date-time",
-          "description": "Specifies the time in which this VM profile for the Virtual Machine Scale Set was created. Minimum API version for this property is 2024-03-01. This value will be added to VMSS Flex VM tags when creating/updating the VMSS VM Profile with minimum api-version 2024-03-01."
+          "description": "Specifies the time in which this VM profile for the Virtual Machine Scale Set was created. This value will be added to VMSS Flex VM tags when creating/updating the VMSS VM Profile. Minimum API version for this property is 2023-09-01."
         }
       },
       "description": "Describes a virtual machine scale set virtual machine profile."
@@ -5335,6 +5379,14 @@
         "resiliencyPolicy": {
           "$ref": "#/definitions/ResiliencyPolicy",
           "description": "Policy for Resiliency"
+        },
+        "zonalPlatformFaultDomainAlignMode": {
+          "$ref": "#/definitions/ZonalPlatformFaultDomainAlignMode",
+          "description": "Specifies the align mode between Virtual Machine Scale Set compute and storage Fault Domain count."
+        },
+        "skuProfile": {
+          "$ref": "#/definitions/SkuProfile",
+          "description": "Specifies the sku profile for the virtual machine scale set."
         }
       },
       "description": "Describes the properties of a Virtual Machine Scale Set."
@@ -5388,6 +5440,14 @@
         "resiliencyPolicy": {
           "$ref": "#/definitions/ResiliencyPolicy",
           "description": "Policy for Resiliency"
+        },
+        "zonalPlatformFaultDomainAlignMode": {
+          "$ref": "#/definitions/ZonalPlatformFaultDomainAlignMode",
+          "description": "Specifies the align mode between Virtual Machine Scale Set compute and storage Fault Domain count."
+        },
+        "skuProfile": {
+          "$ref": "#/definitions/SkuProfile",
+          "description": "Specifies the sku profile for the virtual machine scale set."
         }
       },
       "description": "Describes the properties of a Virtual Machine Scale Set."
@@ -5415,7 +5475,7 @@
           "items": {
             "type": "string"
           },
-          "description": "The virtual machine scale set zones. NOTE: Availability zones can only be set when you create the scale set"
+          "description": "The virtual machine scale set zones."
         },
         "extendedLocation": {
           "$ref": "../../../common-types/v1/common.json#/definitions/ExtendedLocation",
@@ -5483,6 +5543,13 @@
         "identity": {
           "$ref": "#/definitions/VirtualMachineScaleSetIdentity",
           "description": "The identity of the virtual machine scale set, if configured."
+        },
+        "zones": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The virtual machine scale set zones."
         }
       },
       "allOf": [
@@ -5948,13 +6015,13 @@
         },
         "userData": {
           "type": "string",
-          "description": "UserData for the VM, which must be base-64 encoded. Customer should not pass any secrets in here. <br><br>Minimum api-version: 2021-03-01"
+          "description": "UserData for the VM, which must be base-64 encoded. Customer should not pass any secrets in here. Minimum api-version: 2021-03-01"
         },
         "timeCreated": {
           "readOnly": true,
           "type": "string",
           "format": "date-time",
-          "description": "Specifies the time at which the Virtual Machine resource was created.<br><br>Minimum api-version: 2021-11-01."
+          "description": "Specifies the time at which the Virtual Machine resource was created. Minimum api-version: 2021-11-01."
         }
       },
       "description": "Describes the properties of a virtual machine scale set virtual machine."
@@ -6379,6 +6446,18 @@
         }
       },
       "description": "Specifies the security posture to be used in the scale set. Minimum api-version: 2023-03-01"
+    },
+    "ZonalPlatformFaultDomainAlignMode": {
+      "type": "string",
+      "description": "Specifies the align mode between Virtual Machine Scale Set compute and storage Fault Domain count.",
+      "enum": [
+        "Aligned",
+        "Unaligned"
+      ],
+      "x-ms-enum": {
+        "name": "ZonalPlatformFaultDomainAlignMode",
+        "modelAsString": true
+      }
     }
   }
 }

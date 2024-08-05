@@ -3,7 +3,7 @@
   "info": {
     "title": "ComputeManagementClient",
     "description": "The Compute Management Client.",
-    "version": "2024-03-01"
+    "version": "2024-07-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -867,7 +867,7 @@
     },
     "DetachOption": {
       "type": "string",
-      "description": "Specifies the detach behavior to be used while detaching a disk or which is already in the process of detachment from the virtual machine. Supported values are: **ForceDetach.** detachOption: **ForceDetach** is applicable only for managed data disks. If a previous detachment attempt of the data disk did not complete due to an unexpected failure from the virtual machine and the disk is still not released then use force-detach as a last resort option to detach the disk forcibly from the VM. All writes might not have been flushed when using this detach behavior. **This feature is still in preview** mode and is not supported for VirtualMachineScaleSet. To force-detach a data disk update toBeDetached to 'true' along with setting detachOption: 'ForceDetach'.",
+      "description": "Specifies the detach behavior to be used while detaching a disk or which is already in the process of detachment from the virtual machine. Supported values are: **ForceDetach.** detachOption: **ForceDetach** is applicable only for managed data disks. If a previous detachment attempt of the data disk did not complete due to an unexpected failure from the virtual machine and the disk is still not released then use force-detach as a last resort option to detach the disk forcibly from the VM. All writes might not have been flushed when using this detach behavior. **This feature is still in preview** mode. To force-detach a data disk update toBeDetached to 'true' along with setting detachOption: 'ForceDetach'.",
       "enum": [
         "ForceDetach"
       ],
@@ -1189,7 +1189,7 @@
           "description": "Increase the value of this property allows user to reset the key used for securing communication channel between guest and host."
         }
       },
-      "description": "Specifies ProxyAgent settings while creating the virtual machine. Minimum api-version: 2024-03-01."
+      "description": "Specifies ProxyAgent settings while creating the virtual machine. Minimum api-version: 2023-09-01."
     },
     "SecurityProfile": {
       "properties": {
@@ -1219,7 +1219,7 @@
         },
         "proxyAgentSettings": {
           "$ref": "#/definitions/ProxyAgentSettings",
-          "description": "Specifies ProxyAgent settings while creating the virtual machine. Minimum api-version: 2024-03-01."
+          "description": "Specifies ProxyAgent settings while creating the virtual machine. Minimum api-version: 2023-09-01."
         }
       },
       "description": "Specifies the Security profile settings for the virtual machine or virtual machine scale set."
@@ -1395,8 +1395,9 @@
           "description": "Specifies the Windows Remote Management listeners. This enables remote Windows PowerShell."
         },
         "enableVMAgentPlatformUpdates": {
+          "readOnly": true,
           "type": "boolean",
-          "description": "Indicates whether VMAgent Platform Updates is enabled for the Windows virtual machine. Default value is false."
+          "description": "Indicates whether VMAgent Platform Updates are enabled for the Windows Virtual Machine."
         }
       },
       "description": "Specifies Windows operating system settings on the virtual machine."
