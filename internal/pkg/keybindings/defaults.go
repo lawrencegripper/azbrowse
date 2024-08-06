@@ -39,6 +39,7 @@ var DefaultKeys = map[string]interface{}{
 	"commandpanelup":      gocui.KeyArrowUp,
 	"commandpanelenter":   gocui.KeyEnter,
 	"filter":              rune('/'),
+	"filterfuzzy":         KeyWithModifier{Key: rune('/'), Modifier: gocui.ModAlt},
 	"commandpanelclose":   gocui.KeyEsc,
 	"azuresearchquery":    gocui.KeyCtrlR,
 }

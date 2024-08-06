@@ -9,6 +9,12 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/config"
 )
 
+// KeyWithModifier represents a key with a modifier and is used when configuring keybinding defaults etc
+type KeyWithModifier struct {
+	Key      interface{}
+	Modifier gocui.Modifier
+}
+
 // KeyMap reprsents the current mappings from Handler -> Key
 type KeyMap map[string][]interface{}
 
@@ -99,7 +105,13 @@ func bindHandlerToKey(g *gocui.Gui, hnd KeyHandler) error {
 			return err
 		}
 
-		err := g.SetKeybinding(hnd.Widget(), key, gocui.ModNone, hnd.Fn())
+		// If key is a KeyWithModifier then unwrap
+		modifier := gocui.ModNone
+		if keyWithModifier, ok := key.(KeyWithModifier); ok {
+			key = keyWithModifier.Key
+			modifier = keyWithModifier.Modifier
+		}
+		err := g.SetKeybinding(hnd.Widget(), key, modifier, hnd.Fn())
 		if err != nil {
 			return err
 		}
@@ -219,7 +231,22 @@ func keyToString(key interface{}) string {
 		return GocuiKeyToStr[key.(gocui.Key)]
 	case rune:
 		return strings.ToUpper(string(key.(rune)))
+	case KeyWithModifier:
+		keyWithModifier := key.(KeyWithModifier)
+		return modifierToString(keyWithModifier.Modifier) + "+" + keyToString(keyWithModifier.Key)
 	default:
 		panic(fmt.Sprintf("Unhandled key type: %v\n", t))
 	}
+}
+
+func modifierToString(modifier gocui.Modifier) string {
+	switch modifier {
+	case gocui.ModNone:
+		return ""
+	case gocui.ModAlt:
+		return "Alt"
+	case gocui.ModShift:
+		return "Shift"
+	}
+	panic(fmt.Sprintf("Unhandled modifier type: %v\n", modifier))
 }

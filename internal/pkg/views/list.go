@@ -12,6 +12,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/style"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 )
 
 // hitbox is used to enable mouse support on the list
@@ -72,7 +73,7 @@ func (w *ListWidget) itemCount() int {
 }
 
 // SetFilter sets the filter to be applied to list items
-func (w *ListWidget) SetFilter(filterString string) {
+func (w *ListWidget) SetFilter(filterString string, filterFuzzy bool) {
 	if w.currentPage == nil {
 		return
 	}
@@ -81,13 +82,20 @@ func (w *ListWidget) SetFilter(filterString string) {
 	var filterStringLower = strings.ToLower(filterString)
 
 	for _, item := range w.currentPage.Items {
-		if strings.Contains(strings.ToLower(item.Display), filterStringLower) {
-			filteredItems = append(filteredItems, item)
+		if w.currentPage.FilterFuzzy {
+			if fuzzy.MatchFold(filterString, item.Display) {
+				filteredItems = append(filteredItems, item)
+			}
+		} else {
+			if strings.Contains(strings.ToLower(item.Display), filterStringLower) {
+				filteredItems = append(filteredItems, item)
+			}
 		}
 	}
 
 	w.currentPage.Selection = 0
 	w.currentPage.FilterString = filterString
+	w.currentPage.FilterFuzzy = filterFuzzy
 	w.currentPage.FilteredItems = filteredItems
 
 	w.g.Update(func(gui *gocui.Gui) error {
@@ -113,15 +121,44 @@ func (w *ListWidget) itemsToShow() []*expanders.TreeNode {
 	return w.currentPage.FilteredItems
 }
 
-func highlightText(displayText string, highlight string) string {
+func highlightText(displayText string, highlight string, filterFuzzy bool) string {
 	if highlight == "" {
 		return displayText
 	}
-	index := strings.Index(strings.ToLower(displayText), highlight)
-	if index < 0 {
-		return displayText
+	if filterFuzzy {
+		result := ""
+		displayLower := strings.ToLower(displayText)
+		highlightIndex := 0
+		highlightLower := strings.ToLower(highlight)
+		highlightCharLower := rune(highlightLower[highlightIndex])
+
+		for displayIndex, displayCharLower := range displayLower {
+			if displayCharLower == highlightCharLower {
+				// got a match - highlight this character (from the non-lowered display text)
+				result += style.Highlight(string(displayText[displayIndex]))
+				highlightIndex++
+				if highlightIndex < len(highlight) {
+					highlightCharLower = rune(highlightLower[highlightIndex])
+				} else {
+					// we're done, add any remaining characters
+					if displayIndex+1 < len(displayText) {
+						result += displayText[displayIndex+1:]
+					}
+					break
+				}
+			} else {
+				// not a match - add this character (from the non-lowered display text)
+				result += string(displayText[displayIndex])
+			}
+		}
+		return result
+	} else {
+		index := strings.Index(strings.ToLower(displayText), highlight)
+		if index < 0 {
+			return displayText
+		}
+		return displayText[:index] + style.Highlight(displayText[index:index+len(highlight)]) + displayText[index+len(highlight):]
 	}
-	return displayText[:index] + style.Highlight(displayText[index:index+len(highlight)]) + displayText[index+len(highlight):]
 }
 
 // Layout draws the widget in the gocui view
@@ -159,7 +196,7 @@ func (w *ListWidget) Layout(g *gocui.Gui) error {
 				itemToShow = "  "
 			}
 
-			itemToShow = itemToShow + highlightText(s.Display, w.currentPage.FilterString) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
+			itemToShow = itemToShow + highlightText(s.Display, w.currentPage.FilterString, w.currentPage.FilterFuzzy) + " " + s.StatusIndicator + "\n" + style.Separator("  ---") + "\n"
 
 			linesUsedCount += strings.Count(itemToShow, "\n")
 			itemHitbox.end = linesUsedCount
@@ -273,12 +310,14 @@ func (w *ListWidget) Refresh() {
 	// capture current state
 	sorted := false
 	filterString := ""
+	fuzzy := false
 	if w.currentPage != nil {
 		if w.currentPage.Sorted {
 			sorted = true
 		}
 		if w.currentPage.FilterString != "" {
 			filterString = w.currentPage.FilterString
+			fuzzy = w.currentPage.FilterFuzzy
 			w.ClearFilter() // clear filter so that `GoBack` actually navigates back
 		}
 	}
@@ -302,7 +341,7 @@ func (w *ListWidget) Refresh() {
 			w.SortItems()
 		}
 		if filterString != "" {
-			w.SetFilter(filterString)
+			w.SetFilter(filterString, fuzzy)
 		}
 
 		// Clear isRefreshing and re-enable UI updates

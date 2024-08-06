@@ -12,6 +12,7 @@ import (
 	"github.com/lawrencegripper/azbrowse/internal/pkg/eventing"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/expanders"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/interfaces"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/stuartleeks/colorjson"
 
 	"github.com/alecthomas/chroma"
@@ -174,7 +175,7 @@ func (w *ItemWidget) PageUp() {
 }
 
 // SetFilter sets the filter to be applied to list items
-func (w *ItemWidget) SetFilter(filterString string) {
+func (w *ItemWidget) SetFilter(filterString string, filterFuzzy bool) {
 	w.filterString = filterString
 
 	var currentContent []string
@@ -192,8 +193,10 @@ func (w *ItemWidget) SetFilter(filterString string) {
 	var filterStringLower = strings.ToLower(filterString)
 
 	for _, line := range currentContent {
-		if strings.Contains(strings.ToLower(line), filterStringLower) {
-			line = highlightText(line, filterString)
+		if (filterFuzzy && fuzzy.MatchFold(filterString, line)) ||
+			(!filterFuzzy && strings.Contains(strings.ToLower(line), filterStringLower)) {
+			// Got a match - highlight and add to filtered results
+			line = highlightText(line, filterString, filterFuzzy)
 			filteredResult.WriteString(line + "\n")
 		}
 	}

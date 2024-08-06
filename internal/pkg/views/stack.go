@@ -13,6 +13,7 @@ type Page struct {
 	Title            string
 	Selection        int
 	FilterString     string
+	FilterFuzzy      bool
 	FilteredItems    []*expanders.TreeNode
 	ExpandedNodeItem *expanders.TreeNode
 	Sorted           bool
