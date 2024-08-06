@@ -200,13 +200,16 @@ func GetPathsFromSwagger(doc *loads.Document, config *Config, pathPrefix string)
 			return []Path{}, err
 		}
 		segment := endpoint.URLSegments[len(endpoint.URLSegments)-1]
-		name := segment.Match
-		if name == "list" && len(endpoint.URLSegments) > 2 {
-			segment = endpoint.URLSegments[len(endpoint.URLSegments)-2] // 'list' is generic and usually preceded by something more descriptive
-			name = segment.Match
-		}
+		name := override.Name
 		if name == "" {
-			name = "{" + segment.Name + "}"
+			name = segment.Match
+			if name == "list" && len(endpoint.URLSegments) > 2 {
+				segment = endpoint.URLSegments[len(endpoint.URLSegments)-2] // 'list' is generic and usually preceded by something more descriptive
+				name = segment.Match
+			}
+			if name == "" {
+				name = "{" + segment.Name + "}"
+			}
 		}
 		path := Path{
 			Endpoint:              &endpoint,

@@ -85,6 +85,9 @@ func InitializeExpanders(client *armclient.Client, graphClient *armclient.Client
 		&DiagnosticSettingsExpander{
 			client: client,
 		},
+		&ContainerAppExpander{
+			client: client,
+		},
 	}
 }
 

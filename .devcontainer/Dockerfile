@@ -98,3 +98,5 @@ RUN \
 
 # Avoid permissions issues when user UID is mapped see: https://github.com/devcontainers/ci/issues/176
 ENV GOPATH="/home/$USERNAME/go"
+# Ensure GOPATH/bin is in the path (so that azbrowse is found after `make install`)
+ENV PATH="/home/$USERNAME/go/bin:$PATH"
