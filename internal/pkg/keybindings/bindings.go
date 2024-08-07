@@ -198,10 +198,29 @@ func parseKey(key string) (string, error) {
 func parseValue(value string) (interface{}, error) {
 	// TODO Parse semantics properly
 	target := cleanValue(value)
+
+	// Handle modifiers (alt/shift)
+	if strings.HasPrefix(strings.ToLower(target), "alt+") {
+		key, err := parseValue(target[4:])
+		if err != nil {
+			return nil, err
+		}
+		return KeyWithModifier{Key: key, Modifier: gocui.ModAlt}, nil
+	}
+	if strings.HasPrefix(strings.ToLower(target), "shift+") {
+		key, err := parseValue(target[6:])
+		if err != nil {
+			return nil, err
+		}
+		return KeyWithModifier{Key: key, Modifier: gocui.ModShift}, nil
+	}
+
+	// Parse key as string (e.g. "Ctrl+D")
 	if val, ok := StrToGocuiKey[target]; ok {
 		return val, nil
 	}
 
+	// Parse key as rune (e.g. "/")
 	if len(target) == 1 {
 		// attempt as rune
 		return rune(target[0]), nil
