@@ -42,6 +42,7 @@ const (
 	HandlerIDCommandPanelUp          HandlerID = "commandpanelup"        //nolint:golint
 	HandlerIDCommandPanelEnter       HandlerID = "commandpanelenter"     //nolint:golint
 	HandlerIDFilter                  HandlerID = "filter"                //nolint:golint
+	HandlerIDFilterFuzzy             HandlerID = "filterfuzzy"           //nolint:golint
 	HandlerIDAzureSearchQuery        HandlerID = "azuresearchquery"      //nolist:golint
 	HandlerIDToggleDemoMode          HandlerID = "toggledemomode"        //nolist:golint
 	HandlerIDListSort                HandlerID = "listsort"              //nolint:golint

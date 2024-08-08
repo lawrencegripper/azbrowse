@@ -230,11 +230,14 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	// Special handler/hack required by view because `/` doesn't trigger correctly in itemWidget
 	// this causes an ordering issue as the ItemWidget needs the command panel and the command panel needs the views as inputs
 	// to work around this we use two hacky methods of `Set*Widget`
-	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel)
+	commandPanelFilterCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, false)
+	commandPanelFilterFuzzyCommand := keybindings.NewCommandPanelFilterHandler(commandPanel, true)
 	content := views.NewItemWidget(leftColumnWidth+2, 0, 0, -4, settings.HideGuids, settings.ShouldRender, "", commandPanelFilterCommand.InvokeWithStartString)
 	list := views.NewListWidget(ctx, 1, 0, leftColumnWidth, -4, []string{"Loading..."}, 0, content, status, settings.EnableTracing, "Subscriptions", settings.ShouldRender, g)
 	commandPanelFilterCommand.SetItemWidget(content)
 	commandPanelFilterCommand.SetListWidget(list)
+	commandPanelFilterFuzzyCommand.SetItemWidget(content)
+	commandPanelFilterFuzzyCommand.SetListWidget(list)
 
 	copyCommand := keybindings.NewCopyHandler(content, status)
 	toggleDemoModeCommand := keybindings.NewToggleDemoModeHandler(settings, list, status, content)
@@ -252,6 +255,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 
 	commands := []keybindings.Command{
 		commandPanelFilterCommand,
+		commandPanelFilterFuzzyCommand,
 		copyCommand,
 		commandPanelAzureSearchQueryCommand,
 		commandPanelContainerAppLogsCommand,
@@ -285,6 +289,7 @@ func setupViewsAndKeybindings(ctx context.Context, g *gocui.Gui, settings *confi
 	keybindings.AddHandler(keybindings.NewClearPendingDeleteHandler(notifications))
 	keybindings.AddHandler(keybindings.NewOpenCommandPanelHandler(g, commandPanel, commands))
 	keybindings.AddHandler(commandPanelFilterCommand)
+	keybindings.AddHandler(commandPanelFilterFuzzyCommand)
 	keybindings.AddHandler(keybindings.NewCloseCommandPanelHandler(commandPanel))
 	keybindings.AddHandler(keybindings.NewCommandPanelDownHandler(commandPanel))
 	keybindings.AddHandler(keybindings.NewCommandPanelUpHandler(commandPanel))

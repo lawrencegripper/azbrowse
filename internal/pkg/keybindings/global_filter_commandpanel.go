@@ -11,16 +11,22 @@ type CommandPanelFilterHandler struct {
 	commandPanelWidget *views.CommandPanelWidget
 	list               *views.ListWidget
 	itemView           *views.ItemWidget
+	fuzzyFilter        bool
 }
 
 var _ Command = &CommandPanelFilterHandler{}
 
-func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget) *CommandPanelFilterHandler {
+func NewCommandPanelFilterHandler(commandPanelWidget *views.CommandPanelWidget, fuzzyFilter bool) *CommandPanelFilterHandler {
 
 	handler := &CommandPanelFilterHandler{
 		commandPanelWidget: commandPanelWidget,
+		fuzzyFilter:        fuzzyFilter,
 	}
-	handler.id = HandlerIDFilter
+	if fuzzyFilter {
+		handler.id = HandlerIDFilterFuzzy
+	} else {
+		handler.id = HandlerIDFilter
+	}
 	return handler
 }
 
@@ -40,25 +46,37 @@ func (h *CommandPanelFilterHandler) Fn() func(g *gocui.Gui, v *gocui.View) error
 	}
 }
 func (h *CommandPanelFilterHandler) DisplayText() string {
-	return "Filter"
+	if h.fuzzyFilter {
+		return "Filter (Fuzzy)"
+	} else {
+		return "Filter"
+	}
 }
 func (h *CommandPanelFilterHandler) IsEnabled() bool {
 	return true
 }
+func (h *CommandPanelFilterHandler) getTitle() string {
+	if h.fuzzyFilter {
+		return "Filter (fuzzy)"
+	} else {
+		return "Filter"
+	}
+}
 func (h *CommandPanelFilterHandler) Invoke() error {
-	h.commandPanelWidget.ShowWithText("Filter", "", nil, h.CommandPanelNotification)
+	h.commandPanelWidget.ShowWithText(h.getTitle(), "", nil, h.CommandPanelNotification)
 	return nil
 }
+
 func (h *CommandPanelFilterHandler) InvokeWithStartString(s string) error {
-	h.commandPanelWidget.ShowWithText("Filter", s, nil, h.CommandPanelNotification)
+	h.commandPanelWidget.ShowWithText(h.getTitle(), s, nil, h.CommandPanelNotification)
 	return nil
 }
 func (h *CommandPanelFilterHandler) CommandPanelNotification(state interfaces.CommandPanelNotification) {
 	switch h.commandPanelWidget.PreviousViewName {
 	case "listWidget":
-		h.list.SetFilter(state.CurrentText)
+		h.list.SetFilter(state.CurrentText, h.fuzzyFilter)
 	case "itemWidget":
-		h.itemView.SetFilter(state.CurrentText)
+		h.itemView.SetFilter(state.CurrentText, h.fuzzyFilter)
 	}
 	if state.EnterPressed {
 		h.commandPanelWidget.Hide()
