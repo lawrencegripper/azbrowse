@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/awesome-gocui/gocui"
 	"github.com/lawrencegripper/azbrowse/internal/pkg/errorhandling"
@@ -127,18 +128,16 @@ func highlightText(displayText string, highlight string, filterFuzzy bool) strin
 	}
 	if filterFuzzy {
 		result := ""
-		displayLower := strings.ToLower(displayText)
 		highlightIndex := 0
-		highlightLower := strings.ToLower(highlight)
-		highlightCharLower := rune(highlightLower[highlightIndex])
+		highlightCharLower := unicode.ToLower(rune(highlight[highlightIndex]))
 
-		for displayIndex, displayCharLower := range displayLower {
-			if displayCharLower == highlightCharLower {
-				// got a match - highlight this character (from the non-lowered display text)
+		for displayIndex, displayChar := range displayText {
+			if unicode.ToLower(displayChar) == highlightCharLower {
+				// got a match - highlight this character
 				result += style.Highlight(string(displayText[displayIndex]))
 				highlightIndex++
 				if highlightIndex < len(highlight) {
-					highlightCharLower = rune(highlightLower[highlightIndex])
+					highlightCharLower = unicode.ToLower(rune(highlight[highlightIndex]))
 				} else {
 					// we're done, add any remaining characters
 					if displayIndex+1 < len(displayText) {
@@ -147,8 +146,8 @@ func highlightText(displayText string, highlight string, filterFuzzy bool) strin
 					break
 				}
 			} else {
-				// not a match - add this character (from the non-lowered display text)
-				result += string(displayText[displayIndex])
+				// not a match - add this character
+				result += string(displayChar)
 			}
 		}
 		return result
