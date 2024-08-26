@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "MongoClusterManagementClient",
-    "version": "2024-06-01-preview",
+    "version": "2024-07-01",
     "description": "The Microsoft Azure management API provides create, read, update, and delete functionality for Azure Cosmos DB for MongoDB vCore resources including clusters and firewall rules.",
     "x-typespec-generated": [
       {
@@ -1250,9 +1250,55 @@
     }
   },
   "definitions": {
+    "AdministratorProperties": {
+      "type": "object",
+      "description": "The local administrator login properties.",
+      "properties": {
+        "userName": {
+          "type": "string",
+          "description": "The administrator user name.",
+          "x-ms-mutability": [
+            "read",
+            "update",
+            "create"
+          ]
+        },
+        "password": {
+          "type": "string",
+          "format": "password",
+          "description": "The administrator password.",
+          "x-ms-mutability": [
+            "update",
+            "create"
+          ],
+          "x-ms-secret": true
+        }
+      }
+    },
     "Azure.Core.azureLocation": {
       "type": "string",
       "description": "Represents an Azure geography region where supported resource providers live."
+    },
+    "BackupProperties": {
+      "type": "object",
+      "description": "The backup properties of the cluster. This includes the earliest restore time and retention settings.",
+      "properties": {
+        "earliestRestoreTime": {
+          "type": "string",
+          "description": "Earliest restore timestamp in UTC ISO8601 format.",
+          "readOnly": true
+        }
+      }
+    },
+    "ComputeProperties": {
+      "type": "object",
+      "description": "The compute properties of the cluster. This includes the virtual-cores/memory and scaling options applied to servers in the cluster.",
+      "properties": {
+        "tier": {
+          "type": "string",
+          "description": "The compute tier to assign to the cluster, where each tier maps to a virtual-core and memory size. Example values: 'M30', 'M40'."
+        }
+      }
     },
     "ConnectionString": {
       "type": "object",
@@ -1266,6 +1312,11 @@
         "description": {
           "type": "string",
           "description": "Description of the connection string",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the connection string.",
           "readOnly": true
         }
       }
@@ -1312,8 +1363,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/FirewallRuleProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1368,6 +1418,46 @@
         "endIpAddress"
       ]
     },
+    "HighAvailabilityMode": {
+      "type": "string",
+      "description": "The high availability modes for a cluster.",
+      "enum": [
+        "Disabled",
+        "SameZone",
+        "ZoneRedundantPreferred"
+      ],
+      "x-ms-enum": {
+        "name": "HighAvailabilityMode",
+        "modelAsString": true,
+        "values": [
+          {
+            "name": "Disabled",
+            "value": "Disabled",
+            "description": "High availability mode is disabled. This mode is can see availability impact during faults or maintenance and is not recommended for production."
+          },
+          {
+            "name": "SameZone",
+            "value": "SameZone",
+            "description": "High availability mode is enabled, where each server in a shard is placed in the same availability zone."
+          },
+          {
+            "name": "ZoneRedundantPreferred",
+            "value": "ZoneRedundantPreferred",
+            "description": "High availability mode is enabled and preferences ZoneRedundant if availability zones capacity is available in the region, otherwise falls-back to provisioning with SameZone."
+          }
+        ]
+      }
+    },
+    "HighAvailabilityProperties": {
+      "type": "object",
+      "description": "The high availability properties of the cluster.",
+      "properties": {
+        "targetMode": {
+          "$ref": "#/definitions/HighAvailabilityMode",
+          "description": "The target high availability mode requested for the cluster."
+        }
+      }
+    },
     "ListConnectionStringsResult": {
       "type": "object",
       "description": "The connection strings for the given mongo cluster.",
@@ -1389,8 +1479,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/MongoClusterProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1445,24 +1534,9 @@
             "create"
           ]
         },
-        "administratorLogin": {
-          "type": "string",
-          "description": "The administrator's login for the mongo cluster.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        },
-        "administratorLoginPassword": {
-          "type": "string",
-          "format": "password",
-          "description": "The password of the administrator login.",
-          "x-ms-mutability": [
-            "update",
-            "create"
-          ],
-          "x-ms-secret": true
+        "administrator": {
+          "$ref": "#/definitions/AdministratorProperties",
+          "description": "The local administrator properties for the mongo cluster."
         },
         "serverVersion": {
           "type": "string",
@@ -1471,11 +1545,6 @@
         "connectionString": {
           "type": "string",
           "description": "The default mongo connection string for the cluster.",
-          "readOnly": true
-        },
-        "earliestRestoreTime": {
-          "type": "string",
-          "description": "Earliest restore timestamp in UTC ISO8601 format.",
           "readOnly": true
         },
         "provisioningState": {
@@ -1492,13 +1561,25 @@
           "$ref": "#/definitions/PublicNetworkAccess",
           "description": "Whether or not public endpoint access is allowed for this mongo cluster."
         },
-        "nodeGroupSpecs": {
-          "type": "array",
-          "description": "The list of node group specs in the cluster.",
-          "items": {
-            "$ref": "#/definitions/NodeGroupSpec"
-          },
-          "x-ms-identifiers": []
+        "highAvailability": {
+          "$ref": "#/definitions/HighAvailabilityProperties",
+          "description": "The high availability properties of the mongo cluster."
+        },
+        "storage": {
+          "$ref": "#/definitions/StorageProperties",
+          "description": "The storage properties of the mongo cluster."
+        },
+        "sharding": {
+          "$ref": "#/definitions/ShardingProperties",
+          "description": "The sharding properties of the mongo cluster."
+        },
+        "compute": {
+          "$ref": "#/definitions/ComputeProperties",
+          "description": "The compute properties of the mongo cluster."
+        },
+        "backup": {
+          "$ref": "#/definitions/BackupProperties",
+          "description": "The backup properties of the mongo cluster."
         },
         "privateEndpointConnections": {
           "type": "array",
@@ -1639,8 +1720,7 @@
         },
         "properties": {
           "$ref": "#/definitions/MongoClusterUpdateProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       }
     },
@@ -1648,24 +1728,9 @@
       "type": "object",
       "description": "The updatable properties of the MongoCluster.",
       "properties": {
-        "administratorLogin": {
-          "type": "string",
-          "description": "The administrator's login for the mongo cluster.",
-          "x-ms-mutability": [
-            "read",
-            "update",
-            "create"
-          ]
-        },
-        "administratorLoginPassword": {
-          "type": "string",
-          "format": "password",
-          "description": "The password of the administrator login.",
-          "x-ms-mutability": [
-            "update",
-            "create"
-          ],
-          "x-ms-secret": true
+        "administrator": {
+          "$ref": "#/definitions/AdministratorProperties",
+          "description": "The local administrator properties for the mongo cluster."
         },
         "serverVersion": {
           "type": "string",
@@ -1675,13 +1740,25 @@
           "$ref": "#/definitions/PublicNetworkAccess",
           "description": "Whether or not public endpoint access is allowed for this mongo cluster."
         },
-        "nodeGroupSpecs": {
-          "type": "array",
-          "description": "The list of node group specs in the cluster.",
-          "items": {
-            "$ref": "#/definitions/NodeGroupSpec"
-          },
-          "x-ms-identifiers": []
+        "highAvailability": {
+          "$ref": "#/definitions/HighAvailabilityProperties",
+          "description": "The high availability properties of the mongo cluster."
+        },
+        "storage": {
+          "$ref": "#/definitions/StorageProperties",
+          "description": "The storage properties of the mongo cluster."
+        },
+        "sharding": {
+          "$ref": "#/definitions/ShardingProperties",
+          "description": "The sharding properties of the mongo cluster."
+        },
+        "compute": {
+          "$ref": "#/definitions/ComputeProperties",
+          "description": "The compute properties of the mongo cluster."
+        },
+        "backup": {
+          "$ref": "#/definitions/BackupProperties",
+          "description": "The backup properties of the mongo cluster."
         },
         "previewFeatures": {
           "type": "array",
@@ -1690,71 +1767,6 @@
             "$ref": "#/definitions/PreviewFeature"
           }
         }
-      }
-    },
-    "NodeGroupProperties": {
-      "type": "object",
-      "description": "The properties of the node group on a cluster.",
-      "properties": {
-        "sku": {
-          "type": "string",
-          "description": "The resource sku for the node group. This defines the size of CPU and memory that is provisioned for each node. Example values: 'M30', 'M40'."
-        },
-        "diskSizeGB": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The disk storage size for the node group in GB. Example values: 128, 256, 512, 1024."
-        },
-        "enableHa": {
-          "type": "boolean",
-          "description": "Whether high availability is enabled on the node group."
-        }
-      }
-    },
-    "NodeGroupSpec": {
-      "type": "object",
-      "description": "Specification for a node group.",
-      "properties": {
-        "sku": {
-          "type": "string",
-          "description": "The resource sku for the node group. This defines the size of CPU and memory that is provisioned for each node. Example values: 'M30', 'M40'."
-        },
-        "diskSizeGB": {
-          "type": "integer",
-          "format": "int64",
-          "description": "The disk storage size for the node group in GB. Example values: 128, 256, 512, 1024."
-        },
-        "enableHa": {
-          "type": "boolean",
-          "description": "Whether high availability is enabled on the node group."
-        },
-        "kind": {
-          "$ref": "#/definitions/NodeKind",
-          "description": "The node type deployed in the node group."
-        },
-        "nodeCount": {
-          "type": "integer",
-          "format": "int32",
-          "description": "The number of nodes in the node group."
-        }
-      }
-    },
-    "NodeKind": {
-      "type": "string",
-      "description": "The kind of the node on the cluster.",
-      "enum": [
-        "Shard"
-      ],
-      "x-ms-enum": {
-        "name": "NodeKind",
-        "modelAsString": true,
-        "values": [
-          {
-            "name": "Shard",
-            "value": "Shard",
-            "description": "The node is a shard kind."
-          }
-        ]
       }
     },
     "PreviewFeature": {
@@ -1781,8 +1793,7 @@
       "properties": {
         "properties": {
           "$ref": "../../../../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateEndpointConnectionProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1818,8 +1829,7 @@
       "properties": {
         "properties": {
           "$ref": "../../../../../common-types/resource-management/v5/privatelinks.json#/definitions/PrivateLinkResourceProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -1981,8 +1991,7 @@
       "properties": {
         "properties": {
           "$ref": "#/definitions/MongoClusterProperties",
-          "description": "The resource-specific properties for this resource.",
-          "x-ms-client-flatten": true
+          "description": "The resource-specific properties for this resource."
         }
       },
       "allOf": [
@@ -2109,6 +2118,28 @@
             "description": "Replication link is re-configuring due to a promotion event."
           }
         ]
+      }
+    },
+    "ShardingProperties": {
+      "type": "object",
+      "description": "The sharding properties of the cluster. This includes the shard count and scaling options for the cluster.",
+      "properties": {
+        "shardCount": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Number of shards to provision on the cluster."
+        }
+      }
+    },
+    "StorageProperties": {
+      "type": "object",
+      "description": "The storage properties of the cluster. This includes the data storage size and scaling applied to servers in the cluster.",
+      "properties": {
+        "sizeGb": {
+          "type": "integer",
+          "format": "int64",
+          "description": "The size of the data disk assigned to each server."
+        }
       }
     }
   },

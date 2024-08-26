@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "BatchServiceClient",
-    "version": "2024-02-01.19.0",
+    "version": "2024-07-01.20.0",
     "description": "A client for issuing REST requests to the Azure Batch service."
   },
   "x-ms-parameterized-host": {
@@ -326,7 +326,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-account-usage-metrics.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-account-usage-metrics.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -455,7 +455,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-support-images.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-support-images.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -583,7 +583,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -816,7 +816,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-certificates.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-certificates.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -2252,7 +2252,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-task-files.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-task-files.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -2402,7 +2402,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-compute-node-files.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-compute-node-files.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -2770,6 +2770,17 @@
             "type": "string",
             "format": "date-time-rfc1123",
             "description": "A timestamp indicating the last modified time of the resource known to the client. The operation will be performed only if the resource on the service has not been modified since the specified time.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "name": "force",
+            "default": false,
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "If true, the server will delete the JobSchedule even if the corresponding nodes have not fully processed the deletion. The default value is false.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -3700,6 +3711,17 @@
             }
           },
           {
+            "name": "force",
+            "default": false,
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "If true, the server will terminate the JobSchedule even if the corresponding nodes have not fully processed the termination. The default value is false.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
             "$ref": "#/parameters/ApiVersionParameter"
           }
         ],
@@ -3875,7 +3897,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-job-schedules.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-job-schedules.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -4108,6 +4130,17 @@
             "type": "string",
             "format": "date-time-rfc1123",
             "description": "A timestamp indicating the last modified time of the resource known to the client. The operation will be performed only if the resource on the service has not been modified since the specified time.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "name": "force",
+            "default": false,
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "If true, the server will delete the Job even if the corresponding nodes have not fully processed the deletion. The default value is false.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -5058,6 +5091,17 @@
             }
           },
           {
+            "name": "force",
+            "default": false,
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "description": "If true, the server will terminate the Job even if the corresponding nodes have not fully processed the termination. The default value is false.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
             "$ref": "#/parameters/ApiVersionParameter"
           }
         ],
@@ -5234,7 +5278,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-jobs.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-jobs.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -5390,7 +5434,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-jobs-in-a-job-schedule.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-jobs-in-a-job-schedule.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -5547,7 +5591,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-job-preparation-and-release-status.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-job-preparation-and-release-status.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -5774,9 +5818,6 @@
           "Add a simple pool with resourceTags": {
             "$ref": "./examples/PoolAdd_ResourceTags.json"
           },
-          "Add a CloudServiceConfiguration pool": {
-            "$ref": "./examples/PoolAdd_CloudServiceConfiguration.json"
-          },
           "Add a VirtualMachineConfiguration pool": {
             "$ref": "./examples/PoolAdd_VirtualMachineConfiguration.json"
           },
@@ -5918,7 +5959,7 @@
             "$ref": "./examples/PoolList_Basic.json"
           }
         },
-        "summary": "Lists all of the Pools in the specified Account.",
+        "summary": "Lists all of the Pools which be mounted",
         "x-ms-request-id": "request-id",
         "parameters": [
           {
@@ -5926,7 +5967,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-pools.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-pools.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -7686,6 +7727,12 @@
           },
           "Add a task with extra slot requirement": {
             "$ref": "./examples/TaskAdd_RequiredSlots.json"
+          },
+          "Add a container task with container data isolation": {
+            "$ref": "./examples/TaskAdd_ContainerSettingsWithDataIsolation.json"
+          },
+          "Add a container task with container data isolation bad request duplicate sources": {
+            "$ref": "./examples/TaskAdd_ContainerSettingsWithDataIsolation_DuplicateSources.json"
           }
         },
         "summary": "Adds a Task to the specified Job.",
@@ -7824,7 +7871,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-tasks.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-tasks.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -9623,7 +9670,7 @@
           }
         },
         "summary": "Reinstalls the operating system on the specified Compute Node.",
-        "description": "You can reinstall the operating system on a Compute Node only if it is in an idle or running state. This API can be invoked only on Pools created with the cloud service configuration property.",
+        "description": "You can reinstall the operating system on a Compute Node only if it is in an idle or running state.",
         "x-ms-request-id": "request-id",
         "parameters": [
           {
@@ -9980,6 +10027,249 @@
         }
       }
     },
+    "/pools/{poolId}/nodes/{nodeId}/start": {
+      "post": {
+        "tags": [
+          "ComputeNodes"
+        ],
+        "operationId": "ComputeNode_Start",
+        "x-ms-examples": {
+          "Node reboot": {
+            "$ref": "./examples/NodeStart.json"
+          }
+        },
+        "summary": "Starts the specified Compute Node.",
+        "description": "You can start a Compute Node only if it has been deallocated",
+        "x-ms-request-id": "request-id",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the Pool that contains the Compute Node."
+          },
+          {
+            "name": "nodeId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the Compute Node that you want to start."
+          },
+          {
+            "name": "timeout",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 30,
+            "description": "The maximum time that the server can spend processing the request, in seconds. The default is 30 seconds. If the value is larger than 30, the default will be used instead.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "name": "client-request-id",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "format": "uuid",
+            "description": "The caller-generated request identity, in the form of a GUID with no decoration such as curly braces, e.g. 9C4D50EE-2D56-4CD3-8152-34347DC9F2B0.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            },
+            "x-ms-client-request-id": true
+          },
+          {
+            "name": "return-client-request-id",
+            "default": false,
+            "in": "header",
+            "required": false,
+            "type": "boolean",
+            "description": "Whether the server should return the client-request-id in the response.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "name": "ocp-date",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "format": "date-time-rfc1123",
+            "description": "The time the request was issued. Client libraries typically set this to the current system clock time; set it explicitly if you are calling the REST API directly.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "headers": {
+              "client-request-id": {
+                "description": "The client-request-id provided by the client during the request. This will be returned only if the return-client-request-id parameter was set to true.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "request-id": {
+                "description": "A unique identifier for the request that was made to the Batch service. If a request is consistently failing and you have verified that the request is properly formulated, you may use this value to report the error to Microsoft. In your report, include the value of this request ID, the approximate time that the request was made, the Batch Account against which the request was made, and the region that Account resides in.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "ETag": {
+                "description": "The ETag HTTP response header. This is an opaque string. You can use it to detect whether the resource has changed between requests. In particular, you can pass the ETag to one of the If-Modified-Since, If-Unmodified-Since, If-Match or If-None-Match headers.",
+                "type": "string"
+              },
+              "Last-Modified": {
+                "description": "The time at which the resource was last modified.",
+                "type": "string",
+                "format": "date-time-rfc1123"
+              },
+              "DataServiceId": {
+                "description": "The OData ID of the resource to which the request applied.",
+                "type": "string"
+              }
+            },
+            "description": "The request to the Batch service was successful."
+          },
+          "default": {
+            "description": "The error from the Batch service.",
+            "schema": {
+              "$ref": "#/definitions/BatchError"
+            }
+          }
+        }
+      }
+    },
+    "/pools/{poolId}/nodes/{nodeId}/deallocate": {
+      "post": {
+        "tags": [
+          "ComputeNodes"
+        ],
+        "operationId": "ComputeNode_Deallocate",
+        "x-ms-examples": {
+          "Node reboot": {
+            "$ref": "./examples/NodeDeallocate.json"
+          }
+        },
+        "summary": "Deallocates the specified Compute Node.",
+        "description": "You can deallocate a Compute Node only if it is in an idle or running state.",
+        "x-ms-request-id": "request-id",
+        "parameters": [
+          {
+            "name": "poolId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the Pool that contains the Compute Node."
+          },
+          {
+            "name": "nodeId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the Compute Node that you want to deallocate."
+          },
+          {
+            "name": "nodeDeallocateParameter",
+            "in": "body",
+            "required": false,
+            "schema": {
+              "$ref": "#/definitions/NodeDeallocateParameter"
+            },
+            "description": "The parameters for the request."
+          },
+          {
+            "name": "timeout",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32",
+            "default": 30,
+            "description": "The maximum time that the server can spend processing the request, in seconds. The default is 30 seconds. If the value is larger than 30, the default will be used instead.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "name": "client-request-id",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "format": "uuid",
+            "description": "The caller-generated request identity, in the form of a GUID with no decoration such as curly braces, e.g. 9C4D50EE-2D56-4CD3-8152-34347DC9F2B0.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            },
+            "x-ms-client-request-id": true
+          },
+          {
+            "name": "return-client-request-id",
+            "default": false,
+            "in": "header",
+            "required": false,
+            "type": "boolean",
+            "description": "Whether the server should return the client-request-id in the response.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "name": "ocp-date",
+            "in": "header",
+            "required": false,
+            "type": "string",
+            "format": "date-time-rfc1123",
+            "description": "The time the request was issued. Client libraries typically set this to the current system clock time; set it explicitly if you are calling the REST API directly.",
+            "x-ms-parameter-grouping": {
+              "postfix": "Options"
+            }
+          },
+          {
+            "$ref": "#/parameters/ApiVersionParameter"
+          }
+        ],
+        "responses": {
+          "202": {
+            "headers": {
+              "client-request-id": {
+                "description": "The client-request-id provided by the client during the request. This will be returned only if the return-client-request-id parameter was set to true.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "request-id": {
+                "description": "A unique identifier for the request that was made to the Batch service. If a request is consistently failing and you have verified that the request is properly formulated, you may use this value to report the error to Microsoft. In your report, include the value of this request ID, the approximate time that the request was made, the Batch Account against which the request was made, and the region that Account resides in.",
+                "type": "string",
+                "format": "uuid"
+              },
+              "ETag": {
+                "description": "The ETag HTTP response header. This is an opaque string. You can use it to detect whether the resource has changed between requests. In particular, you can pass the ETag to one of the If-Modified-Since, If-Unmodified-Since, If-Match or If-None-Match headers.",
+                "type": "string"
+              },
+              "Last-Modified": {
+                "description": "The time at which the resource was last modified.",
+                "type": "string",
+                "format": "date-time-rfc1123"
+              },
+              "DataServiceId": {
+                "description": "The OData ID of the resource to which the request applied.",
+                "type": "string"
+              }
+            },
+            "description": "The request to the Batch service was successful."
+          },
+          "default": {
+            "description": "The error from the Batch service.",
+            "schema": {
+              "$ref": "#/definitions/BatchError"
+            }
+          }
+        }
+      }
+    },
     "/pools/{poolId}/nodes/{nodeId}/remoteloginsettings": {
       "get": {
         "tags": [
@@ -9992,7 +10282,7 @@
           }
         },
         "summary": "Gets the settings required for remote login to a Compute Node.",
-        "description": "Before you can remotely login to a Compute Node using the remote login settings, you must create a user Account on the Compute Node. This API can be invoked only on Pools created with the virtual machine configuration property. For Pools created with a cloud service configuration, see the GetRemoteDesktop API.",
+        "description": "Before you can remotely login to a Compute Node using the remote login settings, you must create a user Account on the Compute Node.",
         "x-ms-request-id": "request-id",
         "parameters": [
           {
@@ -10085,127 +10375,6 @@
             "description": "A response containing the login settings.",
             "schema": {
               "$ref": "#/definitions/ComputeNodeGetRemoteLoginSettingsResult"
-            }
-          },
-          "default": {
-            "description": "The error from the Batch service.",
-            "schema": {
-              "$ref": "#/definitions/BatchError"
-            }
-          }
-        }
-      }
-    },
-    "/pools/{poolId}/nodes/{nodeId}/rdp": {
-      "get": {
-        "tags": [
-          "ComputeNodes"
-        ],
-        "operationId": "ComputeNode_GetRemoteDesktop",
-        "x-ms-examples": {
-          "Get RDP file of the compute node": {
-            "$ref": "./examples/NodeGetRemoteDesktop.json"
-          }
-        },
-        "summary": "Gets the Remote Desktop Protocol file for the specified Compute Node.",
-        "description": "Before you can access a Compute Node by using the RDP file, you must create a user Account on the Compute Node. This API can only be invoked on Pools created with a cloud service configuration. For Pools created with a virtual machine configuration, see the GetRemoteLoginSettings API.",
-        "x-ms-request-id": "request-id",
-        "parameters": [
-          {
-            "name": "poolId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The ID of the Pool that contains the Compute Node."
-          },
-          {
-            "name": "nodeId",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "description": "The ID of the Compute Node for which you want to get the Remote Desktop Protocol file."
-          },
-          {
-            "name": "timeout",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32",
-            "default": 30,
-            "description": "The maximum time that the server can spend processing the request, in seconds. The default is 30 seconds. If the value is larger than 30, the default will be used instead.",
-            "x-ms-parameter-grouping": {
-              "postfix": "Options"
-            }
-          },
-          {
-            "name": "client-request-id",
-            "in": "header",
-            "required": false,
-            "type": "string",
-            "format": "uuid",
-            "description": "The caller-generated request identity, in the form of a GUID with no decoration such as curly braces, e.g. 9C4D50EE-2D56-4CD3-8152-34347DC9F2B0.",
-            "x-ms-parameter-grouping": {
-              "postfix": "Options"
-            },
-            "x-ms-client-request-id": true
-          },
-          {
-            "name": "return-client-request-id",
-            "default": false,
-            "in": "header",
-            "required": false,
-            "type": "boolean",
-            "description": "Whether the server should return the client-request-id in the response.",
-            "x-ms-parameter-grouping": {
-              "postfix": "Options"
-            }
-          },
-          {
-            "name": "ocp-date",
-            "in": "header",
-            "required": false,
-            "type": "string",
-            "format": "date-time-rfc1123",
-            "description": "The time the request was issued. Client libraries typically set this to the current system clock time; set it explicitly if you are calling the REST API directly.",
-            "x-ms-parameter-grouping": {
-              "postfix": "Options"
-            }
-          },
-          {
-            "$ref": "#/parameters/ApiVersionParameter"
-          }
-        ],
-        "produces": [
-          "application/json",
-          "application/octet-stream"
-        ],
-        "responses": {
-          "200": {
-            "headers": {
-              "client-request-id": {
-                "description": "The client-request-id provided by the client during the request. This will be returned only if the return-client-request-id parameter was set to true.",
-                "type": "string",
-                "format": "uuid"
-              },
-              "request-id": {
-                "description": "A unique identifier for the request that was made to the Batch service. If a request is consistently failing and you have verified that the request is properly formulated, you may use this value to report the error to Microsoft. In your report, include the value of this request ID, the approximate time that the request was made, the Batch Account against which the request was made, and the region that Account resides in.",
-                "type": "string",
-                "format": "uuid"
-              },
-              "ETag": {
-                "description": "The ETag HTTP response header. This is an opaque string. You can use it to detect whether the resource has changed between requests. In particular, you can pass the ETag to one of the If-Modified-Since, If-Unmodified-Since, If-Match or If-None-Match headers.",
-                "type": "string"
-              },
-              "Last-Modified": {
-                "description": "The time at which the resource was last modified.",
-                "type": "string",
-                "format": "date-time-rfc1123"
-              }
-            },
-            "description": "A response containing the RDP information.",
-            "schema": {
-              "type": "object",
-              "format": "file"
             }
           },
           "default": {
@@ -10362,7 +10531,7 @@
             "in": "query",
             "required": false,
             "type": "string",
-            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/en-us/rest/api/batchservice/odata-filters-in-batch#list-nodes-in-a-pool.",
+            "description": "An OData $filter clause. For more information on constructing this filter, see https://docs.microsoft.com/rest/api/batchservice/odata-filters-in-batch#list-nodes-in-a-pool.",
             "x-ms-parameter-grouping": {
               "postfix": "Options"
             }
@@ -11494,12 +11663,17 @@
       "properties": {
         "subnetId": {
           "type": "string",
-          "title": "The ARM resource identifier of the virtual network subnet which Compute Nodes running Tasks from the Job will join for the duration of the Task. This will only work with a VirtualMachineConfiguration Pool.",
-          "description": "The virtual network must be in the same region and subscription as the Azure Batch Account. The specified subnet should have enough free IP addresses to accommodate the number of Compute Nodes which will run Tasks from the Job. This can be up to the number of Compute Nodes in the Pool. The 'MicrosoftAzureBatch' service principal must have the 'Classic Virtual Machine Contributor' Role-Based Access Control (RBAC) role for the specified VNet so that Azure Batch service can schedule Tasks on the Nodes. This can be verified by checking if the specified VNet has any associated Network Security Groups (NSG). If communication to the Nodes in the specified subnet is denied by an NSG, then the Batch service will set the state of the Compute Nodes to unusable. This is of the form /subscriptions/{subscription}/resourceGroups/{group}/providers/{provider}/virtualNetworks/{network}/subnets/{subnet}. If the specified VNet has any associated Network Security Groups (NSG), then a few reserved system ports must be enabled for inbound communication from the Azure Batch service. For Pools created with a Virtual Machine configuration, enable ports 29876 and 29877, as well as port 22 for Linux and port 3389 for Windows. Port 443 is also required to be open for outbound connections for communications to Azure Storage. For more details see: https://docs.microsoft.com/en-us/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration",
+          "title": "The ARM resource identifier of the virtual network subnet which Compute Nodes running Tasks from the Job will join for the duration of the Task.",
+          "description": "The virtual network must be in the same region and subscription as the Azure Batch Account. The specified subnet should have enough free IP addresses to accommodate the number of Compute Nodes which will run Tasks from the Job. This can be up to the number of Compute Nodes in the Pool. The 'MicrosoftAzureBatch' service principal must have the 'Classic Virtual Machine Contributor' Role-Based Access Control (RBAC) role for the specified VNet so that Azure Batch service can schedule Tasks on the Nodes. This can be verified by checking if the specified VNet has any associated Network Security Groups (NSG). If communication to the Nodes in the specified subnet is denied by an NSG, then the Batch service will set the state of the Compute Nodes to unusable. This is of the form /subscriptions/{subscription}/resourceGroups/{group}/providers/{provider}/virtualNetworks/{network}/subnets/{subnet}. If the specified VNet has any associated Network Security Groups (NSG), then a few reserved system ports must be enabled for inbound communication from the Azure Batch service. For Pools created with a Virtual Machine configuration, enable ports 29876 and 29877, as well as port 22 for Linux and port 3389 for Windows. Port 443 is also required to be open for outbound connections for communications to Azure Storage. For more details see: https://docs.microsoft.com/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration",
           "externalDocs": {
-            "url": "https://azure.microsoft.com/en-us/documentation/articles/role-based-access-built-in-roles/#classic-virtual-machine-contributor",
+            "url": "https://azure.microsoft.com/documentation/articles/role-based-access-built-in-roles/#classic-virtual-machine-contributor",
             "description": "Setting up RBAC for Azure Batch VNETs"
           }
+        },
+        "skipWithdrawFromVNet": {
+          "type": "boolean",
+          "title": "Whether to withdraw Compute Nodes from the virtual network to DNC when the job is terminated or deleted.",
+          "description": "If true, nodes will remain joined to the virtual network to DNC. If false, nodes will automatically withdraw when the job ends. Defaults to false."
         }
       },
       "required": [
@@ -11547,6 +11721,14 @@
               }
             ]
           }
+        },
+        "containerHostBatchBindMounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ContainerHostBatchBindMountEntry"
+          },
+          "title": "The paths you want to mounted to container task.",
+          "description": "If this array is null or be not present, container task will mount entire temporary disk drive in windows (or AZ_BATCH_NODE_ROOT_DIR in Linux). It won't' mount any data paths into container if this array is set as empty."
         }
       },
       "required": [
@@ -11843,7 +12025,7 @@
         "loginMode": {
           "type": "string",
           "title": "The login mode for the user",
-          "description": "The default value for VirtualMachineConfiguration Pools is 'batch' and for CloudServiceConfiguration Pools is 'interactive'.",
+          "description": "The default is 'batch'.",
           "enum": [
             "batch",
             "interactive"
@@ -11858,7 +12040,7 @@
               },
               {
                 "value": "interactive",
-                "description": "The LOGON32_LOGON_INTERACTIVE Win32 login mode. UAC is enabled on Windows VirtualMachineConfiguration Pools. If this option is used with an elevated user identity in a Windows VirtualMachineConfiguration Pool, the user session will not be elevated unless the application executed by the Task command line is configured to always require administrative privilege or to always require maximum privilege."
+                "description": "The LOGON32_LOGON_INTERACTIVE Win32 login mode. UAC is enabled on Windows Pools. If this option is used with an elevated user identity in a Windows Pool, the user session will not be elevated unless the application executed by the Task command line is configured to always require administrative privilege or to always require maximum privilege."
               }
             ]
           }
@@ -11939,7 +12121,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the Job Manager Task.",
-          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables)."
+          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/azure/batch/batch-compute-node-environment-variables)."
         },
         "containerSettings": {
           "$ref": "#/definitions/TaskContainerSettings",
@@ -12031,7 +12213,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the Job Preparation Task.",
-          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables)."
+          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/azure/batch/batch-compute-node-environment-variables)."
         },
         "containerSettings": {
           "$ref": "#/definitions/TaskContainerSettings",
@@ -12090,7 +12272,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the Job Release Task.",
-          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables)."
+          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/azure/batch/batch-compute-node-environment-variables)."
         },
         "containerSettings": {
           "$ref": "#/definitions/TaskContainerSettings",
@@ -12173,7 +12355,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the StartTask.",
-          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables)."
+          "description": "The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/azure/batch/batch-compute-node-environment-variables)."
         },
         "containerSettings": {
           "$ref": "#/definitions/TaskContainerSettings",
@@ -12232,7 +12414,7 @@
         "storeLocation": {
           "type": "string",
           "title": "The location of the Certificate store on the Compute Node into which to install the Certificate.",
-          "description": "The default value is currentuser. This property is applicable only for Pools configured with Windows Compute Nodes (that is, created with cloudServiceConfiguration, or with virtualMachineConfiguration using a Windows Image reference). For Linux Compute Nodes, the Certificates are stored in a directory inside the Task working directory and an environment variable AZ_BATCH_CERTIFICATES_DIR is supplied to the Task to query for this location. For Certificates with visibility of 'remoteUser', a 'certs' directory is created in the user's home directory (e.g., /home/{user-name}/certs) and Certificates are placed in that directory.",
+          "description": "The default value is currentuser. This property is applicable only for Pools configured with Windows Compute Nodes. For Linux Compute Nodes, the Certificates are stored in a directory inside the Task working directory and an environment variable AZ_BATCH_CERTIFICATES_DIR is supplied to the Task to query for this location. For Certificates with visibility of 'remoteUser', a 'certs' directory is created in the user's home directory (e.g., /home/{user-name}/certs) and Certificates are placed in that directory.",
           "enum": [
             "currentuser",
             "localmachine"
@@ -12257,7 +12439,7 @@
         "storeName": {
           "type": "string",
           "title": "The name of the Certificate store on the Compute Node into which to install the Certificate.",
-          "description": "This property is applicable only for Pools configured with Windows Compute Nodes (that is, created with cloudServiceConfiguration, or with virtualMachineConfiguration using a Windows Image reference). Common store names include: My, Root, CA, Trust, Disallowed, TrustedPeople, TrustedPublisher, AuthRoot, AddressBook, but any custom store name can also be used. The default value is My."
+          "description": "This property is applicable only for Pools configured with Windows Compute Nodes. Common store names include: My, Root, CA, Trust, Disallowed, TrustedPeople, TrustedPublisher, AuthRoot, AddressBook, but any custom store name can also be used. The default value is My."
         },
         "visibility": {
           "type": "array",
@@ -12333,15 +12515,10 @@
           "title": "The size of the virtual machines in the Pool. All virtual machines in a Pool are the same size.",
           "description": "For information about available sizes of virtual machines in Pools, see Choose a VM size for Compute Nodes in an Azure Batch Pool (https://docs.microsoft.com/azure/batch/batch-pool-vm-sizes)."
         },
-        "cloudServiceConfiguration": {
-          "$ref": "#/definitions/CloudServiceConfiguration",
-          "title": "The cloud service configuration for the Pool.",
-          "description": "This property must be specified if the Pool needs to be created with Azure PaaS VMs. This property and virtualMachineConfiguration are mutually exclusive and one of the properties must be specified. If neither is specified then the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request). This property cannot be specified if the Batch Account was created with its poolAllocationMode property set to 'UserSubscription'."
-        },
         "virtualMachineConfiguration": {
           "$ref": "#/definitions/VirtualMachineConfiguration",
           "title": "The virtual machine configuration for the Pool.",
-          "description": "This property must be specified if the Pool needs to be created with Azure IaaS VMs. This property and cloudServiceConfiguration are mutually exclusive and one of the properties must be specified. If neither is specified then the Batch service returns an error; if you are calling the REST API directly, the HTTP status code is 400 (Bad Request)."
+          "description": "This property must be specified."
         },
         "taskSlotsPerNode": {
           "type": "integer",
@@ -12416,14 +12593,6 @@
           },
           "title": "The list of Packages to be installed on each Compute Node in the Pool.",
           "description": "When creating a pool, the package's application ID must be fully qualified (/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}). Changes to Package references affect all new Nodes joining the Pool, but do not affect Compute Nodes that are already in the Pool until they are rebooted or reimaged. There is a maximum of 10 Package references on any given Pool."
-        },
-        "applicationLicenses": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "The list of application licenses the Batch service will make available on each Compute Node in the Pool.",
-          "description": "The list of application licenses must be a subset of available Batch service application licenses. If a license is requested which is not supported, Pool creation will fail. The permitted licenses available on the Pool are 'maya', 'vray', '3dsmax', 'arnold'. An additional charge applies for each application license added to the Pool."
         },
         "userAccounts": {
           "type": "array",
@@ -13610,25 +13779,6 @@
       },
       "title": "An error that occurred when resizing a Pool."
     },
-    "CloudServiceConfiguration": {
-      "type": "object",
-      "properties": {
-        "osFamily": {
-          "type": "string",
-          "title": "The Azure Guest OS family to be installed on the virtual machines in the Pool.",
-          "description": "Possible values are:\n2 - OS Family 2, equivalent to Windows Server 2008 R2 SP1.\n3 - OS Family 3, equivalent to Windows Server 2012.\n4 - OS Family 4, equivalent to Windows Server 2012 R2.\n5 - OS Family 5, equivalent to Windows Server 2016.\n6 - OS Family 6, equivalent to Windows Server 2019. For more information, see Azure Guest OS Releases (https://azure.microsoft.com/documentation/articles/cloud-services-guestos-update-matrix/#releases)."
-        },
-        "osVersion": {
-          "type": "string",
-          "title": "The Azure Guest OS version to be installed on the virtual machines in the Pool.",
-          "description": "The default value is * which specifies the latest operating system version for the specified OS family."
-        }
-      },
-      "required": [
-        "osFamily"
-      ],
-      "title": "The configuration for Compute Nodes in a Pool based on the Azure Cloud Services platform."
-    },
     "ImageReference": {
       "type": "object",
       "properties": {
@@ -13655,12 +13805,22 @@
         "virtualMachineImageId": {
           "type": "string",
           "title": "The ARM resource identifier of the Azure Compute Gallery Image. Compute Nodes in the Pool will be created using this Image Id. This is of the form /subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/galleries/{galleryName}/images/{imageDefinitionName}/versions/{VersionId} or /subscriptions/{subscriptionId}/resourceGroups/{resourceGroup}/providers/Microsoft.Compute/galleries/{galleryName}/images/{imageDefinitionName} for always defaulting to the latest image version.",
-          "description": "This property is mutually exclusive with other ImageReference properties. The Azure Compute Gallery Image must have replicas in the same region and must be in the same subscription as the Azure Batch account. If the image version is not specified in the imageId, the latest version will be used. For information about the firewall settings for the Batch Compute Node agent to communicate with the Batch service see https://docs.microsoft.com/en-us/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration."
+          "description": "This property is mutually exclusive with other ImageReference properties. The Azure Compute Gallery Image must have replicas in the same region and must be in the same subscription as the Azure Batch account. If the image version is not specified in the imageId, the latest version will be used. For information about the firewall settings for the Batch Compute Node agent to communicate with the Batch service see https://docs.microsoft.com/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration."
         },
         "exactVersion": {
           "type": "string",
           "readOnly": true,
           "description": "The specific version of the platform image or marketplace image used to create the node. This read-only field differs from 'version' only if the value specified for 'version' when the pool was created was 'latest'."
+        },
+        "sharedGalleryImageId": {
+          "type": "string",
+          "title": "The shared gallery image unique identifier",
+          "description": "This property is mutually exclusive with other properties and can be fetched from shared gallery image GET call."
+        },
+        "communityGalleryImageId": {
+          "type": "string",
+          "title": "The community gallery image unique identifier",
+          "description": "This property is mutually exclusive with other properties and can be fetched from community gallery image GET call."
         }
       },
       "title": "A reference to an Azure Virtual Machines Marketplace Image or a Azure Compute Gallery Image. To get the list of all Azure Marketplace Image references verified by Azure Batch, see the 'List Supported Images' operation."
@@ -13767,6 +13927,63 @@
         ]
       }
     },
+    "ContainerHostDataPath": {
+      "type": "string",
+      "title": "The paths which will be mounted to container task's container.",
+      "enum": [
+        "Shared",
+        "Startup",
+        "VfsMounts",
+        "Task",
+        "JobPrep",
+        "Applications"
+      ],
+      "x-ms-enum": {
+        "name": "ContainerHostDataPath",
+        "modelAsString": true,
+        "values": [
+          {
+            "value": "Shared",
+            "description": "The path for multi-instances task to shared their files."
+          },
+          {
+            "value": "Startup",
+            "description": "The path for start task."
+          },
+          {
+            "value": "VfsMounts",
+            "description": "The path contains all virtual file systems are mounted on this node."
+          },
+          {
+            "value": "Task",
+            "description": "The task path."
+          },
+          {
+            "value": "JobPrep",
+            "description": "The job-prep task path."
+          },
+          {
+            "value": "Applications",
+            "description": "The applications path."
+          }
+        ]
+      }
+    },
+    "ContainerHostBatchBindMountEntry": {
+      "type": "object",
+      "title": "The entry of path and mount mode you want to mount into task container.",
+      "properties": {
+        "source": {
+          "$ref": "#/definitions/ContainerHostDataPath",
+          "title": "The path which be mounted to container customer can select."
+        },
+        "isReadOnly": {
+          "type": "boolean",
+          "title": "Mount this source path as read-only mode or not. Default value is false (read/write mode).",
+          "description": "For Linux, if you mount this path as a read/write mode, this does not mean that all users in container have the read/write access for the path, it depends on the access in host VM. If this path is mounted read-only, all users within the container will not be able to modify the path."
+        }
+      }
+    },
     "ServiceArtifactReference": {
       "type": "object",
       "properties": {
@@ -13804,7 +14021,7 @@
             "$ref": "#/definitions/DataDisk"
           },
           "title": "The configuration for data disks attached to the Compute Nodes in the Pool.",
-          "description": "This property must be specified if the Compute Nodes in the Pool need to have empty data disks attached to them. This cannot be updated. Each Compute Node gets its own disk (the disk is not a file share). Existing disks cannot be attached, each attached disk is empty. When the Compute Node is removed from the Pool, the disk and all data associated with it is also deleted. The disk is not formatted after being attached, it must be formatted before use - for more information see https://docs.microsoft.com/en-us/azure/virtual-machines/linux/classic/attach-disk#initialize-a-new-data-disk-in-linux and https://docs.microsoft.com/en-us/azure/virtual-machines/windows/attach-disk-ps#add-an-empty-data-disk-to-a-virtual-machine."
+          "description": "This property must be specified if the Compute Nodes in the Pool need to have empty data disks attached to them. This cannot be updated. Each Compute Node gets its own disk (the disk is not a file share). Existing disks cannot be attached, each attached disk is empty. When the Compute Node is removed from the Pool, the disk and all data associated with it is also deleted. The disk is not formatted after being attached, it must be formatted before use - for more information see https://docs.microsoft.com/azure/virtual-machines/linux/classic/attach-disk#initialize-a-new-data-disk-in-linux and https://docs.microsoft.com/azure/virtual-machines/windows/attach-disk-ps#add-an-empty-data-disk-to-a-virtual-machine."
         },
         "licenseType": {
           "type": "string",
@@ -13956,7 +14173,7 @@
             }
           },
           "title": "The list of disk targets Batch Service will encrypt on the compute node.",
-          "description": "If omitted, no disks on the compute nodes in the pool will be encrypted. On Linux pool, only \"TemporaryDisk\" is supported; on Windows pool, \"OsDisk\" and \"TemporaryDisk\" must be specified."
+          "description": "The list of disk targets Batch Service will encrypt on the compute node."
         }
       },
       "description": "The disk encryption configuration applied on compute nodes in the pool. Disk encryption configuration is not supported on Linux pool created with Azure Compute Gallery Image."
@@ -14158,7 +14375,7 @@
     "DiffDiskPlacement": {
       "type": "string",
       "title": "Specifies the ephemeral disk placement for operating system disk for all compute nodes (VMs) in the pool.",
-      "description": "This property can be used by user in the request to choose which location the operating system should be in. e.g., cache disk space for Ephemeral OS disk provisioning. For more information on Ephemeral OS disk size requirements, please refer to Ephemeral OS disk size requirements for Windows VMs at https://docs.microsoft.com/en-us/azure/virtual-machines/windows/ephemeral-os-disks#size-requirements and Linux VMs at https://docs.microsoft.com/en-us/azure/virtual-machines/linux/ephemeral-os-disks#size-requirements",
+      "description": "This property can be used by user in the request to choose which location the operating system should be in. e.g., cache disk space for Ephemeral OS disk provisioning. For more information on Ephemeral OS disk size requirements, please refer to Ephemeral OS disk size requirements for Windows VMs at https://docs.microsoft.com/azure/virtual-machines/windows/ephemeral-os-disks#size-requirements and Linux VMs at https://docs.microsoft.com/azure/virtual-machines/linux/ephemeral-os-disks#size-requirements",
       "enum": [
         "CacheDisk"
       ],
@@ -14180,7 +14397,7 @@
         "placement": {
           "$ref": "#/definitions/DiffDiskPlacement",
           "title": "Specifies the ephemeral disk placement for operating system disk for all VMs in the pool.",
-          "description": "This property can be used by user in the request to choose the location e.g., cache disk space for Ephemeral OS disk provisioning. For more information on Ephemeral OS disk size requirements, please refer to Ephemeral OS disk size requirements for Windows VMs at https://docs.microsoft.com/en-us/azure/virtual-machines/windows/ephemeral-os-disks#size-requirements and Linux VMs at https://docs.microsoft.com/en-us/azure/virtual-machines/linux/ephemeral-os-disks#size-requirements."
+          "description": "This property can be used by user in the request to choose the location e.g., cache disk space for Ephemeral OS disk provisioning. For more information on Ephemeral OS disk size requirements, please refer to Ephemeral OS disk size requirements for Windows VMs at https://docs.microsoft.com/azure/virtual-machines/windows/ephemeral-os-disks#size-requirements and Linux VMs at https://docs.microsoft.com/azure/virtual-machines/linux/ephemeral-os-disks#size-requirements."
         }
       },
       "title": "Specifies the ephemeral Disk Settings for the operating system disk used by the compute node (VM)."
@@ -14267,9 +14484,9 @@
         "subnetId": {
           "type": "string",
           "title": "The ARM resource identifier of the virtual network subnet which the Compute Nodes of the Pool will join. This is of the form /subscriptions/{subscription}/resourceGroups/{group}/providers/{provider}/virtualNetworks/{network}/subnets/{subnet}.",
-          "description": "The virtual network must be in the same region and subscription as the Azure Batch Account. The specified subnet should have enough free IP addresses to accommodate the number of Compute Nodes in the Pool. If the subnet doesn't have enough free IP addresses, the Pool will partially allocate Nodes and a resize error will occur. The 'MicrosoftAzureBatch' service principal must have the 'Classic Virtual Machine Contributor' Role-Based Access Control (RBAC) role for the specified VNet. The specified subnet must allow communication from the Azure Batch service to be able to schedule Tasks on the Nodes. This can be verified by checking if the specified VNet has any associated Network Security Groups (NSG). If communication to the Nodes in the specified subnet is denied by an NSG, then the Batch service will set the state of the Compute Nodes to unusable. For Pools created with virtualMachineConfiguration only ARM virtual networks ('Microsoft.Network/virtualNetworks') are supported, but for Pools created with cloudServiceConfiguration both ARM and classic virtual networks are supported. If the specified VNet has any associated Network Security Groups (NSG), then a few reserved system ports must be enabled for inbound communication. For Pools created with a virtual machine configuration, enable ports 29876 and 29877, as well as port 22 for Linux and port 3389 for Windows. For Pools created with a cloud service configuration, enable ports 10100, 20100, and 30100. Also enable outbound connections to Azure Storage on port 443. For more details see: https://docs.microsoft.com/en-us/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration",
+          "description": "The virtual network must be in the same region and subscription as the Azure Batch Account. The specified subnet should have enough free IP addresses to accommodate the number of Compute Nodes in the Pool. If the subnet doesn't have enough free IP addresses, the Pool will partially allocate Nodes and a resize error will occur. The 'MicrosoftAzureBatch' service principal must have the 'Classic Virtual Machine Contributor' Role-Based Access Control (RBAC) role for the specified VNet. The specified subnet must allow communication from the Azure Batch service to be able to schedule Tasks on the Nodes. This can be verified by checking if the specified VNet has any associated Network Security Groups (NSG). If communication to the Nodes in the specified subnet is denied by an NSG, then the Batch service will set the state of the Compute Nodes to unusable. Only ARM virtual networks ('Microsoft.Network/virtualNetworks') are supported. If the specified VNet has any associated Network Security Groups (NSG), then a few reserved system ports must be enabled for inbound communication. Enable ports 29876 and 29877, as well as port 22 for Linux and port 3389 for Windows. Also enable outbound connections to Azure Storage on port 443. For more details see: https://docs.microsoft.com/azure/batch/batch-api-basics#virtual-network-vnet-and-firewall-configuration",
           "externalDocs": {
-            "url": "https://azure.microsoft.com/en-us/documentation/articles/role-based-access-built-in-roles/#classic-virtual-machine-contributor",
+            "url": "https://azure.microsoft.com/documentation/articles/role-based-access-built-in-roles/#classic-virtual-machine-contributor",
             "description": "Setting up RBAC for Azure Batch VNETs"
           }
         },
@@ -14297,13 +14514,11 @@
         },
         "endpointConfiguration": {
           "$ref": "#/definitions/PoolEndpointConfiguration",
-          "title": "The configuration for endpoints on Compute Nodes in the Batch Pool.",
-          "description": "Pool endpoint configuration is only supported on Pools with the virtualMachineConfiguration property."
+          "title": "The configuration for endpoints on Compute Nodes in the Batch Pool."
         },
         "publicIPAddressConfiguration": {
           "$ref": "#/definitions/PublicIPAddressConfiguration",
-          "title": "The Public IPAddress configuration for Compute Nodes in the Batch Pool.",
-          "description": "Public IP configuration property is only supported on Pools with the virtualMachineConfiguration property."
+          "title": "The Public IPAddress configuration for Compute Nodes in the Batch Pool."
         },
         "enableAcceleratedNetworking": {
           "type": "boolean",
@@ -14441,15 +14656,10 @@
           "title": "The size of virtual machines in the Pool. All virtual machines in a Pool are the same size.",
           "description": "For information about available sizes of virtual machines in Pools, see Choose a VM size for Compute Nodes in an Azure Batch Pool (https://docs.microsoft.com/azure/batch/batch-pool-vm-sizes)."
         },
-        "cloudServiceConfiguration": {
-          "$ref": "#/definitions/CloudServiceConfiguration",
-          "title": "The cloud service configuration for the Pool.",
-          "description": "This property and virtualMachineConfiguration are mutually exclusive and one of the properties must be specified. This property cannot be specified if the Batch Account was created with its poolAllocationMode property set to 'UserSubscription'."
-        },
         "virtualMachineConfiguration": {
           "$ref": "#/definitions/VirtualMachineConfiguration",
           "title": "The virtual machine configuration for the Pool.",
-          "description": "This property and cloudServiceConfiguration are mutually exclusive and one of the properties must be specified."
+          "description": "This property must be specified."
         },
         "resizeTimeout": {
           "type": "string",
@@ -14535,14 +14745,6 @@
           },
           "title": "The list of Packages to be installed on each Compute Node in the Pool.",
           "description": "Changes to Package references affect all new Nodes joining the Pool, but do not affect Compute Nodes that are already in the Pool until they are rebooted or reimaged. There is a maximum of 10 Package references on any given Pool."
-        },
-        "applicationLicenses": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "The list of application licenses the Batch service will make available on each Compute Node in the Pool.",
-          "description": "The list of application licenses must be a subset of available Batch service application licenses. If a license is requested which is not supported, Pool creation will fail."
         },
         "taskSlotsPerNode": {
           "type": "integer",
@@ -14630,17 +14832,12 @@
         "vmSize": {
           "type": "string",
           "title": "The size of virtual machines in the Pool. All virtual machines in a Pool are the same size.",
-          "description": "For information about available sizes of virtual machines for Cloud Services Pools (pools created with cloudServiceConfiguration), see Sizes for Cloud Services (https://azure.microsoft.com/documentation/articles/cloud-services-sizes-specs/). Batch supports all Cloud Services VM sizes except ExtraSmall, A1V2 and A2V2. For information about available VM sizes for Pools using Images from the Virtual Machines Marketplace (pools created with virtualMachineConfiguration) see Sizes for Virtual Machines (Linux) (https://azure.microsoft.com/documentation/articles/virtual-machines-linux-sizes/) or Sizes for Virtual Machines (Windows) (https://azure.microsoft.com/documentation/articles/virtual-machines-windows-sizes/). Batch supports all Azure VM sizes except STANDARD_A0 and those with premium storage (STANDARD_GS, STANDARD_DS, and STANDARD_DSV2 series)."
-        },
-        "cloudServiceConfiguration": {
-          "$ref": "#/definitions/CloudServiceConfiguration",
-          "title": "The cloud service configuration for the Pool.",
-          "description": "This property and virtualMachineConfiguration are mutually exclusive and one of the properties must be specified. This property cannot be specified if the Batch Account was created with its poolAllocationMode property set to 'UserSubscription'."
+          "description": "For information about available VM sizes, see Sizes for Virtual Machines (Linux) (https://azure.microsoft.com/documentation/articles/virtual-machines-linux-sizes/) or Sizes for Virtual Machines (Windows) (https://azure.microsoft.com/documentation/articles/virtual-machines-windows-sizes/). Batch supports all Azure VM sizes except STANDARD_A0 and those with premium storage (STANDARD_GS, STANDARD_DS, and STANDARD_DSV2 series)."
         },
         "virtualMachineConfiguration": {
           "$ref": "#/definitions/VirtualMachineConfiguration",
           "title": "The virtual machine configuration for the Pool.",
-          "description": "This property and cloudServiceConfiguration are mutually exclusive and one of the properties must be specified."
+          "description": "This property must be specified."
         },
         "resizeTimeout": {
           "type": "string",
@@ -14705,14 +14902,6 @@
           },
           "title": "The list of Packages to be installed on each Compute Node in the Pool.",
           "description": "When creating a pool, the package's application ID must be fully qualified (/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Batch/batchAccounts/{accountName}/applications/{applicationName}). Changes to Package references affect all new Nodes joining the Pool, but do not affect Compute Nodes that are already in the Pool until they are rebooted or reimaged. There is a maximum of 10 Package references on any given Pool."
-        },
-        "applicationLicenses": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "title": "The list of application licenses the Batch service will make available on each Compute Node in the Pool.",
-          "description": "The list of application licenses must be a subset of available Batch service application licenses. If a license is requested which is not supported, Pool creation will fail."
         },
         "taskSlotsPerNode": {
           "type": "integer",
@@ -15144,7 +15333,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the Task.",
-          "description": "For multi-instance Tasks, the command line is executed as the primary Task, after the primary Task and all subtasks have finished executing the coordination command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables)."
+          "description": "For multi-instance Tasks, the command line is executed as the primary Task, after the primary Task and all subtasks have finished executing the coordination command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/azure/batch/batch-compute-node-environment-variables)."
         },
         "containerSettings": {
           "$ref": "#/definitions/TaskContainerSettings",
@@ -15247,7 +15436,7 @@
         "commandLine": {
           "type": "string",
           "title": "The command line of the Task.",
-          "description": "For multi-instance Tasks, the command line is executed as the primary Task, after the primary Task and all subtasks have finished executing the coordination command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/en-us/azure/batch/batch-compute-node-environment-variables)."
+          "description": "For multi-instance Tasks, the command line is executed as the primary Task, after the primary Task and all subtasks have finished executing the coordination command line. The command line does not run under a shell, and therefore cannot take advantage of shell features such as environment variable expansion. If you want to take advantage of such features, you should invoke the shell in the command line, for example using \"cmd /c MyCommand\" in Windows or \"/bin/sh -c MyCommand\" in Linux. If the command line refers to file paths, it should use a relative path (relative to the Task working directory), or use the Batch provided environment variable (https://docs.microsoft.com/azure/batch/batch-compute-node-environment-variables)."
         },
         "containerSettings": {
           "$ref": "#/definitions/TaskContainerSettings",
@@ -15683,7 +15872,9 @@
             "leavingpool",
             "offline",
             "preempted",
-            "upgradingos"
+            "upgradingos",
+            "deallocated",
+            "deallocating"
           ],
           "x-ms-enum": {
             "name": "ComputeNodeState",
@@ -15748,6 +15939,14 @@
                 "value": "upgradingos",
                 "description": "The Compute Node is undergoing an OS upgrade operation.",
                 "name": "upgradingOS"
+              },
+              {
+                "value": "deallocated",
+                "description": "The Compute Node is deallocated."
+              },
+              {
+                "value": "deallocating",
+                "description": "The Compute Node is deallocating."
               }
             ]
           }
@@ -16101,7 +16300,7 @@
         "password": {
           "type": "string",
           "title": "The password of the Account.",
-          "description": "The password is required for Windows Compute Nodes (those created with 'cloudServiceConfiguration', or created with 'virtualMachineConfiguration' using a Windows Image reference). For Linux Compute Nodes, the password can optionally be specified along with the sshPublicKey property."
+          "description": "The password is required for Windows Compute Nodes. For Linux Compute Nodes, the password can optionally be specified along with the sshPublicKey property."
         },
         "sshPublicKey": {
           "type": "string",
@@ -16266,6 +16465,10 @@
           "title": "The Pool on which the Batch service runs the Job's Tasks.",
           "description": "You may change the Pool for a Job only when the Job is disabled. The Patch Job call will fail if you include the poolInfo element and the Job is not disabled. If you specify an autoPoolSpecification in the poolInfo, only the keepAlive property of the autoPoolSpecification can be updated, and then only if the autoPoolSpecification has a poolLifetimeOption of Job (other job properties can be updated as normal). If omitted, the Job continues to run on its current Pool."
         },
+        "networkConfiguration": {
+          "$ref": "#/definitions/JobNetworkConfiguration",
+          "title": "The network configuration for the Job."
+        },
         "metadata": {
           "type": "array",
           "items": {
@@ -16333,7 +16536,7 @@
         "autoScaleFormula": {
           "type": "string",
           "title": "The formula for the desired number of Compute Nodes in the Pool.",
-          "description": "The formula is checked for validity before it is applied to the Pool. If the formula is not valid, the Batch service rejects the request with detailed error information. For more information about specifying this formula, see Automatically scale Compute Nodes in an Azure Batch Pool (https://azure.microsoft.com/en-us/documentation/articles/batch-automatic-scaling)."
+          "description": "The formula is checked for validity before it is applied to the Pool. If the formula is not valid, the Batch service rejects the request with detailed error information. For more information about specifying this formula, see Automatically scale Compute Nodes in an Azure Batch Pool (https://azure.microsoft.com/documentation/articles/batch-automatic-scaling)."
         },
         "autoScaleEvaluationInterval": {
           "type": "string",
@@ -16350,7 +16553,7 @@
         "autoScaleFormula": {
           "type": "string",
           "title": "The formula for the desired number of Compute Nodes in the Pool.",
-          "description": "The formula is validated and its results calculated, but it is not applied to the Pool. To apply the formula to the Pool, 'Enable automatic scaling on a Pool'. For more information about specifying this formula, see Automatically scale Compute Nodes in an Azure Batch Pool (https://azure.microsoft.com/en-us/documentation/articles/batch-automatic-scaling)."
+          "description": "The formula is validated and its results calculated, but it is not applied to the Pool. To apply the formula to the Pool, 'Enable automatic scaling on a Pool'. For more information about specifying this formula, see Automatically scale Compute Nodes in an Azure Batch Pool (https://azure.microsoft.com/documentation/articles/batch-automatic-scaling)."
         }
       },
       "required": [
@@ -16466,6 +16669,71 @@
           "title": "The desired node communication mode for the pool.",
           "description": "If this element is present, it replaces the existing targetNodeCommunicationMode configured on the Pool. If omitted, any existing metadata is left unchanged.",
           "$ref": "#/definitions/NodeCommunicationMode"
+        },
+        "displayName": {
+          "type": "string",
+          "title": "The display name for the Pool.",
+          "description": "The display name need not be unique and can contain any Unicode characters up to a maximum length of 1024.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "vmSize": {
+          "type": "string",
+          "title": "The size of virtual machines in the Pool. All VMs in a Pool are the same size.",
+          "description": "For information about available sizes of virtual machines in Pools, see Choose a VM size for Compute Nodes in an Azure Batch Pool (https://docs.microsoft.com/azure/batch/batch-pool-vm-sizes).<br /><br />This field can be updated only when the pool is empty."
+        },
+        "taskSlotsPerNode": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of task slots that can be used to run concurrent tasks on a single compute node in the pool.",
+          "description": "The default value is 1. The maximum value is the smaller of 4 times the number of cores of the vmSize of the pool or 256.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "taskSchedulingPolicy": {
+          "$ref": "#/definitions/TaskSchedulingPolicy",
+          "title": "How Tasks are distributed across Compute Nodes in a Pool.",
+          "description": "If not specified, the default is spread.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "enableInterNodeCommunication": {
+          "type": "boolean",
+          "title": "Whether the Pool permits direct communication between Compute Nodes.",
+          "description": "Enabling inter-node communication limits the maximum size of the Pool due to deployment restrictions on the Compute Nodes of the Pool. This may result in the Pool not reaching its desired size. The default value is false.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "virtualMachineConfiguration": {
+          "$ref": "#/definitions/VirtualMachineConfiguration",
+          "title": "The virtual machine configuration for the Pool.",
+          "description": "This property must be specified.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "networkConfiguration": {
+          "$ref": "#/definitions/NetworkConfiguration",
+          "title": "The network configuration for the Pool.",
+          "description": "This field can be updated only when the pool is empty."
+        },
+        "userAccounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/UserAccount"
+          },
+          "title": "The list of user Accounts to be created on each Compute Node in the Pool.",
+          "description": "This field can be updated only when the pool is empty."
+        },
+        "mountConfiguration": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/MountConfiguration"
+          },
+          "title": "Mount storage using specified file system for the entire lifetime of the pool.",
+          "description": "Mount the storage using Azure fileshare, NFS, CIFS or Blobfuse based file system.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "upgradePolicy": {
+          "$ref": "#/definitions/UpgradePolicy",
+          "title": "The upgrade policy for the Pool.",
+          "description": "Describes an upgrade policy - automatic, manual, or rolling.<br /><br />This field can be updated only when the pool is empty."
+        },
+        "resourceTags": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "The user-specified tags associated with the pool.",
+          "description": "The user-defined tags to be associated with the Azure Batch Pool. When specified, these tags are propagated to the backing Azure resources associated with the pool. This property can only be specified when the Batch account was created with the poolAllocationMode property set to 'UserSubscription'.<br /><br />This field can be updated only when the pool is empty."
         }
       },
       "title": "The set of changes to be made to a Pool."
@@ -16487,7 +16755,7 @@
         "password": {
           "type": "string",
           "title": "The password of the Account.",
-          "description": "The password is required for Windows Compute Nodes (those created with 'cloudServiceConfiguration', or created with 'virtualMachineConfiguration' using a Windows Image reference). For Linux Compute Nodes, the password can optionally be specified along with the sshPublicKey property. If omitted, any existing password is removed."
+          "description": "The password is required for Windows Compute Nodes. For Linux Compute Nodes, the password can optionally be specified along with the sshPublicKey property. If omitted, any existing password is removed."
         },
         "expiryTime": {
           "type": "string",
@@ -16620,6 +16888,47 @@
       },
       "title": "Options for disabling scheduling on a Compute Node."
     },
+    "NodeDeallocateParameter": {
+      "type": "object",
+      "properties": {
+        "nodeDeallocateOption": {
+          "type": "string",
+          "title": "When to deallocate the Compute Node and what to do with currently running Tasks.",
+          "description": "The default value is requeue.",
+          "enum": [
+            "requeue",
+            "terminate",
+            "taskcompletion",
+            "retaineddata"
+          ],
+          "x-ms-enum": {
+            "name": "ComputeNodeDeallocateOption",
+            "modelAsString": false,
+            "values": [
+              {
+                "value": "requeue",
+                "description": "Terminate running Task processes and requeue the Tasks. The Tasks will run again when a Compute Node is available. Deallocate the Compute Node as soon as Tasks have been terminated."
+              },
+              {
+                "value": "terminate",
+                "description": "Terminate running Tasks. The Tasks will be completed with failureInfo indicating that they were terminated, and will not run again. Deallocate the Compute Node as soon as Tasks have been terminated."
+              },
+              {
+                "value": "taskcompletion",
+                "description": "Allow currently running Tasks to complete. Schedule no new Tasks while waiting. Deallocate the Compute Node when all Tasks have completed.",
+                "name": "taskCompletion"
+              },
+              {
+                "value": "retaineddata",
+                "description": "Allow currently running Tasks to complete, then wait for all Task data retention periods to expire. Schedule no new Tasks while waiting. Deallocate the Compute Node when all Task retention periods have expired.",
+                "name": "retainedData"
+              }
+            ]
+          }
+        }
+      },
+      "title": "Options for deallocating a Compute Node."
+    },
     "NodeRemoveParameter": {
       "type": "object",
       "properties": {
@@ -16708,7 +17017,7 @@
             "$ref": "#/definitions/HttpHeader"
           },
           "title": "A list of name-value pairs for headers to be used in uploading output files",
-          "description": "These headers will be specified when uploading files to Azure Storage. Official document on allowed headers when uploading blobs: https://docs.microsoft.com/en-us/rest/api/storageservices/put-blob#request-headers-all-blob-types"
+          "description": "These headers will be specified when uploading files to Azure Storage. Official document on allowed headers when uploading blobs: https://docs.microsoft.com/rest/api/storageservices/put-blob#request-headers-all-blob-types"
         }
       },
       "required": [
@@ -17322,6 +17631,16 @@
           "format": "int32",
           "title": "The number of Compute Nodes in the upgradingOS state."
         },
+        "deallocated": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of Compute Nodes in the deallocated state."
+        },
+        "deallocating": {
+          "type": "integer",
+          "format": "int32",
+          "title": "The number of Compute Nodes in the deallocating state."
+        },
         "total": {
           "type": "integer",
           "format": "int32",
@@ -17343,6 +17662,8 @@
         "unusable",
         "waitingForStartTask",
         "upgradingOS",
+        "deallocated",
+        "deallocating",
         "total"
       ],
       "title": "The number of Compute Nodes in each Compute Node state."
@@ -17589,6 +17910,10 @@
         "storageAccountType": {
           "$ref": "#/definitions/StorageAccountType",
           "title": "The storage account type for managed disk."
+        },
+        "securityProfile": {
+          "$ref": "#/definitions/VMDiskSecurityProfile",
+          "title": "Specifies the security profile settings for the managed disk."
         }
       }
     },
@@ -17599,7 +17924,8 @@
           "type": "string",
           "title": "Specifies the SecurityType of the virtual machine. It has to be set to any specified value to enable UefiSettings.",
           "enum": [
-            "trustedLaunch"
+            "trustedLaunch",
+            "confidentialVM"
           ],
           "x-ms-enum": {
             "name": "SecurityTypes",
@@ -17608,13 +17934,17 @@
               {
                 "value": "trustedLaunch",
                 "description": "Trusted launch protects against advanced and persistent attack techniques."
+              },
+              {
+                "value": "confidentialVM",
+                "description": "Azure confidential computing offers confidential VMs are for tenants with high security and confidentiality requirements. These VMs provide a strong, hardware-enforced boundary to help meet your security needs. You can use confidential VMs for migrations without making changes to your code, with the platform protecting your VM's state from being read or modified."
               }
             ]
           }
         },
         "encryptionAtHost": {
           "type": "boolean",
-          "description": "This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine or virtual machine scale set. This will enable the encryption for all the disks including Resource/Temp disk at host itself."
+          "description": "This property can be used by user in the request to enable or disable the Host Encryption for the virtual machine or virtual machine scale set. This will enable the encryption for all the disks including Resource/Temp disk at host itself. For more information on encryption at host requirements, please refer to https://learn.microsoft.com/azure/virtual-machines/disk-encryption#supported-vm-sizes."
         },
         "uefiSettings": {
           "$ref": "#/definitions/UefiSettings",
@@ -17675,8 +18005,7 @@
         },
         "rollingUpgradePolicy": {
           "$ref": "#/definitions/RollingUpgradePolicy",
-          "title": "The configuration parameters used while performing a rolling upgrade.",
-          "description": "This property is only supported on Pools with the virtualMachineConfiguration property."
+          "title": "The configuration parameters used while performing a rolling upgrade."
         }
       },
       "required": [
@@ -17693,7 +18022,7 @@
         },
         "enableAutomaticOSUpgrade": {
           "type": "boolean",
-          "description": "Indicates whether OS upgrades should automatically be applied to scale set instances in a rolling fashion when a newer version of the OS image becomes available. <br /><br /> If this is set to true for Windows based pools, [WindowsConfiguration.enableAutomaticUpdates](https://learn.microsoft.com/en-us/rest/api/batchservice/pool/add?tabs=HTTP#windowsconfiguration) cannot be set to true."
+          "description": "Indicates whether OS upgrades should automatically be applied to scale set instances in a rolling fashion when a newer version of the OS image becomes available. <br /><br /> If this is set to true for Windows based pools, [WindowsConfiguration.enableAutomaticUpdates](https://learn.microsoft.com/rest/api/batchservice/pool/add?tabs=HTTP#windowsconfiguration) cannot be set to true."
         },
         "useRollingUpgradePolicy": {
           "type": "boolean",
@@ -17749,6 +18078,32 @@
         }
       },
       "description": "The configuration parameters used while performing a rolling upgrade."
+    },
+    "VMDiskSecurityProfile": {
+      "type": "object",
+      "properties": {
+        "securityEncryptionType": {
+          "type": "string",
+          "title": "Specifies the EncryptionType of the managed disk. It is set to VMGuestStateOnly for encryption of just the VMGuestState blob, and NonPersistedTPM for not persisting firmware state in the VMGuestState blob. **Note**: It can be set for only Confidential VMs and is required when using Confidential VMs.",
+          "enum": [
+            "NonPersistedTPM",
+            "VMGuestStateOnly"
+          ],
+          "x-ms-enum": {
+            "name": "SecurityEncryptionTypes",
+            "modelAsString": true,
+            "values": [
+              {
+                "value": "NonPersistedTPM"
+              },
+              {
+                "value": "VMGuestStateOnly"
+              }
+            ]
+          }
+        }
+      },
+      "description": "Specifies the security profile settings for the managed disk. **Note**: It can only be set for Confidential VMs and required when using Confidential VMs."
     }
   },
   "parameters": {
