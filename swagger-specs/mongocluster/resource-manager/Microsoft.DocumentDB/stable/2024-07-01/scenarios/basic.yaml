@@ -38,7 +38,7 @@ scenarios:
             value: $(primaryClusterName)
           - replace: /resource/location
             value: $(primaryRegion)
-          - replace: /resource/properties/administratorLoginPassword
+          - replace: /resource/properties/administrator/password
             value: $(administratorLoginPassword)
           - add: /resource/properties/previewFeatures
             value:
@@ -89,7 +89,7 @@ scenarios:
         requestUpdate:
           - replace: /mongoClusterName
             value: $(primaryClusterName)
-          - replace: /properties/properties/administratorLoginPassword
+          - replace: /properties/properties/administrator/password
             value: $(administratorLoginPassword2)
       - step: Check_Replica_NameAvailability
         exampleFile: ../examples/MongoClusters_NameAvailability.json
@@ -109,6 +109,13 @@ scenarios:
             value: $(sourceResourceId)
           - replace: /resource/properties/replicaParameters/sourceLocation
             value: $(primaryRegion)
+      - step: MongoClusters_ListByResourceGroup_WithReplicas
+        exampleFile: ../examples/MongoClusters_ListByResourceGroup.json
+      - step: MongoClusters_Get_Replica
+        exampleFile: ../examples/MongoClusters_Get.json
+        requestUpdate:
+          - replace: /mongoClusterName
+            value: $(replicaClusterName)
       - step: MongoClusters_ReplicaList
         exampleFile: ../examples/MongoClusters_ReplicaList.json
         requestUpdate:
