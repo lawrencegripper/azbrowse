@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.ServiceFabric/stable/2024-04-01/managedapplication.json", "Microsoft.ServiceFabric/stable/2024-04-01/managedcluster.json", "Microsoft.ServiceFabric/stable/2024-04-01/nodetype.json"], "name": "package-2024-04"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.ServiceFabric/preview/2024-06-01-preview/managedapplication.json", "Microsoft.ServiceFabric/preview/2024-06-01-preview/managedcluster.json", "Microsoft.ServiceFabric/preview/2024-06-01-preview/nodetype.json"], "name": "package-2024-06-preview"}
