@@ -1,6 +1,6 @@
 # github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3
 ## explicit
-# github.com/Azure/azure-sdk-for-go/sdk/azcore v1.15.0
+# github.com/Azure/azure-sdk-for-go/sdk/azcore v1.16.0
 ## explicit; go 1.18
 github.com/Azure/azure-sdk-for-go/sdk/azcore
 github.com/Azure/azure-sdk-for-go/sdk/azcore/arm
