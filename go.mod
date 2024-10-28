@@ -10,7 +10,7 @@ require (
 	github.com/awesome-gocui/gocui v1.1.0
 	github.com/blang/semver v3.5.1+incompatible
 	github.com/cskr/pubsub v1.0.2
-	github.com/fatih/color v1.17.0
+	github.com/fatih/color v1.18.0
 	github.com/go-openapi/loads v0.22.0
 	github.com/go-openapi/spec v0.21.0
 	github.com/go-xmlfmt/xmlfmt v1.1.2
