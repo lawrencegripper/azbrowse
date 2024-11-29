@@ -341,9 +341,10 @@ github.com/spf13/pflag
 # github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 ## explicit
 github.com/stephanos/clock
-# github.com/stretchr/testify v1.9.0
+# github.com/stretchr/testify v1.10.0
 ## explicit; go 1.17
 github.com/stretchr/testify/assert
+github.com/stretchr/testify/assert/yaml
 # github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 ## explicit
 github.com/stuartleeks/colorjson
