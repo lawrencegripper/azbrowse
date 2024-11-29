@@ -25,7 +25,9 @@ if __name__ == "__main__":
         "databricks": "package-2021-04-01-preview",
         "billing":"",
         # ai/dataplane readme references package-2023-11-06-beta but the files do not exist
-        "ai": "package-2024-05-01-preview"
+        "ai": "package-2024-05-01-preview",
+        # 2024/11/25 17:05:43 Error expanding Swagger: open /workspaces/azbrowse/swagger-specs/policyinsights/resource-manager/Microsoft.PolicyInsights/stable/2019-10-01/operations.json: no such file or directory
+        "policyinsights": ""
     }
 
     # This allows you to augment the included files for each README.MD for a specific tag
