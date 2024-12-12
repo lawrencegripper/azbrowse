@@ -13,7 +13,7 @@ require (
 	github.com/fatih/color v1.18.0
 	github.com/go-openapi/loads v0.22.0
 	github.com/go-openapi/spec v0.21.0
-	github.com/go-xmlfmt/xmlfmt v1.1.2
+	github.com/go-xmlfmt/xmlfmt v1.1.3
 	github.com/guptarohit/asciigraph v0.7.3
 	github.com/nbio/st v0.0.0-20140626010706-e9e8d9816f32
 	github.com/opentracing/opentracing-go v1.2.0
