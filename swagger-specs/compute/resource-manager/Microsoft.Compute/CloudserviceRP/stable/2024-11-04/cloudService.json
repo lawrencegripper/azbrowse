@@ -3,7 +3,7 @@
   "info": {
     "title": "CloudServiceManagementClient",
     "description": "The Cloud Service Management Client.",
-    "version": "2022-09-04"
+    "version": "2024-11-04"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -2014,6 +2014,10 @@
         "certificateUrl": {
           "description": "This is the URL of a certificate that has been uploaded to Key Vault as a secret.",
           "type": "string"
+        },
+        "isBootstrapCertificate": {
+          "description": "Flag indicating if the certificate provided is a bootstrap certificate to be used by the Key Vault Extension to fetch the remaining certificates. ",
+          "type": "boolean"
         }
       }
     },
