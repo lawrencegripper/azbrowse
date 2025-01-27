@@ -2,8 +2,8 @@
   "swagger": "2.0",
   "info": {
     "title": "EventHubManagementClient",
-    "description": "Azure Event Hubs client for managing Event Hubs Cluster, IPFilter Rules and VirtualNetworkRules resources.",
-    "version": "2024-01-01"
+    "description": "Azure Event Hubs client",
+    "version": "2017-04-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -77,9 +77,9 @@
             }
           },
           "default": {
-            "description": "ServiceBus error response describing why the operation failed.",
+            "description": "EventHub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -117,9 +117,9 @@
             }
           },
           "default": {
-            "description": "ServiceBus error response describing why the operation failed.",
+            "description": "EventHub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -128,15 +128,15 @@
     "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/networkRuleSets": {
       "get": {
         "tags": [
-          "NetworkRuleSets"
+          "NetWorkRuleSets"
         ],
         "x-ms-examples": {
           "NameSpaceNetworkRuleSetList": {
             "$ref": "./examples/NameSpaces/VirtualNetworkRule/EHNetworkRuleSetList.json"
           }
         },
-        "operationId": "Namespaces_ListNetworkRuleSet",
-        "description": "Gets NetworkRuleSet for a Namespace.",
+        "operationId": "Namespaces_ListNetworkRuleSets",
+        "description": "Gets list of NetworkRuleSet for a Namespace.",
         "parameters": [
           {
             "$ref": "../../../common/v1/definitions.json#/parameters/ResourceGroupNameParameter"
@@ -153,17 +153,20 @@
         ],
         "responses": {
           "200": {
-            "description": "Namespace NetworkRuleSet successfully returned.",
+            "description": "List of NetworkRuleSets for Namespace successfully returned.",
             "schema": {
               "$ref": "#/definitions/NetworkRuleSetListResult"
             }
           },
           "default": {
-            "description": "ServiceBus error response describing why the operation failed.",
+            "description": "EventHub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
+        },
+        "x-ms-pageable": {
+          "nextLinkName": "nextLink"
         }
       }
     }
@@ -176,6 +179,9 @@
           "description": "Resource ID of Virtual Network Subnet"
         }
       },
+      "required": [
+        "id"
+      ],
       "description": "Properties supplied for Subnet"
     },
     "NWRuleSetIpRules": {
@@ -194,10 +200,11 @@
           "x-ms-enum": {
             "name": "NetworkRuleIPAction",
             "modelAsString": true
-          }
+          },
+          "default": "Allow"
         }
       },
-      "description": "The response from the List namespace operation."
+      "description": "Description of NetWorkRuleSet - IpRules resource."
     },
     "NWRuleSetVirtualNetworkRules": {
       "x-ms-client-flatten": true,
@@ -208,10 +215,10 @@
         },
         "ignoreMissingVnetServiceEndpoint": {
           "type": "boolean",
-          "description": "Value that indicates whether to ignore missing Vnet Service Endpoint"
+          "description": "Value that indicates whether to ignore missing VNet Service Endpoint"
         }
       },
-      "description": "The response from the List namespace operation."
+      "description": "Description of VirtualNetworkRules - NetworkRules resource."
     },
     "NetworkRuleSet": {
       "properties": {
@@ -219,10 +226,6 @@
           "description": "NetworkRuleSet properties",
           "x-ms-client-flatten": true,
           "properties": {
-            "trustedServiceAccessEnabled": {
-              "type": "boolean",
-              "description": "Value that indicates whether Trusted Service Access is Enabled or not."
-            },
             "defaultAction": {
               "type": "string",
               "description": "Default Action for Network Rule Set",
@@ -248,45 +251,25 @@
                 "$ref": "#/definitions/NWRuleSetIpRules"
               },
               "description": "List of IpRules"
-            },
-            "publicNetworkAccess": {
-              "description": "This determines if traffic is allowed over public network. By default it is enabled. If value is SecuredByPerimeter then Inbound and Outbound communication is controlled by the network security perimeter and profile's access rules. ",
-              "enum": [
-                "Enabled",
-                "Disabled",
-                "SecuredByPerimeter"
-              ],
-              "type": "string",
-              "x-ms-enum": {
-                "name": "PublicNetworkAccessFlag",
-                "modelAsString": true
-              },
-              "default": "Enabled"
             }
           }
-        },
-        "systemData": {
-          "readOnly": true,
-          "description": "The system meta data relating to this resource.",
-          "$ref": "../../../common/v1/definitions.json#/definitions/systemData"
         }
       },
       "allOf": [
         {
-          "$ref": "../../../common/v2/definitions.json#/definitions/ProxyResource"
+          "$ref": "../../../common/v1/definitions.json#/definitions/Resource"
         }
       ],
-      "description": "Description of topic resource."
+      "description": "Description of NetworkRuleSet resource."
     },
     "NetworkRuleSetListResult": {
-      "type": "object",
       "properties": {
         "value": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/NetworkRuleSet"
           },
-          "description": "Result of the List NetworkRuleSet operation"
+          "description": "Result of the List NetworkRuleSet operation."
         },
         "nextLink": {
           "type": "string",

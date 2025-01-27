@@ -3,7 +3,7 @@
   "info": {
     "title": "EventHubManagementClient",
     "description": "Azure Event Hubs client",
-    "version": "2024-01-01"
+    "version": "2017-04-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -76,7 +76,7 @@
           "default": {
             "description": "Eventhub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         },
@@ -133,7 +133,7 @@
           "default": {
             "description": "Eventhub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -176,7 +176,7 @@
           "default": {
             "description": "Eventhub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -219,7 +219,7 @@
           "default": {
             "description": "Eventhub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         }
@@ -248,11 +248,15 @@
         "intervalInSeconds": {
           "format": "int32",
           "type": "integer",
+          "maximum": 900,
+          "minimum": 60,
           "description": "The time window allows you to set the frequency with which the capture to Azure Blobs will happen, value should between 60 to 900 seconds"
         },
         "sizeLimitInBytes": {
           "format": "int32",
           "type": "integer",
+          "maximum": 524288000,
+          "minimum": 10485760,
           "description": "The size window defines the amount of data built up in your Event Hub before an capture operation, value should be between 10485760 to 524288000 bytes"
         },
         "destination": {
@@ -265,34 +269,6 @@
         }
       },
       "description": "Properties to configure capture description for eventhub"
-    },
-    "RetentionDescription": {
-      "type": "object",
-      "properties": {
-        "cleanupPolicy": {
-          "type": "string",
-          "description": "Enumerates the possible values for cleanup policy",
-          "enum": [
-            "Delete",
-            "Compact"
-          ],
-          "x-ms-enum": {
-            "name": "CleanupPolicyRetentionDescription",
-            "modelAsString": true
-          }
-        },
-        "retentionTimeInHours": {
-          "format": "int64",
-          "type": "integer",
-          "description": "Number of hours to retain the events for this Event Hub. This value is only used when cleanupPolicy is Delete. If cleanupPolicy is Compact the returned value of this property is Long.MaxValue "
-        },
-        "tombstoneRetentionTimeInHours": {
-          "format": "int32",
-          "type": "integer",
-          "description": "Number of hours to retain the tombstone markers of a compacted Event Hub. This value is only used when cleanupPolicy is Compact. Consumer must complete reading the tombstone marker within this specified amount of time if consumer begins from starting offset to ensure they get a valid snapshot for the specific key described by the tombstone marker within the compacted Event Hub"
-        }
-      },
-      "description": "Properties to configure retention settings for the  eventhub"
     },
     "Eventhub": {
       "properties": {
@@ -350,30 +326,17 @@
                 "modelAsString": false
               }
             },
-            "userMetadata": {
-              "type": "string",
-              "description": "Gets and Sets Metadata of User."
-            },
             "captureDescription": {
               "$ref": "#/definitions/CaptureDescription",
               "description": "Properties of capture description"
-            },
-            "retentionDescription": {
-              "$ref": "#/definitions/RetentionDescription",
-              "description": "Event Hub retention settings"
             }
           },
           "description": "Properties supplied to the Create Or Update Event Hub operation."
-        },
-        "systemData": {
-          "readOnly": true,
-          "description": "The system meta data relating to this resource.",
-          "$ref": "../../../common/v1/definitions.json#/definitions/systemData"
         }
       },
       "allOf": [
         {
-          "$ref": "../../../common/v2/definitions.json#/definitions/ProxyResource"
+          "$ref": "../../../common/v1/definitions.json#/definitions/Resource"
         }
       ],
       "description": "Single item in List or Get Event Hub operation"
@@ -394,36 +357,11 @@
       },
       "description": "The result of the List EventHubs operation."
     },
-    "CaptureIdentity": {
-      "type": "object",
-      "description": "A value that indicates whether capture description is enabled.",
-      "properties": {
-        "type": {
-          "type": "string",
-          "description": "Type of Azure Active Directory Managed Identity.",
-          "enum": [
-            "SystemAssigned",
-            "UserAssigned"
-          ],
-          "x-ms-enum": {
-            "name": "CaptureIdentityType",
-            "modelAsString": false
-          }
-        },
-        "userAssignedIdentity": {
-          "type": "string",
-          "description": "ARM ID of Managed User Identity. This property is required is the type is UserAssignedIdentity. If type is SystemAssigned, then the System Assigned Identity Associated with the namespace will be used."
-        }
-      }
-    },
     "Destination": {
       "properties": {
         "name": {
           "type": "string",
           "description": "Name for capture destination"
-        },
-        "identity": {
-          "$ref": "#/definitions/CaptureIdentity"
         },
         "properties": {
           "x-ms-client-flatten": true,
@@ -439,19 +377,6 @@
             "archiveNameFormat": {
               "type": "string",
               "description": "Blob naming convention for archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}. Here all the parameters (Namespace,EventHub .. etc) are mandatory irrespective of order"
-            },
-            "dataLakeSubscriptionId": {
-              "type": "string",
-              "format": "uuid",
-              "description": "Subscription Id of Azure Data Lake Store"
-            },
-            "dataLakeAccountName": {
-              "type": "string",
-              "description": "The Azure Data Lake Store name for the captured events"
-            },
-            "dataLakeFolderPath": {
-              "type": "string",
-              "description": "The destination folder path for the captured events"
             }
           },
           "description": "Properties describing the storage account, blob container and archive name format for capture destination"
