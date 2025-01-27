@@ -3,7 +3,7 @@
   "info": {
     "title": "EventHubManagementClient",
     "description": "Azure Event Hubs client",
-    "version": "2024-01-01"
+    "version": "2017-04-01"
   },
   "host": "management.azure.com",
   "schemes": [
@@ -73,7 +73,7 @@
           "default": {
             "description": "Eventhub error response describing why the operation failed.",
             "schema": {
-              "$ref": "../../../common/v2/definitions.json#/definitions/ErrorResponse"
+              "$ref": "../../../common/v1/definitions.json#/definitions/ErrorResponse"
             }
           }
         }
