@@ -3,7 +3,7 @@
   "info": {
     "title": "StorageManagementClient",
     "description": "Storage Resource Provider API Common Types",
-    "version": "2023-05-01"
+    "version": "2024-01-01"
   },
   "paths": {},
   "definitions": {
@@ -124,7 +124,13 @@
         "Premium_LRS",
         "Premium_ZRS",
         "Standard_GZRS",
-        "Standard_RAGZRS"
+        "Standard_RAGZRS",
+        "StandardV2_LRS",
+        "StandardV2_GRS",
+        "StandardV2_ZRS",
+        "StandardV2_GZRS",
+        "PremiumV2_LRS",
+        "PremiumV2_ZRS"
       ],
       "x-ms-enum": {
         "name": "SkuName",
