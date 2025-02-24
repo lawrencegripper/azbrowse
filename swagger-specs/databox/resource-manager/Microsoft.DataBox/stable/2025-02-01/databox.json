@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "2024-03-01-preview",
+    "version": "2025-02-01",
     "title": "DataBoxManagementClient"
   },
   "host": "management.azure.com",
@@ -2181,9 +2181,7 @@
           }
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "Error, if any, in the stage",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       },
       "x-ms-discriminator-value": "ValidateCreateOrderLimit"
@@ -2496,9 +2494,7 @@
           }
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       }
     },
@@ -3454,9 +3450,7 @@
           }
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       },
       "x-ms-discriminator-value": "ValidateDataTransferDetails"
@@ -3599,9 +3593,7 @@
           }
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       }
     },
@@ -3909,11 +3901,11 @@
                 "description": "Active Order limit breached."
               },
               {
-                "value": "ActiveOrderLimitBreachedDelay",
+                "value": "HighDemandDelay",
                 "description": "High demand"
               },
               {
-                "value": "ActiveOrderLimitBreachedDelay",
+                "value": "LargeNumberOfFilesDelay",
                 "description": "Slow copy due to large number of files"
               }
             ]
@@ -5667,9 +5659,7 @@
           }
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       },
       "x-ms-discriminator-value": "ValidatePreferences"
@@ -5893,9 +5883,7 @@
           "type": "string"
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       },
       "discriminator": "skuName"
@@ -6177,9 +6165,7 @@
           "type": "string"
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       }
     },
@@ -6262,9 +6248,7 @@
           "type": "string"
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       },
       "x-ms-discriminator-value": "ValidateSkuAvailability"
@@ -6792,9 +6776,7 @@
           }
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       }
     },
@@ -7000,9 +6982,7 @@
           "description": "Preferences related to the shipment logistics of the sku."
         },
         "model": {
-          "$ref": "#/definitions/modelName",
-          "description": "The model name.",
-          "readOnly": true
+          "$ref": "#/definitions/ModelName"
         }
       },
       "x-ms-discriminator-value": "ValidateAddress"
@@ -7205,18 +7185,19 @@
         }
       }
     },
-    "modelName": {
+    "ModelName": {
       "enum": [
         "DataBox",
         "DataBoxDisk",
         "DataBoxHeavy",
         "DataBoxCustomerDisk",
-        "DataBoxV2x100",
-        "DataBoxV2x500"
+        "AzureDataBox120",
+        "AzureDataBox525"
       ],
       "type": "string",
-      "description": "The customer friendly name of the combination of version and capacity of the device. This field is necessary only at the time of ordering the newer generation device i.e. DataBoxV2x100 and DataBoxV2x500 as of May/2024",
+      "description": "The customer friendly name of the combination of version and capacity of the device. This field is necessary only at the time of ordering the newer generation device i.e. AzureDataBox120 and AzureDataBox525 as of Feb/2025",
       "x-ms-enum": {
+        "name": "ModelName",
         "modelAsExtensible": true,
         "values": [
           {
@@ -7236,12 +7217,12 @@
             "description": "Data Box Customer Disk"
           },
           {
-            "value": "DataBoxV2x100",
-            "description": "Data Box V2 100TB."
+            "value": "AzureDataBox120",
+            "description": "Data Box V2 with 125TB usable capacity."
           },
           {
-            "value": "DataBoxV2x500",
-            "description": "Data Box V2 500TB."
+            "value": "AzureDataBox525",
+            "description": "Data Box V2 with 500TB usable capacity."
           }
         ]
       }
