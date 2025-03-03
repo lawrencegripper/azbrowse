@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Advisor/stable/2023-01-01/advisor.json"], "name": "package-2023-01"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Advisor/preview/2023-09-01-preview/advisor.json", "Microsoft.Advisor/preview/2023-09-01-preview/assessments.json", "Microsoft.Advisor/preview/2023-09-01-preview/resiliencyReviews.json"], "name": "package-2023-09-preview"}
