@@ -1,6 +1,6 @@
 module github.com/lawrencegripper/azbrowse
 
-go 1.20
+go 1.24
 
 require (
 	github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3 // indirect
