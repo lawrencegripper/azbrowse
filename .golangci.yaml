@@ -1,83 +1,74 @@
-run:
-  deadline: 5m
-  skip-files: []
-linters-settings:
-  gosec:
-    excludes:
-      # Error types not being check is covered by other linters
-      - G104
-      - G307
-      # Azb invokes commands / read files on the users behalf. As it runs under the users identity on their machine
-      # I think the impact of passing user input is minimal. See: #351
-      - G304
-      - G204
-  govet:
-    check-shadowing: true
-  gocyclo:
-    min-complexity: 12
-  maligned:
-    suggest-new: true
-  goconst:
-    min-len: 3
-    min-occurrences: 3
-  misspell:
-    locale: US
-    ignore-words:
-      - listend
-      - analyses
+version: "2"
 linters:
   enable:
-    - vet
-    - revive
-    - gofmt
-    - deadcode
-    - varcheck
-    - structcheck
-    - misspell
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
     - gosec
+    - misspell
+    - revive
+  settings:
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    gocyclo:
+      min-complexity: 12
+    gosec:
+      excludes:
+        - G104
+        - G307
+        - G304
+        - G204
+    misspell:
+      locale: US
+      ignore-rules:
+        - listend
+        - analyses
+  exclusions:
+    generated: lax
+    rules:
+      - linters:
+          - revive
+        text: 'package-comments: should have a package comment'
+      - linters:
+          - errcheck
+        text: Error return value of `g.DeleteView` is not checked
+      - linters:
+          - errcheck
+        text: Error return value of `g.SetCurrentView` is not checked
+      - linters:
+          - errcheck
+        text: Error return value of `*.SetCursor` is not checked
+      - linters:
+          - govet
+        text: declaration of "err" shadows declaration at *
+      - linters:
+          - govet
+        text: declaration of "ctx" shadows declaration at *
+      - linters:
+          - revive
+        path: internal/pkg/keybindings/listhandlers.go
+      - linters:
+          - revive
+        path: internal/pkg/keybindings/commandpanelhandlers.go
+      - linters:
+          - revive
+        path: internal/pkg/keybindings/itemhandlers.go
+      - linters:
+          - revive
+        path: internal/pkg/keybindings/globalhandlers.go
+      - linters:
+          - revive
+        path: internal/pkg/*
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
-  exclude-use-default: false
-  max-per-linter: 0
   max-same-issues: 0
-  exclude: []
-  exclude-rules:
-    - text: "package-comments: should have a package comment"
-      linters: 
-        - revive
-      #Ignore gocui funcs
-    - text: Error return value of `g.DeleteView` is not checked
-      linters:
-        - errcheck
-    - text: Error return value of `g.SetCurrentView` is not checked
-      linters:
-        - errcheck
-    - text: Error return value of `*.SetCursor` is not checked
-      linters:
-        - errcheck
-      #Ignore shadowed err and ctx variables
-    - text: declaration of "err" shadows declaration at *
-      linters:
-        - govet
-    - text: declaration of "ctx" shadows declaration at *
-      linters:
-        - govet
-      #Ignore comments for KeyBinding Handler funcs
-    - path: internal/pkg/keybindings/listhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/keybindings/commandpanelhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/keybindings/itemhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/keybindings/globalhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/*
-      linters:
-        - revive
+formatters:
+  enable:
+    - gofmt
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
