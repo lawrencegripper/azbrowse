@@ -29,12 +29,11 @@ linters-settings:
       - analyses
 linters:
   enable:
-    - vet
     - revive
     - unused
     - misspell
     - errcheck
-    - gosimple
+    - staticcheck
     - govet
     - ineffassign
     - gosec
