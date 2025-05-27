@@ -161,9 +161,9 @@ func parseKeyValues(keyOverrideSettings map[string]interface{}) (KeyMap, error) 
 		}
 
 		var values []string
-		switch v.(type) { //nolint: gosimple
+		switch v.(type) {
 		case string:
-			values = []string{v.(string)} //nolint: gosimple
+			values = []string{v.(string)}
 		case []interface{}:
 			values = []string{}
 			for _, item := range v.([]interface{}) {
@@ -238,7 +238,7 @@ func cleanValue(str string) string {
 }
 
 func keyToString(key interface{}) string {
-	switch t := key.(type) { //nolint: gosimple
+	switch t := key.(type) {
 	case []interface{}:
 		keyStrings := []string{}
 		keys := key.([]interface{})

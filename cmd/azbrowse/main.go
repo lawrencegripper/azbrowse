@@ -157,7 +157,7 @@ func configureTracing(settings *config.Settings) (context.Context, opentracing.S
 				debug.PrintStack()
 				fmt.Printf("To see the trace details for the session visit: %s. \n Visit https://github.com/lawrencegripper/azbrowse/issues to raise a bug. \n Press any key to exit when you are done. \n", startTraceDashboardForSpan(span))
 
-				bufio.NewReader(os.Stdin).ReadString('\n') //nolint:golint,errcheck
+				bufio.NewReader(os.Stdin).ReadString('\n') //nolint:errcheck
 			}
 		}()
 	} else {

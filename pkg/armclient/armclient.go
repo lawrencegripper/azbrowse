@@ -197,7 +197,7 @@ func (c *Client) DoRequestWithBody(ctx context.Context, method, path, body strin
 		c.tenantID = cliToken.Tenant
 
 		// Retry the request now we have a valid token
-		response, err = c.client.Do(req.WithContext(ctx)) //nolint:staticcheck
+		response, err = c.client.Do(req.WithContext(ctx))
 	}
 	if err != nil {
 		return "", errors.New("Request failed: " + err.Error())
