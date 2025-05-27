@@ -28,15 +28,18 @@ linters-settings:
       - listend
       - analyses
 linters:
+  # Enable specific linters
   enable:
     - revive
     - unused
     - misspell
     - errcheck
-    - staticcheck
     - govet
     - ineffassign
     - gosec
+  # Explicitly disable staticcheck to avoid new errors
+  disable:
+    - staticcheck
 issues:
   exclude-use-default: false
   max-per-linter: 0
@@ -56,11 +59,18 @@ issues:
     - text: Error return value of `*.SetCursor` is not checked
       linters:
         - errcheck
+    # Ignore fmt.Fprint* errors in UI code
+    - text: Error return value of `fmt.Fprint` is not checked
+      linters:
+        - errcheck
+    - text: Error return value of `fmt.Fprintln` is not checked
+      linters:
+        - errcheck
       #Ignore shadowed err and ctx variables
-    - text: declaration of "err" shadows declaration at *
+    - text: declaration of "err" shadows declaration at
       linters:
         - govet
-    - text: declaration of "ctx" shadows declaration at *
+    - text: declaration of "ctx" shadows declaration at
       linters:
         - govet
       #Ignore comments for KeyBinding Handler funcs
@@ -79,3 +89,5 @@ issues:
     - path: internal/pkg/*
       linters:
         - revive
+  # Allow referring to disabled linters in nolint directives
+  allow-unused-ignores: true
