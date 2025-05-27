@@ -12,7 +12,8 @@ linters-settings:
       - G304
       - G204
   govet:
-    check-shadowing: true
+    enable:
+      - shadow
   gocyclo:
     min-complexity: 12
   maligned:
@@ -30,9 +31,7 @@ linters:
     - vet
     - revive
     - gofmt
-    - deadcode
-    - varcheck
-    - structcheck
+    - unused
     - misspell
     - errcheck
     - gosimple
