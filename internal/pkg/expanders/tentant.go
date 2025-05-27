@@ -55,7 +55,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	defer span.Finish()
 
 	// Get Subscriptions
-	data, err := e.client.DoRequest(ctx, "GET", "/subscriptions?api-version=2018-01-01")
+	data, err := e.getSubscriptionsWithPaging(ctx)
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: e.Name(),
@@ -73,7 +73,7 @@ func (e *TenantExpander) Expand(ctx context.Context, currentItem *TreeNode) Expa
 	if err != nil {
 		return ExpanderResult{
 			SourceDescription: e.Name(),
-			Err:               fmt.Errorf("Failed to load subscriptions: %s", err),
+			Err:               fmt.Errorf("failed to load subscriptions: %w", err),
 			Response: ExpanderResponse{
 				Response:     data,
 				ResponseType: interfaces.ResponsePlainText,
@@ -163,6 +163,70 @@ type SubResponse struct {
 			SpendingLimit       string `json:"spendingLimit"`
 		} `json:"subscriptionPolicies"`
 	} `json:"value"`
+	NextLink string `json:"nextLink,omitempty"`
+}
+
+// getSubscriptionsWithPaging retrieves all subscriptions using pagination
+func (e *TenantExpander) getSubscriptionsWithPaging(ctx context.Context) (string, error) {
+	// Start with the initial request
+	url := "/subscriptions?api-version=2018-01-01"
+	data, err := e.client.DoRequest(ctx, "GET", url)
+	if err != nil {
+		return data, err
+	}
+
+	// Parse initial response to check for nextLink
+	var initialResponse SubResponse
+	err = json.Unmarshal([]byte(data), &initialResponse)
+	if err != nil {
+		return data, fmt.Errorf("failed to parse subscription response: %w", err)
+	}
+
+	// If there's no nextLink, no need for pagination
+	if initialResponse.NextLink == "" {
+		return data, nil
+	}
+
+	// We need to aggregate all subscriptions from all pages
+	var allSubs SubResponse
+	allSubs.Subs = initialResponse.Subs
+
+	// Follow nextLinks until there are no more pages
+	nextLink := initialResponse.NextLink
+	for nextLink != "" {
+		// The nextLink is a full URL, we need to extract just the path+query part for DoRequest
+		// Remove the ARM endpoint part (https://management.azure.com) from the URL
+		path := strings.TrimPrefix(nextLink, "https://management.azure.com")
+
+		// Make the request to the next page
+		pageData, err := e.client.DoRequest(ctx, "GET", path)
+		if err != nil {
+			// Return what we have so far along with the error
+			return "", fmt.Errorf("error retrieving additional subscription pages: %w", err)
+		}
+
+		// Parse this page's response
+		var pageResponse SubResponse
+		err = json.Unmarshal([]byte(pageData), &pageResponse)
+		if err != nil {
+			// Return what we have so far along with the error
+			return "", fmt.Errorf("failed to parse additional subscription page: %w", err)
+		}
+
+		// Add this page's subscriptions to our aggregated list
+		allSubs.Subs = append(allSubs.Subs, pageResponse.Subs...)
+
+		// Update nextLink for the next iteration
+		nextLink = pageResponse.NextLink
+	}
+
+	// Convert the aggregated response back to JSON
+	combinedData, err := json.Marshal(allSubs)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal aggregated subscription list: %w", err)
+	}
+
+	return string(combinedData), nil
 }
 
 func (e *TenantExpander) testCases() (bool, *[]expanderTestCase) {
