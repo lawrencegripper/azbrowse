@@ -56,7 +56,7 @@ func (c SwaggerAPISetARMResources) ExpandResource(ctx context.Context, currentIt
 	method := resourceType.Verb
 	data, err := c.client.DoRequest(ctx, method, currentItem.ExpandURL)
 	if err != nil {
-		err = fmt.Errorf("Failed" + err.Error() + currentItem.ExpandURL)
+		err = fmt.Errorf("Failed: %s URL: %s", err.Error(), currentItem.ExpandURL)
 		return APISetExpandResponse{Response: data, ResponseType: interfaces.ResponseJSON}, err
 	}
 	subResources := []SubResource{}

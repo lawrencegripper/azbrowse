@@ -34,7 +34,7 @@ test: test-go test-python
 ## checks:
 ##		Check/lint code
 checks:
-	golangci-lint run
+	./scripts/lint.sh
 
 ## build: 
 ##		Build azbrowse binary

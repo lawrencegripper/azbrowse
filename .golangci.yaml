@@ -28,7 +28,9 @@ linters-settings:
       - listend
       - analyses
 linters:
-  # Enable specific linters
+  # We only want to enable specific linters for compatibility with old code
+  # These were the ones enabled in the previous version
+  enable-all: false
   enable:
     - revive
     - unused
@@ -37,56 +39,6 @@ linters:
     - govet
     - ineffassign
     - gosec
-  # Explicitly disable staticcheck to avoid new errors
+  # We specifically disable staticcheck to avoid new errors
   disable:
     - staticcheck
-issues:
-  exclude-use-default: false
-  max-per-linter: 0
-  max-same-issues: 0
-  exclude: []
-  exclude-rules:
-    - text: "package-comments: should have a package comment"
-      linters: 
-        - revive
-      #Ignore gocui funcs
-    - text: Error return value of `g.DeleteView` is not checked
-      linters:
-        - errcheck
-    - text: Error return value of `g.SetCurrentView` is not checked
-      linters:
-        - errcheck
-    - text: Error return value of `*.SetCursor` is not checked
-      linters:
-        - errcheck
-    # Ignore fmt.Fprint* errors in UI code
-    - text: Error return value of `fmt.Fprint` is not checked
-      linters:
-        - errcheck
-    - text: Error return value of `fmt.Fprintln` is not checked
-      linters:
-        - errcheck
-      #Ignore shadowed err and ctx variables
-    - text: declaration of "err" shadows declaration at
-      linters:
-        - govet
-    - text: declaration of "ctx" shadows declaration at
-      linters:
-        - govet
-      #Ignore comments for KeyBinding Handler funcs
-    - path: internal/pkg/keybindings/listhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/keybindings/commandpanelhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/keybindings/itemhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/keybindings/globalhandlers.go
-      linters:
-        - revive
-    - path: internal/pkg/*
-      linters:
-        - revive
-  # No need for allow-unused-ignores as we're removing nolint directives referring to old linters
