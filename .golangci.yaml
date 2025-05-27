@@ -1,3 +1,4 @@
+version: 2
 run:
   deadline: 5m
   skip-files: []
@@ -30,7 +31,6 @@ linters:
   enable:
     - vet
     - revive
-    - gofmt
     - unused
     - misspell
     - errcheck
