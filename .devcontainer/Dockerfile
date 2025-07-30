@@ -44,7 +44,7 @@ RUN \
     # --> RPM used by goreleaser
     && apt install -y rpm \
     # Install python3
-    && apt-get -y install python3 python3-pip \
+    && apt-get -y install python3 python3-pip python3-venv \
     && apt-get -y install bash-completion \
     # Clean up
     && apt-get autoremove -y \
