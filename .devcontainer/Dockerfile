@@ -3,7 +3,7 @@ FROM ghcr.io/lawrencegripper/azbrowse/snapbase:latest as builder
 
 # Multi-stage build, only need the snaps from the builder. Copy them one at a
 # time so they can be cached.
-FROM golang:1.24-bullseye
+FROM golang:1.24-bookworm
 LABEL org.opencontainers.image.source https://github.com/lawrencegripper/azbrowse
 
 COPY --from=builder /snap/core /snap/core
@@ -33,13 +33,11 @@ ARG GO_RELEASER_VERSION=1.15.2
 ARG GOLANGCI_LINT_VERSION=1.51.1
 
 RUN \
-    # # Add backports to get updated tool versions (like git)
-    echo 'deb http://deb.debian.org/debian bullseye-backports main' > /etc/apt/sources.list.d/backports.list \
-    && apt-get update \
+    apt-get update \
     && apt-get -y install --no-install-recommends apt-utils dialog fuse nano locales ruby-full gnupg2 snapd sudo locales && locale-gen en_US.UTF-8 \
     #
     # Verify git, process tools, lsb-release (common in install instructions for CLIs) installed
-    && apt-get -y install git/bullseye-backports iproute2 procps lsb-release unzip \
+    && apt-get -y install git iproute2 procps lsb-release unzip \
     # 
     # Install Release Tools
     #
@@ -73,7 +71,7 @@ RUN useradd --create-home --uid $USER_UID -m $USERNAME && usermod -aG sudo $USER
 USER $USERNAME
 
 # Install python deps for deving
-RUN pip3 install rope black
+# RUN pip3 install rope black
 
 # Install ruby bunder gem to support inline gems in ruby scripts
 RUN mkdir /home/$USERNAME/.ruby
