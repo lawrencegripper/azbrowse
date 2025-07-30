@@ -1,1 +1,1 @@
-{"addition_input_file_paths": [], "input_files": ["Microsoft.Network/stable/2022-07-01/dnsresolver.json"], "name": "package-2022-07"}
+{"addition_input_file_paths": [], "input_files": ["Microsoft.Network/stable/2025-05-01/dnsresolver.json", "Microsoft.Network/stable/2025-05-01/dnsresolverpolicy.json"], "name": "package-2025-05"}
