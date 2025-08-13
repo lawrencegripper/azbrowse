@@ -93,8 +93,8 @@ class ApiVersion:
     def to_json(self):
         return json.dumps(self.__dict__, ensure_ascii=False, sort_keys=True)
 
-tag_regex = re.compile("openapi-type: [a-z\\-]+\ntag: ([a-z\\-0-9]*)")
-tag_from_header_regex = re.compile("### Tag: (package-[0-9]{4}-[0-9]{2}.*)")
+tag_regex = re.compile("openapi-type: [a-z\\-]+\n[^`]*tag: ([a-z\\-0-9]*)")
+tag_from_header_regex = re.compile("### Tag: (package-[0-9]{4}-[0-9]{2}.*|package-stable-[0-9]{4}-[0-9]{2}.*)")
 def get_api_version_tag(resource_provider_name, readme_contents, overrides):
     override = overrides.get(resource_provider_name)
     if override != None:
