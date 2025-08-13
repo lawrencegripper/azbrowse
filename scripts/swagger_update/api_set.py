@@ -186,6 +186,21 @@ def copy_api_sets_to_swagger_specs(api_sets, source_folder, target_folder):
         # Doing that would remove the need for these additional checks
         # as well as fixing the problem with definitions referenced back in other folders as with comsmos-db etc
 
+        # Look for `common` folder under the parent of the `resource-manager` folder
+        print(f"source path: {resource_provider_source}")
+        file_helper.copy_child_folder_if_exists(
+            resource_provider_source,
+            resource_provider_target,
+            "../common",
+        )
+        # Look for `common-types` folder under the parent of the `resource-manager` folder
+        print(f"source path: {resource_provider_source}")
+        file_helper.copy_child_folder_if_exists(
+            resource_provider_source,
+            resource_provider_target,
+            "../common-types",
+        )
+
         # Look for `common` folder under the `resource-manager` folder
         file_helper.copy_child_folder_if_exists(
             resource_provider_source,
