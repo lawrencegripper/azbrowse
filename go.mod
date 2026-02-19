@@ -25,7 +25,7 @@ require (
 	github.com/stephanos/clock v0.0.0-20161224195152-e4ec0ab5053e
 	github.com/stretchr/testify v1.10.0
 	github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
-	github.com/valyala/fastjson v1.6.4
+	github.com/valyala/fastjson v1.6.9
 	golang.org/x/time v0.10.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 	gopkg.in/yaml.v2 v2.4.0
