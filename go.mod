@@ -1,6 +1,6 @@
 module github.com/lawrencegripper/azbrowse
 
-go 1.24.0
+go 1.25.0
 
 require (
 	github.com/101loops/bdd v0.0.0-20161224202746-3e71f58e2cc3 // indirect
@@ -26,7 +26,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/stuartleeks/colorjson v0.0.0-20190716084507-afc6888e9ba9
 	github.com/valyala/fastjson v1.6.4
-	golang.org/x/time v0.10.0
+	golang.org/x/time v0.15.0
 	gopkg.in/h2non/gock.v1 v1.1.2
 	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
