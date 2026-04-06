@@ -73,6 +73,88 @@ Running this example would render the following graph:
  0.00 ┼╯     ╰
 ```
 
+### Custom Y-axis value formatting
+
+Use `YAxisValueFormatter(...)` to control how values printed on the Y-axis are rendered.
+This is useful for human-readable units like bytes, durations, or domain-specific labels.
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/guptarohit/asciigraph"
+)
+
+func main() {
+	data := []float64{
+		30 * 1024 * 1024 * 1024,
+		70 * 1024 * 1024 * 1024,
+		2 * 1024 * 1024 * 1024,
+	}
+
+	graph := asciigraph.Plot(data,
+		asciigraph.Height(5),
+		asciigraph.Width(45),
+		asciigraph.YAxisValueFormatter(func(v float64) string {
+			return fmt.Sprintf("%.2f GiB", v/1024/1024/1024)
+		}),
+	)
+
+	fmt.Println(graph)
+}
+```
+
+Running this example would render the following graph:
+```bash
+ 70.00 GiB ┤                 ╭──────╮
+ 56.40 GiB ┤         ╭───────╯      ╰────╮
+ 42.80 GiB ┤  ╭──────╯                   ╰───╮
+ 29.20 GiB ┼──╯                              ╰────╮
+ 15.60 GiB ┤                                      ╰───╮
+  2.00 GiB ┤                                          ╰─
+```
+
+### X-axis Support
+
+Use `XAxisRange(min, max)` to add a labeled X-axis below the graph.
+`XAxisTickCount(n)` controls how many tick marks appear (default 5, minimum 2).
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/guptarohit/asciigraph"
+)
+
+func main() {
+	data := []float64{3, 4, 9, 6, 2, 4, 5, 8, 5, 10, 2, 7, 2, 5, 6}
+	graph := asciigraph.Plot(data,
+		asciigraph.XAxisRange(0, 14),
+		asciigraph.XAxisTickCount(3),
+	)
+
+	fmt.Println(graph)
+}
+```
+
+Running this example would render the following graph:
+```bash
+ 10.00 ┤        ╭╮
+  9.00 ┤ ╭╮     ││
+  8.00 ┤ ││   ╭╮││
+  7.00 ┤ ││   ││││╭╮
+  6.00 ┤ │╰╮  ││││││ ╭
+  5.00 ┤ │ │ ╭╯╰╯│││╭╯
+  4.00 ┤╭╯ │╭╯   ││││
+  3.00 ┼╯  ││    ││││
+  2.00 ┤   ╰╯    ╰╯╰╯
+       └┬──────┬──────┬
+        0      7     14
+```
+
 ### Colored graphs
 
 ```go
@@ -205,18 +287,24 @@ Options:
     	upper bound set the maximum value for the vertical axis (ignored if series contains larger values) (default -Inf)
   -w width
     	width in columns, 0 for auto-scaling
+  -xmax value
+    	x-axis maximum value (default NaN)
+  -xmin value
+    	x-axis minimum value (default NaN)
+  -xt tick count
+    	x-axis tick count (default 5, minimum 2)
 asciigraph expects data points from stdin. Invalid values are logged to stderr.
 ```
 
 
 Feed it data points via stdin:
 ```bash
-seq 1 72 | asciigraph -h 10 -c "plot data from stdin"
+seq 1 72 | asciigraph -h 10 -c "plot data from stdin" -xmin 0 -xmax 40 -xt 5
 ```
 
 or use Docker image:
 ```bash
-seq 1 72 | docker run -i --rm ghcr.io/guptarohit/asciigraph -h 10 -c "plot data from stdin"
+seq 1 72 | docker run -i --rm ghcr.io/guptarohit/asciigraph -h 10 -c "plot data from stdin" -xmin 0 -xmax 40 -xt 5
 ```
 
 Output:
@@ -233,6 +321,8 @@ Output:
  15.20 ┤         ╭──────╯
   8.10 ┤  ╭──────╯
   1.00 ┼──╯
+       └┬─────────────────┬─────────────────┬────────────────┬─────────────────┬
+        0                10                20               30                40
                                   plot data from stdin
 ```
 

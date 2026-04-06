@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"strings"
+	"unicode/utf8"
 )
 
 // Plot returns ascii graph for a series.
@@ -12,12 +13,53 @@ func Plot(series []float64, options ...Option) string {
 	return PlotMany([][]float64{series}, options...)
 }
 
+// getCharSet returns the CharSet for a given series index, falling back to DefaultCharSet.
+func getCharSet(config *config, seriesIndex int) CharSet {
+	if seriesIndex < len(config.SeriesChars) {
+		charSet := config.SeriesChars[seriesIndex]
+		// Fill in any empty fields with defaults
+		if charSet.Horizontal == "" {
+			charSet.Horizontal = DefaultCharSet.Horizontal
+		}
+		if charSet.VerticalLine == "" {
+			charSet.VerticalLine = DefaultCharSet.VerticalLine
+		}
+		if charSet.ArcDownRight == "" {
+			charSet.ArcDownRight = DefaultCharSet.ArcDownRight
+		}
+		if charSet.ArcDownLeft == "" {
+			charSet.ArcDownLeft = DefaultCharSet.ArcDownLeft
+		}
+		if charSet.ArcUpRight == "" {
+			charSet.ArcUpRight = DefaultCharSet.ArcUpRight
+		}
+		if charSet.ArcUpLeft == "" {
+			charSet.ArcUpLeft = DefaultCharSet.ArcUpLeft
+		}
+		if charSet.EndCap == "" {
+			charSet.EndCap = DefaultCharSet.EndCap
+		}
+		if charSet.StartCap == "" {
+			charSet.StartCap = DefaultCharSet.StartCap
+		}
+		if charSet.UpRight == "" {
+			charSet.UpRight = DefaultCharSet.UpRight
+		}
+		if charSet.DownHorizontal == "" {
+			charSet.DownHorizontal = DefaultCharSet.DownHorizontal
+		}
+		return charSet
+	}
+	return DefaultCharSet
+}
+
 // PlotMany returns ascii graph for multiple series.
 func PlotMany(data [][]float64, options ...Option) string {
 	var logMaximum float64
 	config := configure(config{
-		Offset:    3,
-		Precision: 2,
+		Offset:     3,
+		Precision:  nil,
+		LineEnding: "\n",
 	}, options)
 
 	// Create a deep copy of the input data
@@ -103,7 +145,11 @@ func PlotMany(data [][]float64, options ...Option) string {
 		plot[i] = line
 	}
 
-	precision := config.Precision
+	var precision uint = 2 //Default precision to maintain backwards compatibility
+	if config.Precision != nil {
+		precision = *config.Precision
+	}
+
 	logMaximum = math.Log10(math.Max(math.Abs(maximum), math.Abs(minimum))) //to find number of zeros after decimal
 	if minimum == float64(0) && maximum == float64(0) {
 		logMaximum = float64(-1)
@@ -117,26 +163,55 @@ func PlotMany(data [][]float64, options ...Option) string {
 		} else {
 			precision += uint(math.Abs(logMaximum) - 1.0)
 		}
-	} else if logMaximum > 2 {
+	} else if logMaximum > 2 && config.Precision == nil {
 		precision = 0
 	}
 
-	maxNumLength := len(fmt.Sprintf("%0.*f", precision, maximum))
-	minNumLength := len(fmt.Sprintf("%0.*f", precision, minimum))
-	maxWidth := int(math.Max(float64(maxNumLength), float64(minNumLength)))
+	maxNumLength := utf8.RuneCountInString(fmt.Sprintf("%0.*f", precision, maximum))
+	minNumLength := utf8.RuneCountInString(fmt.Sprintf("%0.*f", precision, minimum))
+	magnitudes := make([]float64, 0, rows+1)
+	if config.YAxisValueFormatter != nil {
+		maxNumLength = 0
+	}
 
-	// axis and labels
+	// calculate Y-axis values and the width when formatted using the YAxisValueFormatter
 	for y := intmin2; y < intmax2+1; y++ {
 		var magnitude float64
-		if rows > 0 {
+		if rows > 0 && interval > 0 {
 			magnitude = maximum - (float64(y-intmin2) * interval / float64(rows))
+		} else if interval == 0 {
+			magnitude = minimum
 		} else {
 			magnitude = float64(y)
 		}
+		magnitudes = append(magnitudes, magnitude)
 
-		label := fmt.Sprintf("%*.*f", maxWidth+1, precision, magnitude)
-		w := y - intmin2
-		h := int(math.Max(float64(config.Offset)-float64(len(label)), 0))
+		if config.YAxisValueFormatter != nil {
+			l := utf8.RuneCountInString(config.YAxisValueFormatter(magnitude))
+			if l > maxNumLength {
+				maxNumLength = l
+			}
+		}
+	}
+	var maxWidth int
+	if config.YAxisValueFormatter != nil {
+		maxWidth = maxNumLength
+	} else {
+		maxWidth = int(math.Max(float64(maxNumLength), float64(minNumLength)))
+	}
+	leftPad := config.Offset + maxWidth
+
+	// axis and labels reusing the previously calculated values
+	for w, magnitude := range magnitudes {
+		var label string
+		if config.YAxisValueFormatter == nil {
+			label = fmt.Sprintf("%*.*f", maxWidth+1, precision, magnitude)
+		} else {
+			val := config.YAxisValueFormatter(magnitude)
+			label = strings.Repeat(" ", maxWidth+1-utf8.RuneCountInString(val)) + val
+		}
+
+		h := int(math.Max(float64(config.Offset)-float64(utf8.RuneCountInString(label)), 0))
 
 		plot[w][h].Text = label
 		plot[w][h].Color = config.LabelColor
@@ -151,6 +226,9 @@ func PlotMany(data [][]float64, options ...Option) string {
 		if i < len(config.SeriesColors) {
 			color = config.SeriesColors[i]
 		}
+
+		// Get the character set for this series
+		charSet := getCharSet(config, i)
 
 		var y0, y1 int
 
@@ -170,14 +248,14 @@ func PlotMany(data [][]float64, options ...Option) string {
 
 			if math.IsNaN(d1) && !math.IsNaN(d0) {
 				y0 = int(round(d0*ratio) - float64(intmin2))
-				plot[rows-y0][x+config.Offset].Text = "╴"
+				plot[rows-y0][x+config.Offset].Text = charSet.EndCap
 				plot[rows-y0][x+config.Offset].Color = color
 				continue
 			}
 
 			if math.IsNaN(d0) && !math.IsNaN(d1) {
 				y1 = int(round(d1*ratio) - float64(intmin2))
-				plot[rows-y1][x+config.Offset].Text = "╶"
+				plot[rows-y1][x+config.Offset].Text = charSet.StartCap
 				plot[rows-y1][x+config.Offset].Color = color
 				continue
 			}
@@ -186,20 +264,20 @@ func PlotMany(data [][]float64, options ...Option) string {
 			y1 = int(round(d1*ratio) - float64(intmin2))
 
 			if y0 == y1 {
-				plot[rows-y0][x+config.Offset].Text = "─"
+				plot[rows-y0][x+config.Offset].Text = charSet.Horizontal
 			} else {
 				if y0 > y1 {
-					plot[rows-y1][x+config.Offset].Text = "╰"
-					plot[rows-y0][x+config.Offset].Text = "╮"
+					plot[rows-y1][x+config.Offset].Text = charSet.ArcUpRight
+					plot[rows-y0][x+config.Offset].Text = charSet.ArcDownLeft
 				} else {
-					plot[rows-y1][x+config.Offset].Text = "╭"
-					plot[rows-y0][x+config.Offset].Text = "╯"
+					plot[rows-y1][x+config.Offset].Text = charSet.ArcDownRight
+					plot[rows-y0][x+config.Offset].Text = charSet.ArcUpLeft
 				}
 
 				start := int(math.Min(float64(y0), float64(y1))) + 1
 				end := int(math.Max(float64(y0), float64(y1)))
 				for y := start; y < end; y++ {
-					plot[rows-y][x+config.Offset].Text = "│"
+					plot[rows-y][x+config.Offset].Text = charSet.VerticalLine
 				}
 			}
 
@@ -215,7 +293,7 @@ func PlotMany(data [][]float64, options ...Option) string {
 	var lines bytes.Buffer
 	for h, horizontal := range plot {
 		if h != 0 {
-			lines.WriteRune('\n')
+			lines.WriteString(config.LineEnding)
 		}
 
 		// remove trailing spaces
@@ -241,10 +319,15 @@ func PlotMany(data [][]float64, options ...Option) string {
 		}
 	}
 
+	// add x-axis if configured
+	if config.XAxisRange != nil {
+		addXAxis(&lines, config, lenMax, leftPad)
+	}
+
 	// add caption if not empty
 	if config.Caption != "" {
-		lines.WriteRune('\n')
-		lines.WriteString(strings.Repeat(" ", config.Offset+maxWidth))
+		lines.WriteString(config.LineEnding)
+		lines.WriteString(strings.Repeat(" ", leftPad))
 		if len(config.Caption) < lenMax {
 			lines.WriteString(strings.Repeat(" ", (lenMax-len(config.Caption))/2))
 		}
@@ -258,8 +341,161 @@ func PlotMany(data [][]float64, options ...Option) string {
 	}
 
 	if len(config.SeriesLegends) > 0 {
-		addLegends(&lines, config, lenMax, config.Offset+maxWidth)
+		addLegends(&lines, config, lenMax, leftPad)
 	}
 
 	return lines.String()
+}
+
+// defaultXAxisFormatter formats X-axis tick values using %g.
+var defaultXAxisFormatter XAxisValueFormatterFunc = func(v float64) string {
+	return fmt.Sprintf("%g", v)
+}
+
+// addXAxis appends an X-axis line and tick labels below the plot body.
+func addXAxis(lines *bytes.Buffer, config *config, lenMax int, leftPad int) {
+	if lenMax <= 0 {
+		return
+	}
+
+	xMin := config.XAxisRange[0]
+	xMax := config.XAxisRange[1]
+
+	tickCount := config.XAxisTickCount
+	if lenMax == 1 {
+		tickCount = 1
+	} else if tickCount < 2 {
+		tickCount = 5
+	}
+	if tickCount > lenMax {
+		tickCount = lenMax
+	}
+
+	formatter := config.XAxisValueFormatter
+
+	// compute tick column positions and values
+	type tick struct {
+		col   int
+		value float64
+		label string
+	}
+	ticks := make([]tick, tickCount)
+	for i := 0; i < tickCount; i++ {
+		if tickCount == 1 {
+			ticks[i].col = 0
+			ticks[i].value = xMin
+		} else {
+			ticks[i].value = xMin + float64(i)/float64(tickCount-1)*(xMax-xMin)
+			ticks[i].col = int(math.Round(float64(lenMax-1) * float64(i) / float64(tickCount-1)))
+		}
+	}
+
+	// select formatter: when using default, auto-detect precision based on visible ticks
+	if formatter == nil {
+		// simulate overlap with %g labels to find visible ticks with fractional values
+		hasDecimal := false
+		lastEnd := -1
+		for i := range ticks {
+			label := defaultXAxisFormatter(ticks[i].value)
+			labelLen := utf8.RuneCountInString(label)
+			startCol := leftPad + ticks[i].col - labelLen/2
+			if startCol < 0 {
+				startCol = 0
+			}
+			if startCol > lastEnd {
+				if ticks[i].value != math.Floor(ticks[i].value) {
+					hasDecimal = true
+					break
+				}
+				lastEnd = startCol + labelLen
+			}
+		}
+		if hasDecimal {
+			formatter = func(v float64) string { return fmt.Sprintf("%.2f", v) }
+		} else {
+			formatter = defaultXAxisFormatter
+		}
+	}
+
+	// format labels
+	for i := range ticks {
+		ticks[i].label = formatter(ticks[i].value)
+	}
+
+	// axis line: leftPad-1 spaces + └ + ─/┬ characters
+	totalWidth := leftPad + lenMax
+	axisLine := make([]rune, totalWidth)
+	for i := range axisLine {
+		axisLine[i] = ' '
+	}
+	axisLine[leftPad-1] = []rune(DefaultCharSet.UpRight)[0]
+	for i := 0; i < lenMax; i++ {
+		axisLine[leftPad+i] = []rune(DefaultCharSet.Horizontal)[0]
+	}
+	for _, tk := range ticks {
+		axisLine[leftPad+tk.col] = []rune(DefaultCharSet.DownHorizontal)[0]
+	}
+
+	// write axis line with colors
+	lines.WriteString(config.LineEnding)
+	axisStr := strings.TrimRight(string(axisLine), " ")
+	if config.AxisColor != Default {
+		lines.WriteString(config.AxisColor.String())
+	}
+	lines.WriteString(axisStr)
+	if config.AxisColor != Default {
+		lines.WriteString(Default.String())
+	}
+
+	// label line: place each label centered on its tick column
+	maxRightExtent := totalWidth
+	for _, tk := range ticks {
+		labelLen := utf8.RuneCountInString(tk.label)
+		endCol := leftPad + tk.col + (labelLen - labelLen/2)
+		if endCol > maxRightExtent {
+			maxRightExtent = endCol
+		}
+	}
+	labelLine := make([]rune, maxRightExtent)
+	for i := range labelLine {
+		labelLine[i] = ' '
+	}
+
+	lastEnd := -1 // tracks the rightmost column used by the previous label
+	for _, tk := range ticks {
+		labelRunes := []rune(tk.label)
+		labelLen := len(labelRunes)
+
+		// center the label on the tick column
+		startCol := leftPad + tk.col - labelLen/2
+		if startCol < 0 {
+			startCol = 0
+		}
+
+		// skip if this label would overlap the previous one (need 1-space gap)
+		if startCol <= lastEnd {
+			continue
+		}
+
+		for j, r := range labelRunes {
+			pos := startCol + j
+			if pos < len(labelLine) {
+				labelLine[pos] = r
+			}
+		}
+		lastEnd = startCol + labelLen
+	}
+
+	// trim and write label line
+	labelStr := strings.TrimRight(string(labelLine), " ")
+	if labelStr != "" {
+		lines.WriteString(config.LineEnding)
+		if config.LabelColor != Default {
+			lines.WriteString(config.LabelColor.String())
+		}
+		lines.WriteString(labelStr)
+		if config.LabelColor != Default {
+			lines.WriteString(Default.String())
+		}
+	}
 }

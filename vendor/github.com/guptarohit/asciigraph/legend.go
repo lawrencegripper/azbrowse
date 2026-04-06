@@ -21,14 +21,21 @@ func createLegendItem(text string, color AnsiColor) (string, int) {
 
 // Add legend for each series added to the graph
 func addLegends(lines *bytes.Buffer, config *config, lenMax int, leftPad int) {
-	lines.WriteString("\n\n")
+	lines.WriteString(config.LineEnding)
+	lines.WriteString(config.LineEnding)
 	lines.WriteString(strings.Repeat(" ", leftPad))
 
 	var legendsText string
 	var legendsTextLen int
 	rightPad := 3
 	for i, text := range config.SeriesLegends {
-		item, itemLen := createLegendItem(text, config.SeriesColors[i])
+		// Use default color if SeriesColors is not set or index is out of range
+		color := Default
+		if i < len(config.SeriesColors) {
+			color = config.SeriesColors[i]
+		}
+
+		item, itemLen := createLegendItem(text, color)
 		legendsText += item
 		legendsTextLen += itemLen
 

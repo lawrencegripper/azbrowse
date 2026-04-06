@@ -2,6 +2,53 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.9.0](https://github.com/guptarohit/asciigraph/compare/v0.8.1...v0.9.0) (2026-03-28)
+
+
+### Added
+
+* **plot:** add X-axis rendering with tick marks and labels ([#78](https://github.com/guptarohit/asciigraph/pull/78))
+* **cli:** add -xmin, -xmax, and -xt flags for X-axis support ([#78](https://github.com/guptarohit/asciigraph/pull/78))
+
+
+### Fixed
+
+* **docker:** add OCI labels to Dockerfile for ghcr.io metadata ([#76](https://github.com/guptarohit/asciigraph/issues/76)) ([02f3e4a](https://github.com/guptarohit/asciigraph/commit/02f3e4a0f5136d710be39c407f77cfffc384821b))
+
+## [0.8.1](https://github.com/guptarohit/asciigraph/compare/v0.8.0...v0.8.1) (2026-03-08)
+
+
+### Fixed
+
+* 32-bit compile overflow and release workflow cleanup ([451bece](https://github.com/guptarohit/asciigraph/commit/451becef290c1c8e1d114d73cbe60a05fb5e7c0c))
+* 32-bit compile overflow and release workflow cleanup ([#74](https://github.com/guptarohit/asciigraph/issues/74)) ([7f76123](https://github.com/guptarohit/asciigraph/commit/7f7612366a79f8ef909c872dcb5df677cf4a9fbb))
+
+
+### Changed
+
+* **axis:** remove minNumLength sentinel from formatter path ([8a81a67](https://github.com/guptarohit/asciigraph/commit/8a81a6718d59db385822e454ecc2e5a387011845))
+
+## [0.8.0] - (2026-03-08)
+
+
+### Added
+
+* Option to format Y-axis values with `YAxisValueFormatter(...)` ([#58](https://github.com/guptarohit/asciigraph/pull/58))
+* Option to customize plot characters with `SeriesChars(...)` and `CreateCharSet(...)` ([#70](https://github.com/guptarohit/asciigraph/pull/70))
+* CLI: `-x` flag to specify custom characters, including comma-separated values for multiple series ([#70](https://github.com/guptarohit/asciigraph/pull/70))
+* Option to configure line endings for raw terminals ([#71](https://github.com/guptarohit/asciigraph/pull/71))
+
+
+### Fixed
+
+* Respect caller-specified precision for large numbers ([#69](https://github.com/guptarohit/asciigraph/pull/69))
+* Preserve exact Y-axis values for series with identical data points ([#65](https://github.com/guptarohit/asciigraph/pull/65)), closes [#61](https://github.com/guptarohit/asciigraph/issues/61)
+* Prevent panics when legends are set without series colors ([#64](https://github.com/guptarohit/asciigraph/pull/64))
+
+### Changed
+
+* Automates the release flow, update goreleaser config for v2 ([#72](https://github.com/guptarohit/asciigraph/pull/72))
+
 ## [0.7.3] - 2024-10-26
 
 ### Fixed
@@ -99,6 +146,8 @@ All notable changes to this project will be documented in this file.
 - Prevent panics when data is flat. (#8)
 - Prevent BADPREC issue when maximum and minimum values in a series are 0. (#10)
 
+[0.8.0]: https://github.com/guptarohit/asciigraph/releases/tag/v0.8.0
+[0.7.3]: https://github.com/guptarohit/asciigraph/releases/tag/v0.7.3
 [0.7.2]: https://github.com/guptarohit/asciigraph/releases/tag/v0.7.2
 [0.7.1]: https://github.com/guptarohit/asciigraph/releases/tag/v0.7.1
 [0.7.0]: https://github.com/guptarohit/asciigraph/releases/tag/v0.7.0
