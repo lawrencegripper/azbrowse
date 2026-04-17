@@ -72,18 +72,20 @@ type AccessToken struct {
 	ClientID          string            `json:"client_id,omitempty"`
 	Secret            string            `json:"secret,omitempty"`
 	Scopes            string            `json:"target,omitempty"`
+	RefreshOn         internalTime.Unix `json:"refresh_on,omitempty"`
 	ExpiresOn         internalTime.Unix `json:"expires_on,omitempty"`
 	ExtendedExpiresOn internalTime.Unix `json:"extended_expires_on,omitempty"`
 	CachedAt          internalTime.Unix `json:"cached_at,omitempty"`
 	UserAssertionHash string            `json:"user_assertion_hash,omitempty"`
 	TokenType         string            `json:"token_type,omitempty"`
 	AuthnSchemeKeyID  string            `json:"keyid,omitempty"`
+	ExtCacheKey       string            `json:"ext_cache_key,omitempty"`
 
 	AdditionalFields map[string]interface{}
 }
 
 // NewAccessToken is the constructor for AccessToken.
-func NewAccessToken(homeID, env, realm, clientID string, cachedAt, expiresOn, extendedExpiresOn time.Time, scopes, token, tokenType, authnSchemeKeyID string) AccessToken {
+func NewAccessToken(homeID, env, realm, clientID string, cachedAt, refreshOn, expiresOn, extendedExpiresOn time.Time, scopes, token, tokenType, authnSchemeKeyID string) AccessToken {
 	return AccessToken{
 		HomeAccountID:     homeID,
 		Environment:       env,
@@ -93,6 +95,7 @@ func NewAccessToken(homeID, env, realm, clientID string, cachedAt, expiresOn, ex
 		Secret:            token,
 		Scopes:            scopes,
 		CachedAt:          internalTime.Unix{T: cachedAt.UTC()},
+		RefreshOn:         internalTime.Unix{T: refreshOn.UTC()},
 		ExpiresOn:         internalTime.Unix{T: expiresOn.UTC()},
 		ExtendedExpiresOn: internalTime.Unix{T: extendedExpiresOn.UTC()},
 		TokenType:         tokenType,
@@ -102,15 +105,22 @@ func NewAccessToken(homeID, env, realm, clientID string, cachedAt, expiresOn, ex
 
 // Key outputs the key that can be used to uniquely look up this entry in a map.
 func (a AccessToken) Key() string {
-	key := strings.Join(
-		[]string{a.HomeAccountID, a.Environment, a.CredentialType, a.ClientID, a.Realm, a.Scopes},
-		shared.CacheKeySeparator,
-	)
+	ks := []string{a.HomeAccountID, a.Environment, a.CredentialType, a.ClientID, a.Realm, a.Scopes}
+
 	// add token type to key for new access tokens types. skip for bearer token type to
 	// preserve fwd and back compat between a common cache and msal clients
 	if !strings.EqualFold(a.TokenType, authority.AccessTokenTypeBearer) {
-		key = strings.Join([]string{key, a.TokenType}, shared.CacheKeySeparator)
+		ks = append(ks, a.TokenType)
 	}
+	// add extra body param hash to key if present
+	if a.ExtCacheKey != "" {
+		ks[2] = "atext" // if the there is extra cache we add "atext" to the key replacing accesstoken
+		ks = append(ks, a.ExtCacheKey)
+	}
+	key := strings.Join(
+		ks,
+		shared.CacheKeySeparator,
+	)
 	return strings.ToLower(key)
 }
 

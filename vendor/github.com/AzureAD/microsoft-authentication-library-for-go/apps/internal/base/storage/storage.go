@@ -135,7 +135,8 @@ func (m *Manager) Read(ctx context.Context, authParameters authority.AuthParams)
 		aliases = metadata.Aliases
 	}
 
-	accessToken := m.readAccessToken(homeAccountID, aliases, realm, clientID, scopes, tokenType, authnSchemeKeyID)
+	accessToken := m.readAccessToken(homeAccountID, aliases, realm, clientID, scopes, tokenType, authnSchemeKeyID, authParameters.CacheExtKeyGenerator())
+
 	tr.AccessToken = accessToken
 
 	if homeAccountID == "" {
@@ -173,6 +174,7 @@ func (m *Manager) Write(authParameters authority.AuthParams, tokenResponse acces
 	environment := authParameters.AuthorityInfo.Host
 	realm := authParameters.AuthorityInfo.Tenant
 	clientID := authParameters.ClientID
+
 	target := strings.Join(tokenResponse.GrantedScopes.Slice, scopeSeparator)
 	cachedAt := time.Now()
 	authnSchemeKeyID := authParameters.AuthnScheme.KeyID()
@@ -193,7 +195,8 @@ func (m *Manager) Write(authParameters authority.AuthParams, tokenResponse acces
 			realm,
 			clientID,
 			cachedAt,
-			tokenResponse.ExpiresOn.T,
+			tokenResponse.RefreshOn.T,
+			tokenResponse.ExpiresOn,
 			tokenResponse.ExtExpiresOn.T,
 			target,
 			tokenResponse.AccessToken,
@@ -201,6 +204,7 @@ func (m *Manager) Write(authParameters authority.AuthParams, tokenResponse acces
 			authnSchemeKeyID,
 		)
 
+		accessToken.ExtCacheKey = authParameters.CacheExtKeyGenerator()
 		// Since we have a valid access token, cache it before moving on.
 		if err := accessToken.Validate(); err == nil {
 			if err := m.writeAccessToken(accessToken); err != nil {
@@ -265,6 +269,9 @@ func (m *Manager) aadMetadataFromCache(ctx context.Context, authorityInfo author
 }
 
 func (m *Manager) aadMetadata(ctx context.Context, authorityInfo authority.Info) (authority.InstanceDiscoveryMetadata, error) {
+	if m.requests == nil {
+		return authority.InstanceDiscoveryMetadata{}, fmt.Errorf("httpclient in oauth instance for fetching metadata is nil")
+	}
 	m.aadCacheMu.Lock()
 	defer m.aadCacheMu.Unlock()
 	discoveryResponse, err := m.requests.AADInstanceDiscovery(ctx, authorityInfo)
@@ -286,26 +293,49 @@ func (m *Manager) aadMetadata(ctx context.Context, authorityInfo authority.Info)
 	return m.aadCache[authorityInfo.Host], nil
 }
 
-func (m *Manager) readAccessToken(homeID string, envAliases []string, realm, clientID string, scopes []string, tokenType, authnSchemeKeyID string) AccessToken {
+func (m *Manager) readAccessToken(homeID string, envAliases []string, realm, clientID string, scopes []string, tokenType, authnSchemeKeyID, extCacheKey string) AccessToken {
 	m.contractMu.RLock()
-	// TODO: linear search (over a map no less) is slow for a large number (thousands) of tokens.
-	// this shows up as the dominating node in a profile. for real-world scenarios this likely isn't
-	// an issue, however if it does become a problem then we know where to look.
-	for k, at := range m.contract.AccessTokens {
+
+	tokensToSearch := m.contract.AccessTokens
+
+	for k, at := range tokensToSearch {
+		// TODO: linear search (over a map no less) is slow for a large number (thousands) of tokens.
+		// this shows up as the dominating node in a profile. for real-world scenarios this likely isn't
+		// an issue, however if it does become a problem then we know where to look.
 		if at.HomeAccountID == homeID && at.Realm == realm && at.ClientID == clientID {
-			if (strings.EqualFold(at.TokenType, tokenType) && at.AuthnSchemeKeyID == authnSchemeKeyID) || (at.TokenType == "" && (tokenType == "" || tokenType == "Bearer")) {
-				if checkAlias(at.Environment, envAliases) && isMatchingScopes(scopes, at.Scopes) {
-					m.contractMu.RUnlock()
-					if needsUpgrade(k) {
-						m.contractMu.Lock()
-						defer m.contractMu.Unlock()
-						at = upgrade(m.contract.AccessTokens, k)
+			// Match token type and authentication scheme
+			tokenTypeMatch := (strings.EqualFold(at.TokenType, tokenType) && at.AuthnSchemeKeyID == authnSchemeKeyID) ||
+				(at.TokenType == "" && (tokenType == "" || tokenType == "Bearer"))
+			environmentAndScopesMatch := checkAlias(at.Environment, envAliases) && isMatchingScopes(scopes, at.Scopes)
+
+			if tokenTypeMatch && environmentAndScopesMatch {
+				// For hashed tokens, check that the key contains the hash
+				if extCacheKey != "" {
+					if !strings.Contains(k, extCacheKey) {
+						continue // Skip this token if the key doesn't contain the hash
 					}
+				} else {
+					// If no extCacheKey is provided, only match tokens that also have no extCacheKey
+					if at.ExtCacheKey != "" {
+						continue // Skip tokens that require a hash when no hash is provided
+					}
+				}
+				// Handle token upgrade if needed
+				if needsUpgrade(k) {
+					m.contractMu.RUnlock()
+					m.contractMu.Lock()
+					at = upgrade(tokensToSearch, k)
+					m.contractMu.Unlock()
 					return at
 				}
+
+				m.contractMu.RUnlock()
+				return at
 			}
 		}
 	}
+
+	// No token found, unlock and return empty token
 	m.contractMu.RUnlock()
 	return AccessToken{}
 }
@@ -459,6 +489,7 @@ func (m *Manager) readAccount(homeAccountID string, envAliases []string, realm s
 
 func (m *Manager) writeAccount(account shared.Account) error {
 	key := account.Key()
+
 	m.contractMu.Lock()
 	defer m.contractMu.Unlock()
 	m.contract.Accounts[key] = account
