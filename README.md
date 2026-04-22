@@ -9,7 +9,7 @@ An interactive CLI for browsing azure resources, inspired by [resources.azure.co
 
 ## Status
 
-This is a pet project which has matured thanks to support from awesome contributions.
+This is **no longer actively maintained**. If you are interested in taking the project forward please consider setting up a fork.
 
 [![asciicast](https://asciinema.org/a/325237.svg)](https://asciinema.org/a/325237)
 
